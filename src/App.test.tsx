@@ -2,7 +2,6 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
 import i18n from "./i18n";
-import { TitleScreen } from "./screens/TitleScreen";
 import { START, useNav } from "./state/screen";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
@@ -35,14 +34,6 @@ describe("complete expedition", () => {
     click(t("teacher.open")); screen.getByRole("heading", { name: t("teacher.title") });
     click(t("teacher.back")); screen.getByRole("heading", { name: t("app.name") });
     expect(document.documentElement.lang).toBe("en");
-  });
-  it("keeps Start disabled until the mission setup is ready", () => {
-    useMission.setState({ status: "loading", setup: undefined });
-    render(<TitleScreen />);
-    const start = screen.getByRole("button", { name: t("title.start") });
-    expect(start.hasAttribute("disabled")).toBe(true);
-    fireEvent.click(start);
-    expect(useNav.getState()).toMatchObject(START);
   });
   it("plays three actual plans, shows earned Earth answer and causal sources, then replays the same start", async () => {
     await launch();

@@ -18,7 +18,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         menu: resolve(projectRoot, "index.html"),
-        mission: resolve(projectRoot, "mission.html"),
         hub: resolve(projectRoot, "hub.html"),
         console: resolve(projectRoot, "console.html"),
       },

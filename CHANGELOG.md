@@ -4,7 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [0.1.0] — 2026-11-14
 
-First playable hackathon build. [Play it](https://yyn192.github.io/impossible-solution/).
+First playable hackathon build. [Play it](https://impossible-solution.vercel.app).
 
 ### Added
 

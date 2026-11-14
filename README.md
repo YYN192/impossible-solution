@@ -1,13 +1,12 @@
 <div align="center">
 
-# The Impossible SOLution
+# Can you keep 3 astronauts safe through a real Mars solar storm?
 
-**Run a Mars base on real NASA data. Fix it now, or pay for it later.**
+**The Impossible SOLution** is a browser game for kids aged 7–12 and their classrooms, in English and Bulgarian, made in Sofia, Bulgaria by team SoftUniors.
 
-A browser game for kids aged 7–12 where no choice is free.
+It turns real NASA storm and radiation data into hard choices, so kids learn that on Mars every decision costs something and the cost can arrive days later.
 
-<a href="https://impossible-solution.vercel.app"><strong>▶ Play now</strong></a> ·
-<a href="https://yyn192.github.io/impossible-solution/">Mirror (GitHub Pages)</a> ·
+<a href="https://impossible-solution.vercel.app"><strong>▶ Play now: https://impossible-solution.vercel.app</strong></a> ·
 <a href="#quick-start">🚀 Quick start</a> ·
 <a href="#nasa-data">🛰️ NASA data</a> ·
 <a href="docs/README.md">📚 Docs</a> ·

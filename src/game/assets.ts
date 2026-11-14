@@ -1,5 +1,5 @@
 /** Vite resolves all sprite URLs at build time, including separate animation frames. */
-const urls = import.meta.glob<string>(["../assets/pixel/**/*.png", "!../assets/pixel/astronaut.png"], {
+const urls = import.meta.glob<string>(["../assets/pixel/**/*.png", "!../assets/pixel/ui/**"], {
   eager: true, query: "?url", import: "default",
 });
 export function asset(path: string): string {
