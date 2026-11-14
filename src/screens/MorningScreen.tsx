@@ -1,17 +1,17 @@
 import { useTranslation } from "react-i18next";
+import { DominoCard } from "../components/DominoCard";
+import { ScreenFrame } from "../components/ScreenFrame";
 import { tDynamic } from "../i18n/dynamic";
 import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "../state/game";
 import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
-import { DominoCard } from "./DominoCard";
 import {
   pickMorning,
   type Extra,
   type MorningReport,
 } from "./morning/pickMorning";
-import { ScreenFrame } from "./ScreenFrame";
 
 /**
  * Morning report (#13): the domino that just fell comes first ("⚡↓ because 🧽✗"),

@@ -3,6 +3,9 @@ import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createGame, stars } from "../sim/engine";
 import { MISSION_SOLS } from "../sim/types";
+import { JOBS } from "../sim/types";
+import { DEMO_CHAIN_IDS, DEMO_PLANS } from "../data/demo";
+import { readFlags } from "../data/flags";
 import { FinalScreen } from "../screens/FinalScreen";
 import { MorningScreen } from "../screens/MorningScreen";
 import { useGame } from "./game";
@@ -74,13 +77,59 @@ describe("game store (real engine)", () => {
             sol: 1,
             kind: "particleBurst",
             captionKey: "event.burst.may2024",
-            source: { label: "x", url: "https://example.org", mode: "snapshot" },
+            source: {
+              label: "x",
+              url: "https://example.org",
+              mode: "snapshot",
+            },
           },
         ],
         forecasts: {},
       } as never,
     });
     useGame.getState().endSol({});
-    expect(useGame.getState().fell.map((d) => d.id)).toContain("sol1-dose-high");
+    expect(useGame.getState().fell.map((d) => d.id)).toContain(
+      "sol1-dose-high",
+    );
+  });
+
+  it("can step safely before mission data has loaded", () => {
+    useMission.setState({ status: "loading", setup: undefined });
+
+    expect(() => useGame.getState().endSol({})).not.toThrow();
+    expect(useGame.getState().state.sol).toBe(2);
+  });
+
+  it("?demo=1 replays the same real-engine chain every time, fully offline", async () => {
+    const flags = readFlags("?demo=1&offline=1&sun=today");
+    expect(flags).toEqual({ demo: true, offline: true, todaysSun: false });
+    await useMission.getState().load(flags);
+
+    const replay = () => {
+      useGame.getState().reset();
+      expect(DEMO_PLANS[1].a1).toBe("greenhouse");
+      for (const [index, plan] of DEMO_PLANS.entries()) {
+        if (index === 1) {
+          expect(useGame.getState().state.bars.power).toBeLessThan(
+            JOBS.greenhouse.powerCost,
+          );
+        }
+        useGame.getState().endSol(plan);
+      }
+      return structuredClone(useGame.getState().state);
+    };
+
+    const first = replay();
+    const second = replay();
+    expect(second).toEqual(first);
+
+    const byId = new Map(first.dominoes.map((domino) => [domino.id, domino]));
+    expect(DEMO_CHAIN_IDS.every((id) => byId.has(id))).toBe(true);
+    for (let i = 1; i < DEMO_CHAIN_IDS.length; i++) {
+      expect(byId.get(DEMO_CHAIN_IDS[i])?.causeIds).toContain(
+        DEMO_CHAIN_IDS[i - 1],
+      );
+    }
+    expect(first.over).toBe(true);
   });
 });

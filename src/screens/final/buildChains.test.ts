@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Domino } from "../../sim/types";
-import { FAKE_DOMINOES } from "../fakeGame";
+import { FAKE_DOMINOES } from "../../test/fixtures/fakeGame";
 import { buildChains } from "./buildChains";
 
 const d = (id: string, causeIds: string[] = [], sol = 1): Domino => ({

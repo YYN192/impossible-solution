@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { ScreenFrame } from "../components/ScreenFrame";
 import { useNav } from "../state/screen";
-import { ScreenFrame } from "./ScreenFrame";
 import heroArt from "../assets/pixel/backgrounds/mars-menu-hero.png";
 
 export function TitleScreen() {

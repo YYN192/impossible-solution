@@ -6,6 +6,14 @@ A browser game for kids aged 7–12. You run a Mars base for 3 sols (a sol is on
 
 Built for the NASA Space Apps Challenge 2026 ("Build a Junior Astronaut Mission Trainer") by team **SoftUniors**, Sofia.
 
+## What is in the game
+
+- A pure, deterministic three-sol simulation with power, air, food and radiation trade-offs.
+- A causal domino report that traces each outcome back to the player's choices.
+- A fixed `?demo=1` recording path that uses bundled data and replays the same five-link story every time.
+- An offline-first NASA data layer with honest **LIVE** and **SAVED DATA** labels.
+- A Data Sources screen that separates real measurements from explicitly labelled game numbers and simplifications.
+
 ---
 
 ## 1. Set up your computer (once, ~10 min)
@@ -56,7 +64,7 @@ Each person has their own branch:
 | Person     | Branch       | Works in                                                                 |
 | ---------- | ------------ | ------------------------------------------------------------------------ |
 | Aleksandar | `sim/engine` | `src/sim/`                                                               |
-| Yavor      | `data/layer` | `src/data/`, `scripts/`, `public/snapshots/`                             |
+| Yavor      | `data/layer` | `src/data/`, `scripts/ingest/`, `public/data/`                           |
 | Viktor     | `ui/planner` | `src/screens/Plan*`                                                      |
 | Danislav   | `ui/reports` | `src/App.tsx`, `src/screens/` (title, morning, final), `src/i18n/` setup |
 | Nikolay P. | `copy/text`  | `src/i18n/en.json`, `CREDITS.md`, `docs/`                                |
@@ -116,28 +124,45 @@ git push
 
 ## 4. Commands
 
-| Command            | What it does                                              |
-| ------------------ | --------------------------------------------------------- |
-| `npm run dev`      | Run locally with live reload                              |
-| `npm test`         | Run the Vitest tests once                                 |
-| `npm run build`    | Type-check and build into `dist/` (what gets deployed)    |
-| `npm run preview`  | Serve the built `dist/` locally                           |
-| `npm run snapshot` | Re-download NASA data snapshots (needs `.env`, see below) |
+| Command            | What it does                                           |
+| ------------------ | ------------------------------------------------------ |
+| `npm run dev`      | Run locally with live reload                           |
+| `npm test`         | Run the Vitest tests once                              |
+| `npm run build`    | Type-check and build into `dist/` (what gets deployed) |
+| `npm run preview`  | Serve the built `dist/` locally                        |
+| `npm run ingest`   | Refresh NASA/CSA snapshots and media (see below)       |
+| `npm run snapshot` | Compatibility alias for `npm run ingest`               |
 
-URL switches: `?offline=1` (no network, saved NASA data only) · `?demo=1` (fixed mission for the video).
+### URL modes
 
-**NASA key (only for `npm run snapshot`):** copy `.env.example` to `.env` and put your free key from https://api.nasa.gov after `NASA_API_KEY=`. Never commit `.env`, and never put the key in a `VITE_*` variable.
+| Mode         | Behaviour                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| `?offline=1` | Never uses the network; reads bundled NASA/CSA snapshots only                             |
+| `?demo=1`    | Runs the deterministic video scenario and implies offline mode                            |
+| `?sun=today` | Uses current Mars-bound DONKI forecasts when available, otherwise shows the saved mission |
+
+`?demo=1&offline=1` is the regression-tested recording URL. It always uses the same May 2024 storm data, starting state and three-sol plan.
+
+**NASA key (for data refreshes):** copy `.env.example` to `.env` and put your free key from https://api.nasa.gov after `NASA_API_KEY=`. Never commit `.env`, and never put the key in a `VITE_*` variable. The canonical pipeline is `npm run ingest`; `npm run snapshot` remains as a compatibility alias for the team's existing workflow. See [`docs/data-pipeline.md`](docs/data-pipeline.md) for source-specific commands and safeguards.
 
 ## 5. Project map
 
 ```
-src/sim/types.ts     shared contract + job cause/effect table (read this first)
-src/sim/             game engine (pure TypeScript, no React)
-src/data/            NASA data: fetch → cache → bundled snapshot
-src/screens/         title, morning report, plan, end of sol, final chain
-src/i18n/en.json     every kid-facing sentence (bg.json later)
-public/snapshots/    saved real NASA data (works offline)
-docs/                concept.md (the game), plan.md (who/when), team-brief.pdf, council/ (how we decided)
+src/sim/types.ts       shared contract + job cause/effect table (read this first)
+src/sim/               game engine (pure TypeScript, no React)
+src/data/              mission/data boundary, resilient clients and source metadata
+src/data/demo.ts       deterministic recording start, plans and expected causal chain
+src/data/gameNumbers.ts engine-derived registry of every disclosed game number
+src/data/snapshots/    saved NASA/CSA JSON used by the offline game
+src/components/        reusable interface components shared by screens
+src/screens/           title, reports, planner placeholder, sources and final chain
+src/state/             Zustand stores for navigation, mission setup, game state and best score
+src/test/fixtures/     shared test fixtures (not production data)
+src/demo.test.tsx      full-UI regression test that replays the demo twice
+src/i18n/en.json       every kid-facing sentence (bg.json later)
+scripts/ingest/        canonical data download, validation and normalization pipeline
+public/data/           tracked images and Mars map tiles served beside the app
+docs/                  project documentation; see docs/README.md for its status map
 ```
 
 ## 6. Team rules

@@ -1,6 +1,12 @@
 /** Science-check findings (Sat 14 Nov) pinned as tests, so the wording can't drift back. */
 import { describe, expect, it } from "vitest";
-import { DONKI_ENLIL_MAY23, LIGHT_DELAY, REAL_FACTS, SIMPLIFICATIONS } from "./sources";
+import en from "../i18n/en.json";
+import {
+  DONKI_ENLIL_MAY23,
+  LIGHT_DELAY,
+  REAL_FACTS,
+  SIMPLIFICATION_KEYS,
+} from "./sources";
 import { may2024Mission, todaysSunMission } from "./mission";
 import may from "./snapshots/enlil-mars-2024-05.json";
 
@@ -35,10 +41,33 @@ describe("science check: real-data wording", () => {
   });
 
   it("the simplifies card says the dust forecast is made up and the dates differ", () => {
-    const all = SIMPLIFICATIONS.join(" ");
+    const all = SIMPLIFICATION_KEYS.map(
+      (key) => en.dataSources.simplificationItems[key],
+    ).join(" ");
     expect(all).toMatch(/computer forecast, not a measurement/i);
     expect(all).toMatch(/dust forecast is made up/i);
     expect(all).toMatch(/2012.13/);
+  });
+
+  it("every real fact has complete, dated provenance", () => {
+    for (const item of REAL_FACTS) {
+      expect(item.what).not.toBe("");
+      expect(item.value).not.toBe("");
+      expect(item.ref.url).toMatch(/^https:\/\//);
+      expect(new Date(item.ref.fetched).toString()).not.toBe("Invalid Date");
+    }
+  });
+
+  it("uses the agreed final simplification text from issue 16", () => {
+    const all = SIMPLIFICATION_KEYS.map(
+      (key) => en.dataSources.simplificationItems[key],
+    ).join(" ");
+    expect(all).toMatch(/3 crew/i);
+    expect(all).toMatch(/short sols/i);
+    expect(all).toMatch(/job numbers.*game numbers/i);
+    expect(all).toMatch(
+      /storm, normal radiation dose, dust effect.*message delay/i,
+    );
   });
 });
 
@@ -51,7 +80,12 @@ describe("science check: Earth's answer credits DONKI only for the storm cloud",
 
   it("Today's Sun answers say the dust part is a game number", () => {
     const now = new Date("2026-11-14T10:00:00Z");
-    const m = todaysSunMission([{ simulationID: "x", arrival: "2026-11-16T10:00Z" }], "network", now.getTime(), now);
+    const m = todaysSunMission(
+      [{ simulationID: "x", arrival: "2026-11-16T10:00Z" }],
+      "network",
+      now.getTime(),
+      now,
+    );
     for (const a of Object.values(m.forecasts)) {
       expect(a.source.label).toMatch(/dust.*game/i);
     }

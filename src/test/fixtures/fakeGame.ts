@@ -3,12 +3,12 @@
  * through useGame). It follows the demo chain from docs/concept.md:
  *   sol 1 skip panels → sol 2 power low (+ the 20 May 2024 burst) → sol 3 astronaut too tired.
  */
-import type { MissionSetup } from "../data/mission";
-import { createGame } from "../sim/engine";
-import type { DataRef, Domino, EarthAnswer, StormEvent } from "../sim/types";
-import { useGame } from "../state/game";
-import { useMission } from "../state/mission";
-import type { MorningInput } from "./morning/pickMorning";
+import type { MissionSetup } from "../../data/mission";
+import { createGame } from "../../sim/engine";
+import type { DataRef, Domino, EarthAnswer, StormEvent } from "../../sim/types";
+import { useGame } from "../../state/game";
+import { useMission } from "../../state/mission";
+import type { MorningInput } from "../../screens/morning/pickMorning";
 
 // Placeholder provenance. The data layer replaces these with snapshot DataRefs (url + fetched date).
 const DONKI = "https://kauai.ccmc.gsfc.nasa.gov/DONKI/";

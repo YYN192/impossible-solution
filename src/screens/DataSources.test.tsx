@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
+import { GAME_NUMBERS } from "../data/gameNumbers";
+import { REAL_FACTS, SIMPLIFICATION_KEYS } from "../data/sources";
+import en from "../i18n/en.json";
 import { DataSources } from "./DataSources";
 
 describe("DataSources screen", () => {
@@ -10,11 +12,20 @@ describe("DataSources screen", () => {
       expect(screen.getAllByText(f.what).length).toBeGreaterThan(0);
       const links = screen.getAllByRole("link", { name: f.ref.label });
       expect(links[0].getAttribute("href")).toMatch(/^https:\/\//);
+      const item = screen.getByText(f.what).closest("li")!;
+      expect(item.textContent).toContain(f.value);
+      expect(item.textContent).toContain("Source checked or data fetched");
+      expect(
+        item.querySelector(`time[datetime="${f.ref.fetched}"]`),
+      ).not.toBeNull();
     }
   });
   it("shows the 'What this game simplifies' card", () => {
     render(<DataSources />);
-    for (const s of SIMPLIFICATIONS) expect(screen.getByText(s)).toBeTruthy();
+    for (const key of SIMPLIFICATION_KEYS)
+      expect(
+        screen.getByText(en.dataSources.simplificationItems[key]),
+      ).toBeTruthy();
   });
   it("labels saved data honestly", () => {
     render(<DataSources />);
@@ -23,23 +34,50 @@ describe("DataSources screen", () => {
 });
 
 describe("DataSources game numbers (#7)", () => {
-  it("lists every job's power cost from the engine table, labelled as a game number", async () => {
-    const { JOBS } = await import("../sim/types");
+  it("renders every engine-derived descriptor once, with a stable id and explicit label", () => {
     render(<DataSources />);
     const section = screen.getByRole("region", { name: /game numbers/i });
-    for (const [id, job] of Object.entries(JOBS)) {
-      const row = section.querySelector(`[data-job="${id}"]`);
-      expect(row, `row for ${id}`).not.toBeNull();
-      expect(row!.textContent).toContain(`${job.powerCost} power`);
+    expect(new Set(GAME_NUMBERS.map(({ id }) => id)).size).toBe(
+      GAME_NUMBERS.length,
+    );
+    for (const descriptor of GAME_NUMBERS) {
+      const rows = section.querySelectorAll(
+        `[data-game-number="${descriptor.id}"]`,
+      );
+      expect(rows, `row for ${descriptor.id}`).toHaveLength(1);
+      const row = rows[0];
+      expect(row!.textContent).toMatch(/game number/i);
+      expect(row!.textContent).toContain(String(descriptor.value));
+      if (descriptor.skipped)
+        expect(row!.textContent).toContain(descriptor.skipped);
     }
-    expect(section.textContent).toMatch(/game number/i);
   });
 
-  it("shows the nightly air-machine cost and that the dose scale is a game unit", async () => {
-    const { NIGHT } = await import("../sim/types");
-    render(<DataSources />);
-    const section = screen.getByRole("region", { name: /game numbers/i });
-    expect(section.textContent).toContain(`${NIGHT.airMachinePower} power`);
-    expect(section.textContent).toMatch(/space-ray meter/i);
+  it("covers every current job, nightly, dose, engine, and demo mechanic", () => {
+    const jobIds = ["panels", "greenhouse", "shelter", "askEarth", "science"];
+    const expected = [
+      ...jobIds.flatMap((id) => [`job-power-${id}`, `job-outcome-${id}`]),
+      "mission-sols",
+      "night-air-power",
+      "night-air-loss",
+      "night-solar-power",
+      "dose-normal",
+      "dose-outside-extra",
+      "dose-burst-outside",
+      "dose-burst-inside",
+      "dose-shelter-factor",
+      "start-air",
+      "start-food",
+      "dust-factor",
+      "low-power-threshold",
+      "shelter-sols",
+      "cloud-dose-inside",
+      "cloud-dose-outside",
+      "safe-dose-limit",
+      "science-goal",
+      "demo-start-food",
+      "demo-start-panels",
+    ];
+    expect(GAME_NUMBERS.map(({ id }) => id)).toEqual(expected);
   });
 });
