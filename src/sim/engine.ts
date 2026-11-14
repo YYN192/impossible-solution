@@ -21,6 +21,9 @@ export const ENGINE = {
   shelterSols: 2,
   /** Air at or below this after a drop → air warning next morning. */
   airLow: 3,
+  /** Storm cloud (CME) dose: a smaller burst. Game numbers; the real CME is never mapped to a Mars dose. */
+  cloudInside: 1,
+  cloudOutside: 4,
   /** Crew-safe star: final dose must stay below this. */
   doseLimit: 5,
   /** Science star. */
@@ -127,10 +130,14 @@ export function step(
     ? outside
       ? DOSE.burstOutside
       : DOSE.burstInside
-    : DOSE.normalDay + (outside ? DOSE.outsideExtra : 0);
+    : cloud
+      ? outside
+        ? ENGINE.cloudOutside
+        : ENGINE.cloudInside
+      : DOSE.normalDay + (outside ? DOSE.outsideExtra : 0);
   if (sheltered) doseToday *= DOSE.shelterFactor;
-  if (burst && outside) {
-    const causes = [p(sol, "burst")];
+  if ((burst || cloud) && outside) {
+    const causes = burst ? [p(sol, "burst")] : [p(sol, "storm-cloud")];
     if (!sheltered) for (const s of [sol - 1, sol]) if (fallen(p(s, "shelter-skipped"))) causes.push(p(s, "shelter-skipped"));
     add({ id: p(sol, "dose-big"), sol, icon: "☢️↑", textKey: "domino.doseBig", causeIds: causes });
   }
