@@ -146,3 +146,51 @@ button.link-button {
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
 }
+/* Final screen: stars + domino chain */
+.stars-count {
+  font-size: 1.4rem;
+  margin: 0;
+}
+.stars-count > span[aria-hidden] {
+  color: #ffd166;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+}
+.star-empty {
+  color: var(--muted);
+}
+.star-goals {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
+.star-goals .won span[aria-hidden] {
+  color: #ffd166;
+}
+.star-goals .missed {
+  color: var(--muted);
+}
+.chain {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+.chain .domino-fall {
+  animation-delay: var(--fall-delay, 0ms);
+}
+.chain li + li {
+  margin-left: 1.5rem;
+}
+.chain-sol {
+  margin: 0.25rem 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -86,3 +86,20 @@ export function fakeMorning(sol: number): MorningInput {
     earthAnswer: sol === 3 ? EARTH_ANSWER_SOL3 : undefined,
   };
 }
+
+/**
+ * What the final screen would get after the demo run: every domino, plus the star result in the
+ * shape of the engine's `stars(state)` (sim/engine branch). Food running out is not a bar, so the
+ * base kept running; no science trips, so 2★.
+ */
+export function fakeFinal() {
+  return {
+    dominoes: FAKE_DOMINOES,
+    stars: {
+      crewSafe: true,
+      baseRunning: true,
+      science: false,
+      count: 2 as const,
+    },
+  };
+}
