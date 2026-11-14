@@ -183,9 +183,9 @@ describe("space rays (real ratio: a burst ≈ 39 normal days, Curiosity RAD)", (
 });
 
 describe("bars stay in range", () => {
-  it("power, air and dose are clamped to 0–10", () => {
-    const g: GameState = { ...createGame(), bars: { power: 10, air: 10, dose: 9.9 } };
+  it("power and air are clamped to 0–10, dose to 0–DOSE.meterMax", () => {
+    const g: GameState = { ...createGame(), bars: { power: 10, air: 10, dose: 24.9 } };
     const r = step(g, { a1: "science", a2: "science", a3: "science" }, [burst(1)]).state;
-    for (const v of Object.values(r.bars)) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(10);
+    for (const [k, v] of Object.entries(r.bars)) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(k === "dose" ? DOSE.meterMax : 10);
   });
 });

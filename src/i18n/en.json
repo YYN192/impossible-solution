@@ -26,7 +26,11 @@
     "foodEmpty": "The food ran out.",
     "airLow": "The air is getting thin.",
     "crewTired": "One astronaut is too tired to work.",
-    "doseHigh": "The space-ray meter jumped up."
+    "doseHigh": "The space-ray meter jumped up.",
+    "noPowerGreenhouse": "Not enough power to run the greenhouse lights.",
+    "noPowerShelter": "Not enough power to build up the shelter.",
+    "noPowerAskEarth": "Not enough power to call Earth.",
+    "outsideStorm": "Astronauts were outside during the storm."
   },
   "event": {
     "burst": {

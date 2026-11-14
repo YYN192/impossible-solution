@@ -14,11 +14,11 @@ export type CrewId = "a1" | "a2" | "a3";
 export type Plan = Partial<Record<CrewId, JobId>>;
 
 export interface Bars {
-  /** 0–10 */
+  /** 0–10, whole units: the number on screen is what the jobs can spend. */
   power: number;
   /** 0–10 */
   air: number;
-  /** Crew dose in game units, 0–10 (lower is better). Normal Mars day ≈ 1 unit. */
+  /** Crew dose in game units, 0–DOSE.meterMax (lower is better). Normal Mars day = DOSE.normalDay. */
   dose: number;
 }
 
@@ -35,6 +35,8 @@ export interface GameState {
   tired: CrewId[];
   /** Earth's answer to show in this morning's report, if any. */
   earthAnswer?: EarthAnswer;
+  /** Sols of storm clouds Earth has warned about: the only storms the plan preview may show. */
+  warnedSols?: number[];
   /** Every effect that happened so far, for the domino chain. */
   dominoes: Domino[];
   over: boolean;
@@ -59,6 +61,8 @@ export interface EarthAnswer {
 
 export interface DataRef {
   label: string; // human words: "A Mars rover measured this storm on 20 May 2024"
+  /** The real number itself, short (e.g. "8.1 mGy"). Shown first on the chip. */
+  value?: string;
   url: string;
   mode: "live" | "snapshot" | "constant";
   fetched?: string; // ISO date for snapshots/live
@@ -152,4 +156,6 @@ export const DOSE = {
   burstOutside: 7.8,
   burstInside: 2,
   shelterFactor: 0.5,
+  /** Top of the space-ray meter: above the worst 3-sol mission (≈ 21.4), so a storm never hits the cap. */
+  meterMax: 25,
 };

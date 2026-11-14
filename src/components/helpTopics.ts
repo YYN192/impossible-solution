@@ -13,6 +13,10 @@ const BY_DOMINO: Record<string, HelpTopic> = {
   "domino.crewTired": "food",
   "domino.doseHigh": "dose",
   "domino.shelterSkipped": "dose",
+  "domino.noPowerGreenhouse": "power",
+  "domino.noPowerShelter": "power",
+  "domino.noPowerAskEarth": "power",
+  "domino.outsideStorm": "dose",
 };
 
 export function helpTopicForDomino(textKey: string): HelpTopic | undefined {
