@@ -10,6 +10,8 @@ const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig({
   base: '/impossible-solution/',
   plugins: [react()],
+  // Other agents' worktrees live inside this folder; don't reload on their edits.
+  server: { watch: { ignored: ['**/.claude/worktrees/**'] } },
   build: {
     rollupOptions: {
       input: {

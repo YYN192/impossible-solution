@@ -55,3 +55,17 @@ export function nearestInteraction(room: Room, p: Point): Entity | undefined {
     .map((e) => ({ e, distance: Math.hypot(p.x - (e.x + e.w / 2), p.y - (e.y + e.h - 5)) }))
     .filter(({ distance }) => distance < 53).sort((a, b) => a.distance - b.distance)[0]?.e;
 }
+/** Where a tap sends the player: in front of a tapped console/NPC/door, else the tapped floor spot (kept inside the walls). */
+export function tapTarget(room: Room, tap: Point): Point & { entity?: Entity } {
+  const b = room.bounds, r = 8;
+  const clamp = (x: number, y: number) => ({ x: Math.min(Math.max(x, b.x + r), b.x + b.w - r), y: Math.min(Math.max(y, b.y + r), b.y + b.h - r) });
+  const entity = room.entities.find((e) => e.interaction && tap.x >= e.x - 6 && tap.x <= e.x + e.w + 6 && tap.y >= e.y - 6 && tap.y <= e.y + e.h + 6);
+  return entity ? { ...clamp(entity.x + entity.w / 2, entity.y + entity.h + 12), entity } : clamp(tap.x, tap.y);
+}
+/** One frame of tap-to-walk; `done` once arrived or blocked, so the player never pushes into a wall forever. */
+export function walkToward(room: Room, p: Point & { facing: Facing }, target: Point, seconds: number) {
+  const dx = target.x - p.x, dy = target.y - p.y;
+  if (Math.hypot(dx, dy) < 2) return { p, done: true };
+  const next = movePlayer(room, p, dx, dy, seconds);
+  return { p: next, done: next.x === p.x && next.y === p.y };
+}

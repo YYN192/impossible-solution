@@ -1,7 +1,7 @@
 import { getSprite, playerSprite, type Facing } from "./assets";
 import type { Point, Room } from "./world";
 const floor = "environment/floors/mars-floor-";
-export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, labels: string[]) {
+export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean) {
   ctx.imageSmoothingEnabled = false;
   const sprite = (path: string, x: number, y: number, w: number, h: number) => {
     const img = getSprite(path);
@@ -11,7 +11,9 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   // Warm Mars beyond the base; the habitat itself stays silver and blue.
   sprite("backgrounds/mars-menu-space", 0, -104, 640, 256);
   for (let y = 64; y < 352; y += 16) for (let x = 16; x < 624; x += 16) {
-    sprite(floor + ((x >= 288 && x < 352) || (y >= 240 && y < 256) ? "reinforced" : (x / 16 + y / 16) % 4 === 0 ? "panel" : "metal"), x, y, 16, 16);
+    sprite(floor + ((x >= 288 && x < 352) || (y >= 240 && y < 256) ? "reinforced" : "metal"), x, y, 16, 16);
+    // Calm floor: plain metal, a stable hash lightens ~1 tile in 9 very slightly (no busy "panel" grid).
+    if (((x * 7 + y * 13) ^ (x >> 3)) % 9 === 0) { ctx.fillStyle = "#ffffff07"; ctx.fillRect(x, y, 16, 16); }
   }
   for (let x = 16; x < 624; x += 16) {
     sprite("environment/walls/mars-wall-straight", x, 48, 16, 16);
@@ -47,8 +49,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     sprite(playerSprite(player.facing, moving && !reduced ? Math.floor(time / 140) % 4 : undefined), player.x - 16, player.y - 27, 32, 32);
   }});
   entities.sort((a, b) => a.y - b.y).forEach((e) => e.draw());
-  ctx.font = "8px monospace"; ctx.textAlign = "center"; ctx.fillStyle = "#afc4d2";
-  ctx.fillText(labels[0], 128, 96); ctx.fillText(labels[1], 320, 220); ctx.fillText(labels[2], 496, 152);
-  ctx.fillStyle = "#7995aa"; ctx.fillText(labels[3], 320, 378);
+  // Area names are HTML overlays in MarsHub so they stay sharp and readable at any scale.
+  ctx.font = "bold 10px monospace"; ctx.textAlign = "center";
   if (near) { ctx.fillStyle = "#0b1829"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 47), 20, 16); ctx.fillStyle = "#b4f6ed"; ctx.fillText("E", Math.round(player.x), Math.round(player.y - 35)); }
 }
