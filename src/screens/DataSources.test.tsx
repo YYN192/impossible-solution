@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
+import { REAL_FACTS, SIMPLIFICATION_KEYS } from "../data/sources";
 import { DataSources } from "./DataSources";
+import i18n from "../i18n";
 
 describe("DataSources screen", () => {
   it("lists every real fact with a working-looking source link", () => {
@@ -14,7 +15,7 @@ describe("DataSources screen", () => {
   });
   it("shows the 'What this game simplifies' card", () => {
     render(<DataSources />);
-    for (const s of SIMPLIFICATIONS) expect(screen.getByText(s)).toBeTruthy();
+    for (const k of SIMPLIFICATION_KEYS) expect(screen.getByText(i18n.t(k))).toBeTruthy();
   });
   it("labels saved data honestly", () => {
     render(<DataSources />);

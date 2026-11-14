@@ -1,9 +1,11 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { useNav } from "../state/screen";
 import { FAKE_DOMINOES, FAKE_EVENTS, loadFakeGame } from "./fakeGame";
 import { MorningScreen } from "./MorningScreen";
+import { helpTopicForDomino } from "../components/helpTopics";
+import en from "../i18n/en.json";
 
 const showMorning = (sol: number) => {
   loadFakeGame(sol);
@@ -66,5 +68,27 @@ describe("Morning report", () => {
       ...FAKE_EVENTS.map((e) => e.captionKey),
     ];
     expect(keys.filter((k) => !i18n.exists(k))).toEqual([]);
+  });
+});
+
+describe("Morning report 'What's this?' tooltips (#16)", () => {
+  afterEach(cleanup);
+  const help = (title: string) => screen.queryByRole("button", { name: `What's this? ${title}` });
+
+  it("sol 2: explains the fallen domino (power) and the storm (space-ray storm)", () => {
+    showMorning(2);
+    expect(help("Power")).not.toBeNull();
+    fireEvent.click(help("Space-ray storm")!);
+    expect(text()).toContain("too fast for Earth to warn you");
+  });
+
+  it("sol 3: explains food and Ask Earth", () => {
+    showMorning(3);
+    expect(help("Food")).not.toBeNull();
+    expect(help("Ask Earth")).not.toBeNull();
+  });
+
+  it("every domino the engine can drop has a tooltip topic", () => {
+    for (const key of Object.keys(en.domino)) expect(helpTopicForDomino(`domino.${key}`), key).toBeDefined();
   });
 });

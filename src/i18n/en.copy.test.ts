@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import en from "./en.json";
+import { JARGON } from "./jargon";
 
 /**
  * Copy rules for kid text (#15). Grown-up screens (Data Sources, teacher card, badges) may use
@@ -10,8 +11,6 @@ const KID_SECTIONS = [
   "jobs", "jobInfo", "crew", "planHelp", "bars", "help",
 ] as const;
 
-/** Science words kids should never have to read. Tooltips say "space rays" and "storm cloud" instead. */
-const JARGON = [/\bDONKI\b/, /\bmGy\b/, /\bmSv\b/, /\bCME\b/, /\bEnlil\b/i, /X-ray/i, /\bdosimeter\b/i];
 
 const MAX_WORDS = 12;
 

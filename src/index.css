@@ -148,9 +148,16 @@ a {
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
+.topbar__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
 button.link-button {
   border: 0;
   padding: 0.6rem 0.25rem;
+  min-height: 44px;
   font-size: 0.95rem;
   color: #7cc4ff;
   text-decoration: underline;

@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { helpTopicForDomino, helpTopicForEvent } from "../components/helpTopics";
+import { WhatsThis } from "../components/WhatsThis";
 import { tDynamic } from "../i18n/dynamic";
 import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "../state/game";
@@ -50,6 +52,7 @@ export function MorningReportView({
       {headline ? (
         <div className="fallen">
           <DominoCard domino={headline} fall />
+          <DominoHelp textKey={headline.textKey} />
           {cause && (
             <>
               <p className="because">{t("morning.because")}</p>
@@ -74,12 +77,25 @@ export function MorningReportView({
   );
 }
 
+/** "What's this?" for the science word behind the fallen domino (dust, power, air …). */
+function DominoHelp({ textKey }: { textKey: string }) {
+  const topic = helpTopicForDomino(textKey);
+  return topic ? (
+    <p className="domino-help">
+      <WhatsThis topic={topic} />
+    </p>
+  ) : null;
+}
+
 function ExtraLine({ extra }: { extra: Extra }) {
   const { t } = useTranslation();
   if (extra.kind === "event") {
     return (
       <div className="extra">
-        <p className="lead">{tDynamic(extra.event.captionKey)}</p>
+        <p className="lead">
+          <span>{tDynamic(extra.event.captionKey)}</span>{" "}
+          <WhatsThis topic={helpTopicForEvent(extra.event.kind)} />
+        </p>
         <DataChip source={extra.event.source} />
       </div>
     );
@@ -92,10 +108,13 @@ function ExtraLine({ extra }: { extra: Extra }) {
   return (
     <div className="extra">
       <p className="lead">
-        {t("earth.answer", {
-          dust: t(`earth.dust.${answer.dustTomorrow}`),
-          storm,
-        })}
+        <span>
+          {t("earth.answer", {
+            dust: t(`earth.dust.${answer.dustTomorrow}`),
+            storm,
+          })}
+        </span>{" "}
+        <WhatsThis topic="askEarth" />
       </p>
       <DataChip source={answer.source} />
     </div>
