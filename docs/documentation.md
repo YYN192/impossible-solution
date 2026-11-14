@@ -209,10 +209,8 @@ On `copy/text`: 154 tests passing.
 
 **Known issues**
 
-- On Node 25 or newer, 14 data-layer tests fail because Node's built-in `localStorage` hides jsdom's. CI uses Node 22, so it is unaffected; the fix in `src/test/setup.ts` is on `copy/text`, not yet on `main`.
-- The morning-report data chip shows the source label, which contains "DONKI WSA-Enlil" on a kid screen; it needs a kid-friendly label.
-- The "What this game simplifies" text is hard-coded in `src/data/sources.ts`, so it cannot be translated yet.
-- `public/favicon.svg` is still the Vite logo from the project template.
+- The Data Sources facts (`REAL_FACTS` in `src/data/sources.ts`) are still English-only; they move to i18n with the Bulgarian translation (#19).
+- The bars on the Plan screen still need their "What's this?" buttons (`power`, `air`, `dose`, `food`) once the real Plan screen (#9) lands.
 
 ## Team and workflow
 
