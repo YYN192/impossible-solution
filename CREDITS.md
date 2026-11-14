@@ -26,6 +26,14 @@
 
 ## Assets (author, licence, link)
 
+| Asset | Author | Licence | Notes |
+|---|---|---|---|
+| Icons in the game (🧽 🥬 🛡️ 📡 🔬 ⚡ 🫧 ☢️ 😴 🛰️ ⭐) | Unicode emoji, drawn by each device's own emoji font | No image files shipped | We use emoji characters only, no downloaded icon packs |
+| `public/favicon.svg` | Vite project template (the Vite logo) | MIT (Vite) | Placeholder from the scaffold. TODO: replace with our own Mars icon before submission |
+| "What's this?" tooltip style | Team SoftUniors | Apache-2.0 (this repo) | Plain CSS, no icon font |
+
+No NASA logos, the NASA "meatball" or the NASA "worm" are used anywhere, and no fonts are downloaded (system fonts only).
+
 ## Reference code
 
 - Generic API resilience patterns adapted from the team's prep notes (Apache-2.0).
