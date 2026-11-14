@@ -104,6 +104,7 @@ export const SCREENS = {
   menu: async (page) => openMenu(page),
   hub: async (page) => { await openMenu(page); await startMission(page); },
   hubDialogue: async (page) => { await openMenu(page); await startMission(page); await openDialogue(page); },
+  morning: async (page) => { await openMenu(page); await startMission(page); await skipToConsole(page); },
   plan: async (page) => { await openMenu(page); await startMission(page); await skipToConsole(page); await toPlan(page); },
   endSol: async (page) => { await SCREENS.plan(page); await assignAll(page); await endSol(page); },
   final: async (page) => { await openMenu(page); await startMission(page); await skipToConsole(page); await playToFinal(page); },

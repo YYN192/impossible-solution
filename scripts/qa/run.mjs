@@ -349,18 +349,90 @@ check("a11y", async () => {
   return fails;
 });
 
+// ---- 8. labels: text on every control must look right, in English and Bulgarian ----
+function labelAudit({ touch }) {
+  const out = [];
+  const SEL = 'button, [role=button], a[href], summary, input:not([type=range]), select';
+  const vis = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.display !== "none"; };
+  const modal = document.querySelector("dialog[open]");
+  const els = [...document.querySelectorAll(SEL)].filter((e) => vis(e) && (!modal || modal.contains(e)));
+  const nm = (e) => `<${e.tagName.toLowerCase()}${typeof e.className === "string" && e.className ? "." + e.className.split(" ")[0] : ""}> "${(e.getAttribute("aria-label") || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 28)}"`;
+  const min = touch ? 48 : 44;
+  for (const e of els) {
+    const r = e.getBoundingClientRect(), who = nm(e), bad = [];
+    if (r.width < min - 0.5 || r.height < min - 0.5) bad.push(`target ${Math.round(r.width)}x${Math.round(r.height)} < ${min}`);
+    const nodes = [e, ...e.querySelectorAll("*")].filter((n) => n.clientWidth > 0 || n === e);
+    for (const n of nodes) {
+      const s = getComputedStyle(n);
+      if (n.scrollWidth > n.clientWidth + 1 || n.scrollHeight > n.clientHeight + 1) { if (s.overflow !== "visible" || n === e || n.scrollWidth > n.clientWidth + 1) bad.push(`clipped (${n.scrollWidth}x${n.scrollHeight} in ${n.clientWidth}x${n.clientHeight})`); }
+      if (s.textOverflow === "ellipsis" && (n.scrollWidth > n.clientWidth)) bad.push("ellipsis hides text");
+    }
+    const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+    for (let t; (t = walker.nextNode());) {
+      if (!t.textContent.trim() || t.parentElement.closest("[aria-hidden=true]") && !t.parentElement.closest("[aria-hidden=true]").contains(e)) continue;
+      const p = t.parentElement, s = getComputedStyle(p), fs = parseFloat(s.fontSize);
+      const rg = document.createRange(); rg.selectNodeContents(t);
+      const tr = rg.getBoundingClientRect();
+      if (!tr.width) continue;
+      const lh = s.lineHeight === "normal" ? fs * 1.2 : parseFloat(s.lineHeight);
+      if (fs < 14) bad.push(`font ${fs.toFixed(1)}px < 14`);
+      if (lh < fs * 1.15 - 0.1) bad.push(`line-height ${(lh / fs).toFixed(2)} < 1.15`);
+      if (Math.round(tr.height / lh) > 3) bad.push(`${Math.round(tr.height / lh)} lines > 3`);
+      if (tr.left < r.left - 1 || tr.right > r.right + 1 || tr.top < r.top - 1 || tr.bottom > r.bottom + 1) bad.push("label outside the control box");
+    }
+    for (const b of new Set(bad)) out.push(`${who} ${b}`);
+  }
+  // siblings in one row: same height and padding
+  const parents = new Set(els.map((e) => e.parentElement));
+  for (const p of parents) {
+    const kids = els.filter((e) => e.parentElement === p && !e.matches("input,summary"));
+    for (const a of kids) for (const b of kids) {
+      if (a >= b && a !== b) continue;
+      if (a === b) continue;
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      if (Math.abs(ra.top - rb.top) > 4 || ra.left >= rb.left) continue;
+      const sa = getComputedStyle(a), sb = getComputedStyle(b);
+      if (Math.abs(ra.height - rb.height) > 1.5 || sa.paddingTop !== sb.paddingTop || sa.paddingBottom !== sb.paddingBottom)
+        out.push(`row mismatch ${nm(a)} (${Math.round(ra.height)}px, pad ${sa.paddingTop}) vs ${nm(b)} (${Math.round(rb.height)}px, pad ${sb.paddingTop})`);
+    }
+  }
+  return out;
+}
+const LABEL_VIEWPORTS = [[360, 640], [390, 844], [844, 390], [768, 1024], [1366, 768]];
+check("labels", async () => {
+  let fails = 0;
+  mkdirSync("docs/qa", { recursive: true });
+  const stage = opt("shots-prefix"); // e.g. --shots-prefix=before: screenshots at 390 and 1366 only
+  for (const lang of ["en", "bg"]) for (const [w, h] of LABEL_VIEWPORTS) {
+    const phone = w < 500 || h < 500;
+    for (const screen of ["menu", "hub", "morning", "plan", "endSol", "final", "dataSources", "teacherCard"]) {
+      const page = await newPage(w, h, phone ? { hasTouch: true, isMobile: true } : {});
+      try {
+        await SCREENS[screen](page);
+        if (lang === "bg") { await page.getByRole("button", { name: "Български", exact: true }).click(); await page.waitForTimeout(250); }
+        await page.waitForTimeout(250);
+        if (stage && (w === 390 || w === 1366) && h !== 390) await page.screenshot({ path: `docs/qa/labels-${stage}-${screen}-${lang}-${w}.png` });
+        fails += emit(`labels ${lang} ${w}x${h} ${screen}`, (await page.evaluate(labelAudit, { touch: phone })).map((m) => ["FAIL", m]));
+      } catch (e) { console.log(`FAIL labels ${lang} ${w}x${h} ${screen}: ${String(e.message).split("\n")[0]}`); fails++; }
+      await done(page);
+    }
+  }
+  return fails;
+});
+
 // ---- main ----
 const wanted = args.filter((a) => !a.startsWith("--"));
 const names = wanted.length ? wanted : Object.keys(ALL);
 const unknown = names.filter((n) => !ALL[n]);
 if (unknown.length) { console.log(`unknown check: ${unknown.join(", ")} (have: ${Object.keys(ALL).join(", ")})`); process.exit(2); }
-browser = await chromium.launch({ channel: "chrome", headless: true });
 let failed = 0;
-for (const n of names) {
-  let count;
-  try { count = await ALL[n](); } catch (e) { console.log(`FAIL ${n} crashed: ${String(e.message).split("\n")[0]}`); count = 1; }
-  console.log(count ? `FAIL ${n} (${count} findings)` : `PASS ${n}`);
-  if (count) failed++;
-}
-await browser.close();
+browser = await chromium.launch({ channel: "chrome", headless: true }); // never headed
+try {
+  for (const n of names) {
+    let count;
+    try { count = await ALL[n](); } catch (e) { console.log(`FAIL ${n} crashed: ${String(e.message).split("\n")[0]}`); count = 1; }
+    console.log(count ? `FAIL ${n} (${count} findings)` : `PASS ${n}`);
+    if (count) failed++;
+  }
+} finally { await browser.close(); }
 process.exit(failed ? 1 : 0);
