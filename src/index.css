@@ -1,0 +1,14 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  line-height: 1.5;
+  --bg: #0b1020;
+  --fg: #e8ecf8;
+  --muted: #9aa3bd;
+}
+body { margin: 0; background: var(--bg); color: var(--fg); }
+.shell { max-width: 40rem; margin: 0 auto; padding: 2rem 1rem; }
+.note { color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
