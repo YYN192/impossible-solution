@@ -2,7 +2,11 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { useNav } from "../state/screen";
-import { FAKE_DOMINOES, FAKE_EVENTS, loadFakeGame } from "./fakeGame";
+import {
+  FAKE_DOMINOES,
+  FAKE_EVENTS,
+  loadFakeGame,
+} from "../test/fixtures/fakeGame";
 import { MorningScreen } from "./MorningScreen";
 import { helpTopicForDomino } from "../components/helpTopics";
 import en from "../i18n/en.json";

@@ -1,12 +1,13 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
 import i18n from "./i18n";
+import { TitleScreen } from "./screens/TitleScreen";
 import { START, useNav } from "./state/screen";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
 import { useSession } from "./game/session";
-import { createGame, step } from "./sim/engine";
+import { step } from "./sim/engine";
 import type { JobId } from "./sim/types";
 const t = i18n.t.bind(i18n);
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -16,6 +17,7 @@ beforeEach(() => {
   useMission.setState({ status: "idle", setup: undefined });
   useSession.setState({ position: { x: 320, y: 212, facing: "back" }, draft: {}, before: undefined });
 });
+afterEach(cleanup);
 async function launch() {
   render(<App />);
   fireEvent.click(await screen.findByRole("button", { name: t("title.start") }));
@@ -34,9 +36,18 @@ describe("complete expedition", () => {
     click(t("teacher.back")); screen.getByRole("heading", { name: t("app.name") });
     expect(document.documentElement.lang).toBe("en");
   });
+  it("keeps Start disabled until the mission setup is ready", () => {
+    useMission.setState({ status: "loading", setup: undefined });
+    render(<TitleScreen />);
+    const start = screen.getByRole("button", { name: t("title.start") });
+    expect(start.hasAttribute("disabled")).toBe(true);
+    fireEvent.click(start);
+    expect(useNav.getState()).toMatchObject(START);
+  });
   it("plays three actual plans, shows earned Earth answer and causal sources, then replays the same start", async () => {
     await launch();
     const setup = useMission.getState().setup!;
+    const start = useGame.getState().state;
     const plans: JobId[][] = [["greenhouse", "shelter", "askEarth"], ["panels", "greenhouse", "shelter"], ["panels", "greenhouse", "science"]];
     for (let sol = 1; sol <= 3; sol++) {
       expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("morning.heading", { sol }));
@@ -54,12 +65,13 @@ describe("complete expedition", () => {
     expect(document.querySelectorAll(".chain").length).toBeGreaterThan(0);
     expect(document.querySelectorAll(".chain .chip a").length).toBeGreaterThan(0);
     click(t("final.tryAgain"));
-    expect(useGame.getState().state).toEqual(createGame());
+    expect(useGame.getState().state).toEqual(start);
     expect(useMission.getState().setup).toBe(setup);
     screen.getByRole("heading", { name: t("morning.heading", { sol: 1 }) });
   });
   it("keeps a draft and the player's position while leaving the console", async () => {
     await launch(); click(t("morning.goPlan"));
+    const start = useGame.getState().state;
     click(t("crew.name", { n: 1 })); click(t("jobs.greenhouse"));
     const position = useSession.getState().position;
     click(/Return to station/);
@@ -68,7 +80,7 @@ describe("complete expedition", () => {
     await screen.findByRole("heading", { name: t("plan.heading", { sol: 1 }) });
     expect(useSession.getState().draft).toEqual({ a1: "greenhouse" });
     expect(useSession.getState().position).toEqual(position);
-    expect(useGame.getState().state).toEqual(createGame());
+    expect(useGame.getState().state).toEqual(start);
   });
   it("lets children leave crew idle deliberately and disables tired crew", async () => {
     await launch(); click(t("morning.goPlan")); click(/End sol/);

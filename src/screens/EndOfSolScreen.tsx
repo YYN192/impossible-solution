@@ -1,12 +1,14 @@
 import { useTranslation } from "react-i18next";
+import { DominoCard } from "../components/DominoCard";
 import { ResourceMeters } from "../components/ResourceMeters";
+import { ScreenFrame } from "../components/ScreenFrame";
+import { asset } from "../game/assets";
 import { useSession } from "../game/session";
 import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
-import { DominoCard } from "./DominoCard";
-import { ScreenFrame } from "./ScreenFrame";
-import { asset } from "../game/assets";
+
+/** End of sol: the bars animate here once the engine lands (respect reduced motion). */
 export function EndOfSolScreen() {
   const { t } = useTranslation();
   const { sol, next } = useNav();

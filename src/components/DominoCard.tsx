@@ -1,6 +1,6 @@
 import type { Domino } from "../sim/types";
 import { tDynamic } from "../i18n/dynamic";
-import { DataChip } from "./DataChip";
+import { DataChip } from "../screens/DataChip";
 
 /**
  * One domino: icon + kid sentence. Reused by the morning report (#13) and the final chain (#14).

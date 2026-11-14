@@ -1,13 +1,13 @@
 import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
+import { DominoCard } from "../components/DominoCard";
+import { ScreenFrame } from "../components/ScreenFrame";
 import { stars as starsOf, type Stars } from "../sim/engine";
 import { MISSION_SOLS, type Domino } from "../sim/types";
 import { useBest } from "../state/best";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
-import { DominoCard } from "./DominoCard";
 import { buildChains } from "./final/buildChains";
-import { ScreenFrame } from "./ScreenFrame";
 
 export type { Stars };
 

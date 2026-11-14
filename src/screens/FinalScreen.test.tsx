@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { BEST_KEY, useBest } from "../state/best";
 import { useNav } from "../state/screen";
-import { FAKE_DOMINOES, loadFakeGame } from "./fakeGame";
+import { FAKE_DOMINOES, loadFakeGame } from "../test/fixtures/fakeGame";
 import { FinalScreen, FinalView, type Stars } from "./FinalScreen";
 
 const t = i18n.t.bind(i18n);

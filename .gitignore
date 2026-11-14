@@ -30,3 +30,7 @@ dist-ssr
 
 # Playwright MCP output
 .playwright-mcp/
+
+# Local analysis output
+.ua/
+graphify-out/

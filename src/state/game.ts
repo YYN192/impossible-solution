@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { DEMO_START } from "../data/demo";
+import { readFlags } from "../data/flags";
 import { createGame, step } from "../sim/engine";
 import type { Domino, GameState, Plan } from "../sim/types";
 import { useMission } from "./mission";
@@ -17,10 +19,21 @@ interface GameStore {
   reset: () => void;
 }
 
+/** Use the loaded scenario when available; the URL fallback also covers a very fast Start click. */
+const createMissionGame = (): GameState => {
+  const setup = useMission.getState().setup;
+  const initialState =
+    setup?.initialState ?? (readFlags().demo ? DEMO_START : undefined);
+  const state = createGame();
+  return { ...state, ...initialState };
+};
+
 export const useGame = create<GameStore>()((set, get) => ({
-  state: createGame(),
+  state: createMissionGame(),
   fell: [],
   endSol: (plan) => {
+    // Mission data is loaded independently at startup. Keeping these fallbacks here
+    // lets the game remain playable if a player advances before that load finishes.
     const setup = useMission.getState().setup;
     const { state, fell } = step(
       get().state,
@@ -31,5 +44,5 @@ export const useGame = create<GameStore>()((set, get) => ({
     set({ state, fell });
     return state;
   },
-  reset: () => set({ state: createGame(), fell: [] }),
+  reset: () => set({ state: createMissionGame(), fell: [] }),
 }));

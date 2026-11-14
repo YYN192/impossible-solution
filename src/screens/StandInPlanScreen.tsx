@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
+import { ScreenFrame } from "../components/ScreenFrame";
+import { demoPlanForSol } from "../data/demo";
+import { readFlags } from "../data/flags";
 import { MISSION_SOLS, type Plan } from "../sim/types";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
-import { ScreenFrame } from "./ScreenFrame";
 
-/** The stand-in has no job picker, so every sol runs with nobody assigned. */
+/** Outside recording mode, the stand-in has no job picker, so nobody is assigned. */
 const STAND_IN_PLAN: Plan = {};
 
 /**
@@ -16,7 +18,8 @@ export function StandInPlanScreen() {
   const { t } = useTranslation();
   const { sol, next, endEarly } = useNav();
   const endSol = () => {
-    const state = useGame.getState().endSol(STAND_IN_PLAN);
+    const plan = readFlags().demo ? demoPlanForSol(sol) : STAND_IN_PLAN;
+    const state = useGame.getState().endSol(plan);
     if (state.over && sol < MISSION_SOLS) endEarly();
     else next();
   };

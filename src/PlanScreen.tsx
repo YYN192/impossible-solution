@@ -7,7 +7,7 @@ import { asset } from "./game/assets";
 import { audio } from "./game/audio";
 import { useSession } from "./game/session";
 import { DataChip } from "./screens/DataChip";
-import { ScreenFrame } from "./screens/ScreenFrame";
+import { ScreenFrame } from "./components/ScreenFrame";
 import { step } from "./sim/engine";
 import { JOBS, MISSION_SOLS, type CrewId, type JobId } from "./sim/types";
 import { useGame } from "./state/game";

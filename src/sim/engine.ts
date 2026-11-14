@@ -11,7 +11,17 @@
  *
  * Domino ids are `sol{N}-{name}` and text keys are `domino.{key}` from src/i18n/en.json.
  */
-import type { CrewId, DataRef, Domino, EarthAnswer, GameState, JobId, Plan, StepResult, StormEvent } from "./types";
+import type {
+  CrewId,
+  DataRef,
+  Domino,
+  EarthAnswer,
+  GameState,
+  JobId,
+  Plan,
+  StepResult,
+  StormEvent,
+} from "./types";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT } from "./types";
 
 /** Engine game numbers (invented, tuned for play). Change only with the balance tests green. */
@@ -31,6 +41,12 @@ export const ENGINE = {
   doseLimit: 5,
   /** Science star. */
   scienceGoal: 2,
+  /** Food made by a successful greenhouse job. */
+  foodGain: 1,
+  /** Food consumed when the greenhouse job is skipped. */
+  foodLoss: 1,
+  /** Science earned by a successful science trip. */
+  scienceGain: 1,
 };
 
 const CREW: CrewId[] = ["a1", "a2", "a3"];
@@ -55,7 +71,11 @@ const clamp = (v: number) => Math.min(10, Math.max(0, v));
 export function createGame(): GameState {
   return {
     sol: 1,
-    bars: { power: NIGHT.solarPowerAtFullEfficiency, air: ENGINE.startAir, dose: 0 },
+    bars: {
+      power: NIGHT.solarPowerAtFullEfficiency,
+      air: ENGINE.startAir,
+      dose: 0,
+    },
     food: ENGINE.startFood,
     science: 0,
     panelEfficiency: 1,
@@ -82,7 +102,8 @@ export function step(
   const next = sol + 1;
   const last = sol >= MISSION_SOLS;
   const fell: Domino[] = [];
-  const fallen = (id: string) => state.dominoes.some((d) => d.id === id) || fell.some((d) => d.id === id);
+  const fallen = (id: string) =>
+    state.dominoes.some((d) => d.id === id) || fell.some((d) => d.id === id);
   const add = (d: Domino) => fell.push(d);
   const p = (s: number, what: string) => `sol${s}-${what}`;
 
@@ -96,8 +117,16 @@ export function step(
   // Morning: is power low today? (Usually it already fell last night, caused by dusty panels.)
   let power = state.bars.power;
   if (!fallen(p(sol, "power-low")) && power + EPS < ENGINE.lowPowerToday)
-    add({ id: p(sol, "power-low"), sol, icon: "⚡↓", textKey: "domino.powerLow", causeIds: [] });
-  const powerLowToday = fallen(p(sol, "power-low")) ? [p(sol, "power-low")] : [];
+    add({
+      id: p(sol, "power-low"),
+      sol,
+      icon: "⚡↓",
+      textKey: "domino.powerLow",
+      causeIds: [],
+    });
+  const powerLowToday = fallen(p(sol, "power-low"))
+    ? [p(sol, "power-low")]
+    : [];
 
   // Day: jobs spend today's power.
   const done = new Set<JobId>();
@@ -113,24 +142,39 @@ export function step(
     if (!skip) continue;
     // Low power is a cause when it stopped the job, and for the greenhouse (the big power user) on a low-power sol.
     const causeIds = assignedJob || job === "greenhouse" ? powerLowToday : [];
-    add({ id: p(sol, `${job}-skipped`), sol, icon: skip.icon, textKey: `domino.${skip.key}`, causeIds });
+    add({
+      id: p(sol, `${job}-skipped`),
+      sol,
+      icon: skip.icon,
+      textKey: `domino.${skip.key}`,
+      causeIds,
+    });
   }
 
   // Night: the air machine.
   let air = state.bars.air;
   if (power + EPS < NIGHT.airMachinePower) {
     air = clamp(air - NIGHT.airLossWithoutPower);
-    add({ id: p(sol, "air-low"), sol, icon: "🫧↓", textKey: "domino.airLow", causeIds: powerLowToday });
+    add({
+      id: p(sol, "air-low"),
+      sol,
+      icon: "🫧↓",
+      textKey: "domino.airLow",
+      causeIds: powerLowToday,
+    });
   } else {
     power -= NIGHT.airMachinePower;
   }
 
   // Space rays: shelter, storms, and every astronaut outside.
-  const shelterSols = done.has("shelter") ? ENGINE.shelterSols : state.shelterSols;
+  const shelterSols = done.has("shelter")
+    ? ENGINE.shelterSols
+    : state.shelterSols;
   const sheltered = shelterSols > 0;
   const outsideCount = [...done].filter((j) => JOBS[j].outside).length;
   const storm =
-    events.find((e) => e.sol === sol && e.kind === "particleBurst") ?? events.find((e) => e.sol === sol && e.kind === "stormCloud");
+    events.find((e) => e.sol === sol && e.kind === "particleBurst") ??
+    events.find((e) => e.sol === sol && e.kind === "stormCloud");
   const [inside, outside] = !storm
     ? [DOSE.normalDay, DOSE.normalDay + DOSE.outsideExtra]
     : storm.kind === "particleBurst"
@@ -139,32 +183,66 @@ export function step(
   let doseToday = inside + outsideCount * (outside - inside);
   if (sheltered) doseToday *= DOSE.shelterFactor;
   if (storm) {
-    const causeIds = sheltered ? [] : [sol - 1, sol].map((s) => p(s, "shelter-skipped")).filter(fallen);
-    add({ id: p(sol, "dose-high"), sol, icon: "☢️↑", textKey: "domino.doseHigh", causeIds, source: storm.source });
+    const causeIds = sheltered
+      ? []
+      : [sol - 1, sol].map((s) => p(s, "shelter-skipped")).filter(fallen);
+    add({
+      id: p(sol, "dose-high"),
+      sol,
+      icon: "☢️↑",
+      textKey: "domino.doseHigh",
+      causeIds,
+      source: storm.source,
+    });
   }
 
   // Food.
   let food = state.food;
-  if (done.has("greenhouse")) food += 1;
+  if (done.has("greenhouse")) food += ENGINE.foodGain;
   else {
-    food = Math.max(0, food - 1);
+    food = Math.max(0, food - ENGINE.foodLoss);
     if (food === 0)
-      add({ id: p(sol, "food-empty"), sol, icon: "🥬0", textKey: "domino.foodEmpty", causeIds: [p(sol, "greenhouse-skipped")] });
+      add({
+        id: p(sol, "food-empty"),
+        sol,
+        icon: "🥬0",
+        textKey: "domino.foodEmpty",
+        causeIds: [p(sol, "greenhouse-skipped")],
+      });
   }
   const tired: CrewId[] = food === 0 ? ["a1"] : [];
 
   // The panels charge for tomorrow.
-  const panelEfficiency = done.has("panels") ? 1 : state.panelEfficiency * ENGINE.dustFactor;
-  const powerTomorrow = clamp(power + NIGHT.solarPowerAtFullEfficiency * panelEfficiency);
+  const panelEfficiency = done.has("panels")
+    ? 1
+    : state.panelEfficiency * ENGINE.dustFactor;
+  const powerTomorrow = clamp(
+    power + NIGHT.solarPowerAtFullEfficiency * panelEfficiency,
+  );
 
   const over = last || air <= 0;
 
   // Next morning's dominoes.
   if (!over) {
-    if (!done.has("panels") && powerTomorrow + EPS < NIGHT.solarPowerAtFullEfficiency)
-      add({ id: p(next, "power-low"), sol: next, icon: "⚡↓", textKey: "domino.powerLow", causeIds: [p(sol, "panels-skipped")] });
+    if (
+      !done.has("panels") &&
+      powerTomorrow + EPS < NIGHT.solarPowerAtFullEfficiency
+    )
+      add({
+        id: p(next, "power-low"),
+        sol: next,
+        icon: "⚡↓",
+        textKey: "domino.powerLow",
+        causeIds: [p(sol, "panels-skipped")],
+      });
     if (tired.length)
-      add({ id: p(next, "crew-tired"), sol: next, icon: "😴", textKey: "domino.crewTired", causeIds: [p(sol, "food-empty")] });
+      add({
+        id: p(next, "crew-tired"),
+        sol: next,
+        icon: "😴",
+        textKey: "domino.crewTired",
+        causeIds: [p(sol, "food-empty")],
+      });
   }
 
   // Earth's answer.
@@ -172,7 +250,9 @@ export function step(
   if (done.has("askEarth")) {
     earthAnswer = forecasts?.[sol];
     if (!earthAnswer) {
-      const coming = events.filter((e) => e.kind === "stormCloud" && e.sol > sol).sort((a, b) => a.sol - b.sol)[0];
+      const coming = events
+        .filter((e) => e.kind === "stormCloud" && e.sol > sol)
+        .sort((a, b) => a.sol - b.sol)[0];
       earthAnswer = {
         dustTomorrow: panelEfficiency < 1 ? "dusty" : "clear",
         ...(coming ? { stormCloudInSols: coming.sol - next } : {}),
@@ -183,9 +263,13 @@ export function step(
 
   const newState: GameState = {
     sol: over ? sol : next,
-    bars: { power: powerTomorrow, air, dose: clamp(state.bars.dose + doseToday) },
+    bars: {
+      power: powerTomorrow,
+      air,
+      dose: clamp(state.bars.dose + doseToday),
+    },
     food,
-    science: state.science + (done.has("science") ? 1 : 0),
+    science: state.science + (done.has("science") ? ENGINE.scienceGain : 0),
     panelEfficiency,
     shelterSols: Math.max(0, shelterSols - 1),
     tired,
@@ -210,5 +294,12 @@ export function stars(state: GameState): Stars {
   const crewSafe = state.bars.dose < ENGINE.doseLimit;
   const baseRunning = state.bars.air > 0 && state.bars.power > 0;
   const science = state.science >= ENGINE.scienceGoal;
-  return { crewSafe, baseRunning, science, count: ((crewSafe ? 1 : 0) + (baseRunning ? 1 : 0) + (science ? 1 : 0)) as Stars["count"] };
+  return {
+    crewSafe,
+    baseRunning,
+    science,
+    count: ((crewSafe ? 1 : 0) +
+      (baseRunning ? 1 : 0) +
+      (science ? 1 : 0)) as Stars["count"],
+  };
 }
