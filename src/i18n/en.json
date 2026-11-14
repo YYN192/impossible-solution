@@ -66,6 +66,22 @@
   },
   "final": {
     "heading": "Mission over",
+    "endedEarly": "Mission ended early. Here is what caused it.",
+    "chainIntro": "Here is how one thing led to another:",
+    "chainLabel": "Domino chain {{n}}",
+    "noChain": "No dominoes fell. Every problem was stopped in time!",
+    "sol": "Sol {{sol}}",
+    "stars_one": "{{count}} star out of 3",
+    "stars_other": "{{count}} stars out of 3",
+    "goal": {
+      "crewSafe": "Crew safe from space rays",
+      "baseRunning": "Base kept running",
+      "science": "Science goal reached"
+    },
+    "goalWon": "(got it)",
+    "goalMissed": "(missed)",
+    "best_one": "Best: {{count}}★",
+    "best_other": "Best: {{count}}★",
     "tryAgain": "Try a different plan",
     "home": "Back to start"
   },
