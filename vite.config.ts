@@ -14,6 +14,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         menu: resolve(projectRoot, "index.html"),
+        mission: resolve(projectRoot, "mission.html"),
         hub: resolve(projectRoot, "hub.html"),
         console: resolve(projectRoot, "console.html"),
       },
@@ -22,5 +23,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     passWithNoTests: true,
+    setupFiles: ['./src/test/setup.ts'],
   },
 })

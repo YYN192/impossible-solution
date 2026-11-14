@@ -1,60 +1,75 @@
 # The Impossible SOLution — fix it now, or pay for it later
 
-Locked Sat 14 Nov 2026 ~10:30 Sofia time, after `/idea-forge` (see `idea-forge.md`), a judge review (16/25) and a kid playtest. Designed during the hackathon.
+**v2, locked Sat 14 Nov 2026 ~11:00 Sofia.** Designed during the hackathon. v1 → judge review, kid playtest, science check, then an LLM council (5 advisors + peer review + chairman). Full record: `docs/council/`.
 
-**What kids learn (one sentence for teachers):** on a Mars base, every choice costs something, and skipping a fix today usually costs more tomorrow.
+Title screen line: **"A sol is one day on Mars."**
+Teacher sentence: **On Mars, every choice costs something, and help from Earth can't always arrive in time.**
 
 ## Player / audience
-Kids 7–12 (default "Cadet" mode: plain words, picture cards, 2-sentence read-aloud reports). "Engineer" mode for 11–12, parents and teachers: real terms and units (sol, mSv, W). One mission ≈ 10 min; a class can play 3 runs in a 40-min lesson. No login, no data collected.
 
-## The 3 resources the player juggles
-1. **Power** (battery bar)
-2. **Air & water** (life support bar)
-3. **Space-ray meter** (crew radiation dose; Engineer mode: mSv)
+Kids 7–12. One mission = 3 sols ≈ 8 min. A class can do: 1 run → discuss (teacher card) → 1 run. No login, no data collected. EN first, BG toggle. Real terms (sol, mSv) appear only as small "What's this?" tooltips, never as required reading.
 
-## How all five systems appear
-- **Life support:** the air & water bar; the CO₂ filter is a job; skipping it lowers air next day.
-- **Shielding:** a "stay inside / reinforce shelter" job vs. outside jobs; outside work during a sun storm raises the space-ray meter.
-- **Power:** solar panels; dust lowers output; "clean panels" is a job.
-- **Food:** the greenhouse job (lights cost power; skipping it lowers food → crew slower next day). Reference: CSA food-production toolkit, NASA Veggie.
-- **Comms delay:** "Ask Earth" job: the question goes out now, the answer comes back later in the day (real one-way delay 3–22 min, shown as a live clock in Engineer mode).
+## The 3 bars
 
-## Core loop (one Mars day = one round)
-1. **Morning report**: max 2 short sentences, read aloud, one picture ("A sun storm is coming! Where should your crew work?").
-2. **Plan**: 3 astronauts, 4 job cards; tap an astronaut, tap a job. One shift per day. Every placement immediately moves the bars and shows a mini-domino ("Panels skipped → less power tomorrow"). Idle astronauts and skipped jobs also cost something, so there's no free choice.
-3. **End of day**: bars update with a short animation.
-4. After 3 days (stretch: 5): **domino chain**, a visual chain from each problem back to its real cause, each link with a "Real data: source" chip where applicable. Then "Try a different plan" with the same starting conditions.
+1. **Power** ⚡ — solar panels make it; dust lowers it.
+2. **Air** 🫧 — the air machine uses power every night; no power → air drops.
+3. **Space-ray meter** ☢️ — crew radiation dose (lower is better).
+   Plus **Food** 🥬 as a small counter (greenhouse), not a bar.
 
-## NASA data that drives decisions (dataset → mechanic → fallback)
-| Dataset | Mechanic | Fallback |
-|---|---|---|
-| Curiosity RAD normal surface dose, 0.67 mSv/day (Hassler 2014) | Baseline of the space-ray meter | Constant in code, cited |
-| DONKI FLR/CME/SEP records (a real event Curiosity measured at Mars — exact event and dose **to verify with science-checker**) | The storm day: timing and strength of the sun storm | Snapshot JSON, labelled "Snapshot, May 2024", never "live" |
-| DONKI live (last 30 days) | Optional "today's real sun" banner: "Right now the Sun is calm/active", plus a bonus mission seeded from it | Snapshot + badge LIVE / SAVED DATA |
-| Curiosity REMS weather (lags ~2.5 months) | Daily temperature/dust affects panel output | Snapshot, labelled "recent Mars weather" |
-| Earth–Mars light delay 3–22 min (+ DSN Now rtlt if CORS allows) | Ask Earth answer timing | Constant range, cited |
-| OSDR / RadLab | Science fact cards ("What space did to lettuce/mice") | Snapshot |
+## Jobs (3 astronauts, 5 job cards → 2 jobs are always left undone)
 
-In-app **Data Sources** screen + a **"What this game simplifies"** card (3 crew, short days, food rules are invented, Mars dose numbers are real).
+Every job costs something today, and every skipped job costs something later. Numbers are **invented game units** unless a source is named; they are labelled "game number" in the Data Sources screen.
 
-## The "wow" moment (first 10 s of video)
-The domino chain falling backwards: "Mars day 3: greenhouse dark" ← "Mars day 2: low power" ← "Mars day 1: you skipped cleaning the panels during a dust storm (real Curiosity data)". Then: "Try again".
+| Job                             | Cost today                                          | If done                                                           | If skipped                                                       | Real anchor                                                                      |
+| ------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 🧽 Clean solar panels (outside) | 1 worker, small space-ray dose (big during a burst) | Panels back to full → normal power tomorrow                       | Dust builds: tomorrow's power about a third lower                | InSight: 2022 dust storm cut 425 → 275 Wh/sol (≈ −35%)                           |
+| 🥬 Run greenhouse lights        | 1 worker, 2 power                                   | +1 food                                                           | −1 food; food at 0 → one astronaut is too tired to work tomorrow | CSA food toolkit, NASA Veggie (context only)                                     |
+| 🛡️ Build up the shelter         | 1 worker, 1 power                                   | Everyone's space-ray dose halved today and tomorrow               | No protection if a burst hits                                    | Shielding lowers dose (direction only; the factor is a game number)              |
+| 📡 Ask Earth                    | 1 worker, 1 power                                   | Next morning: dust forecast + "is a storm cloud heading to Mars?" | You plan blind tomorrow                                          | Light delay 3–22 min one way; DONKI WSA-Enlil forecasts Mars arrivals days ahead |
+| 🔬 Science trip (outside)       | 1 worker, space-ray dose                            | +1 science ⭐ (mission goal)                                      | No science                                                       | —                                                                                |
+| (idle astronaut)                | —                                                   | —                                                                 | Counts as a wasted worker; mission goal gets harder              | —                                                                                |
 
-## Primary award we're aiming at
-Best Use of Science / Galactic Impact (education). Secondary: Local Impact (EN + BG).
+### Built-in domino chain (must be provable in Vitest)
 
-## MVP (must have by Sat 19:00)
-1 Mars mission, 3 days, 4 jobs, 3 bars, storm day from a DONKI snapshot, domino chain (text version ok), Data Sources screen, LIVE/SAVED badge, `?offline=1`.
+Skip panels (sol 1) → power −⅓ (sol 2) → not enough power for both the greenhouse and the air machine → food 0 or air drops (sol 2 night) → one astronaut too tired / air warning (sol 3). That is 3+ links inside 3 sols.
 
-## Stretch (only after MVP is deployed)
-Engineer mode, Bulgarian, read-aloud (Web Speech), 5-day mission, second mission (Moon), animated dominoes, DSN Now live delay.
+## Storms: two kinds, both real
 
-## Cut list (drop in this order)
-Second mission → read-aloud → animations → Engineer mode → BG translation (keep at least the toggle with partial strings).
+1. **Particle burst** — arrives in **tens of minutes**, so no warning from Earth can beat it. Data: **20 May 2024**; Curiosity's radiation detector (RAD) measured **8.1 mGy** from that one storm, as much as **more than a month of normal Mars radiation** (normal: 0.21 mGy/day, 0.64 mSv/day, Hassler et al. 2014). The DONKI record for that event is **CME 2024-05-20T05:36:00-CME-001**. Kid text: "The Sun just blasted a storm! A real Mars rover measured one like this on 20 May 2024." Do **not** say "30 chest X-rays".
+2. **Storm cloud (CME)** — takes **days**, so Earth _can_ warn you. Data: DONKI WSA-Enlil forecast that the **23 May 2024 CME would brush past Mars on 28 May ~11:30 UTC** (glancing blow). Earth's dust forecast is a game number. This is what Ask Earth reveals.
 
-## Risks + mitigations
-- Too complex for 7 → max 4 job cards, tap-tap, costs shown instantly, playtest with a real kid on Sunday morning.
-- Science errors → every number goes through `science-checker` before it reaches kid text; "simplifies" card.
-- Engine bugs → pure TS engine in `src/sim/` with Vitest tests first (deterministic: same plan → same result).
-- API down at venue → snapshots bundled; app works with `?offline=1`.
-- Looks like every other "DONKI storm" game → video opens on the domino chain, not the storm.
+**Ask Earth wording:** "Your message takes about 12 minutes to reach Earth. Scientists study it overnight. Their answer is waiting for you in the morning."
+
+## Loop (one sol = one round)
+
+1. **Morning report:** first line = **the domino that just fell**, with icons ("⚡↓ because you skipped the panels"). Then at most 1 more sentence (event or Earth's answer).
+2. **Plan:** tap an astronaut → tap a job. Each placement immediately previews its cost on the bars, plus a small icon domino for the skipped jobs ("🧽✗ → ⚡↓ tomorrow").
+3. _(Stretch, only if MVP is green at 19:00)_ **Prediction tap:** "Which bar will drop tomorrow?"
+4. **End of sol:** bars animate (respecting reduced motion).
+5. After sol 3: **domino chain** (problem ← cause ← cause), **1–3 stars** (⭐ crew safe: dose under limit · ⭐ base running: no bar hit 0 · ⭐ science goal reached), "Best: 2★", **Try a different plan** (same start).
+
+Losing never feels punitive: "Mission ended early. Here's what caused it", then the domino chain and Try again.
+
+## NASA data that drives decisions
+
+| Data                                                           | Mechanic                                                                                                              | Fallback                                                               |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Curiosity RAD (JPL 20 May 2024 release; Hassler 2014 baseline) | Size of the burst vs. a normal day on the space-ray meter                                                             | Constants in code, cited                                               |
+| DONKI CME 2024-05-20-CME-001                                   | Storm sol in the default/demo mission                                                                                 | Bundled snapshot, badge SNAPSHOT                                       |
+| DONKI WSA-Enlil (impactList contains "Mars")                   | Ask Earth "storm cloud coming" forecast; optional **"Today's Sun"** run seeded only by live CMEs forecast to hit Mars | None in 30 days → "The Sun is quiet toward Mars this month" + snapshot |
+| InSight power vs. dust                                         | Panel-dust penalty (≈ −⅓)                                                                                             | Constant, cited                                                        |
+| Earth–Mars light delay 3–22 min                                | Ask Earth wording                                                                                                     | Constant, cited                                                        |
+
+Never map a live CME to a Mars dose. Data Sources screen + a **"What this game simplifies"** card (3 crew, short sols, job numbers are game numbers; the storm, normal dose, dust effect and delay are real).
+
+## Video "wow" (first 8 s)
+
+The domino chain falling backwards: "Sol 3: astronaut too tired" ← "Sol 2: power low" ← "Sol 1: you skipped cleaning the panels". Then the caption: "Based on real NASA data: InSight's dusty panels and the 20 May 2024 solar storm Curiosity measured." Shot from `?demo=1`, captions only (no minor voices).
+
+## Award target
+
+Best Use of Science / Galactic Impact (education); Local Impact (BG).
+
+## Cut (council)
+
+Moon mission, DSN live clock, read-aloud, 5-day mission, OSDR fact cards, Engineer mode, run-1 vs run-2 comparison, seed codes / Wordle daily, accuracy tracking, animated dominoes beyond a simple fall, dataset IDs/units on kid screens, decorative DONKI banner.

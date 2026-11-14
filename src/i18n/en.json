@@ -1,0 +1,282 @@
+{
+  "app": {
+    "name": "The Impossible SOLution",
+    "disclaimer": "Uses NASA open data. Not affiliated with or endorsed by NASA."
+  },
+  "title": {
+    "solLine": "A sol is one day on Mars.",
+    "start": "Start mission"
+  },
+  "common": {
+    "solOf": "Sol {{sol}} of {{total}}",
+    "next": "Next"
+  },
+  "morning": {
+    "heading": "Good morning! Sol {{sol}}",
+    "goPlan": "Plan the day",
+    "firstDay": "First morning on Mars. Everything works.",
+    "nothingFell": "Nothing broke overnight. Good plan!",
+    "because": "because"
+  },
+  "domino": {
+    "panelsSkipped": "Nobody cleaned the solar panels.",
+    "greenhouseSkipped": "Nobody ran the greenhouse lights.",
+    "shelterSkipped": "Nobody built up the shelter.",
+    "powerLow": "Power is low today.",
+    "foodEmpty": "The food ran out.",
+    "airLow": "The air is getting thin.",
+    "crewTired": "One astronaut is too tired to work.",
+    "doseHigh": "The space-ray meter jumped up."
+  },
+  "event": {
+    "burst": {
+      "may2024": "The Sun just blasted a space-ray storm!"
+    },
+    "stormCloud": {
+      "may2024": "A storm cloud from the Sun reached Mars.",
+      "today": "A real storm cloud from the Sun is heading for Mars."
+    }
+  },
+  "earth": {
+    "answer": "📡 Earth says: {{dust}}, and {{storm}}.",
+    "dust": {
+      "clear": "clear skies tomorrow",
+      "dusty": "dusty skies tomorrow"
+    },
+    "storm": {
+      "none": "no storm cloud is coming",
+      "coming_one": "a storm cloud arrives in {{count}} sol",
+      "coming_other": "a storm cloud arrives in {{count}} sols"
+    }
+  },
+  "chip": {
+    "live": "Live NASA data",
+    "snapshot": "Real NASA data (saved)",
+    "constant": "Real NASA number",
+    "source": "source"
+  },
+  "plan": {
+    "heading": "Plan sol {{sol}}",
+    "endSol": "End sol"
+  },
+  "endSol": {
+    "heading": "Night falls on sol {{sol}}",
+    "nextMorning": "Go to sleep",
+    "seeResults": "See how it went"
+  },
+  "final": {
+    "heading": "Mission over",
+    "endedEarly": "Mission ended early. Here is what caused it.",
+    "chainIntro": "Here is how one thing led to another:",
+    "chainLabel": "Domino chain {{n}}",
+    "noChain": "No dominoes fell. Every problem was stopped in time!",
+    "sol": "Sol {{sol}}",
+    "stars_one": "{{count}} star out of 3",
+    "stars_other": "{{count}} stars out of 3",
+    "goal": {
+      "crewSafe": "Crew safe from space rays",
+      "baseRunning": "Base kept running",
+      "science": "Science goal reached"
+    },
+    "goalWon": "(got it)",
+    "goalMissed": "(missed)",
+    "best_one": "Best: {{count}}★",
+    "best_other": "Best: {{count}}★",
+    "tryAgain": "Try a different plan",
+    "home": "Back to start"
+  },
+  "data": {
+    "badge": {
+      "live": "LIVE",
+      "saved": "SAVED DATA",
+      "liveTitle": "Real NASA data, downloaded just now",
+      "savedTitle": "Real NASA data, saved on {{date}}"
+    }
+  },
+  "dataSources": {
+    "open": "Where our numbers come from",
+    "title": "Where our numbers come from",
+    "intro": "This game uses real NASA science. Here is every real number, where it comes from, and what the game makes up.",
+    "real": "Real NASA data",
+    "inGame": "In the game",
+    "savedOn": "Saved NASA space-weather data was downloaded on {{date}}.",
+    "gameNumbers": "Game numbers",
+    "gameNumbersIntro": "We chose these numbers so the game is fair and fun. Each one is a game number, not a NASA measurement.",
+    "power": "{{n}} power",
+    "outside": "outside (more space rays)",
+    "airMachine": "Air machine, every night",
+    "doseUnits": "The space-ray meter uses game units. Only the size of a storm compared with a normal day is real.",
+    "simplifies": "What this game simplifies",
+    "back": "Back"
+  },
+  "jobs": {
+    "panels": "Clean solar panels",
+    "greenhouse": "Run greenhouse lights",
+    "shelter": "Build up the shelter",
+    "askEarth": "Ask Earth",
+    "science": "Science trip"
+  },
+  "jobInfo": {
+    "panels": {
+      "done": "Clean panels make full power tomorrow.",
+      "skipped": "Dust builds up. Less power tomorrow."
+    },
+    "greenhouse": {
+      "done": "The plants grow 1 food.",
+      "skipped": "1 less food. No food makes someone too tired."
+    },
+    "shelter": {
+      "done": "Fewer space rays today and tomorrow.",
+      "skipped": "No cover if a space-ray storm hits."
+    },
+    "askEarth": {
+      "done": "Earth's answer comes tomorrow morning.",
+      "skipped": "You plan tomorrow without a forecast."
+    },
+    "science": {
+      "done": "You earn 1 science star.",
+      "skipped": "No science today."
+    },
+    "cost_zero": "No power needed",
+    "cost_one": "Uses {{count}} power",
+    "cost_other": "Uses {{count}} power",
+    "outside": "Outside: more space rays"
+  },
+  "crew": {
+    "name": "Astronaut {{n}}",
+    "tired": "Too tired to work today",
+    "idle": "No job yet",
+    "idleWarning": "An astronaut with no job is a wasted worker."
+  },
+  "planHelp": {
+    "howTo": "Tap an astronaut. Then tap a job.",
+    "leftUndone_one": "{{count}} job is left undone.",
+    "leftUndone_other": "{{count}} jobs are left undone.",
+    "tomorrow": "tomorrow",
+    "notEnoughPower": "Not enough power for this job."
+  },
+  "bars": {
+    "power": "Power",
+    "air": "Air",
+    "dose": "Space-ray meter",
+    "food": "Food",
+    "science": "Science"
+  },
+  "help": {
+    "whatsThis": "What's this?",
+    "close": "Got it",
+    "sol": {
+      "title": "Sol",
+      "text": "A sol is one day on Mars. It is about 40 minutes longer than an Earth day."
+    },
+    "power": {
+      "title": "Power",
+      "text": "Solar panels turn sunlight into power. Jobs inside the base use some."
+    },
+    "air": {
+      "title": "Air",
+      "text": "The air machine makes air to breathe. It needs power every night."
+    },
+    "dose": {
+      "title": "Space-ray meter",
+      "text": "Space rays come from the Sun and from deep space. Scientists call them radiation. Too much is bad for astronauts, so keep this meter low."
+    },
+    "food": {
+      "title": "Food",
+      "text": "The greenhouse grows food under lamps. With no food, an astronaut gets too tired to work."
+    },
+    "dust": {
+      "title": "Dust",
+      "text": "Mars dust settles on solar panels. Dusty panels make less power. A dust storm cut a real lander's power by about a third."
+    },
+    "burst": {
+      "title": "Space-ray storm",
+      "text": "Sometimes the Sun blasts out space rays. They reach Mars in under an hour. That is too fast for Earth to warn you."
+    },
+    "stormCloud": {
+      "title": "Storm cloud",
+      "text": "A storm cloud is a huge gas cloud from the Sun. It takes days to reach Mars. So Earth can see it coming and warn you."
+    },
+    "askEarth": {
+      "title": "Ask Earth",
+      "text": "Your message takes about 12 minutes to reach Earth. Scientists study it overnight. Their answer is waiting for you in the morning."
+    }
+  },
+  "teacher": {
+    "title": "For teachers",
+    "goal": "On Mars, every choice costs something, and help from Earth can't always arrive in time.",
+    "howTo": "Play one mission (about 8 minutes). Talk about the questions. Then play again.",
+    "questionsTitle": "Talk about it",
+    "q1": "Who waited for Earth's answer? Was it worth the wait?",
+    "q2": "Which skipped job hurt your base the most? How did you find out?",
+    "q3": "Why can Earth warn you about a storm cloud but not about a space-ray storm?",
+    "realTitle": "What is real",
+    "real": "The 20 May 2024 solar storm, normal Mars radiation, dust on solar panels, and the Earth–Mars message delay are real NASA science. Job costs are game numbers."
+  },
+  "notice": {
+    "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission."
+  },
+  "mission": {
+    "may2024": {
+      "title": "Mission: May 2024"
+    },
+    "todaysSun": {
+      "title": "Mission: Today's Sun"
+    }
+  },
+  "moreData": {
+    "title": "More real data",
+    "intro": "Real measurements and pictures from NASA, plus ideas from the Canadian Space Agency.",
+    "savedOn": "Saved on {{date}}.",
+    "storm": {
+      "title": "The storm, measured on Mars",
+      "chartLabel": "Radiation measured by the Curiosity rover on Mars, 15 to 25 May 2024. The line jumps up on 20 May 2024.",
+      "body": "On a normal day, Curiosity measured about {{normal}} µGy every hour. On 20 May 2024 it shot up to about {{peak}} µGy an hour. That is about {{times}} times normal! A few days later it was back to normal.",
+      "unit": "µGy (microgray) is a tiny unit for how much radiation something soaks up.",
+      "inGame": "In the game: this is why the space-ray meter jumps in a particle burst, and why the shelter matters.",
+      "axisNormal": "normal",
+      "source": "Data: {{attribution}}. Each point on the line is a one-hour average."
+    },
+    "site": {
+      "title": "Where is our base?",
+      "body": "Our pretend base is at Gale Crater on Mars. The real Curiosity rover works there.",
+      "alt": "Map of Gale Crater on Mars seen from above: a big round crater with a mountain in the middle",
+      "credit": "Map: {{credit}}",
+      "explore": "Explore Mars yourself in NASA Mars Trek"
+    },
+    "pictures": {
+      "title": "Real pictures",
+      "dust": "NASA's InSight lander got so dusty that its solar panels made much less power.",
+      "storm": "During the 20 May 2024 storm, space rays hit Curiosity's camera and made white specks.",
+      "credit": "Picture: {{credit}} (NASA Image and Video Library)"
+    },
+    "plants": {
+      "title": "Real plants grown in space",
+      "body": "Astronauts really grew food on the International Space Station. Scientists keep what they learned in NASA's space-biology library (OSDR).",
+      "count": "Search OSDR for “Veggie”, the space garden, and you find {{n}} studies.",
+      "food": "Food",
+      "radiation": "Space rays",
+      "health": "Health"
+    },
+    "sun": {
+      "title": "What the Sun did this month",
+      "intro": "In the 30 days up to {{date}}, NASA counted:",
+      "flares": "Solar flares: {{n}} (big ones: {{big}})",
+      "cmes": "Storm clouds (CMEs): {{n}}",
+      "storms": "Magnetic storms at Earth: {{n}}",
+      "flaresMissing": "NASA's solar flare list was not available when we checked, so we leave flares out.",
+      "note": "NASA watches the Sun from near Earth. Most of these storms never reach Mars."
+    },
+    "apod": {
+      "title": "Space picture of the day",
+      "body": "“{{title}}”, {{date}}. Picture: {{credit}}.",
+      "open": "See it on NASA's Astronomy Picture of the Day"
+    },
+    "teach": {
+      "title": "For teachers and families",
+      "body": "Free activities from the Canadian Space Agency, to keep exploring after the game."
+    },
+    "disclaimer": "Uses NASA open data and Canadian Space Agency resources. This project is not affiliated with or endorsed by NASA or the Canadian Space Agency.",
+    "fresh": "{{label}} · {{date}}"
+  }
+}

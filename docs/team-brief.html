@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Team Brief — The Impossible SOLution</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      :root {
+        --ink: #14182b;
+        --muted: #5b6380;
+        --line: #e3e6ef;
+        --paper: #ffffff;
+        --space: #0c1124;
+        --space2: #1a2246;
+        --mars: #e0603a;
+        --mars-soft: #fdebe4;
+        --blue: #2f6fe4;
+        --blue-soft: #e7effd;
+        --green: #1f9d63;
+        --green-soft: #e3f5ec;
+        --amber: #c98a0b;
+        --amber-soft: #fbf1db;
+        --violet: #7a4fd6;
+        --violet-soft: #efe8fb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        font-size: 10.2pt;
+        line-height: 1.45;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page {
+        width: 210mm;
+        height: 297mm;
+        padding: 16mm 16mm 14mm;
+        position: relative;
+        overflow: hidden;
+        page-break-after: always;
+      }
+      .page:last-child {
+        page-break-after: auto;
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      h2 {
+        font-size: 17pt;
+        margin-bottom: 4mm;
+      }
+      h2 .num {
+        color: var(--mars);
+        margin-right: 2mm;
+      }
+      h3 {
+        font-size: 11pt;
+        margin-bottom: 1.5mm;
+      }
+      p {
+        margin: 0 0 2.5mm;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .small {
+        font-size: 8.6pt;
+      }
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 8.6pt;
+        background: #f2f4f9;
+        padding: 0.3mm 1.2mm;
+        border-radius: 1mm;
+      }
+      .foot {
+        position: absolute;
+        bottom: 8mm;
+        left: 16mm;
+        right: 16mm;
+        display: flex;
+        justify-content: space-between;
+        font-size: 7.8pt;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+        padding-top: 2mm;
+      }
+
+      /* cover */
+      .cover {
+        background:
+          radial-gradient(circle at 78% 18%, #3a2a5c 0, transparent 38%),
+          radial-gradient(circle at 15% 85%, #4a1f1a 0, transparent 40%),
+          linear-gradient(160deg, var(--space2), var(--space));
+        color: #eef1ff;
+      }
+      .cover .stars {
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(1.2px 1.2px at 10% 20%, #fff 50%, transparent 51%),
+          radial-gradient(1px 1px at 30% 70%, #cfd6ff 50%, transparent 51%),
+          radial-gradient(1.4px 1.4px at 55% 35%, #fff 50%, transparent 51%),
+          radial-gradient(1px 1px at 80% 60%, #fff 50%, transparent 51%),
+          radial-gradient(1.2px 1.2px at 90% 15%, #dfe4ff 50%, transparent 51%),
+          radial-gradient(1px 1px at 65% 85%, #fff 50%, transparent 51%),
+          radial-gradient(1px 1px at 22% 45%, #fff 50%, transparent 51%),
+          radial-gradient(1.3px 1.3px at 42% 12%, #fff 50%, transparent 51%);
+        opacity: 0.8;
+      }
+      .planet {
+        position: absolute;
+        right: -40mm;
+        bottom: -55mm;
+        width: 150mm;
+        height: 150mm;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #f08a5d,
+          #c8452a 45%,
+          #6e1f15 80%
+        );
+        box-shadow: 0 0 40mm rgba(224, 96, 58, 0.35);
+      }
+      .cover .inner {
+        position: relative;
+        z-index: 1;
+      }
+      .kicker {
+        font-size: 9pt;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #ffb59c;
+      }
+      .cover h1 {
+        font-size: 38pt;
+        line-height: 1.02;
+        margin: 6mm 0 4mm;
+        font-weight: 800;
+      }
+      .cover h1 span {
+        color: var(--mars);
+      }
+      .tagline {
+        font-size: 14pt;
+        color: #c9d0f0;
+        max-width: 125mm;
+      }
+      .sol {
+        display: inline-block;
+        margin-top: 7mm;
+        padding: 2mm 4mm;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 20mm;
+        font-size: 9.5pt;
+        color: #fff;
+      }
+      .cover-grid {
+        margin-top: 16mm;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5mm;
+        max-width: 140mm;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 3mm;
+        padding: 4mm 5mm;
+      }
+      .glass h3 {
+        color: #ffb59c;
+        font-size: 8.5pt;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 2mm;
+      }
+      .glass p {
+        margin: 0;
+        color: #e6e9fb;
+        font-size: 9.6pt;
+      }
+      .glass a {
+        color: #fff;
+      }
+      .cover .foot {
+        color: #e6e9fb;
+        z-index: 2;
+        border-top-color: rgba(255, 255, 255, 0.15);
+      }
+
+      /* game */
+      .lead {
+        font-size: 11.5pt;
+      }
+      .bars {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3mm;
+        margin: 4mm 0 5mm;
+      }
+      .bar {
+        border-radius: 2.5mm;
+        padding: 3mm 3.5mm;
+      }
+      .bar b {
+        display: block;
+        font-size: 10.5pt;
+      }
+      .bar span {
+        font-size: 8.4pt;
+        color: var(--muted);
+      }
+      .b1 {
+        background: var(--amber-soft);
+      }
+      .b2 {
+        background: var(--blue-soft);
+      }
+      .b3 {
+        background: var(--violet-soft);
+      }
+      .b4 {
+        background: var(--green-soft);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8.8pt;
+      }
+      th {
+        text-align: left;
+        font-size: 7.8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        border-bottom: 1.5px solid var(--ink);
+        padding: 1.5mm 2mm;
+      }
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 1.8mm 2mm;
+        vertical-align: top;
+      }
+      td.real {
+        color: var(--green);
+        font-weight: 600;
+      }
+      .chain {
+        display: flex;
+        align-items: center;
+        gap: 2mm;
+        margin: 4mm 0;
+        flex-wrap: nowrap;
+      }
+      .dom {
+        flex: 1;
+        background: var(--mars-soft);
+        border: 1px solid #f4c3b1;
+        border-radius: 2.5mm;
+        padding: 2.5mm 3mm;
+        font-size: 8.6pt;
+      }
+      .dom b {
+        display: block;
+        color: var(--mars);
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .arrow {
+        color: var(--mars);
+        font-size: 14pt;
+        font-weight: 700;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5mm;
+      }
+      .box {
+        border: 1px solid var(--line);
+        border-radius: 3mm;
+        padding: 3.5mm 4mm;
+      }
+      .box.mars {
+        border-left: 4px solid var(--mars);
+      }
+      .box.blue {
+        border-left: 4px solid var(--blue);
+      }
+
+      /* roles */
+      .roles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4mm;
+      }
+      .role {
+        border: 1px solid var(--line);
+        border-radius: 3mm;
+        padding: 3.5mm 4mm 3mm;
+        position: relative;
+      }
+      .role .tag {
+        position: absolute;
+        top: 3.5mm;
+        right: 4mm;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 7.6pt;
+        padding: 0.6mm 2mm;
+        border-radius: 1.5mm;
+      }
+      .role h3 {
+        font-size: 12pt;
+        margin-bottom: 0.5mm;
+      }
+      .role .what {
+        color: var(--muted);
+        font-size: 8.8pt;
+        margin-bottom: 2mm;
+      }
+      .role ul {
+        margin: 0;
+        padding-left: 4mm;
+        font-size: 8.8pt;
+      }
+      .role li {
+        margin-bottom: 0.8mm;
+      }
+      .role .gh {
+        font-size: 7.8pt;
+        color: var(--muted);
+        margin-top: 2mm;
+      }
+      .r-sim {
+        border-top: 4px solid var(--blue);
+      }
+      .r-sim .tag {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .r-data {
+        border-top: 4px solid var(--violet);
+      }
+      .r-data .tag {
+        background: var(--violet-soft);
+        color: var(--violet);
+      }
+      .r-ui {
+        border-top: 4px solid var(--amber);
+      }
+      .r-ui .tag {
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+      .r-copy {
+        border-top: 4px solid var(--green);
+      }
+      .r-copy .tag {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .r-guide {
+        border-top: 4px solid var(--muted);
+        background: #fafbfd;
+      }
+
+      /* timeline */
+      .tl {
+        position: relative;
+        margin: 2mm 0 4mm 3mm;
+        padding-left: 7mm;
+        border-left: 2px solid var(--line);
+      }
+      .ev {
+        position: relative;
+        margin-bottom: 2.6mm;
+      }
+      .ev::before {
+        content: "";
+        position: absolute;
+        left: -9.3mm;
+        top: 1.2mm;
+        width: 3.4mm;
+        height: 3.4mm;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid var(--muted);
+      }
+      .ev.gate::before {
+        background: var(--mars);
+        border-color: var(--mars);
+      }
+      .ev .t {
+        font-weight: 700;
+        display: inline-block;
+        min-width: 25mm;
+      }
+      .ev.gate .t {
+        color: var(--mars);
+      }
+      .ev .who {
+        color: var(--muted);
+        font-size: 8.4pt;
+      }
+      .day {
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+        margin: 3mm 0 2mm -7mm;
+      }
+      ol.drop {
+        margin: 0;
+        padding-left: 5mm;
+      }
+      ol.drop li {
+        margin-bottom: 1mm;
+      }
+      .never {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5mm;
+        margin-top: 2mm;
+      }
+      .chip {
+        font-size: 8.2pt;
+        background: var(--green-soft);
+        color: var(--green);
+        border-radius: 10mm;
+        padding: 0.8mm 2.6mm;
+        font-weight: 600;
+      }
+
+      /* how-to */
+      pre {
+        background: var(--space);
+        color: #e6e9fb;
+        border-radius: 2.5mm;
+        padding: 3mm 4mm;
+        font-size: 8.4pt;
+        line-height: 1.5;
+        margin: 1.5mm 0 3mm;
+        white-space: pre-wrap;
+      }
+      pre .c {
+        color: #8c96c4;
+      }
+      .rules li {
+        margin-bottom: 1.2mm;
+      }
+      .links td:first-child {
+        font-weight: 600;
+        width: 38mm;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- PAGE 1: COVER -->
+    <section class="page cover">
+      <div class="stars"></div>
+      <div class="planet"></div>
+      <div class="inner">
+        <div class="kicker">NASA Space Apps Challenge 2026 · Team brief</div>
+        <h1>The Impossible<br /><span>SOL</span>ution</h1>
+        <div class="tagline">
+          Fix it now, or pay for it later. A Mars-base game for kids aged 7–12,
+          built on real NASA data.
+        </div>
+        <div class="sol">A <b>sol</b> is one day on Mars</div>
+
+        <div class="cover-grid">
+          <div class="glass">
+            <h3>Team</h3>
+            <p>
+              SoftUniors, Sofia<br />Aleksandar · Yavor · Viktor<br />Danislav ·
+              Nikolay P.<br />Guide: Nikolai Palashev
+            </p>
+          </div>
+          <div class="glass">
+            <h3>Challenge</h3>
+            <p>Build a Junior Astronaut Mission Trainer</p>
+          </div>
+          <div class="glass">
+            <h3>Play</h3>
+            <p>
+              <a href="https://yyn192.github.io/impossible-solution/"
+                >yyn192.github.io/impossible-solution</a
+              >
+            </p>
+          </div>
+          <div class="glass">
+            <h3>Code &amp; tasks</h3>
+            <p>
+              <a href="https://github.com/YYN192/impossible-solution"
+                >github.com/YYN192/impossible-solution</a
+              ><br />→ Issues tab = your to-do list
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Version 2 · Sat 14 Nov 2026, 11:00 Sofia</span
+        ><span>Sources: docs/concept.md · docs/plan.md · docs/council/</span>
+      </div>
+    </section>
+
+    <!-- PAGE 2: THE GAME -->
+    <section class="page">
+      <h2><span class="num">01</span>The game in one minute</h2>
+      <p class="lead">
+        You run a Mars base for <b>3 sols</b>. Each morning you have
+        <b>3 astronauts</b> and <b>5 jobs</b>, so 2 jobs are always left undone.
+        Every job costs something today, and every skipped job costs something
+        later. At the end, a <b>domino chain</b> shows which choice caused each
+        problem. Then you try a different plan.
+      </p>
+      <p class="muted">
+        <b>What kids learn:</b> on Mars, every choice costs something, and help
+        from Earth can't always arrive in time.
+      </p>
+
+      <div class="bars">
+        <div class="bar b1">
+          <b>⚡ Power</b><span>Solar panels make it. Dust lowers it.</span>
+        </div>
+        <div class="bar b2">
+          <b>🫧 Air</b><span>The air machine needs power every night.</span>
+        </div>
+        <div class="bar b3">
+          <b>☢️ Space-ray meter</b
+          ><span>Crew radiation dose. Lower is better.</span>
+        </div>
+        <div class="bar b4">
+          <b>🥬 Food</b><span>Small counter from the greenhouse.</span>
+        </div>
+      </div>
+
+      <h3>The 5 jobs</h3>
+      <table>
+        <tr>
+          <th>Job</th>
+          <th>Costs today</th>
+          <th>If done</th>
+          <th>If skipped</th>
+          <th>Real anchor</th>
+        </tr>
+        <tr>
+          <td>🧽 Clean panels <span class="muted">(outside)</span></td>
+          <td>worker + small dose</td>
+          <td>Full power tomorrow</td>
+          <td>Tomorrow's power ≈ ⅓ lower</td>
+          <td class="real">InSight dust storm: 425 → 275 Wh/sol</td>
+        </tr>
+        <tr>
+          <td>🥬 Greenhouse</td>
+          <td>worker + 2 power</td>
+          <td>+1 food</td>
+          <td>−1 food; at 0 an astronaut is too tired</td>
+          <td class="muted">game number</td>
+        </tr>
+        <tr>
+          <td>🛡️ Shelter</td>
+          <td>worker + 1 power</td>
+          <td>Dose halved today + tomorrow</td>
+          <td>No protection in a storm</td>
+          <td class="muted">game number</td>
+        </tr>
+        <tr>
+          <td>📡 Ask Earth</td>
+          <td>worker + 1 power</td>
+          <td>Morning: dust + storm-cloud forecast</td>
+          <td>You plan blind</td>
+          <td class="real">Light delay 3–22 min; DONKI forecasts</td>
+        </tr>
+        <tr>
+          <td>🔬 Science trip <span class="muted">(outside)</span></td>
+          <td>worker + dose</td>
+          <td>+1 science ⭐</td>
+          <td>No science</td>
+          <td class="muted">—</td>
+        </tr>
+      </table>
+
+      <h3 style="margin-top: 5mm">
+        The domino chain (our "wow" moment, first 8 seconds of the video)
+      </h3>
+      <div class="chain">
+        <div class="dom"><b>Sol 1</b>🧽✗ You skipped cleaning the panels</div>
+        <div class="arrow">→</div>
+        <div class="dom"><b>Sol 2</b>⚡↓ Power about a third lower</div>
+        <div class="arrow">→</div>
+        <div class="dom">
+          <b>Sol 2 night</b>🥬✗ Not enough power for greenhouse + air
+        </div>
+        <div class="arrow">→</div>
+        <div class="dom"><b>Sol 3</b>😴 An astronaut is too tired to work</div>
+      </div>
+
+      <div class="two">
+        <div class="box mars">
+          <h3>☀️ Particle burst: no warning</h3>
+          <p class="small">
+            Arrives in <b>tens of minutes</b>, faster than any message from
+            Earth. Real: <b>20 May 2024</b>. Curiosity's radiation detector
+            measured <b>8.1 mGy</b> from one storm: more than <b>a month</b>
+            of normal Mars radiation.
+          </p>
+        </div>
+        <div class="box blue">
+          <h3>🌫️ Storm cloud: Earth can warn you</h3>
+          <p class="small">
+            A CME takes <b>days</b>. NASA's DONKI forecast that the
+            <b>23 May 2024</b> CME would brush past <b>Mars on 28 May</b>. That's
+            what "Ask Earth" reveals: the message takes ~12 min; scientists
+            study it overnight.
+          </p>
+        </div>
+      </div>
+      <p class="small muted" style="margin-top: 3mm">
+        Score: ⭐ crew safe · ⭐ base running · ⭐ science goal. Losing never
+        feels like punishment: "Here's what caused it. Try again."
+      </p>
+      <div class="foot">
+        <span>The Impossible SOLution · Team brief</span><span>2</span>
+      </div>
+    </section>
+
+    <!-- PAGE 3: ROLES -->
+    <section class="page">
+      <h2><span class="num">02</span>Who does what</h2>
+      <p class="muted">
+        Each person has a branch, a folder and their own GitHub issues. Open
+        <b>Issues → Assignee: you</b> to see your to-do list with checkboxes.
+      </p>
+      <div class="roles">
+        <div class="role r-sim">
+          <span class="tag">sim/engine</span>
+          <h3>Aleksandar</h3>
+          <div class="what">
+            Game engine + <b>gate decider</b> · <code>src/sim/</code>
+          </div>
+          <ul>
+            <li>
+              <b>#1</b> Pure <code>step()</code> engine + determinism test ·
+              <i>14:00</i>
+            </li>
+            <li>
+              <b>#2</b> Brute-force tests: 3-link chain, 3★ reachable, no free
+              plan · <i>19:00</i>
+            </li>
+            <li><b>#3</b> Stars + Best score · <i>19:00</i></li>
+          </ul>
+          <div class="gh">Decides what gets cut if a gate slips.</div>
+        </div>
+
+        <div class="role r-data">
+          <span class="tag">data/layer</span>
+          <h3>Yavor</h3>
+          <div class="what">
+            NASA data, offline, demo, submission · <code>src/data/</code>
+          </div>
+          <ul>
+            <li>
+              <b>#4</b> Snapshots: 20 May storm + 23→28 May forecast ·
+              <i>14:00</i>
+            </li>
+            <li><b>#20</b> Registration → Sofia (with Nikolai) · <i>now</i></li>
+            <li>
+              <b>#5</b> Fallback fetch, LIVE/SNAPSHOT badge,
+              <code>?offline=1</code> · <i>19:00</i>
+            </li>
+            <li>
+              <b>#6</b> <code>?demo=1</code> · <b>#7</b> Data Sources screen ·
+              <i>19:00</i>
+            </li>
+            <li>
+              <b>#21</b> Playtest · <b>#8</b> Today's Sun (stretch) ·
+              <b>#22</b> Submission
+            </li>
+          </ul>
+        </div>
+
+        <div class="role r-ui">
+          <span class="tag">ui/planner</span>
+          <h3>Viktor</h3>
+          <div class="what">
+            The plan screen · <code>src/screens/Plan*</code>
+          </div>
+          <ul>
+            <li>
+              <b>#9</b> 3 astronauts × 5 job cards, tap-tap, keyboard, 44 px ·
+              <i>14:00</i>
+            </li>
+            <li>
+              <b>#10</b> Instant cost preview + mini-dominoes · <i>19:00</i>
+            </li>
+            <li>
+              <b>#11</b> Record the ≤ 30 s video (with Nikolay) ·
+              <i>Sun 13:00</i>
+            </li>
+          </ul>
+        </div>
+
+        <div class="role r-ui">
+          <span class="tag">ui/reports</span>
+          <h3>Danislav</h3>
+          <div class="what">
+            App shell, reports, final chain · <code>src/screens/</code>
+          </div>
+          <ul>
+            <li>
+              <b>#12</b> i18next setup <b>first</b>, title screen, screen
+              switching · <i>14:00</i>
+            </li>
+            <li>
+              <b>#13</b> Morning report: fallen domino first · <i>14:00</i>
+            </li>
+            <li>
+              <b>#14</b> Final domino chain + stars + Try again · <i>19:00</i>
+            </li>
+          </ul>
+        </div>
+
+        <div class="role r-copy">
+          <span class="tag">copy/text</span>
+          <h3>Nikolay P.</h3>
+          <div class="what">
+            Every word kids read, credits · <code>src/i18n/en.json</code>
+          </div>
+          <ul>
+            <li>
+              <b>#15</b> All kid text in <code>en.json</code> (short sentences)
+              · <i>14:00</i>
+            </li>
+            <li>
+              <b>#16</b> "What's this?" tooltips + simplifies card ·
+              <i>19:00</i>
+            </li>
+            <li>
+              <b>#17</b> CREDITS + AI log always current · <b>#18</b> Teacher
+              card
+            </li>
+            <li><b>#19</b> Bulgarian after the copy freeze · <i>Sun</i></li>
+          </ul>
+        </div>
+
+        <div class="role r-guide">
+          <h3>Nikolai Palashev</h3>
+          <div class="what">Guide · Team Owner on spaceappschallenge.org</div>
+          <ul>
+            <li>
+              Change the team's Local Event to <b>Sofia</b> (only the owner can)
+            </li>
+            <li>
+              Find a 7–12-year-old for the <b>18:00 playtest</b> (guardian
+              present, no recording)
+            </li>
+            <li>Review the teacher card</li>
+          </ul>
+          <div class="gh">Follows the public repo: Watch → All activity.</div>
+        </div>
+      </div>
+      <div class="foot">
+        <span>The Impossible SOLution · Team brief</span><span>3</span>
+      </div>
+    </section>
+
+    <!-- PAGE 4: TIMELINE -->
+    <section class="page">
+      <h2><span class="num">03</span>Timeline and gates</h2>
+      <div class="two" style="grid-template-columns: 1.25fr 1fr">
+        <div class="tl">
+          <div class="day">Saturday 14 Nov</div>
+          <div class="ev">
+            <span class="t">11:00</span> Everyone starts on their branch
+          </div>
+          <div class="ev gate">
+            <span class="t">14:00</span> <b>Gate 1: playable loop</b>, deployed
+            (ugly is fine)
+          </div>
+          <div class="ev">
+            <span class="t">14–16</span> Costs both ways, morning domino, Ask
+            Earth, storm
+          </div>
+          <div class="ev">
+            <span class="t">16:00</span> Science check of all kid text
+            <span class="who">· science-checker</span>
+          </div>
+          <div class="ev gate">
+            <span class="t">18:00</span> <b>Real-kid playtest</b>
+            <span class="who">· Nikolai + Yavor</span>
+          </div>
+          <div class="ev gate">
+            <span class="t">19:00</span> <b>Gate 2: MVP</b> + judge pass #1
+          </div>
+          <div class="ev">
+            <span class="t">19–23</span> Playtest fixes, then stretch goals
+          </div>
+          <div class="ev gate">
+            <span class="t">23:00</span> <b>Gate 3: feature + text freeze</b>
+          </div>
+          <div class="day">Sunday 15 Nov</div>
+          <div class="ev">
+            <span class="t">08–10</span> Fixes only, judge pass #2, rules audit
+          </div>
+          <div class="ev">
+            <span class="t">10–12</span> Record video from <code>?demo=1</code>
+            <span class="who">· Viktor + Nikolay</span>
+          </div>
+          <div class="ev gate">
+            <span class="t">13:00</span> <b>Gate 4: video uploaded</b> (due
+            14:00)
+          </div>
+          <div class="ev">
+            <span class="t">14–16</span> Pitch + Q&amp;A practice
+            <span class="who">· everyone</span>
+          </div>
+          <div class="ev gate">
+            <span class="t">16:00</span> <b>Live finals</b>, 3-min pitch
+          </div>
+          <div class="ev gate">
+            <span class="t">20:00</span> <b>Gate 5: global submission</b> (hard
+            deadline 23:59)
+          </div>
+        </div>
+        <div>
+          <div class="box mars" style="margin-bottom: 4mm">
+            <h3>If we're late: drop in this order</h3>
+            <p class="small muted">Aleksandar decides at each gate.</p>
+            <ol class="drop small">
+              <li>Prediction tap ("which bar drops tomorrow?")</li>
+              <li>"Today's Sun" live run</li>
+              <li>Bulgarian toggle (text stays in i18n)</li>
+              <li>Stars → simple pass / fail</li>
+              <li>Teacher card → static page</li>
+            </ol>
+          </div>
+          <div class="box blue">
+            <h3>Never drop</h3>
+            <div class="never">
+              <span class="chip">Morning domino</span
+              ><span class="chip">Ask Earth</span
+              ><span class="chip">Real storm (snapshot)</span>
+              <span class="chip">Data Sources screen</span
+              ><span class="chip">LIVE / SNAPSHOT badge</span
+              ><span class="chip">?demo=1 · ?offline=1</span>
+            </div>
+          </div>
+          <div class="box" style="margin-top: 4mm">
+            <h3>What we cut on purpose</h3>
+            <p class="small muted">
+              Moon mission · 5-day mission · read-aloud · Engineer mode · live
+              DSN clock · OSDR fact cards · daily Wordle-style mission · run
+              comparison screen · fancy animations · dataset IDs on kid screens.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <span>The Impossible SOLution · Team brief</span><span>4</span>
+      </div>
+    </section>
+
+    <!-- PAGE 5: HOW TO WORK -->
+    <section class="page">
+      <h2><span class="num">04</span>How to work</h2>
+      <div class="two">
+        <div>
+          <h3>Set up once</h3>
+          <p class="small">
+            Windows (PowerShell), then open a <b>new</b> PowerShell:
+          </p>
+          <pre>
+winget install --id Git.Git -e
+winget install OpenJS.NodeJS.LTS</pre>
+          <p class="small">Accept the GitHub invite, then:</p>
+          <pre style="font-size: 6.7pt; white-space: pre">git clone https://github.com/YYN192/impossible-solution
+cd impossible-solution
+npm install
+npm run dev
+<span class="c"># open localhost:5173/impossible-solution/</span></pre>
+
+          <h3>Every work session</h3>
+          <pre>git switch <span class="c">&lt;your-branch&gt;</span>
+git pull
+<span class="c"># get everyone else's merged work:</span>
+git fetch &amp;&amp; git merge origin/main</pre>
+
+          <h3>Every 30–60 minutes</h3>
+          <pre><span class="c"># must pass before pushing:</span>
+npm run build &amp;&amp; npm test
+git add -A
+git commit -m "Plan screen: tap astronaut then job"
+git push</pre>
+          <p class="small">
+            Then on GitHub: <b>Compare &amp; pull request</b> → into
+            <code>main</code> → wait for the green check → <b>Merge</b>. The
+            live site updates in ~1 minute.
+          </p>
+        </div>
+        <div>
+          <h3>Team rules</h3>
+          <ul class="rules small">
+            <li>
+              <b>Short kid sentences.</b> Explain every science word. All text
+              goes in <code>src/i18n/en.json</code>.
+            </li>
+            <li>
+              <b>Buttons ≥ 44 px</b>, keyboard + touch work, respect reduced
+              motion.
+            </li>
+            <li>
+              <b>Every number has a source</b> or says "game number". Never call
+              saved data "live".
+            </li>
+            <li>
+              <b>Credit everything the same day:</b> library, icon, font →
+              <code>CREDITS.md</code>; AI use →
+              <code>docs/ai-usage-log.md</code>.
+            </li>
+            <li>
+              <b>No NASA logos.</b> No faces or voices of team members (we're
+              under 18) in the video or project page.
+            </li>
+            <li>
+              <b>Small commits, <code>main</code> always works.</b> Stuck for 20
+              minutes? Ask the team.
+            </li>
+            <li>
+              <b>Merge conflict?</b> Don't delete anything. Keep the right
+              lines, remove the <code>&lt;&lt;&lt;&lt;</code> <code>====</code>
+              <code>&gt;&gt;&gt;&gt;</code> markers, commit.
+            </li>
+          </ul>
+
+          <h3 style="margin-top: 4mm">Where things are</h3>
+          <table class="links small">
+            <tr>
+              <td>Your to-do list</td>
+              <td>GitHub → Issues → filter by you</td>
+            </tr>
+            <tr>
+              <td>The game design</td>
+              <td><code>docs/concept.md</code></td>
+            </tr>
+            <tr>
+              <td>Who / when</td>
+              <td><code>docs/plan.md</code></td>
+            </tr>
+            <tr>
+              <td>Engine contract</td>
+              <td><code>src/sim/types.ts</code> (read first)</td>
+            </tr>
+            <tr>
+              <td>Setup help</td>
+              <td><code>README.md</code></td>
+            </tr>
+            <tr>
+              <td>How we decided</td>
+              <td><code>docs/council/verdict.md</code></td>
+            </tr>
+            <tr>
+              <td>Live game</td>
+              <td>yyn192.github.io/impossible-solution</td>
+            </tr>
+            <tr>
+              <td>Test switches</td>
+              <td><code>?offline=1</code> · <code>?demo=1</code></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="foot">
+        <span
+          >Uses NASA open data. Not affiliated with or endorsed by NASA.</span
+        ><span>5</span>
+      </div>
+    </section>
+  </body>
+</html>
