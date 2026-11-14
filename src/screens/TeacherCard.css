@@ -1,0 +1,10 @@
+.teacher__goal { font-size: 1.2rem; font-weight: 700; color: #ffcf8a; }
+.teacher__questions li { margin-bottom: 0.6rem; }
+.teacher h2:focus { outline: none; }
+
+/* Print the card on its own: dark background off, no buttons or top bar. */
+@media print {
+  body:has(.teacher) { background: #fff !important; color: #000 !important; }
+  body:has(.teacher) :is(.topbar, .notice, .note, .sources__back) { display: none !important; }
+  .teacher__goal { color: #000; }
+}

@@ -1,5 +1,7 @@
 # AI usage log
 
+Required in the Space Apps submission. One line per use: when, who, tool, what for, what we kept.
+
 ## Local Mars UI experiment — 2026-11-14
 
 - Generated `src/assets/pixel/astronaut.png` as an original pixel-art player sprite for the Mars base prototype.
@@ -24,5 +26,6 @@
 | Sat 14 Nov 12:17–12:38 | Danislav | Claude Code (Claude Opus 5.5) | #14 final screen (domino chain, stars + Best, Try a different plan); game store on the real engine | PR #29: src/screens/FinalScreen.tsx, src/state/game.ts (from commit co-author lines) |
 | Sat 14 Nov 13:00 | Nikolay P. | Claude Code (Claude Opus 5.5) | #15/#16/#17: kid text in en.json (job effects, crew, bars, plan help, tooltips, teacher card draft), copy-rule tests, "What's this?" tooltip component, credits/assets, test fix for Node 25+ localStorage | en.json, src/components/WhatsThis.*, src/i18n/en.copy.test.ts, CREDITS.md (text to be science-checked before merge) |
 | Sat 14 Nov 13:30 | Nikolay P. | Claude Code (Claude Opus 5.5) | Pitch slide deck for the Sunday pitch; full project documentation | docs/documentation.md (playtest slide left with placeholders until the real playtest) |
+| Sat 14 Nov 14:45–15:15 | Nikolay P. | Claude Code (Claude Opus 5.5) | Audit of my area after the merges; tooltips placed on title + morning screens, kid-friendly chip labels + jargon test, simplifies card moved to en.json, teacher card screen (#18), own favicon, docs; tests first where possible | src/components/helpTopics.ts, src/screens/{TitleScreen,MorningScreen,TeacherCard}.tsx, src/data/sources.ts, mission.ts, en.json, App.tsx, favicon.svg (reviewed by Nikolay P.) |
 
 - 2026-11-14: Codex merged origin/main into ui/planner, retained both asset credits and AI logs, and added mission.html to expose the upstream app alongside the prototype pages. Validation: 244 tests passed, production build passed, lint completed with two existing engine-test warnings.

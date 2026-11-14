@@ -180,7 +180,7 @@ npm run dev
 
 | Area | What the tests prove |
 | --- | --- |
-| Engine (`src/sim/`) | `step()` is pure and deterministic; a 3-link domino chain exists inside 3 sols; several 2–3 star plans exist; no plan is free; bars stay within 0–10 |
+| Engine (`src/sim/`) | `step()` is pure and deterministic; a 3-link domino chain exists inside 3 sols; several 2–3 star plans and at least one 1-star plan exist; no plan is free and no single job is the best pick every time; bars stay within 0–10; the kid text matches the game numbers |
 | Data layer (`src/data/`) | Live fetch, retry on 429, timeout, cache, snapshot fallback, offline mode, API key never cached; science-check wording |
 | Screens and state | Navigation, morning report picks the fallen domino first, badge never says LIVE for saved data |
 | Copy rules (`src/i18n/en.copy.test.ts`) | No DONKI/mGy/CME/X-ray on any screen, kid sentences of 12 words or fewer, locked Ask Earth wording |
@@ -209,10 +209,8 @@ On `copy/text`: 154 tests passing.
 
 **Known issues**
 
-- On Node 25 or newer, 14 data-layer tests fail because Node's built-in `localStorage` hides jsdom's. CI uses Node 22, so it is unaffected; the fix in `src/test/setup.ts` is on `copy/text`, not yet on `main`.
-- The morning-report data chip shows the source label, which contains "DONKI WSA-Enlil" on a kid screen; it needs a kid-friendly label.
-- The "What this game simplifies" text is hard-coded in `src/data/sources.ts`, so it cannot be translated yet.
-- `public/favicon.svg` is still the Vite logo from the project template.
+- The Data Sources facts (`REAL_FACTS` in `src/data/sources.ts`) are still English-only; they move to i18n with the Bulgarian translation (#19).
+- The bars on the Plan screen still need their "What's this?" buttons (`power`, `air`, `dose`, `food`) once the real Plan screen (#9) lands.
 
 ## Team and workflow
 

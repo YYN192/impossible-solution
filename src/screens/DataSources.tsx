@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
+import { REAL_FACTS, SIMPLIFICATION_KEYS } from "../data/sources";
 import { SNAPSHOT_DATES } from "../data/donki";
 import { DataBadge } from "../components/DataBadge";
 import { MoreRealData } from "./MoreRealData";
@@ -73,8 +73,8 @@ export function DataSources({
 
       <h3>{t("dataSources.simplifies")}</h3>
       <ul className="sources__simple">
-        {SIMPLIFICATIONS.map((s) => (
-          <li key={s}>{s}</li>
+        {SIMPLIFICATION_KEYS.map((k) => (
+          <li key={k}>{t(k)}</li>
         ))}
       </ul>
 

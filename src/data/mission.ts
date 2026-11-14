@@ -74,7 +74,7 @@ export function todaysSunMission(hits: MarsHit[], source: DataSource, fetchedAt:
   // Future arrival: show it on the sol it would arrive (capped). Past arrival (already hit): last sol.
   const sol = Math.min(MISSION_SOLS, Math.max(2, days >= 0 ? days + 1 : MISSION_SOLS));
   const ref = {
-    label: `NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud reaching Mars on ${newest.arrival.slice(0, 10)}`,
+    label: `NASA's space weather forecast: a storm cloud reaching Mars on ${newest.arrival.slice(0, 10)}`,
     url: newest.link ?? "https://kauai.ccmc.gsfc.nasa.gov/DONKI/",
     mode: isLive(source) ? ("live" as const) : ("snapshot" as const),
     fetched: new Date(fetchedAt).toISOString(),

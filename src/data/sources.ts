@@ -47,7 +47,8 @@ export const DONKI_CME_MAY20: DataRef = {
 };
 
 export const DONKI_ENLIL_MAY23: DataRef = {
-  label: "NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud of 23 May 2024 was forecast to brush past Mars on 28 May",
+  // Kid chip text: no dataset names here (the Data Sources facts name DONKI WSA-Enlil).
+  label: "NASA's space weather forecast: a storm cloud of 23 May 2024 was forecast to brush past Mars on 28 May",
   url: "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1",
   mode: "snapshot",
 };
@@ -110,13 +111,16 @@ export const REAL_FACTS: RealFact[] = [
   },
 ];
 
-/** Things the game invents or simplifies. Shown on the "What this game simplifies" card. */
-export const SIMPLIFICATIONS: string[] = [
-  "A real base would have more than 3 astronauts and many more jobs.",
-  "Our sols are short rounds. Real storm clouds take several days to reach Mars; we squeeze that into a sol or two.",
-  "Job costs (power, food, the size of each bar) are game numbers we chose so the game is fair and fun.",
-  "The space-ray meter uses game units. The size of a storm compared with a normal day is real.",
-  "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
-  "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
-  "Real: the 20 May 2024 storm, normal Mars radiation, the dust effect on solar panels, and the message delay.",
-];
+/**
+ * Things the game invents or simplifies, as en.json keys (simplifies.*) so BG can translate them.
+ * Shown on the "What this game simplifies" card.
+ */
+export const SIMPLIFICATION_KEYS = [
+  "simplifies.crew",
+  "simplifies.sols",
+  "simplifies.costs",
+  "simplifies.dose",
+  "simplifies.forecast",
+  "simplifies.dates",
+  "simplifies.real",
+] as const;
