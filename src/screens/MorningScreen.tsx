@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { tDynamic } from "../i18n/dynamic";
 import { MISSION_SOLS } from "../sim/types";
+import { useGame } from "../state/game";
+import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
 import { DominoCard } from "./DominoCard";
-import { fakeMorning } from "./fakeGame";
 import {
   pickMorning,
   type Extra,
@@ -17,9 +18,18 @@ import { ScreenFrame } from "./ScreenFrame";
  * then at most one more sentence (today's storm or Earth's answer) with a real-data chip.
  */
 export function MorningScreen() {
-  const { sol } = useNav();
-  // TODO(engine): replace fakeMorning with the real GameState / StepResult.fell / StormEvents.
-  return <MorningReportView sol={sol} report={pickMorning(fakeMorning(sol))} />;
+  const sol = useNav((s) => s.sol);
+  const state = useGame((s) => s.state);
+  const fell = useGame((s) => s.fell);
+  const events = useMission((s) => s.setup?.events);
+  const report = pickMorning({
+    sol,
+    fell,
+    all: state.dominoes,
+    events: events ?? [],
+    earthAnswer: state.earthAnswer,
+  });
+  return <MorningReportView sol={sol} report={report} />;
 }
 
 export function MorningReportView({

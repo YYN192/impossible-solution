@@ -2,10 +2,11 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { useNav } from "../state/screen";
-import { FAKE_DOMINOES, FAKE_EVENTS } from "./fakeGame";
+import { FAKE_DOMINOES, FAKE_EVENTS, loadFakeGame } from "./fakeGame";
 import { MorningScreen } from "./MorningScreen";
 
 const showMorning = (sol: number) => {
+  loadFakeGame(sol);
   useNav.setState({ screen: "morning", sol });
   render(<MorningScreen />);
 };

@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { MISSION_SOLS } from "../sim/types";
+import { useGame } from "./game";
 
 /**
  * Which screen is showing. The game itself (bars, dominoes, sol results) lives in the
- * engine's GameState (src/sim/); this store only handles navigation.
+ * engine's GameState, held by useGame (./game.ts); this store only handles navigation.
+ * Every way into sol 1 (Start mission, Try a different plan) starts a fresh game.
  *
  * Flow: title → (morning → plan → endSol) × MISSION_SOLS → final → morning sol 1 (same start)
  */
@@ -47,8 +49,16 @@ interface NavStore extends Nav {
 
 export const useNav = create<NavStore>()((set) => ({
   ...START,
-  next: () => set((s) => nextNav(s)),
-  restart: () => set({ screen: "morning", sol: 1 }),
+  next: () =>
+    set((s) => {
+      const to = nextNav(s);
+      if (to.screen === "morning" && to.sol === 1) useGame.getState().reset();
+      return to;
+    }),
+  restart: () => {
+    useGame.getState().reset();
+    set({ screen: "morning", sol: 1 });
+  },
   home: () => set(START),
   endEarly: () => set({ screen: "final" }),
 }));

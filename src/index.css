@@ -28,6 +28,21 @@ body {
 .screen h1:focus {
   outline: none;
 }
+.title-art {
+  display: block;
+  width: min(100%, 40rem);
+  height: auto;
+  margin: 0.75rem 0 1.25rem;
+  image-rendering: pixelated;
+  border: 4px solid #252c38;
+  box-shadow: 4px 4px 0 #080b12;
+}
+.pixel-button {
+  border-radius: 0;
+  border: 3px solid #83d9f4 !important;
+  box-shadow: 4px 4px 0 #080b12;
+  image-rendering: pixelated;
+}
 .lead {
   font-size: 1.25rem;
 }
@@ -145,4 +160,52 @@ button.link-button {
   border-left: 6px solid #7cc4ff;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
+}
+/* Final screen: stars + domino chain */
+.stars-count {
+  font-size: 1.4rem;
+  margin: 0;
+}
+.stars-count > span[aria-hidden] {
+  color: #ffd166;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+}
+.star-empty {
+  color: var(--muted);
+}
+.star-goals {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
+.star-goals .won span[aria-hidden] {
+  color: #ffd166;
+}
+.star-goals .missed {
+  color: var(--muted);
+}
+.chain {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+.chain .domino-fall {
+  animation-delay: var(--fall-delay, 0ms);
+}
+.chain li + li {
+  margin-left: 1.5rem;
+}
+.chain-sol {
+  margin: 0.25rem 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
