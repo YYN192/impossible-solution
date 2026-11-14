@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
 import { DEMO_CHAIN_IDS, demoPlanForSol } from "./data/demo";
 import { useSession } from "./game/session";
+import { buildChains } from "./screens/final/buildChains";
 import i18n from "./i18n";
 import type { CrewId } from "./sim/types";
 import { useGame } from "./state/game";
@@ -18,7 +19,11 @@ function resetStores() {
   useNav.setState(START);
   useMission.setState({ status: "idle", setup: undefined });
   useGame.getState().reset();
-  useSession.setState({ position: { x: 320, y: 212, facing: "back" }, draft: {}, before: undefined });
+  useSession.setState({
+    position: { x: 320, y: 212, facing: "back" },
+    draft: {},
+    before: undefined,
+  });
 }
 
 describe("?demo=1 recording path (#6)", () => {
@@ -31,14 +36,22 @@ describe("?demo=1 recording path (#6)", () => {
   async function playThroughUi() {
     const view = render(<App />);
     const start = await screen.findByRole("button", { name: t("title.start") });
-    await waitFor(() => expect((start as HTMLButtonElement).disabled).toBe(false));
+    await waitFor(() =>
+      expect((start as HTMLButtonElement).disabled).toBe(false),
+    );
     fireEvent.click(start);
-    const consoleButton = await screen.findByRole("button", { name: /Open mission console/ });
-    await waitFor(() => expect((consoleButton as HTMLButtonElement).disabled).toBe(false));
+    const consoleButton = await screen.findByRole("button", {
+      name: /Open mission console/,
+    });
+    await waitFor(() =>
+      expect((consoleButton as HTMLButtonElement).disabled).toBe(false),
+    );
     fireEvent.click(consoleButton);
 
     for (let sol = 1; sol <= 3; sol++) {
-      await screen.findByRole("heading", { name: t("morning.heading", { sol }) });
+      await screen.findByRole("heading", {
+        name: t("morning.heading", { sol }),
+      });
       click(t("morning.goPlan"));
       for (const [crew, job] of Object.entries(demoPlanForSol(sol))) {
         click(t("crew.name", { n: crewNumber[crew as CrewId] }));
@@ -70,5 +83,12 @@ describe("?demo=1 recording path (#6)", () => {
         DEMO_CHAIN_IDS[i - 1],
       );
     }
+    // The final screen leads with the 5-link story, repeats no root, and shows a real-data chip.
+    const chains = buildChains(first.dominoes);
+    expect(chains[0].map((d) => d.id)).toEqual([...DEMO_CHAIN_IDS].reverse());
+    expect(
+      chains.flat().filter((d) => d.id === "sol1-panels-skipped"),
+    ).toHaveLength(1);
+    expect(chains.flat().some((d) => d.source)).toBe(true);
   });
 });

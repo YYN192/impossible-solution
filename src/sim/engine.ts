@@ -66,7 +66,27 @@ const SKIP_DOMINO: Partial<Record<JobId, { icon: string; key: string }>> = {
   shelter: { icon: "🛡️✗", key: "shelterSkipped" },
 };
 
-const clamp = (v: number) => Math.min(10, Math.max(0, v));
+/** Assigned but not enough power: says so, instead of "nobody did it". */
+const NO_POWER_DOMINO: Partial<Record<JobId, { icon: string; key: string }>> = {
+  greenhouse: { icon: "🥬⚡✗", key: "noPowerGreenhouse" },
+  shelter: { icon: "🛡️⚡✗", key: "noPowerShelter" },
+  askEarth: { icon: "📡⚡✗", key: "noPowerAskEarth" },
+};
+
+const clamp = (v: number, max = 10) => Math.min(max, Math.max(0, v));
+
+/**
+ * Storms the player has been told about, so the plan preview can show them. Particle bursts
+ * come without warning (tens of minutes); storm clouds only after Earth warned about them.
+ */
+export function knownEvents(
+  state: GameState,
+  events: StormEvent[],
+): StormEvent[] {
+  return events.filter(
+    (e) => e.kind === "stormCloud" && state.warnedSols?.includes(e.sol),
+  );
+}
 
 export function createGame(): GameState {
   return {
@@ -138,7 +158,7 @@ export function step(
       done.add(job);
       continue;
     }
-    const skip = SKIP_DOMINO[job];
+    const skip = (assignedJob && NO_POWER_DOMINO[job]) || SKIP_DOMINO[job];
     if (!skip) continue;
     // Low power is a cause when it stopped the job, and for the greenhouse (the big power user) on a low-power sol.
     const causeIds = assignedJob || job === "greenhouse" ? powerLowToday : [];
@@ -183,9 +203,21 @@ export function step(
   let doseToday = inside + outsideCount * (outside - inside);
   if (sheltered) doseToday *= DOSE.shelterFactor;
   if (storm) {
-    const causeIds = sheltered
-      ? []
-      : [sol - 1, sol].map((s) => p(s, "shelter-skipped")).filter(fallen);
+    // Being outside gives most of the storm dose, so it is the first cause.
+    if (outsideCount > 0)
+      add({
+        id: p(sol, "outside-storm"),
+        sol,
+        icon: "🧑‍🚀☢️",
+        textKey: "domino.outsideStorm",
+        causeIds: [],
+      });
+    const causeIds = [
+      ...(outsideCount > 0 ? [p(sol, "outside-storm")] : []),
+      ...(sheltered
+        ? []
+        : [sol - 1, sol].map((s) => p(s, "shelter-skipped")).filter(fallen)),
+    ];
     add({
       id: p(sol, "dose-high"),
       sol,
@@ -216,8 +248,11 @@ export function step(
   const panelEfficiency = done.has("panels")
     ? 1
     : state.panelEfficiency * ENGINE.dustFactor;
+  // Whole units, rounded down: the meter never shows power the jobs cannot spend.
   const powerTomorrow = clamp(
-    power + NIGHT.solarPowerAtFullEfficiency * panelEfficiency,
+    Math.floor(
+      power + NIGHT.solarPowerAtFullEfficiency * panelEfficiency + EPS,
+    ),
   );
 
   const over = last || air <= 0;
@@ -261,12 +296,19 @@ export function step(
     }
   }
 
+  const warnedSols = [
+    ...(state.warnedSols ?? []),
+    ...(earthAnswer?.stormCloudInSols !== undefined
+      ? [next + earthAnswer.stormCloudInSols]
+      : []),
+  ];
+
   const newState: GameState = {
     sol: over ? sol : next,
     bars: {
       power: powerTomorrow,
       air,
-      dose: clamp(state.bars.dose + doseToday),
+      dose: clamp(state.bars.dose + doseToday, DOSE.meterMax),
     },
     food,
     science: state.science + (done.has("science") ? ENGINE.scienceGain : 0),
@@ -274,6 +316,7 @@ export function step(
     shelterSols: Math.max(0, shelterSols - 1),
     tired,
     ...(earthAnswer ? { earthAnswer } : {}),
+    ...(warnedSols.length ? { warnedSols } : {}),
     dominoes: [...state.dominoes, ...fell],
     over,
   };

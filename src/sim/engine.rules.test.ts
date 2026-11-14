@@ -183,7 +183,7 @@ describe("jobs: cost today, and cost if skipped", () => {
     const r = step(initialState(), plan("greenhouse", "shelter", "science"), []);
     expect(r.state.panelEfficiency).toBeCloseTo(ENGINE.dustFactor);
     expect(ENGINE.dustFactor).toBeCloseTo(0.65);
-    expect(r.state.bars.power).toBeCloseTo(1 + NIGHT.solarPowerAtFullEfficiency * 0.65);
+    expect(r.state.bars.power).toBe(Math.floor(1 + NIGHT.solarPowerAtFullEfficiency * 0.65));
     expect(ids(r.fell)).toContain("sol1-panels-skipped");
     const low = r.fell.find((d) => d.id === "sol2-power-low");
     expect(low?.causeIds).toEqual(["sol1-panels-skipped"]);
@@ -287,16 +287,16 @@ describe("power and the air machine", () => {
 
   it("uses the text keys the screens know (en.json)", () => {
     const s = run([plan("science"), plan()], [burstOn(2)]);
-    const known = ["panelsSkipped", "greenhouseSkipped", "shelterSkipped", "powerLow", "foodEmpty", "airLow", "crewTired", "doseHigh"];
+    const known = ["panelsSkipped", "greenhouseSkipped", "shelterSkipped", "powerLow", "foodEmpty", "airLow", "crewTired", "doseHigh", "outsideStorm"];
     for (const d of s.dominoes) expect(known.map((k) => `domino.${k}`)).toContain(d.textKey);
   });
 
-  it("bars stay inside 0–10", () => {
+  it("bars stay inside 0–10 (dose: 0–DOSE.meterMax)", () => {
     for (const p of ALL_PLANS) {
       const { bars } = run([p, p, p], [burstOn(2)]);
-      for (const v of Object.values(bars)) {
+      for (const [k, v] of Object.entries(bars)) {
         expect(v).toBeGreaterThanOrEqual(0);
-        expect(v).toBeLessThanOrEqual(10);
+        expect(v).toBeLessThanOrEqual(k === "dose" ? DOSE.meterMax : 10);
       }
     }
   });

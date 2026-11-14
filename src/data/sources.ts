@@ -21,6 +21,7 @@ export interface RealFact {
 }
 
 export const RAD_STORM: DatedDataRef = {
+  value: "8.1 mGy",
   label: "A Mars rover (Curiosity) measured this solar storm on 20 May 2024",
   url: "https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/",
   mode: "constant",
@@ -28,6 +29,7 @@ export const RAD_STORM: DatedDataRef = {
 };
 
 export const RAD_BASELINE: DatedDataRef = {
+  value: "0.21 mGy per day",
   label:
     "Curiosity's radiation detector, first measurements on the Mars surface (Hassler et al., Science 2014)",
   url: "https://doi.org/10.1126/science.1244797",
@@ -77,14 +79,14 @@ export const REAL_FACTS: RealFact[] = [
   {
     id: "burst",
     what: "Radiation from the 20 May 2024 solar storm, measured on Mars",
-    value: "8.1 mGy (8,100 micrograys) absorbed dose from one storm",
+    value: `${RAD_STORM.value} (8,100 micrograys) absorbed dose from one storm`,
     usedFor: "How much the space-ray meter jumps in a particle burst",
     ref: RAD_STORM,
   },
   {
     id: "baseline",
     what: "Normal radiation on the Mars surface",
-    value: "0.21 mGy per day absorbed (0.64 mSv per day dose equivalent)",
+    value: `${RAD_BASELINE.value} absorbed (0.64 mSv per day dose equivalent)`,
     usedFor:
       "The normal daily rise of the space-ray meter. The burst is about 39 normal days at once.",
     ref: RAD_BASELINE,

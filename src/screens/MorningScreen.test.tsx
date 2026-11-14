@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { useNav } from "../state/screen";
@@ -28,7 +28,7 @@ describe("Morning report", () => {
     expect(document.querySelector(".chip")).toBeNull();
   });
 
-  it("sol 2: fallen domino first, then its cause, then the storm with a saved-data chip", () => {
+  it("sol 2: fallen domino first, then its cause; the burst is NOT announced (no warning possible)", () => {
     showMorning(2);
     const dominoes = [...document.querySelectorAll(".domino")].map(
       (d) => d.textContent,
@@ -38,12 +38,8 @@ describe("Morning report", () => {
       "🧽✗Nobody cleaned the solar panels.",
     ]);
     screen.getByText("because");
-    screen.getByText("The Sun just blasted a space-ray storm!");
-    expect(text()).toContain(
-      "A Mars rover measured this storm on 20 May 2024.",
-    );
-    // Snapshot data must never be called live.
-    expect(text()).toContain("Real NASA data (saved)");
+    // The kid sees the burst only in the end-of-sol report.
+    expect(text()).not.toContain("The Sun just blasted a space-ray storm!");
     expect(text()).not.toMatch(/live/i);
   });
 
@@ -77,13 +73,13 @@ describe("Morning report", () => {
 
 describe("Morning report 'What's this?' tooltips (#16)", () => {
   afterEach(cleanup);
-  const help = (title: string) => screen.queryByRole("button", { name: `What's this? ${title}` });
+  const help = (title: string) =>
+    screen.queryByRole("button", { name: `What's this? ${title}` });
 
-  it("sol 2: explains the fallen domino (power) and the storm (space-ray storm)", () => {
+  it("sol 2: explains the fallen domino (power); no storm tooltip before the surprise burst", () => {
     showMorning(2);
     expect(help("Power")).not.toBeNull();
-    fireEvent.click(help("Space-ray storm")!);
-    expect(text()).toContain("too fast for Earth to warn you");
+    expect(help("Space-ray storm")).toBeNull();
   });
 
   it("sol 3: explains food and Ask Earth", () => {
@@ -93,6 +89,7 @@ describe("Morning report 'What's this?' tooltips (#16)", () => {
   });
 
   it("every domino the engine can drop has a tooltip topic", () => {
-    for (const key of Object.keys(en.domino)) expect(helpTopicForDomino(`domino.${key}`), key).toBeDefined();
+    for (const key of Object.keys(en.domino))
+      expect(helpTopicForDomino(`domino.${key}`), key).toBeDefined();
   });
 });
