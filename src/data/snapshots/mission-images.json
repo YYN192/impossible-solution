@@ -1,0 +1,42 @@
+{
+  "fetchedAt": "2026-11-14T11:37:27.706Z",
+  "source": "https://images-api.nasa.gov/search?nasa_id={PIA25287,PIA26302,PIA16058}",
+  "attribution": "NASA Image and Video Library",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "Real pictures for the dust, storm and landing-site facts. Small copies saved in public/data/img/ so they show offline.",
+  "data": [
+    {
+      "nasaId": "PIA25287",
+      "title": "InSight's Final Selfie",
+      "description": "NASA's InSight lander took this final selfie on April 24, 2022. The lander is covered with far more dust than it was in its first selfie, taken in December 2018, or in its second selfie, taken in March and April of 2019.",
+      "date": "2022-05-23",
+      "credit": "NASA/JPL-Caltech",
+      "page": "https://images.nasa.gov/details/PIA25287",
+      "remoteImage": "https://images-assets.nasa.gov/image/PIA25287/PIA25287~small.jpg",
+      "use": "dust",
+      "image": "data/img/PIA25287.jpg"
+    },
+    {
+      "nasaId": "PIA26302",
+      "title": "Curiosity Sees Streaks and Specks During 2024 Solar Storm",
+      "description": "NASA's Curiosity Mars rover captured streaks and specks using one of its navigation cameras just as particles from a solar storm arrived on the Martian surface. These artifacts are caused by energetic particles hitting the camera's image detector.",
+      "date": "2024-06-10",
+      "credit": "NASA/JPL-Caltech",
+      "page": "https://images.nasa.gov/details/PIA26302",
+      "remoteImage": "https://images-assets.nasa.gov/image/PIA26302/PIA26302~small.jpg",
+      "use": "storm",
+      "image": "data/img/PIA26302.jpg"
+    },
+    {
+      "nasaId": "PIA16058",
+      "title": "Curiosity Cradled by Gale Crater",
+      "description": "NASA Curiosity rover landed in the Martian crater known as Gale Crater, which is approximately the size of Connecticut and Rhode Island combined. A green dot shows where the rover landed, well within its targeted landing ellipse, outlined in blue.",
+      "date": "2012-08-14",
+      "credit": "NASA/JPL-Caltech/ESA/DLR/FU Berlin/MSSS",
+      "page": "https://images.nasa.gov/details/PIA16058",
+      "remoteImage": "https://images-assets.nasa.gov/image/PIA16058/PIA16058~small.jpg",
+      "use": "site",
+      "image": "data/img/PIA16058.jpg"
+    }
+  ]
+}

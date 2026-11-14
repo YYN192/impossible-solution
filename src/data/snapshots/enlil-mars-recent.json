@@ -1,7 +1,8 @@
 {
-  "fetchedAt": "2026-11-14T09:00:54.017Z",
+  "fetchedAt": "2026-11-14T12:04:31.287Z",
   "source": "https://api.nasa.gov/DONKI/WSAEnlilSimulations?startDate=2026-10-15&endDate=2026-11-14",
   "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
   "about": "Fallback for \"Today's Sun\": the latest WSA-Enlil runs that forecast a CME reaching Mars (last 30 days before the snapshot date).",
   "data": [
     {

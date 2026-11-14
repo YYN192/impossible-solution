@@ -1,6 +1,7 @@
 import { useEffect, useState, type JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
+import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
 import { EndOfSolScreen } from "./screens/EndOfSolScreen";
 import { FinalScreen } from "./screens/FinalScreen";
@@ -64,6 +65,7 @@ export default function App() {
           onBack={() => setShowSources(false)}
           missionSource={setup?.dataSource}
           missionFetchedAt={setup?.dataFetchedAt}
+          liveData={!readFlags().offline && import.meta.env.MODE !== "test"}
         />
       ) : (
         /* key: remount on every step so each screen starts fresh and focuses its heading */

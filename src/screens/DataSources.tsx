@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
 import { SNAPSHOT_DATES } from "../data/donki";
 import { DataBadge } from "../components/DataBadge";
+import { MoreRealData } from "./MoreRealData";
 import type { DataSource } from "../data/http";
 import { JOBS, NIGHT, type JobId } from "../sim/types";
 import "./DataSources.css";
@@ -12,8 +13,11 @@ export function DataSources({
   onBack,
   missionSource = "snapshot",
   missionFetchedAt,
+  liveData = false,
 }: {
   onBack?: () => void;
+  /** Refresh DONKI / APOD cards in the background (App passes !offline). */
+  liveData?: boolean;
   missionSource?: DataSource;
   missionFetchedAt?: number;
 }) {
@@ -47,6 +51,8 @@ export function DataSources({
         ))}
       </ul>
       <p className="sources__note">{t("dataSources.savedOn", { date })}</p>
+
+      <MoreRealData live={liveData} />
 
       <section aria-labelledby="game-numbers-title">
         <h3 id="game-numbers-title">{t("dataSources.gameNumbers")}</h3>

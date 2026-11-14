@@ -1,0 +1,23 @@
+[
+  {
+    "id": "csa-food-toolkit",
+    "topic": "food",
+    "title": "Food production on the Moon and in remote areas",
+    "kind": "Toolkit for educators and youth",
+    "url": "https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/",
+    "links": [
+      { "title": "Master Chef: Mars (Grades 6–9)", "url": "https://www.asc-csa.gc.ca/eng/youth-educators/activities/fitness-and-nutrition/master-chef-mars.asp" },
+      { "title": "Space farmer: a mini-greenhouse experiment", "url": "https://www.asc-csa.gc.ca/eng/youth-educators/activities/mini-greenhouse-experiment.asp" }
+    ]
+  },
+  {
+    "id": "csa-stem",
+    "topic": "educators",
+    "title": "Space resources for STEM and youth organizations",
+    "kind": "Free, bilingual activities and tools",
+    "url": "https://www.asc-csa.gc.ca/eng/youth-educators/resources-stem-and-youth-organizations.asp",
+    "links": [
+      { "title": "Hands-on space activities", "url": "https://www.asc-csa.gc.ca/eng/youth-educators/activities-and-experiments.asp" }
+    ]
+  }
+]

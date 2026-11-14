@@ -11,6 +11,19 @@
 | Curiosity RAD surface baseline (Hassler et al., Science 2014) | https://doi.org/10.1126/science.1244797 | Normal daily dose | constant |
 | InSight dust and solar power | https://www.jpl.nasa.gov/news/nasas-insight-waits-out-dust-storm/ | Panel-dust penalty | constant |
 | NSSDC Mars fact sheet (light delay) | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html | Ask Earth delay wording | constant |
+| Curiosity RAD dose rates 15–25 May 2024 (MSL-RAD-Surface, absorbed dose rate in silicon, µGy/h) — NASA OSDR RadLab | https://visualization.osdr.nasa.gov/radlab/ | Storm curve on Data Sources (peak vs normal); trimmed to hourly averages | 2026-11-14 (snapshot) |
+| OSDR studies OSD-267, OSD-772, OSD-766, OSD-658 + search "Veggie" | https://osdr.nasa.gov/bio/repo/ | "Real plants grown in space" cards (titles + links only) | 2026-11-14 (snapshot) |
+| NASA Image and Video Library: PIA25287 (InSight dusty selfie), PIA26302 (Curiosity camera, May 2024 storm), PIA16058 (Gale Crater) — NASA/JPL-Caltech | https://images.nasa.gov/ | Pictures next to the dust, storm and base-site facts; small copies in public/data/img/ | 2026-11-14 (snapshot) |
+| NASA Mars Trek, Viking MDIM 2.1 colour mosaic (NASA/JPL-Caltech, USGS), 4 tiles around Gale Crater | https://trek.nasa.gov/mars/ | "Where is our base?" map; copies in public/data/trek/ | 2026-11-14 (snapshot) |
+| DONKI FLR, SEP, CME, GST, notifications, last 30 days | https://api.nasa.gov/DONKI/ | "What the Sun did this month" (context only; most never reach Mars) | refreshed every 3 h by the deploy workflow |
+| Astronomy Picture of the Day (science.nasa.gov) — each picture has its own credit/copyright | https://science.nasa.gov/wp-json/wp/v2/apod-basic | Link + credit only; the picture is never copied | refreshed every 3 h |
+
+## Partner agency resources
+
+| Resource | Link | Used for | Terms |
+|---|---|---|---|
+| Canadian Space Agency — Food production on the Moon and in remote areas (toolkit) | https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/ | "For teachers and families" links | Linked only, not reproduced; CSA terms https://www.asc-csa.gc.ca/eng/terms.asp#copyright |
+| Canadian Space Agency — Space resources for STEM and youth organizations | https://www.asc-csa.gc.ca/eng/youth-educators/resources-stem-and-youth-organizations.asp | "For teachers and families" links | as above |
 
 ## Libraries (licence)
 
@@ -36,4 +49,4 @@
 
 ## AI tools — see docs/ai-usage-log.md
 
-Uses NASA open data. Not affiliated with or endorsed by NASA.
+Uses NASA open data and Canadian Space Agency resources. Not affiliated with or endorsed by NASA or the Canadian Space Agency.

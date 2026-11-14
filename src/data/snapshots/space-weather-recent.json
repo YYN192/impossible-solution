@@ -1,0 +1,58 @@
+{
+  "fetchedAt": "2026-11-14T12:06:38.761Z",
+  "source": "https://api.nasa.gov/DONKI/{FLR,SEP,CME,GST,notifications}?startDate=2026-10-15&endDate=2026-11-14",
+  "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "What the Sun did in the last 30 days, as seen from near Earth: flares, particle events, CMEs, geomagnetic storms. Context only — most of these never reach Mars.",
+  "data": {
+    "window": {
+      "start": "2026-10-15",
+      "end": "2026-11-14"
+    },
+    "counts": {
+      "flares": null,
+      "bigFlares": null,
+      "particleEvents": 0,
+      "cmes": 86,
+      "geomagneticStorms": 1
+    },
+    "strongestFlare": null,
+    "latestCme": {
+      "id": "2026-11-13T21:24:00-CME-001",
+      "startTime": "2026-11-13T21:24Z",
+      "speedKmS": 474,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49547/-1"
+    },
+    "strongestStormKp": 6,
+    "missing": [
+      "flr"
+    ],
+    "notifications": [
+      {
+        "type": "CME",
+        "issueTime": "2026-11-13T16:25Z",
+        "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/49532/1"
+      },
+      {
+        "type": "RBE",
+        "issueTime": "2026-11-12T21:30Z",
+        "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/49522/1"
+      },
+      {
+        "type": "Report",
+        "issueTime": "2026-11-11T21:02Z",
+        "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/49503/1"
+      },
+      {
+        "type": "RBE",
+        "issueTime": "2026-11-10T21:31Z",
+        "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/49486/1"
+      },
+      {
+        "type": "CME",
+        "issueTime": "2026-11-10T16:29Z",
+        "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/49483/1"
+      }
+    ]
+  }
+}

@@ -86,3 +86,12 @@ describe("getJson fallbacks (gap tests)", () => {
     expect(r.source).toBe("snapshot");
   });
 });
+
+describe("getJson in-flight dedupe", () => {
+  it("two calls at the same time share one request (StrictMode double effects)", async () => {
+    server.use(http.get(URL_, () => (calls++, HttpResponse.json([{ id: "a" }]))));
+    const [a, b] = await Promise.all([getJson({ url: URL_, schema: Thing }), getJson({ url: URL_, schema: Thing })]);
+    expect(calls).toBe(1);
+    expect(a.data).toEqual(b.data);
+  });
+});
