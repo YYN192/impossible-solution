@@ -48,7 +48,7 @@ export function may2024Mission(): MissionSetup {
     titleKey: "mission.may2024.title",
     events: [
       { sol: 2, kind: "particleBurst", captionKey: "event.burst.may2024", source: RAD_STORM },
-      ...(cloud ? [{ sol: 3, kind: "stormCloud" as const, captionKey: "event.cloud.may2024", source: cloudRef }] : []),
+      ...(cloud ? [{ sol: 3, kind: "stormCloud" as const, captionKey: "event.stormCloud.may2024", source: cloudRef }] : []),
     ],
     forecasts: {
       1: { dustTomorrow: "dusty", stormCloudInSols: cloud ? 1 : undefined, source: answerRef },
@@ -86,7 +86,7 @@ export function todaysSunMission(hits: MarsHit[], source: DataSource, fetchedAt:
   return {
     kind: "todaysSun",
     titleKey: "mission.todaysSun.title",
-    events: [{ sol, kind: "stormCloud", captionKey: "event.cloud.today", source: ref }],
+    events: [{ sol, kind: "stormCloud", captionKey: "event.stormCloud.today", source: ref }],
     forecasts,
     dataSource: source,
     dataFetchedAt: fetchedAt,

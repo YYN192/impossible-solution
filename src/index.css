@@ -124,3 +124,25 @@ a {
     transition: none !important;
   }
 }
+/* Top bar: data badge + Data Sources link */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+button.link-button {
+  border: 0;
+  padding: 0.6rem 0.25rem;
+  font-size: 0.95rem;
+  color: #7cc4ff;
+  text-decoration: underline;
+}
+.notice {
+  background: #1a2240;
+  border-left: 6px solid #7cc4ff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+}
