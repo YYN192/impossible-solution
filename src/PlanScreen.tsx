@@ -1,568 +1,84 @@
-import { useMemo, useState } from "react";
-import { en } from "./i18n/en";
-import {
-  DOSE,
-  JOBS,
-  NIGHT,
-  type CrewId,
-  type GameState,
-  type JobId,
-  type Plan,
-} from "./sim/types";
-
-const crew: Array<{
-  id: CrewId;
-  name: string;
-  role: string;
-  initials: string;
-}> = [
-  {
-    id: "a1",
-    name: en.plan.crew.nova.name,
-    role: en.plan.crew.nova.role,
-    initials: "N",
-  },
-  {
-    id: "a2",
-    name: en.plan.crew.kai.name,
-    role: en.plan.crew.kai.role,
-    initials: "K",
-  },
-  {
-    id: "a3",
-    name: en.plan.crew.amani.name,
-    role: en.plan.crew.amani.role,
-    initials: "A",
-  },
-];
-
-const jobIds: JobId[] = [
-  "panels",
-  "greenhouse",
-  "shelter",
-  "askEarth",
-  "science",
-];
-const initialState: GameState = {
-  sol: 1,
-  bars: { power: 7, air: 8, dose: 0.4 },
-  food: 1,
-  science: 0,
-  panelEfficiency: 0.65,
-  shelterSols: 0,
-  tired: [],
-  dominoes: [],
-  over: false,
-};
-const clamp = (value: number) => Math.min(10, Math.max(0, value));
-
+import { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ResourceMeters } from "./components/ResourceMeters";
+import { WhatsThis } from "./components/WhatsThis";
+import { INSIGHT_DUST, LIGHT_DELAY, RAD_BASELINE, DONKI_ENLIL_MAY23 } from "./data/sources";
+import { asset } from "./game/assets";
+import { audio } from "./game/audio";
+import { useSession } from "./game/session";
+import { DataChip } from "./screens/DataChip";
+import { ScreenFrame } from "./screens/ScreenFrame";
+import { step } from "./sim/engine";
+import { JOBS, MISSION_SOLS, type CrewId, type JobId } from "./sim/types";
+import { useGame } from "./state/game";
+import { useMission } from "./state/mission";
+import { useNav } from "./state/screen";
+const crew: CrewId[] = ["a1", "a2", "a3"];
+const jobIds = Object.keys(JOBS) as JobId[];
+const jobArt: Record<JobId, string> = { panels: "power-cell", greenhouse: "mineral-green", shelter: "oxygen-tank", askEarth: "mission-tablet", science: "sample-container" };
+const portraits = ["mission-commander", "engineer", "scientist"];
 export default function PlanScreen() {
-  const [plan, setPlan] = useState<Plan>({});
-  const [selectedCrew, setSelectedCrew] = useState<CrewId | null>(null);
-  const [locked, setLocked] = useState(false);
-  const [showHint, setShowHint] = useState(false);
-  const assignedJobs = useMemo(() => Object.values(plan), [plan]);
-
-  const preview = useMemo(() => {
-    const powerCost = assignedJobs.reduce(
-      (total, id) => total + JOBS[id].powerCost,
-      0,
-    );
-    const outsideJobs = assignedJobs.filter((id) => JOBS[id].outside).length;
-    const totalPowerCost = powerCost + NIGHT.airMachinePower;
-    return {
-      power: clamp(initialState.bars.power - totalPowerCost),
-      air: initialState.bars.air,
-      dose: clamp(
-        initialState.bars.dose +
-          DOSE.normalDay +
-          outsideJobs * DOSE.outsideExtra,
-      ),
-      food: initialState.food + (assignedJobs.includes("greenhouse") ? 1 : 0),
-      powerCost: totalPowerCost,
-      outsideJobs,
-    };
-  }, [assignedJobs]);
-
-  function assignJob(jobId: JobId) {
-    if (!selectedCrew || locked) return;
-    setPlan((current) => {
-      const next = { ...current };
-      const otherCrew = Object.entries(next).find(
-        ([, assigned]) => assigned === jobId,
-      )?.[0] as CrewId | undefined;
-      if (otherCrew && otherCrew !== selectedCrew) delete next[otherCrew];
-      next[selectedCrew] = jobId;
-      return next;
-    });
-    setSelectedCrew(null);
+  const { t } = useTranslation();
+  const state = useGame((s) => s.state);
+  const setup = useMission((s) => s.setup);
+  const plan = useSession((s) => s.draft);
+  const assign = useSession((s) => s.assign);
+  const [selected, select] = useState<CrewId | null>(null);
+  const [confirmIdle, setConfirmIdle] = useState(false);
+  const resolved = useRef(false);
+  // Pure engine preview; no parallel simulation in the interface.
+  const preview = useMemo(() => step(state, plan, setup?.events ?? [], setup?.forecasts), [state, plan, setup]);
+  const idle = crew.filter((id) => !state.tired.includes(id) && !plan[id]).length;
+  function finish() {
+    if (!setup || resolved.current) return;
+    if (idle && !confirmIdle) { setConfirmIdle(true); return; }
+    resolved.current = true;
+    useSession.setState({ before: { ...state.bars }, draft: {} });
+    const result = useGame.getState().endSol(plan);
+    audio.playSfx("resolve");
+    if (result.over && state.sol < MISSION_SOLS) useNav.getState().endEarly();
+    else useNav.getState().next();
   }
-
-  function removeAssignment(crewId: CrewId) {
-    if (locked) return;
-    setPlan((current) => {
-      const next = { ...current };
-      delete next[crewId];
-      return next;
-    });
-    setSelectedCrew(null);
-  }
-
-  return (
-    <main className="mission-shell">
-      <header className="topbar">
-        <a className="brand" href="#mission" aria-label={en.app.title}>
-          <span className="brand-mark" aria-hidden="true">
-            <span />
-          </span>
-          <span className="brand-name">{en.app.title}</span>
-        </a>
-        <div className="topbar-right">
-          <span className="data-badge">
-            <span className="status-dot" />
-            {en.plan.snapshotBadge}
-          </span>
-          <button
-            className="help-button"
-            type="button"
-            onClick={() => setShowHint(!showHint)}
-            aria-expanded={showHint}
-          >
-            <span aria-hidden="true">?</span>
-            {en.plan.helpButton}
-          </button>
-        </div>
-      </header>
-
-      {showHint && (
-        <div className="hint-popover" role="status">
-          <strong>{en.plan.helpTitle}</strong>
-          <p>{en.plan.helpBody}</p>
-        </div>
-      )}
-
-      <section className="mission-heading" id="mission">
-        <div>
-          <p className="eyebrow">{en.plan.eyebrow}</p>
-          <h1>{en.plan.title}</h1>
-          <p className="heading-copy">{en.plan.subtitle}</p>
-        </div>
-        <div className="sol-progress" aria-label={en.plan.solProgressLabel}>
-          <div className="sol-progress-label">
-            <span>{en.plan.solLabel} 01</span>
-            <span>{en.plan.ofLabel} 03</span>
-          </div>
-          <div className="sol-progress-track">
-            <span />
-          </div>
-          <span className="sol-progress-caption">{en.plan.dayOnMars}</span>
-        </div>
-      </section>
-
-      <section className="morning-card" aria-labelledby="morning-title">
-        <div className="morning-copy">
-          <span className="morning-icon" aria-hidden="true">
-            ☀️
-          </span>
-          <div>
-            <p className="eyebrow">{en.plan.morningReport}</p>
-            <h2 id="morning-title">{en.plan.reportTitle}</h2>
-            <p>{en.plan.reportBody}</p>
-          </div>
-        </div>
-        <div className="storm-alert">
-          <span className="storm-icon" aria-hidden="true">
-            ☄
-          </span>
-          <div>
-            <span className="storm-label">{en.plan.stormLabel}</span>
-            <strong>{en.plan.stormTitle}</strong>
-            <span className="storm-sol">{en.plan.stormTiming}</span>
-          </div>
-          <span className="alert-pulse" aria-hidden="true" />
-        </div>
-      </section>
-
-      <section className="resource-section" aria-label={en.plan.resourcesTitle}>
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">{en.plan.resourcesEyebrow}</p>
-            <h2>{en.plan.resourcesTitle}</h2>
-          </div>
-          <span className="game-number-tag">{en.plan.gameNumbers}</span>
-        </div>
-        <div className="resource-grid">
-          <ResourceCard
-            icon="⚡"
-            label={en.plan.resources.power}
-            value={preview.power}
-            start={initialState.bars.power}
-            delta={
-              preview.powerCost
-                ? en.plan.powerCommitted.replace(
-                    "{value}",
-                    String(preview.powerCost),
-                  )
-                : en.plan.powerReady
-            }
-            tone="power"
-          />
-          <ResourceCard
-            icon="🫧"
-            label={en.plan.resources.air}
-            value={preview.air}
-            start={initialState.bars.air}
-            delta={en.plan.airStable}
-            tone="air"
-          />
-          <ResourceCard
-            icon="☢️"
-            label={en.plan.resources.dose}
-            value={preview.dose}
-            start={initialState.bars.dose}
-            delta={
-              preview.outsideJobs
-                ? en.plan.outsideDose.replace(
-                    "{count}",
-                    String(preview.outsideJobs),
-                  )
-                : en.plan.normalDose
-            }
-            tone="dose"
-            isDose
-          />
-          <div className="food-counter">
-            <span className="food-icon" aria-hidden="true">
-              🥬
-            </span>
-            <div>
-              <span className="resource-label">{en.plan.resources.food}</span>
-              <strong>
-                {preview.food}
-                <small> / 5</small>
-              </strong>
-              <span className="resource-delta">
-                {assignedJobs.includes("greenhouse")
-                  ? en.plan.foodGrowing
-                  : en.plan.foodWaiting}
-              </span>
-            </div>
-          </div>
-        </div>
-        <p className="preview-note">
-          <span aria-hidden="true">↗</span>
-          {en.plan.previewNote}
-        </p>
-      </section>
-
-      <section className="planning-layout" aria-label={en.plan.assignmentTitle}>
-        <div className="crew-panel">
-          <div className="section-heading crew-heading">
-            <div>
-              <p className="eyebrow">{en.plan.stepOne}</p>
-              <h2>{en.plan.crewTitle}</h2>
-            </div>
-            <span className="count-pill">
-              {assignedJobs.length}
-              <span> / 3</span>
-            </span>
-          </div>
-          <p className="panel-instruction">
-            {selectedCrew ? en.plan.crewSelected : en.plan.crewInstruction}
-          </p>
-          <div className="crew-list">
-            {crew.map((person, index) => {
-              const assignedJob = plan[person.id];
-              const selected = selectedCrew === person.id;
-              return (
-                <div
-                  className={
-                    "crew-card" +
-                    (selected ? " is-selected" : "") +
-                    (assignedJob ? " is-assigned" : "")
-                  }
-                  key={person.id}
-                >
-                  <button
-                    type="button"
-                    className="crew-select"
-                    onClick={() => setSelectedCrew(selected ? null : person.id)}
-                    disabled={locked}
-                    aria-pressed={selected}
-                    aria-label={en.plan.selectCrew.replace(
-                      "{name}",
-                      person.name,
-                    )}
-                  >
-                    <span className={"crew-avatar avatar-" + (index + 1)}>
-                      {person.initials}
-                      <span className="crew-online" />
-                    </span>
-                    <span className="crew-info">
-                      <strong>{person.name}</strong>
-                      <small>{person.role}</small>
-                    </span>
-                    <span className="crew-check" aria-hidden="true">
-                      {assignedJob ? "✓" : "+"}
-                    </span>
-                  </button>
-                  <div className="crew-assignment">
-                    {assignedJob ? (
-                      <>
-                        <span className="assignment-dot" />
-                        {en.plan.jobNames[assignedJob]}
-                        <button
-                          type="button"
-                          onClick={() => removeAssignment(person.id)}
-                          aria-label={en.plan.removeAssignment.replace(
-                            "{name}",
-                            person.name,
-                          )}
-                        >
-                          ×
-                        </button>
-                      </>
-                    ) : (
-                      <span className="idle-label">{en.plan.unassigned}</span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="crew-footnote">
-            <span aria-hidden="true">✦</span>
-            {en.plan.crewFootnote}
-          </div>
-        </div>
-
-        <div className="jobs-panel">
-          <div className="section-heading jobs-heading">
-            <div>
-              <p className="eyebrow">{en.plan.stepTwo}</p>
-              <h2>{en.plan.jobsTitle}</h2>
-            </div>
-            <span className="job-count">{en.plan.jobCount}</span>
-          </div>
-          <p className="panel-instruction">{en.plan.jobsInstruction}</p>
-          <div className="jobs-grid">
-            {jobIds.map((jobId) => {
-              const job = en.plan.jobs[jobId];
-              const assignedCrew = crew.find(
-                (person) => plan[person.id] === jobId,
-              );
-              const disabled = !selectedCrew || locked;
-              return (
-                <button
-                  className={
-                    "job-card" +
-                    (assignedCrew ? " is-assigned" : "") +
-                    (selectedCrew && !locked ? " is-available" : "")
-                  }
-                  type="button"
-                  key={jobId}
-                  onClick={() => assignJob(jobId)}
-                  disabled={disabled}
-                  aria-label={
-                    assignedCrew
-                      ? en.plan.assignedJob
-                          .replace("{job}", job.title)
-                          .replace("{name}", assignedCrew.name)
-                      : en.plan.assignJob.replace("{job}", job.title)
-                  }
-                >
-                  <span className="job-card-top">
-                    <span className="job-icon" aria-hidden="true">
-                      {job.icon}
-                    </span>
-                    <span
-                      className={
-                        "job-tag " +
-                        (JOBS[jobId].outside ? "outside-tag" : "inside-tag")
-                      }
-                    >
-                      {JOBS[jobId].outside ? en.plan.outside : en.plan.inside}
-                    </span>
-                    {assignedCrew && (
-                      <span className="job-assignee">
-                        {assignedCrew.initials}
-                      </span>
-                    )}
-                  </span>
-                  <span className="job-title">{job.title}</span>
-                  <span className="job-description">{job.description}</span>
-                  <span className="job-effect">
-                    <span className="effect-label">{en.plan.ifDone}</span>
-                    <strong>{job.effect}</strong>
-                  </span>
-                  <span className="job-cost">
-                    <span>{job.cost}</span>
-                    {JOBS[jobId].powerCost > 0 && (
-                      <span className="power-cost">
-                        ⚡ −{JOBS[jobId].powerCost}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="domino-preview" aria-label={en.plan.dominoTitle}>
-        <div className="domino-heading">
-          <span className="domino-spark" aria-hidden="true">
-            ✳
-          </span>
-          <div>
-            <p className="eyebrow">{en.plan.dominoEyebrow}</p>
-            <h2>{en.plan.dominoTitle}</h2>
-          </div>
-        </div>
-        <div className="domino-chain">
-          <DominoStep
-            icon="🧽"
-            label={en.plan.dominoPanels}
-            muted={!assignedJobs.includes("panels")}
-          />
-          <span className="chain-arrow" aria-hidden="true">
-            →
-          </span>
-          <DominoStep
-            icon="⚡"
-            label={en.plan.dominoPower}
-            muted={!assignedJobs.includes("panels")}
-          />
-          <span className="chain-arrow" aria-hidden="true">
-            →
-          </span>
-          <DominoStep
-            icon="🥬"
-            label={en.plan.dominoGreenhouse}
-            muted={
-              !assignedJobs.includes("panels") ||
-              !assignedJobs.includes("greenhouse")
-            }
-          />
-        </div>
-        <p className="domino-note">{en.plan.dominoNote}</p>
-      </section>
-
-      <footer className="plan-footer">
-        <div className="plan-status">
-          <span
-            className={"status-ring" + (locked ? " is-locked" : "")}
-            aria-hidden="true"
-          >
-            {locked ? "✓" : assignedJobs.length}
-          </span>
-          <div>
-            <strong>
-              {locked
-                ? en.plan.lockedTitle
-                : en.plan.footerTitle.replace(
-                    "{count}",
-                    String(assignedJobs.length),
-                  )}
-            </strong>
-            <span>
-              {locked
-                ? en.plan.lockedBody
-                : crew.length - assignedJobs.length > 0
-                  ? en.plan.idleWarning.replace(
-                      "{count}",
-                      String(crew.length - assignedJobs.length),
-                    )
-                  : en.plan.allCrewAssigned}
-            </span>
-          </div>
-        </div>
-        <button
-          className="lock-button"
-          type="button"
-          onClick={() => {
-            setLocked(!locked);
-            setSelectedCrew(null);
-          }}
-        >
-          <span>{locked ? en.plan.editPlan : en.plan.lockPlan}</span>
-          <span aria-hidden="true">{locked ? "↺" : "→"}</span>
+  return <ScreenFrame title={t("plan.heading", { sol: state.sol })}>
+    <p className="lead">{t("planHelp.howTo")}</p>
+    <div className="planner-layout"><div>
+      <h2 className="step-label">{t("play.crewStep")}</h2>
+      <div className="crew-roster">{crew.map((id, i) => <div className={`crew-tile ${selected === id ? "selected" : ""}`} key={id}>
+        <button type="button" disabled={state.tired.includes(id)} aria-pressed={selected === id} aria-label={t("crew.name", { n: i + 1 })} onClick={() => { select(id); setConfirmIdle(false); audio.playSfx("select"); }}>
+          <img src={asset(`characters/npcs/${portraits[i]}-portrait`)} alt="" />
+          <span><strong>{t("crew.name", { n: i + 1 })}</strong><small>{state.tired.includes(id) ? t("crew.tired") : plan[id] ? t(`jobs.${plan[id]}`) : t("crew.idle")}</small></span>
         </button>
-      </footer>
-    </main>
-  );
-}
-
-function ResourceCard({
-  icon,
-  label,
-  value,
-  start,
-  delta,
-  tone,
-  isDose = false,
-}: {
-  icon: string;
-  label: string;
-  value: number;
-  start: number;
-  delta: string;
-  tone: "power" | "air" | "dose";
-  isDose?: boolean;
-}) {
-  const display = (number: number) =>
-    Number.isInteger(number) ? String(number) : number.toFixed(1);
-  const percent = Math.min(100, (value / 10) * 100);
-  return (
-    <div className={"resource-card " + tone}>
-      <div className="resource-top">
-        <span className="resource-icon" aria-hidden="true">
-          {icon}
-        </span>
-        <span className="resource-label">{label}</span>
-        {isDose && (
-          <span className="dose-guidance">{en.plan.lowerIsSafer}</span>
-        )}
-        <span className="resource-more" title={en.plan.gameNumberTooltip}>
-          i
-        </span>
-      </div>
-      <div className="resource-reading">
-        <strong>{display(value)}</strong>
-        <span>/ 10</span>
-        <small>
-          {en.plan.nowLabel} {display(start)}
-        </small>
-      </div>
-      <div
-        className={"meter-track" + (isDose ? " dose-meter" : "")}
-        role="meter"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={10}
-        aria-valuenow={value}
-      >
-        <span style={{ width: percent + "%" }} />
-      </div>
-      <span className="resource-delta">{delta}</span>
-    </div>
-  );
-}
-
-function DominoStep({
-  icon,
-  label,
-  muted,
-}: {
-  icon: string;
-  label: string;
-  muted: boolean;
-}) {
-  return (
-    <div className={"domino-step" + (muted ? " is-muted" : "")}>
-      <span aria-hidden="true">{icon}</span>
-      <strong>{label}</strong>
-    </div>
-  );
+        {plan[id] && <button type="button" className="unassign" onClick={() => assign(id)} aria-label={t("play.clearCrew", { n: i + 1 })}>×</button>}
+      </div>)}</div>
+      <h2 className="step-label">{t("play.jobsStep")}</h2>
+      <div className="job-list">{jobIds.map((id, i) => {
+        const owner = crew.find((c) => plan[c] === id);
+        return <button type="button" className={`job-choice ${owner ? "assigned" : ""}`} key={id}
+          disabled={!selected} aria-label={t(`jobs.${id}`)} aria-pressed={Boolean(owner)}
+          onClick={() => { if (selected) assign(selected, id); select(null); audio.playSfx("assign"); }}>
+          <span className="job-number">0{i + 1}</span><img src={asset(`items/${jobArt[id]}`)} alt="" />
+          <span className="job-copy"><strong>{t(`jobs.${id}`)}</strong><small>{t(`jobInfo.${id}.done`)}</small>
+            <span className="job-cost">{t("jobInfo.cost", { count: JOBS[id].powerCost })}{JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}</span></span>
+          <span className="job-owner">{owner ? t("play.crewNumber", { n: crew.indexOf(owner) + 1 }) : "+"}</span>
+        </button>;
+      })}</div>
+      <div className="planner-guidance" aria-live="polite">{selected ? t("play.chooseJob", { n: crew.indexOf(selected) + 1 }) : t("play.chooseCrew")}</div>
+    </div><aside className="plan-outlook">
+      <h2>{t("play.preview")}</h2><p className="note">{t("play.previewMeaning")}</p>
+      <ResourceMeters bars={preview.state.bars} previous={state.bars} />
+      <div className="small-counters"><span>{t("bars.food")} <b>{preview.state.food}</b></span><span>{t("bars.science")} <b>{preview.state.science}</b></span></div>
+      <details className="science-details"><summary>{t("play.leftBehind")}</summary>
+        {jobIds.filter((id) => !Object.values(plan).includes(id)).map((id) => <p key={id}><b>{t(`jobs.${id}`)}</b><br />{t(`jobInfo.${id}.skipped`)}</p>)}
+        {preview.fell.filter((d) => d.sol > state.sol).map((d) => <p key={d.id}>{t(d.textKey as "domino.powerLow")}</p>)}
+      </details>
+      {confirmIdle && <p role="alert">{t("play.idleConfirm", { count: idle })}</p>}
+      <button type="button" className="primary end-sol" disabled={!setup} onClick={finish}>{confirmIdle ? t("play.confirmEnd") : t("plan.endSol")} →</button>
+      <p className="note">{t("play.gameUnits")}</p>
+    </aside></div>
+    <details className="science-details"><summary>{t("play.scienceBehind")}</summary>
+      <p>{t("help.askEarth.text")} <WhatsThis topic="askEarth" /></p>
+      <DataChip source={LIGHT_DELAY} /><DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
+      <DataChip source={INSIGHT_DUST} /><DataChip source={RAD_BASELINE} />
+    </details>
+  </ScreenFrame>;
 }

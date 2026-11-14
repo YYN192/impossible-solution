@@ -1,5 +1,6 @@
 import type { Domino } from "../sim/types";
 import { tDynamic } from "../i18n/dynamic";
+import { DataChip } from "./DataChip";
 
 /**
  * One domino: icon + kid sentence. Reused by the morning report (#13) and the final chain (#14).
@@ -14,11 +15,11 @@ export function DominoCard({
   fall?: boolean;
 }) {
   return (
-    <div className={fall ? "domino domino-fall" : "domino"}>
+    <div className="domino-record"><div className={fall ? "domino domino-fall" : "domino"}>
       <span className="domino-icon" aria-hidden="true">
         {domino.icon}
       </span>
       <span className="domino-text">{tDynamic(domino.textKey)}</span>
-    </div>
+    </div>{domino.source && <DataChip source={domino.source} />}</div>
   );
 }

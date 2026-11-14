@@ -289,5 +289,106 @@
     },
     "disclaimer": "Uses NASA open data and Canadian Space Agency resources. This project is not affiliated with or endorsed by NASA or the Canadian Space Agency.",
     "fresh": "{{label}} · {{date}}"
+  },
+  "menu": {
+    "eyebrow": "MARS EXPEDITION / 2042",
+    "tagline": "Fix it now. Or pay for it later.",
+    "coordinates": "GALE CRATER · 4.6° S / 137.4° E",
+    "crew": "ASTRONAUTS",
+    "days": "MARS DAYS",
+    "home": "SHARED HOME",
+    "welcome": "MISSION CONTROL",
+    "ready": "Your crew needs you.",
+    "intro": "Explore the base. Make a plan. Discover what happens next.",
+    "resume": "Return to base",
+    "settings": "Settings",
+    "quit": "Quit",
+    "closeTab": "You can close this tab to leave.",
+    "preferences": "MAKE YOURSELF AT HOME",
+    "master": "Master volume",
+    "music": "Music",
+    "sfx": "Sound effects",
+    "mute": "Mute sound",
+    "unmute": "Unmute sound",
+    "silent": "Sound controls are ready. No sound files are installed yet.",
+    "loading": "Preparing your mission…",
+    "edition": "THE IMPOSSIBLE SOLUTION · JUNIOR EXPEDITION"
+  },
+  "play": {
+    "lowerBetter": "Lower is better",
+    "higherBetter": "Higher is better",
+    "crewStep": "01 / Choose an astronaut",
+    "jobsStep": "02 / Give them a job",
+    "clearCrew": "Clear astronaut {{n}}'s job",
+    "crewNumber": "Crew {{n}}",
+    "chooseJob": "Choose a job for astronaut {{n}}.",
+    "chooseCrew": "Choose an astronaut to change their job.",
+    "preview": "After this sol",
+    "previewMeaning": "Your plan, after jobs, night needs and solar charging.",
+    "leftBehind": "What happens to skipped jobs?",
+    "idleConfirm": "{{count}} available crew have no job. End anyway?",
+    "confirmEnd": "End with idle crew",
+    "gameUnits": "Meters and job costs use game numbers.",
+    "scienceBehind": "The science behind your choices",
+    "nightSummary": "The base rests. Your choices keep working.",
+    "progress": "Mission progress",
+    "earthInbox": "A message you earned from Earth",
+    "knownStorm": "Today's space weather",
+    "crewReady": "Crew ready",
+    "allAssigned": "Everyone has a job."
+  },
+  "world": {
+    "menu": "Menu",
+    "return": "Return to station",
+    "location": "MARS / GALE CRATER",
+    "name": "Ares Research Station",
+    "console": "MISSION CONSOLE",
+    "supplies": "ENGINEERING",
+    "research": "SCIENCE LAB",
+    "airlock": "AIRLOCK / SURFACE ACCESS",
+    "objective": "Walk to the glowing console to plan your mission.",
+    "controls": "WASD / ARROWS · E TO INTERACT",
+    "canvas": "Mars station. Use WASD or arrow keys. Press E near a console or crew member.",
+    "connecting": "CONNECTING TO MISSION CONTROL…",
+    "movement": "Movement controls",
+    "up": "Move up",
+    "down": "Move down",
+    "left": "Move left",
+    "right": "Move right",
+    "explore": "Explore your home on Mars.",
+    "openConsole": "Open mission console",
+    "interact": "Interact",
+    "tip": "Meet your crew. They have useful advice.",
+    "crewChannel": "CREW CHANNEL",
+    "near": {
+      "console": "Mission console",
+      "commander": "Commander Nova",
+      "engineer": "Engineer Kai",
+      "scientist": "Scientist Amara",
+      "drone": "Pip · Maintenance drone",
+      "airlock": "Station airlock"
+    }
+  },
+  "dialogue": {
+    "commander": {
+      "hello": "Welcome, commander! Three astronauts. Three days. One shared home.",
+      "advice": "Choose each job carefully. Skipped jobs can cause problems tomorrow."
+    },
+    "engineer": {
+      "hello": "I keep our lights on. Mars dust is everywhere!",
+      "advice": "Clean panels make more power. The air machine needs power nightly."
+    },
+    "scientist": {
+      "hello": "Our plants grow food. Our trips collect science.",
+      "advice": "Two science trips earn a star. Keep everyone fed, too!"
+    },
+    "drone": {
+      "hello": "Hello! I'm Pip. I help keep this station running.",
+      "advice": "Build the shelter before space rays arrive. Lower dose is better."
+    },
+    "airlock": {
+      "hello": "Surface trips are assigned through the mission console.",
+      "advice": "Outside jobs collect science or clean panels. Watch the space rays!"
+    }
   }
 }

@@ -21,6 +21,9 @@ export default defineConfig({
     },
   },
   test: {
+    // Threads avoid fork-pool temporary-file renames blocked by Windows sandboxes.
+    pool: 'threads',
+    maxWorkers: 4,
     environment: 'jsdom',
     passWithNoTests: true,
     setupFiles: ['./src/test/setup.ts'],

@@ -1,65 +1,79 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
 import i18n from "./i18n";
 import { START, useNav } from "./state/screen";
-
-const click = (name: string) =>
-  fireEvent.click(screen.getByRole("button", { name }));
-const heading = () => screen.getByRole("heading", { level: 1 });
+import { useGame } from "./state/game";
+import { useMission } from "./state/mission";
+import { useSession } from "./game/session";
+import { createGame, step } from "./sim/engine";
+import type { JobId } from "./sim/types";
 const t = i18n.t.bind(i18n);
-
-describe("App shell", () => {
-  beforeEach(() => useNav.setState(START));
-  afterEach(cleanup);
-
-  it("title screen shows the name, the sol line and Start", () => {
+const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+beforeEach(() => {
+  window.history.replaceState({}, "", "/?demo=1");
+  useNav.setState(START); useGame.getState().reset();
+  useMission.setState({ status: "idle", setup: undefined });
+  useSession.setState({ position: { x: 320, y: 212, facing: "back" }, draft: {}, before: undefined });
+});
+async function launch() {
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: t("title.start") }));
+  const consoleButton = await screen.findByRole("button", { name: /Open mission console/ });
+  await waitFor(() => expect((consoleButton as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(consoleButton);
+  await screen.findByRole("heading", { name: t("morning.heading", { sol: 1 }) });
+}
+describe("complete expedition", () => {
+  it("shows the title, short introduction, tooltip and data entry", async () => {
     render(<App />);
-    expect(heading().textContent).toBe("The Impossible SOLution");
-    screen.getByText("A sol is one day on Mars.");
-    screen.getByRole("button", { name: "Start mission" });
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("app.name"));
+    await screen.findByRole("button", { name: t("title.start") });
+    click("What's this? Sol"); screen.getByText(/40 minutes longer/);
+    click(t("teacher.open")); screen.getByRole("heading", { name: t("teacher.title") });
+    click(t("teacher.back")); screen.getByRole("heading", { name: t("app.name") });
     expect(document.documentElement.lang).toBe("en");
   });
-
-  it("plays a full 3-sol loop to the final screen and back", () => {
-    render(<App />);
-    click(t("title.start"));
+  it("plays three actual plans, shows earned Earth answer and causal sources, then replays the same start", async () => {
+    await launch();
+    const setup = useMission.getState().setup!;
+    const plans: JobId[][] = [["greenhouse", "shelter", "askEarth"], ["panels", "greenhouse", "shelter"], ["panels", "greenhouse", "science"]];
     for (let sol = 1; sol <= 3; sol++) {
-      expect(heading().textContent).toBe(t("morning.heading", { sol }));
-      expect(document.activeElement).toBe(heading()); // focus moved for keyboard users
+      expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("morning.heading", { sol }));
+      if (sol === 2) screen.getByRole("complementary", { name: t("play.earthInbox") });
       click(t("morning.goPlan"));
-      click(t("plan.endSol"));
+      for (const [i, job] of plans[sol - 1].entries()) { click(t("crew.name", { n: i + 1 })); click(t(`jobs.${job}`)); }
+      const before = useGame.getState().state;
+      const expected = step(before, useSession.getState().draft, setup.events, setup.forecasts).state;
+      expect(Number(screen.getByRole("meter", { name: t("bars.power") }).getAttribute("aria-valuenow"))).toBe(expected.bars.power);
+      click(/End sol/);
+      expect(useGame.getState().state).toEqual(expected);
       click(sol < 3 ? t("endSol.nextMorning") : t("endSol.seeResults"));
     }
-    expect(heading().textContent).toBe(t("final.heading"));
+    screen.getByRole("heading", { name: t("final.heading") });
+    expect(document.querySelectorAll(".chain").length).toBeGreaterThan(0);
+    expect(document.querySelectorAll(".chain .chip a").length).toBeGreaterThan(0);
     click(t("final.tryAgain"));
-    expect(heading().textContent).toBe(t("morning.heading", { sol: 1 }));
+    expect(useGame.getState().state).toEqual(createGame());
+    expect(useMission.getState().setup).toBe(setup);
+    screen.getByRole("heading", { name: t("morning.heading", { sol: 1 }) });
   });
-
-  it("en.json keys resolve and unknown keys are reported missing", () => {
-    expect(i18n.exists("title.solLine")).toBe(true);
-    expect(i18n.exists("title.doesNotExist" as never)).toBe(false);
+  it("keeps a draft and the player's position while leaving the console", async () => {
+    await launch(); click(t("morning.goPlan"));
+    click(t("crew.name", { n: 1 })); click(t("jobs.greenhouse"));
+    const position = useSession.getState().position;
+    click(/Return to station/);
+    await waitFor(() => expect((screen.getByRole("button", { name: /Open mission console/ }) as HTMLButtonElement).disabled).toBe(false));
+    click(/Open mission console/);
+    await screen.findByRole("heading", { name: t("plan.heading", { sol: 1 }) });
+    expect(useSession.getState().draft).toEqual({ a1: "greenhouse" });
+    expect(useSession.getState().position).toEqual(position);
+    expect(useGame.getState().state).toEqual(createGame());
   });
-});
-
-describe("Title 'What's this?' (#16)", () => {
-  beforeEach(() => useNav.setState(START));
-  afterEach(cleanup);
-  it("explains what a sol is", () => {
-    render(<App />);
-    click("What's this? Sol");
-    screen.getByText(/40 minutes longer than an Earth day/);
-  });
-});
-
-describe("Teacher card link (#18)", () => {
-  beforeEach(() => useNav.setState(START));
-  afterEach(cleanup);
-  it("opens from the top bar and Back returns to the game", () => {
-    render(<App />);
-    click(t("teacher.open"));
-    expect(document.activeElement?.textContent).toBe(t("teacher.title"));
-    click(t("teacher.back"));
-    expect(heading().textContent).toBe("The Impossible SOLution");
+  it("lets children leave crew idle deliberately and disables tired crew", async () => {
+    await launch(); click(t("morning.goPlan")); click(/End sol/);
+    screen.getByRole("alert"); click(new RegExp(t("play.confirmEnd"))); click(t("endSol.nextMorning")); click(t("morning.goPlan"));
+    expect((screen.getByRole("button", { name: t("crew.name", { n: 1 }) }) as HTMLButtonElement).disabled).toBe(true);
+    expect(useGame.getState().state.tired).toEqual(["a1"]);
   });
 });

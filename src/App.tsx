@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from "react";
+import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
 import { readFlags } from "./data/flags";
@@ -6,86 +6,53 @@ import { DataSources } from "./screens/DataSources";
 import { EndOfSolScreen } from "./screens/EndOfSolScreen";
 import { FinalScreen } from "./screens/FinalScreen";
 import { MorningScreen } from "./screens/MorningScreen";
-import { StandInPlanScreen } from "./screens/StandInPlanScreen";
 import { TeacherCard } from "./screens/TeacherCard";
-import { TitleScreen } from "./screens/TitleScreen";
 import { useMission } from "./state/mission";
 import { useNav, type Screen } from "./state/screen";
+import { useSession } from "./game/session";
+import MainMenu from "./MainMenu";
+import MarsHub from "./MarsHub";
+import ConsolePage from "./ConsolePage";
+import PlanScreen from "./PlanScreen";
 
-// Viktor (#9): swap StandInPlanScreen for your Plan screen here.
-const SCREENS: Record<Screen, () => JSX.Element> = {
-  title: TitleScreen,
-  morning: MorningScreen,
-  plan: StandInPlanScreen,
-  endSol: EndOfSolScreen,
-  final: FinalScreen,
+const SCREENS: Record<Exclude<Screen, "title">, () => JSX.Element> = {
+  morning: MorningScreen, plan: PlanScreen, endSol: EndOfSolScreen, final: FinalScreen,
 };
-
+type Place = "menu" | "hub" | "console";
 export default function App() {
   const { t } = useTranslation();
-  const screen = useNav((s) => s.screen);
-  const sol = useNav((s) => s.sol);
-  const setup = useMission((s) => s.setup);
-  const load = useMission((s) => s.load);
-  /** A grown-up page shown over the game (the game keeps its place underneath). */
+  const { screen, sol } = useNav();
+  const { setup, load } = useMission();
+  const [place, setPlace] = useState<Place>("menu");
   const [overlay, setOverlay] = useState<null | "sources" | "teacher">(null);
-  const close = () => setOverlay(null);
-
-  // Load the mission (storm events, Earth's forecasts, data source) once at start.
-  // Reads ?demo=1, ?offline=1, ?sun=today from the URL.
+  const directEntry = useRef(false);
+  const openConsole = useCallback(() => setPlace("console"), []);
+  useEffect(() => { void load(); }, [load]);
   useEffect(() => {
-    void load();
-  }, [load]);
-
-  const Current = SCREENS[screen];
-  return (
-    <main className="shell">
-      <div className="topbar">
-        {setup ? (
-          <DataBadge
-            source={setup.dataSource}
-            fetchedAt={setup.dataFetchedAt}
-          />
-        ) : (
-          <span />
-        )}
-        {!overlay ? (
-          <span className="topbar__links">
-            <button
-              type="button"
-              className="link-button"
-              onClick={() => setOverlay("sources")}
-            >
-              {t("dataSources.open")}
-            </button>
-            <button
-              type="button"
-              className="link-button"
-              onClick={() => setOverlay("teacher")}
-            >
-              {t("teacher.open")}
-            </button>
-          </span>
-        ) : null}
-      </div>
-      {setup?.noticeKey ? (
-        <p className="notice">{t(setup.noticeKey as "notice.sunQuiet")}</p>
-      ) : null}
-
-      {overlay === "teacher" ? (
-        <TeacherCard onBack={close} />
-      ) : overlay === "sources" ? (
-        <DataSources
-          onBack={close}
-          missionSource={setup?.dataSource}
-          missionFetchedAt={setup?.dataFetchedAt}
-          liveData={!readFlags().offline && import.meta.env.MODE !== "test"}
-        />
-      ) : (
-        /* key: remount on every step so each screen starts fresh and focuses its heading */
-        <Current key={`${screen}-${sol}`} />
-      )}
-      <p className="note">{t("app.disclaimer")}</p>
-    </main>
-  );
+    if (!setup || directEntry.current) return;
+    directEntry.current = true;
+    // Legacy pages share the same app, stores and URL flags.
+    const name = window.location.pathname.split("/").pop();
+    if (name === "hub.html" || name === "console.html") {
+      if (useNav.getState().screen === "title") useNav.getState().next();
+      setPlace(name === "hub.html" ? "hub" : "console");
+    }
+  }, [setup]);
+  const visiblePlace = screen === "title" ? "menu" : place;
+  const play = () => {
+    if (screen === "title") { useSession.getState().clearPlan(); useNav.getState().next(); }
+    setPlace("hub");
+  };
+  const Current = screen !== "title" ? SCREENS[screen] : null;
+  return <div className="expedition">
+    <div className="mission-status-bar">
+      {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
+      {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => setOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => setOverlay("teacher")}>{t("teacher.open")}</button></nav>}
+    </div>
+    {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet")}</p>}
+    {overlay ? <main className="information-panel">{overlay === "teacher" ? <TeacherCard onBack={() => setOverlay(null)} /> : <DataSources onBack={() => setOverlay(null)} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
+      : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} onPlay={play} onSources={() => setOverlay("sources")} onTeacher={() => setOverlay("teacher")} />
+      : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />
+      : <ConsolePage onExit={() => setPlace("hub")}>{Current && <Current key={`${screen}-${sol}`} />}</ConsolePage>}
+  </div>;
 }
