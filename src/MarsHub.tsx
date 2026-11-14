@@ -90,7 +90,11 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     const target = tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
     held.current.clear(); goal.current = target; pending.current = target.entity?.id;
   };
-  const closeDialogue = () => { audio.playSfx("menu-back"); setDialogue(undefined); canvas.current?.focus({ preventScroll: true }); };
+  const closeDialogue = () => {
+    audio.playSfx("menu-back");
+    dialogueBox.current?.close(); // a modal dialog keeps the canvas inert until it is closed, so focus() only works after this
+    setDialogue(undefined); canvas.current?.focus({ preventScroll: true });
+  };
   const dialogueBox = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
   const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue}-portrait`;
@@ -98,7 +102,8 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
     <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
-      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} onPointerDown={tap} />
+      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />
+      <p id="world-description" className="visually-hidden">{t("world.description")}</p>
       {LABELS.map(([key, x, y]) => <span key={key} className="world-label" style={{ left: `${x / 6.4}%`, top: `${y / 3.84}%` }}>{t(key)}</span>)}
       {activating && <div className="console-boot" role="status">{t("world.connecting")}</div>}
     </div></div>
@@ -110,8 +115,8 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd>E</kbd></button>
       <button className="quiet-button go-console" onClick={onConsole}>{t("world.goConsole")} →</button>
     </div><p className="station-tip">{t("world.tip")}</p></div>
-    {dialogue && <dialog ref={dialogueBox} className="npc-dialogue" onCancel={(e) => { e.preventDefault(); closeDialogue(); }}>
-      <img src={asset(portrait)} alt="" /><div><p className="eyebrow">{t("world.crewChannel")}</p><h2>{t(`world.near.${dialogue.dialogue!}`)}</h2>
+    {dialogue && <dialog ref={dialogueBox} className="npc-dialogue" aria-labelledby="npc-dialogue-title" onCancel={(e) => { e.preventDefault(); closeDialogue(); }}>
+      <img src={asset(portrait)} alt="" /><div><p className="eyebrow">{t("world.crewChannel")}</p><h2 id="npc-dialogue-title">{t(`world.near.${dialogue.dialogue!}`)}</h2>
         <p className="lead">{t(`dialogue.${dialogue.dialogue!}.${page === 0 ? "hello" : "advice"}`)}</p>
         <div className="actions">{page === 0 && <button className="primary" onClick={() => { setPage(1); audio.playSfx("dialogue"); }}>{t("common.next")} →</button>}<button onClick={closeDialogue}>{t("help.close")}</button></div></div>
     </dialog>}

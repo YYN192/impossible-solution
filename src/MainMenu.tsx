@@ -11,7 +11,6 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChooseSun, re
   const flags = readFlags();
   const { t } = useTranslation();
   const [settings, showSettings] = useState(false);
-  const [quit, setQuit] = useState(false);
   const prefs = useAudio();
   return <main className="mission-menu">
     <div className="drifting-stars" aria-hidden="true">{stars.map((style, i) => <i key={i} style={style} />)}</div>
@@ -36,8 +35,6 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChooseSun, re
         <button onClick={() => { audio.playSfx("menu-open"); showSettings(true); }}>{t("menu.settings")}</button>
         <button onClick={onSources}>{t("dataSources.open")}</button>
         <button onClick={onTeacher}>{t("teacher.open")}</button>
-        <button className="quiet-button" onClick={() => { audio.playSfx("menu-back"); window.close(); setQuit(true); }}>{t("menu.quit")}</button>
-        {quit && <p role="status">{t("menu.closeTab")}</p>}
         <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" /></p>
       </> : <>
         <p className="eyebrow">{t("menu.preferences")}</p><h2>{t("menu.settings")}</h2>

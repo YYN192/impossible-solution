@@ -12,6 +12,13 @@ afterEach(() => {
   onChooseSun.mockReset();
 });
 
+describe("Main menu: no dead buttons", () => {
+  it("has no Quit button (a tab cannot be closed from the page)", () => {
+    menu();
+    expect(screen.queryByRole("button", { name: /^(Quit|Изход)$/ })).toBeNull();
+  });
+});
+
 describe("Main menu: which Sun to play (#8)", () => {
   it("offers today's real Sun and the May 2024 storm; May 2024 is the default", () => {
     menu();
