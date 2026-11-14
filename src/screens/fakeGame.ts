@@ -1,10 +1,13 @@
 /**
- * FAKE game data so the report screens can be built before the engine (#1) and the data layer
- * (#4/#5) land. It follows the demo chain from docs/concept.md:
+ * TEST FIXTURE: a fixed demo game for the report screen tests (the app itself runs the engine
+ * through useGame). It follows the demo chain from docs/concept.md:
  *   sol 1 skip panels → sol 2 power low (+ the 20 May 2024 burst) → sol 3 astronaut too tired.
- * Delete this file once the screens read the real GameState / StormEvents.
  */
+import type { MissionSetup } from "../data/mission";
+import { createGame } from "../sim/engine";
 import type { DataRef, Domino, EarthAnswer, StormEvent } from "../sim/types";
+import { useGame } from "../state/game";
+import { useMission } from "../state/mission";
 import type { MorningInput } from "./morning/pickMorning";
 
 // Placeholder provenance. The data layer replaces these with snapshot DataRefs (url + fetched date).
@@ -88,18 +91,23 @@ export function fakeMorning(sol: number): MorningInput {
 }
 
 /**
- * What the final screen would get after the demo run: every domino, plus the star result in the
- * shape of the engine's `stars(state)` (sim/engine branch). Food running out is not a bar, so the
- * base kept running; no science trips, so 2★.
+ * Put the demo game into the stores as it stands on the morning of `sol` (or, with `final`, after
+ * the last sol), so a screen test can render the real MorningScreen / FinalScreen.
  */
-export function fakeFinal() {
-  return {
-    dominoes: FAKE_DOMINOES,
-    stars: {
-      crewSafe: true,
-      baseRunning: true,
-      science: false,
-      count: 2 as const,
+export function loadFakeGame(sol: number, { final = false } = {}) {
+  const m = fakeMorning(sol);
+  useGame.setState({
+    state: {
+      ...createGame(),
+      sol,
+      dominoes: final ? FAKE_DOMINOES : m.all,
+      earthAnswer: m.earthAnswer,
+      over: final,
     },
-  };
+    fell: m.fell,
+  });
+  useMission.setState({
+    status: "ready",
+    setup: { events: FAKE_EVENTS, forecasts: {} } as unknown as MissionSetup,
+  });
 }

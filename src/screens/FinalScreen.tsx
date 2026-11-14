@@ -1,23 +1,15 @@
 import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
+import { stars as starsOf, type Stars } from "../sim/engine";
 import { MISSION_SOLS, type Domino } from "../sim/types";
 import { useBest } from "../state/best";
+import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
 import { DominoCard } from "./DominoCard";
-import { fakeFinal } from "./fakeGame";
 import { buildChains } from "./final/buildChains";
 import { ScreenFrame } from "./ScreenFrame";
 
-/** Same shape as the engine's `stars(state)` result (src/sim/engine.ts on sim/engine). */
-export interface Stars {
-  /** Dose stayed under the limit. */
-  crewSafe: boolean;
-  /** No bar hit 0. */
-  baseRunning: boolean;
-  /** Science goal reached. */
-  science: boolean;
-  count: 0 | 1 | 2 | 3;
-}
+export type { Stars };
 
 /** Delay between dominoes in the fall effect (CSS turns animation off for reduced motion). */
 const FALL_STEP_MS = 250;
@@ -27,14 +19,12 @@ const FALL_STEP_MS = 250;
  * and "Try a different plan" (same start).
  */
 export function FinalScreen() {
-  const { sol } = useNav();
-  // TODO(engine): replace fakeFinal with GameState.dominoes and stars(state).
-  const { dominoes, stars } = fakeFinal();
+  const state = useGame((s) => s.state);
   return (
     <FinalView
-      dominoes={dominoes}
-      stars={stars}
-      endedEarly={sol < MISSION_SOLS}
+      dominoes={state.dominoes}
+      stars={starsOf(state)}
+      endedEarly={state.sol < MISSION_SOLS}
     />
   );
 }

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { BEST_KEY, useBest } from "../state/best";
 import { useNav } from "../state/screen";
-import { FAKE_DOMINOES } from "./fakeGame";
+import { FAKE_DOMINOES, loadFakeGame } from "./fakeGame";
 import { FinalScreen, FinalView, type Stars } from "./FinalScreen";
 
 const t = i18n.t.bind(i18n);
@@ -22,6 +22,7 @@ describe("Final screen", () => {
   beforeEach(() => {
     localStorage.clear();
     useBest.setState({ best: 0 });
+    loadFakeGame(3, { final: true });
     useNav.setState({ screen: "final", sol: 3 });
   });
   afterEach(cleanup);
