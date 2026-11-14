@@ -10,7 +10,7 @@ NASA / CSA sources ──► scripts/ingest (Node, timeout + retry + validation)
               src/data/client.ts → dataClient.getX()  → screens (always labelled SAVED, with date)
 ```
 
-Live data in the browser exists only for **"Today's Sun"** (`src/data/donki.ts`, DEMO_KEY, Mars-only WSA-Enlil, falls back to the snapshot). Everything else is saved data, never labelled live.
+Live data in the browser: **"Today's Sun"** (`src/data/donki.ts`, DEMO_KEY, Mars-only WSA-Enlil, falls back to the snapshot). Everything else is saved data, never labelled live.
 
 ## Sources
 
@@ -56,3 +56,21 @@ A failed source prints `✘` and **keeps its last good file**; empty answers are
 
 - RadLab's integrated extra dose for 20–25 May 2024 is ~1.6 mGy (silicon), while JPL reports 8.1 mGy for the storm. Different quantity/detector or integration window — **do not show the RadLab total**; we only show the peak-vs-normal ratio and the curve.
 - RadLab "normal" in May 2024 (~4 µGy/h ≈ 0.1 mGy/day) is lower than the Hassler 2014 baseline (0.21 mGy/day); solar maximum lowers cosmic rays. The game keeps the cited Hassler value.
+
+## Live refresh in the browser (src/data/live.ts)
+
+CORS checked 14 Nov 2026 with `Origin: https://yyn192.github.io`:
+
+| API | Browser may call? | What we do |
+|---|---|---|
+| api.nasa.gov DONKI | yes (`*`) | `liveSpaceWeather()` refreshes "What the Sun did this month" |
+| science.nasa.gov APOD | yes (reflects origin) | `liveApod()` refreshes "Space picture of the day" |
+| images-api.nasa.gov, trek.nasa.gov | yes (`*`) | saved copies only — fixed history, no requests wasted |
+| osdr.nasa.gov | no (`osdr.nasa.gov` only) | saved only |
+| RadLab | no header | saved only |
+| asc-csa.gc.ca | n/a | links only |
+
+Saved data renders first; the live call runs in the background (timeout → retry/backoff on 429/5xx →
+6 h localStorage cache → stale cache → saved snapshot). Two calls for the same URL at once share one
+request (StrictMode). Each card shows LIVE or SAVED with the time. `?offline=1` and `npm test` never call out.
+The browser uses DEMO_KEY only (public, 30 requests/hour per player IP; 5 DONKI calls per player per 6 h).

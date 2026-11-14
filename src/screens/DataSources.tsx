@@ -13,8 +13,11 @@ export function DataSources({
   onBack,
   missionSource = "snapshot",
   missionFetchedAt,
+  liveData = false,
 }: {
   onBack?: () => void;
+  /** Refresh DONKI / APOD cards in the background (App passes !offline). */
+  liveData?: boolean;
   missionSource?: DataSource;
   missionFetchedAt?: number;
 }) {
@@ -49,7 +52,7 @@ export function DataSources({
       </ul>
       <p className="sources__note">{t("dataSources.savedOn", { date })}</p>
 
-      <MoreRealData />
+      <MoreRealData live={liveData} />
 
       <section aria-labelledby="game-numbers-title">
         <h3 id="game-numbers-title">{t("dataSources.gameNumbers")}</h3>

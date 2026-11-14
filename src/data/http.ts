@@ -98,7 +98,19 @@ function isRetryable(err: unknown): boolean {
   return true; // network error / timeout
 }
 
-export async function getJson<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
+const inFlight = new Map<string, Promise<Result<unknown>>>();
+
+/** One request per cache key at a time: React StrictMode double effects must not burn the rate limit. */
+export function getJson<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
+  const key = opts.cacheKey ?? stripKey(opts.url);
+  const running = inFlight.get(key);
+  if (running) return running as Promise<Result<T>>;
+  const p = getJsonOnce(opts).finally(() => inFlight.delete(key));
+  inFlight.set(key, p);
+  return p;
+}
+
+async function getJsonOnce<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
   const {
     url,
     schema,

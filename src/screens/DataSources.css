@@ -31,3 +31,5 @@
 .more__cards { padding-left: 1.1rem; }
 .more__cards li { margin-bottom: 0.25rem; }
 .more__disclaimer { margin-top: 1rem; }
+.more__fresh { font-weight: 700; letter-spacing: 0.02em; }
+.more__fresh--live { color: #7ee2a8; }

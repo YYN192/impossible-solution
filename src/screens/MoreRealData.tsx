@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dataClient, publicUrl, type Loaded } from "../data/client";
+import { isLive, type Result } from "../data/http";
+import { liveApod, liveSpaceWeather } from "../data/live";
 import type {
   ApodEntry,
   LearningResource,
@@ -17,8 +19,8 @@ interface All {
   images: Loaded<MissionImage[]> | null;
   cards: Loaded<ScienceCard[]> | null;
   veggie: number | null;
-  sun: Loaded<SpaceWeather> | null;
-  apod: Loaded<ApodEntry> | null;
+  sun: Result<SpaceWeather> | null;
+  apod: Result<ApodEntry> | null;
   teach: Loaded<LearningResource[]> | null;
 }
 
@@ -117,17 +119,30 @@ function Picture({ img, caption }: { img: MissionImage; caption: string }) {
   );
 }
 
-/** Data Sources, part 2: every extra NASA / CSA source, each tied to something in the game. */
-export function MoreRealData() {
+/**
+ * Data Sources, part 2: every extra NASA / CSA source, each tied to something in the game.
+ * Saved data renders first; with `live`, DONKI and APOD refresh in the background (never with ?offline=1).
+ */
+export function MoreRealData({ live = false }: { live?: boolean }) {
   const { t, i18n } = useTranslation();
   const [all, setAll] = useState<All | null>(null);
   useEffect(() => {
     let alive = true;
-    loadAll().then((a) => alive && setAll(a));
+    loadAll().then((a) => {
+      if (!alive) return;
+      setAll(a);
+      if (!live) return;
+      liveSpaceWeather()
+        .then((sun) => alive && setAll((p) => (p ? { ...p, sun } : p)))
+        .catch(() => undefined);
+      liveApod()
+        .then((apod) => alive && setAll((p) => (p ? { ...p, apod } : p)))
+        .catch(() => undefined);
+    });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [live]);
   if (!all) return null;
 
   const fmtDate = (ms: number | string) =>
@@ -136,6 +151,15 @@ export function MoreRealData() {
       month: "long",
       year: "numeric",
     });
+  /** Honest per-card label: LIVE only for data fetched now (or cached from a fetch), else SAVED + date. */
+  const fresh = (r: Result<unknown>) => (
+    <p className={`sources__note more__fresh ${isLive(r.source) ? "more__fresh--live" : ""}`}>
+      {t("moreData.fresh", {
+        label: isLive(r.source) ? t("data.badge.live") : t("data.badge.saved"),
+        date: new Date(r.fetchedAt).toLocaleString(i18n.language, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+      })}
+    </p>
+  );
   const saved = (r: Loaded<unknown> | null) =>
     r ? (
       <p className="sources__note">
@@ -265,7 +289,7 @@ export function MoreRealData() {
             })}
           </p>
           <p className="sources__note">{t("moreData.sun.note")}</p>
-          {saved(all.sun)}
+          {fresh(all.sun)}
         </section>
       ) : null}
 
@@ -282,6 +306,7 @@ export function MoreRealData() {
           <a href={all.apod.data.page} target="_blank" rel="noreferrer">
             {t("moreData.apod.open")}
           </a>
+          {fresh(all.apod)}
         </section>
       ) : null}
 

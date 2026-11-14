@@ -159,6 +159,7 @@
       "title": "For teachers and families",
       "body": "Free activities from the Canadian Space Agency, to keep exploring after the game."
     },
-    "disclaimer": "Uses NASA open data and Canadian Space Agency resources. This project is not affiliated with or endorsed by NASA or the Canadian Space Agency."
+    "disclaimer": "Uses NASA open data and Canadian Space Agency resources. This project is not affiliated with or endorsed by NASA or the Canadian Space Agency.",
+    "fresh": "{{label}} · {{date}}"
   }
 }

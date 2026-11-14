@@ -1,5 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import "../i18n";
 import { MoreRealData } from "./MoreRealData";
 
@@ -80,5 +82,49 @@ describe("MoreRealData (RadLab, Mars Trek, Image Library, OSDR, DONKI, APOD, CSA
     render(<MoreRealData />);
     await ready();
     expect(screen.queryAllByRole("status")).toHaveLength(0);
+  });
+});
+
+describe("MoreRealData live refresh (DONKI + APOD, saved data first)", () => {
+  const server = setupServer();
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+  afterEach(() => {
+    server.resetHandlers();
+    localStorage.clear();
+  });
+  afterAll(() => server.close());
+
+  const sun = (flares: unknown[]) => [
+    http.get("https://api.nasa.gov/DONKI/FLR", () => HttpResponse.json(flares)),
+    http.get("https://api.nasa.gov/DONKI/SEP", () => HttpResponse.json([])),
+    http.get("https://api.nasa.gov/DONKI/CME", () => HttpResponse.json([])),
+    http.get("https://api.nasa.gov/DONKI/GST", () => HttpResponse.json([])),
+    http.get("https://api.nasa.gov/DONKI/notifications", () => HttpResponse.json([])),
+    http.get("https://science.nasa.gov/wp-json/wp/v2/apod-basic", () =>
+      HttpResponse.json([{ date: "2026-11-14", title: "Live picture", permalink: "https://science.nasa.gov/x", media_type: "image", credit: "Jo", copyright: "Jo", alt: "" }]),
+    ),
+  ];
+
+  it("shows the Sun card from live DONKI with a LIVE label", async () => {
+    server.use(...sun([{ classType: "M2.0", peakTime: "2026-11-10T00:00Z" }, { classType: "C1.0", peakTime: "2026-11-11T00:00Z" }]));
+    render(<MoreRealData live />);
+    const card = await screen.findByRole("region", { name: /what the sun did/i });
+    await within(card).findByText(/LIVE/);
+    expect(card.textContent).toMatch(/2 solar flares \(1 big/);
+  });
+
+  it("APOD comes from the live site when it answers", async () => {
+    server.use(...sun([]));
+    render(<MoreRealData live />);
+    const card = await screen.findByRole("region", { name: /space picture of the day/i });
+    await within(card).findByText(/Live picture/);
+    expect(within(card).getByText(/LIVE/)).toBeTruthy();
+  });
+
+  it("when NASA is down, sections keep the saved data and say SAVED", async () => {
+    server.use(http.get("https://api.nasa.gov/DONKI/*", () => HttpResponse.error()), http.get("https://science.nasa.gov/*", () => HttpResponse.error()));
+    render(<MoreRealData live />);
+    const card = await screen.findByRole("region", { name: /space picture of the day/i });
+    await waitFor(() => expect(card.textContent).toMatch(/SAVED/), { timeout: 4000 });
   });
 });
