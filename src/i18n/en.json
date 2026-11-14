@@ -13,7 +13,46 @@
   },
   "morning": {
     "heading": "Good morning! Sol {{sol}}",
-    "goPlan": "Plan the day"
+    "goPlan": "Plan the day",
+    "firstDay": "First morning on Mars. Everything works.",
+    "nothingFell": "Nothing broke overnight. Good plan!",
+    "because": "because"
+  },
+  "domino": {
+    "panelsSkipped": "Nobody cleaned the solar panels.",
+    "greenhouseSkipped": "Nobody ran the greenhouse lights.",
+    "shelterSkipped": "Nobody built up the shelter.",
+    "powerLow": "Power is low today.",
+    "foodEmpty": "The food ran out.",
+    "airLow": "The air is getting thin.",
+    "crewTired": "One astronaut is too tired to work.",
+    "doseHigh": "The space-ray meter jumped up."
+  },
+  "event": {
+    "burst": {
+      "may2024": "The Sun just blasted a space-ray storm!"
+    },
+    "stormCloud": {
+      "may2024": "A storm cloud from the Sun reached Mars."
+    }
+  },
+  "earth": {
+    "answer": "📡 Earth says: {{dust}}, and {{storm}}.",
+    "dust": {
+      "clear": "clear skies tomorrow",
+      "dusty": "dusty skies tomorrow"
+    },
+    "storm": {
+      "none": "no storm cloud is coming",
+      "coming_one": "a storm cloud arrives in {{count}} sol",
+      "coming_other": "a storm cloud arrives in {{count}} sols"
+    }
+  },
+  "chip": {
+    "live": "Live NASA data",
+    "snapshot": "Real NASA data (saved)",
+    "constant": "Real NASA number",
+    "source": "source"
   },
   "plan": {
     "heading": "Plan sol {{sol}}",
