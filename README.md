@@ -137,7 +137,7 @@ src/data/            NASA data: fetch → cache → bundled snapshot
 src/screens/         title, morning report, plan, end of sol, final chain
 src/i18n/en.json     every kid-facing sentence (bg.json later)
 public/snapshots/    saved real NASA data (works offline)
-docs/                concept.md (the game), plan.md (who/when), team-brief.pdf, council/ (how we decided)
+docs/                documentation.md (full project docs), concept.md (the game), plan.md (who/when), team-brief.pdf, council/ (how we decided)
 ```
 
 ## 6. Team rules
