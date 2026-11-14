@@ -163,10 +163,12 @@
     },
     "sun": {
       "title": "What the Sun did this month",
-      "body": "In the 30 days up to {{date}}, NASA counted {{flares}} solar flares ({{big}} big ones) and {{cmes}} storm clouds (CMEs).",
-      "note": "NASA watches the Sun from near Earth. Most of these storms never reach Mars.",
-      "bodyNoFlares": "In the 30 days up to {{date}}, NASA counted {{cmes}} storm clouds (CMEs) and {{storms}} magnetic storms at Earth.",
-      "flaresMissing": "NASA's solar flare list was not available when we checked, so we leave flares out."
+      "intro": "In the 30 days up to {{date}}, NASA counted:",
+      "flares": "Solar flares: {{n}} (big ones: {{big}})",
+      "cmes": "Storm clouds (CMEs): {{n}}",
+      "storms": "Magnetic storms at Earth: {{n}}",
+      "flaresMissing": "NASA's solar flare list was not available when we checked, so we leave flares out.",
+      "note": "NASA watches the Sun from near Earth. Most of these storms never reach Mars."
     },
     "apod": {
       "title": "Space picture of the day",

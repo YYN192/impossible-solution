@@ -110,7 +110,8 @@ describe("MoreRealData live refresh (DONKI + APOD, saved data first)", () => {
     render(<MoreRealData live />);
     const card = await screen.findByRole("region", { name: /what the sun did/i });
     await within(card).findByText(/LIVE/);
-    expect(card.textContent).toMatch(/2 solar flares \(1 big/);
+    expect(card.textContent).toMatch(/Solar flares: 2 \(big ones: 1\)/);
+    expect(card.textContent).not.toMatch(/\b1 \w+s\b/); // no "1 storms"
   });
 
   it("APOD comes from the live site when it answers", async () => {
@@ -148,8 +149,8 @@ describe("MoreRealData Sun card with the flare list missing", () => {
     render(<MoreRealData live />);
     const card = await screen.findByRole("region", { name: /what the sun did/i });
     await within(card).findByText(/LIVE/);
-    expect(card.textContent).not.toMatch(/0 solar flares/);
-    expect(card.textContent).toMatch(/1 storm cloud/);
+    expect(card.textContent).not.toMatch(/Solar flares:/);
+    expect(card.textContent).toMatch(/Storm clouds \(CMEs\): 1/);
     expect(card.textContent).toMatch(/flare list was not available/i);
   });
 });

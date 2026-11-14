@@ -280,20 +280,16 @@ export function MoreRealData({ live = false }: { live?: boolean }) {
       {all.sun ? (
         <section className="sources__item" aria-labelledby="more-sun">
           <h4 id="more-sun">{t("moreData.sun.title")}</h4>
-          <p>
-            {all.sun.data.counts.flares === null
-              ? t("moreData.sun.bodyNoFlares", {
-                  date: fmtDate(all.sun.data.window.end),
-                  cmes: all.sun.data.counts.cmes ?? 0,
-                  storms: all.sun.data.counts.geomagneticStorms ?? 0,
-                })
-              : t("moreData.sun.body", {
-                  date: fmtDate(all.sun.data.window.end),
-                  flares: all.sun.data.counts.flares,
-                  big: all.sun.data.counts.bigFlares ?? 0,
-                  cmes: all.sun.data.counts.cmes ?? 0,
-                })}
-          </p>
+          <p>{t("moreData.sun.intro", { date: fmtDate(all.sun.data.window.end) })}</p>
+          <ul className="more__cards">
+            {all.sun.data.counts.flares !== null ? (
+              <li>{t("moreData.sun.flares", { n: all.sun.data.counts.flares, big: all.sun.data.counts.bigFlares ?? 0 })}</li>
+            ) : null}
+            {all.sun.data.counts.cmes !== null ? <li>{t("moreData.sun.cmes", { n: all.sun.data.counts.cmes })}</li> : null}
+            {all.sun.data.counts.geomagneticStorms !== null ? (
+              <li>{t("moreData.sun.storms", { n: all.sun.data.counts.geomagneticStorms })}</li>
+            ) : null}
+          </ul>
           {all.sun.data.missing.includes("flr") ? <p className="sources__note">{t("moreData.sun.flaresMissing")}</p> : null}
           <p className="sources__note">{t("moreData.sun.note")}</p>
           {fresh(all.sun)}

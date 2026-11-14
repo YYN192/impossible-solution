@@ -55,7 +55,8 @@ export async function liveSpaceWeather(
       cacheKey: `donki:${path}:${start}`,
       schema: LenientList,
       offline: opts.offline,
-      retries: opts.retries,
+      // One try per part: on 429 the saved card is already showing, retries would only burn the shared DEMO_KEY.
+      retries: opts.retries ?? 0,
       fetchImpl: opts.fetchImpl,
     });
   try {

@@ -105,3 +105,11 @@ describe("liveSpaceWeather when one DONKI part is down", () => {
     expect(r.data.missing).toEqual(["flr"]);
   });
 });
+
+describe("liveSpaceWeather does not hammer a rate-limited DONKI", () => {
+  it("asks each part once by default when DONKI says 429 (the saved data is already on screen)", async () => {
+    server.use(http.get("https://api.nasa.gov/DONKI/*", () => (calls++, new HttpResponse(null, { status: 429, headers: { "Retry-After": "0" } }))));
+    await liveSpaceWeather({ now }).catch(() => undefined);
+    expect(calls).toBe(5);
+  });
+});
