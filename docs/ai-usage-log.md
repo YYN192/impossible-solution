@@ -1,10 +1,26 @@
 # AI usage log
 
-Required in the Space Apps submission. One line per use: when, who, tool, what for, what we kept.
+Required in the Space Apps submission.
+
+## Summary: one row per AI tool
+
+| Tool | What it was used for | Where the output is | Reviewed by us | Notes |
+|---|---|---|---|---|
+| Claude Code with Claude Fable 5.2 | The overnight build, 14–15 Nov 2026: simulation engine, campaigns, data layer, reviewing diffs and merging | `src/sim/`, `src/data/`, `src/state/`, campaign content, merges on `main` | Yes: the lead agent reviewed every diff and ran build and tests before every merge; the `science-checker` agent checked science claims. TODO(team): confirm your own read-through of the final build | Text and code only. Every real number is sourced in `src/data/sources.ts` or disclosed as a game number |
+| Claude Sonnet 5.5 subagents (Claude Code) | UI, CSS, i18n and docs, QA scripts, and reviews (judge, kid-playtester, science-checker, rules-auditor) | `src/` screens and styles, `docs/`, `scripts/qa/`, review notes | Yes: each branch was reviewed by the lead agent, with build and tests green before merge | Text and code only |
+| Claude Code with Claude Opus 5.5 | Earlier work on 14 Nov: scaffold, data layer, app shell, engine tests, kid text, Bulgarian strings, sound library, README, docs (detailed rows below) | Across the repo, see the detailed log | Yes: reviewed by the named team member in each row | Text and code only |
+| pxl (https://github.com/crsolver/claude-pxl, MIT) | Programmatic pixel art: sprites are drawn by code written with Claude, not by an image-generation model | `art-src/pixel/hub.px.js`, PNGs in `src/assets/pixel/` | Yes: each sprite's rendered preview was looked at before export, and the hub was checked in the running game | Original art, cartoon faces of nobody real |
+| Codex | Early local Mars UI prototype and a merge; one failed image-generation attempt (see detailed log) | Procedural sprite script `scripts/generate-pixel-assets.mjs`, page shell | Yes: reviewed by the team | The failed image job produced no asset |
+
+No NASA logos (meatball, worm, seal) appear in any AI-assisted output. No generative image, video or voice models were used for any shipped asset. One early prototype sprite (`astronaut.png`) was made with an image-generation tool on 14 Nov, was never used in the game, and has been deleted from the repo.
+
+## Detailed log
+
+One line per use: when, who, tool, what for, what we kept.
 
 ## Local Mars UI experiment — 2026-11-14
 
-- Generated `src/assets/pixel/astronaut.png` as an original pixel-art player sprite for the Mars base prototype.
+- Generated an early prototype pixel-art player sprite, `src/assets/pixel/astronaut.png`, with an image-generation tool. It was never shown in the game and has since been deleted; the game's sprites are made with pxl code (see above).
 - Used AI assistance to draft the Vite multi-page menu, canvas hub, console shell, styles, and documentation. The implementation is a local trial; it has not been committed or pushed.
 
 | When (Sofia) | Who | Tool | What for | Output used |
@@ -26,11 +42,11 @@ Required in the Space Apps submission. One line per use: when, who, tool, what f
 | Sat 14 Nov 12:17–12:38 | Danislav | Claude Code (Claude Opus 5.5) | #14 final screen (domino chain, stars + Best, Try a different plan); game store on the real engine | PR #29: src/screens/FinalScreen.tsx, src/state/game.ts (from commit co-author lines) |
 | Sat 14 Nov 13:00 | Nikolay P. | Claude Code (Claude Opus 5.5) | #15/#16/#17: kid text in en.json (job effects, crew, bars, plan help, tooltips, teacher card draft), copy-rule tests, "What's this?" tooltip component, credits/assets, test fix for Node 25+ localStorage | en.json, src/components/WhatsThis.*, src/i18n/en.copy.test.ts, CREDITS.md (text to be science-checked before merge) |
 | Sat 14 Nov 13:30 | Nikolay P. | Claude Code (Claude Opus 5.5) | Pitch slide deck for the Sunday pitch; full project documentation | docs/documentation.md (playtest slide left with placeholders until the real playtest) |
-| Sat 14 Nov 14:45–15:15 | Nikolay P. | Claude Code (Claude Opus 5.5) | Audit of my area after the merges; tooltips placed on title + morning screens, kid-friendly chip labels + jargon test, simplifies card moved to en.json, teacher card screen (#18), own favicon, docs; tests first where possible | src/components/helpTopics.ts, src/screens/{TitleScreen,MorningScreen,TeacherCard}.tsx, src/data/sources.ts, mission.ts, en.json, App.tsx, favicon.svg (reviewed by Nikolay P.) |
+| Sat 14 Nov 14:45–15:15 | Nikolay P. | Claude Code (Claude Opus 5.5) | Audit of my area after the merges; tooltips placed on title + morning screens, kid-friendly chip labels + jargon test, simplifies card moved to en.json, teacher card screen (#18), own favicon, docs; tests first where possible | src/components/helpTopics.ts, src/screens/{MorningScreen,TeacherCard}.tsx (title screen since removed), src/data/sources.ts, mission.ts, en.json, App.tsx, favicon.svg (reviewed by Nikolay P.) |
 
-- 2026-11-14: Codex merged origin/main into ui/planner, retained both asset credits and AI logs, and added mission.html to expose the upstream app alongside the prototype pages. Validation: 244 tests passed, production build passed, lint completed with two existing engine-test warnings.
+- 2026-11-14: Codex merged origin/main into ui/planner, retained both asset credits and AI logs, and added a separate mission page (since removed; all pages now load src/main.tsx). Validation: 244 tests passed, production build passed, lint completed with two existing engine-test warnings.
 | Sat 14 Nov 17:00 | Nikolay P. | Claude Code (Claude Opus 5.5) | #19: Bulgarian translation of every en.json key, EN/BG toggle in the status bar (remembered, `?lang=bg`), tests for matching keys/placeholders/numbers and the toggle | src/i18n/bg.json, src/components/LanguageToggle.* (translation to be read over by a native speaker on the team) |
-| Sat 14 Nov 17:45 | Nikolay P. | Claude Code (Claude Opus 5.5) | Original 8-bit sound library: synthesiser script, 63 WAV files, manifest with triggers and aliases for the existing sound IDs, verification script and test, dev-only preview page, integration guide | scripts/generate-audio.mjs, scripts/verify-audio.mjs, public/audio/, audio-preview.html, docs/audio.md (not yet wired into the game) |
+| Sat 14 Nov 17:45 | Nikolay P. | Claude Code (Claude Opus 5.5) | Original 8-bit sound library: synthesiser script, 63 WAV files, manifest with triggers and aliases for the existing sound IDs, verification script and test, dev-only preview page, integration guide | scripts/generate-audio.mjs, scripts/verify-audio.mjs, public/audio/, scripts/audio-preview.html, docs/audio.md (not yet wired into the game) |
 | Sat 14 Nov 19:45 | Yavor | Claude Code (Claude Opus 5.5) | Repo polish: recorded the `?demo=1` path into a README GIF (Playwright screenshots + ffmpeg, no generative imagery), cropped a social preview from the title screen, split team setup into CONTRIBUTING.md, added CHANGELOG and issue templates | README.md, CONTRIBUTING.md, CHANGELOG.md, docs/media/, .github/ISSUE_TEMPLATE/ (reviewed by Yavor) |
 | Sat 14 Nov 20:30 | Yavor | Claude Code (Claude Opus 5.5) | Restructured README after the layout common to the 10 top GitHub-trending READMEs: centred header, tagline, link row, badges, hero GIF, What is it / Key features / Quick start / How to play / NASA data / Privacy / Contributing / License | README.md (reviewed by Yavor) |
 | Sat 14 Nov 20:10 | Yavor | Claude Code (Claude Opus 5.5) | Wire the sound library into the game: Web Audio engine (unlock on first tap, cached buffers, lazy loading, music off by default), Sound on/off toggle, sound cues at key moments, AAC copies of the ambience loops, tests, headless browser play-through | src/game/audio.ts, src/components/SoundToggle.tsx, sound calls in screens, docs/audio.md |

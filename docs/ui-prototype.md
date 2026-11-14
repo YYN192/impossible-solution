@@ -21,7 +21,6 @@ The menu, hub, and console are separate Vite HTML entry pages. The menu is the d
 - The volume setting is stored but cannot change audio yet.
 - The planner keeps its dashboard styling inside a pixel-art console frame.
 
-See [MARS_UI_INTEGRATION_TODO.md](MARS_UI_INTEGRATION_TODO.md) for the remaining integration and verification work.
 
 ## Verification
 
