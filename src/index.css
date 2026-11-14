@@ -111,6 +111,14 @@ a {
   margin: 0.25rem 0 0.25rem 1.5rem;
   color: var(--muted);
 }
+.fallen__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.fallen__row .domino {
+  flex: 1;
+}
 .fallen .domino:not(.domino-fall) {
   margin-left: 1.5rem;
   border-left-color: var(--muted);

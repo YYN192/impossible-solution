@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./WhatsThis.css";
 
@@ -35,6 +35,18 @@ export function WhatsThis({ topic }: { topic: HelpTopic }) {
     };
   }, [open]);
 
+  // Keep the bubble inside the screen: it is centred on the "?", which can sit near an edge
+  // on a phone. Measure once it opens and slide it back in (8 px margin).
+  const bubble = useRef<HTMLSpanElement>(null);
+  const [shift, setShift] = useState(0);
+  useLayoutEffect(() => {
+    if (!open || !bubble.current) return setShift(0);
+    const r = bubble.current.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    if (r.left < 8) setShift(8 - r.left);
+    else if (r.right > vw - 8) setShift(vw - 8 - r.right);
+  }, [open]);
+
   const title = t(`help.${topic}.title`);
   return (
     <span className="whats-this" ref={root}>
@@ -50,7 +62,13 @@ export function WhatsThis({ topic }: { topic: HelpTopic }) {
         ?
       </button>
       {open ? (
-        <span id={id} role="note" className="whats-this__bubble">
+        <span
+          id={id}
+          ref={bubble}
+          role="note"
+          className="whats-this__bubble"
+          style={shift ? { transform: `translateX(calc(-50% + ${shift}px))` } : undefined}
+        >
           <strong>{title}</strong> {t(`help.${topic}.text`)}{" "}
           <button
             type="button"

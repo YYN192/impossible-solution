@@ -51,8 +51,10 @@ export function MorningReportView({
 
       {headline ? (
         <div className="fallen">
-          <DominoCard domino={headline} fall />
-          <DominoHelp textKey={headline.textKey} />
+          <div className="fallen__row">
+            <DominoCard domino={headline} fall />
+            <DominoHelp textKey={headline.textKey} />
+          </div>
           {cause && (
             <>
               <p className="because">{t("morning.because")}</p>
@@ -80,11 +82,7 @@ export function MorningReportView({
 /** "What's this?" for the science word behind the fallen domino (dust, power, air …). */
 function DominoHelp({ textKey }: { textKey: string }) {
   const topic = helpTopicForDomino(textKey);
-  return topic ? (
-    <p className="domino-help">
-      <WhatsThis topic={topic} />
-    </p>
-  ) : null;
+  return topic ? <WhatsThis topic={topic} /> : null;
 }
 
 function ExtraLine({ extra }: { extra: Extra }) {
