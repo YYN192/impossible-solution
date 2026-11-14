@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   clearCache,
   handleDonki,
+  handleDsnMars,
   handleOsdrSearch,
   handleStatus,
 } from "./nasa.js";
@@ -20,6 +21,12 @@ const req = (path: string, origin?: string) =>
     headers: origin ? { Origin: origin } : {},
   });
 const now = () => new Date("2026-11-14T12:00:00Z");
+/** CCMC unreachable (as from the venue): every call goes to the api.nasa.gov gateway. */
+const noCcmc = (f: (u: string) => Promise<Response>) =>
+  vi.fn(async (u: string | URL | Request) => {
+    if (String(u).includes("kauai")) throw new TypeError("fetch failed");
+    return f(String(u));
+  });
 
 afterEach(() => {
   clearCache();
@@ -52,7 +59,7 @@ describe("/api/donki/:type", () => {
 
   it("answers a live envelope, keeps the key server-side, sets CDN cache", async () => {
     vi.stubEnv("NASA_API_KEY", "secret-test-key");
-    const f = vi.fn(async () => ok([{ activityID: "C1" }]));
+    const f = noCcmc(async () => ok([{ activityID: "C1" }]));
     const r = await handleDonki(
       req("/api/donki/CME?startDate=2026-11-01&endDate=2026-11-14"),
       { fetchImpl: f, now },
@@ -68,21 +75,21 @@ describe("/api/donki/:type", () => {
     );
     expect(Date.parse(body.fetchedAt)).not.toBeNaN();
     expect(JSON.stringify(body)).not.toContain("secret-test-key");
-    expect(String(f.mock.calls[0]?.[0])).toContain("api_key=secret-test-key");
+    expect(String(f.mock.calls[1]?.[0])).toContain("api_key=secret-test-key");
     expect(r.headers.get("Cache-Control")).toMatch(
       /s-maxage=3600.*stale-while-revalidate/,
     );
   });
 
   it("uses DEMO_KEY when no key is set and defaults to the last 30 days", async () => {
-    const f = vi.fn(async () => ok(""));
+    const f = noCcmc(async () => ok(""));
     const r = await handleDonki(req("/api/donki/notifications?type=all"), {
       fetchImpl: f,
       now,
     });
     expect(r.status).toBe(200);
     expect((await r.json()).data).toEqual([]); // DONKI says "" when nothing happened
-    const url = new URL(String(f.mock.calls[0]?.[0]));
+    const url = new URL(String(f.mock.calls[1]?.[0]));
     expect(url.searchParams.get("api_key")).toBe("DEMO_KEY");
     expect(url.searchParams.get("startDate")).toBe("2026-10-15");
     expect(url.searchParams.get("type")).toBe("all");
@@ -206,5 +213,50 @@ describe("/api/status", () => {
       body.upstreams.find((u: { name: string }) => u.name === "osdr"),
     ).toMatchObject({ ok: false, status: 500 });
     expect(JSON.stringify(body)).not.toContain("api_key");
+  });
+});
+
+describe("DONKI: CCMC first (no key), then the api.nasa.gov gateway", () => {
+  it("answers from CCMC when it works and never sends the key there", async () => {
+    vi.stubEnv("NASA_API_KEY", "secret-test-key");
+    const f = vi.fn(async () => ok([]));
+    const r = await handleDonki(req("/api/donki/CME?startDate=2026-11-01&endDate=2026-11-14"), { fetchImpl: f, now });
+    expect(String(f.mock.calls[0]?.[0])).toBe("https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/CME?startDate=2026-11-01&endDate=2026-11-14");
+    expect((await r.json()).upstream).toMatch(/^https:\/\/kauai/);
+  });
+
+  it("falls back to the gateway when CCMC is unreachable", async () => {
+    const f = vi.fn(async (u: string | URL | Request) => {
+      if (String(u).includes("kauai")) throw new TypeError("fetch failed");
+      return ok([{ activityID: "G" }]);
+    });
+    const r = await handleDonki(req("/api/donki/GST"), { fetchImpl: f as typeof fetch, now });
+    expect(r.status).toBe(200);
+    expect((await r.json()).upstream).toMatch(/^https:\/\/api\.nasa\.gov/);
+  });
+
+  it("marks the last good copy stale", async () => {
+    const f = vi.fn().mockResolvedValueOnce(ok([{ a: 1 }])).mockResolvedValue(ok({}, 500));
+    await handleDonki(req("/api/donki/SEP"), { fetchImpl: f, now });
+    expect(await (await handleDonki(req("/api/donki/SEP"), { fetchImpl: f, now })).json()).toMatchObject({ source: "cached", stale: true });
+  });
+});
+
+describe("/api/dsn/mars", () => {
+  const xml = `<dsn><station name="gdscc" friendlyName="Goldstone" timeUTC="1"/>
+    <dish name="DSS24"><target name="M20" id="168" rtlt="1320"/></dish>
+    <dish name="DSS26"><target name="SOHO" id="21" rtlt="8.34"/></dish>
+    <station name="mdscc" friendlyName="Madrid" timeUTC="1"/>
+    <dish name="DSS55"><target name="MRO" id="74" rtlt="-1"/></dish></dsn>`;
+  it("gives the real round-trip light time for Mars spacecraft only", async () => {
+    const r = await handleDsnMars(req("/api/dsn/mars"), { fetchImpl: async () => new Response(xml), now });
+    const body = await r.json();
+    expect(body.source).toBe("live");
+    expect(body.data).toEqual([{ spacecraft: "M20", rtltSeconds: 1320, dish: "DSS24", station: "Goldstone" }]);
+    expect(r.headers.get("Cache-Control")).toMatch(/s-maxage=60/);
+  });
+  it("refuses a page that is not DSN Now", async () => {
+    const r = await handleDsnMars(req("/api/dsn/mars"), { fetchImpl: async () => new Response("<html>"), now });
+    expect(r.status).toBe(502);
   });
 });

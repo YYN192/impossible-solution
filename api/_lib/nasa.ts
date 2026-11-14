@@ -45,7 +45,7 @@ const OsdrSearch = z
   .object({ hits: z.object({ hits: z.array(z.unknown()) }).loose() })
   .loose();
 
-const memory = new Map<string, { fetchedAt: string; data: unknown }>();
+const memory = new Map<string, { fetchedAt: string; data: unknown; upstream: string }>();
 /** Tests only. */
 export const clearCache = () => memory.clear();
 
@@ -91,26 +91,31 @@ class Upstream extends Error {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function fetchJson(url: string, deps: Deps): Promise<unknown> {
+interface Source {
+  /** Public URL, shown in the envelope (never contains the key). */
+  url: string;
+  key?: string;
+  timeoutMs?: number;
+  /** One retry on 429 / 5xx. */
+  retry?: boolean;
+}
+
+async function fetchBody(src: Source, deps: Deps, asText: boolean): Promise<unknown> {
   const f = deps.fetchImpl ?? fetch;
+  const sep = src.url.includes("?") ? "&" : "?";
+  const url = src.key ? `${src.url}${sep}api_key=${encodeURIComponent(src.key)}` : src.url;
   for (let attempt = 0; ; attempt++) {
     let res: Response;
     try {
-      res = await f(url, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(deps.timeoutMs ?? 8000),
-      });
+      res = await f(url, { signal: AbortSignal.timeout(deps.timeoutMs ?? src.timeoutMs ?? 8000) });
     } catch {
       throw new Upstream(504, "NASA did not answer in time (timeout)");
     }
     if (res.ok)
-      return res.json().catch(() => {
-        throw new Upstream(
-          502,
-          "NASA answered with something that is not JSON",
-        );
+      return (asText ? res.text() : res.json()).catch(() => {
+        throw new Upstream(502, "NASA answered with something we cannot read");
       });
-    if (attempt === 0 && (res.status === 429 || res.status >= 500)) {
+    if (src.retry && attempt === 0 && (res.status === 429 || res.status >= 500)) {
       const secs = Number(res.headers.get("Retry-After"));
       await sleep(Number.isFinite(secs) ? Math.min(secs * 1000, 2000) : 500);
       continue;
@@ -119,39 +124,25 @@ async function fetchJson(url: string, deps: Deps): Promise<unknown> {
   }
 }
 
-/** upstream = public URL (in the envelope); key = query added server-side only. */
-async function proxy(
-  req: Request,
-  upstream: string,
-  schema: ZodType,
-  maxAge: number,
-  deps: Deps,
-  key?: string,
-) {
-  try {
-    const sep = upstream.includes("?") ? "&" : "?";
-    const raw = await fetchJson(
-      key ? `${upstream}${sep}api_key=${encodeURIComponent(key)}` : upstream,
-      deps,
-    );
-    const parsed = schema.safeParse(raw);
-    if (!parsed.success)
-      throw new Upstream(502, "NASA's answer had an unexpected shape");
-    const entry = {
-      fetchedAt: (deps.now?.() ?? new Date()).toISOString(),
-      data: parsed.data,
-    };
-    memory.set(upstream, entry);
-    return json(req, 200, { source: "live", ...entry, upstream }, maxAge);
-  } catch (e) {
-    const err =
-      e instanceof Upstream ? e : new Upstream(502, "Unexpected error");
-    const last = memory.get(upstream);
-    // shortcut: per-instance memory only; a cold instance has nothing to fall back on (the client still has its snapshot).
-    if (last)
-      return json(req, 200, { source: "cached", ...last, upstream }, 60);
-    return json(req, err.status, { error: err.message, upstream }, 60);
+/** Try each source in order; first valid answer wins. memoKey names the data, whichever source answered. */
+async function proxy(req: Request, sources: Source[], schema: ZodType, maxAge: number, deps: Deps, asText = false) {
+  const memoKey = sources[sources.length - 1].url;
+  let err = new Upstream(502, "Unexpected error");
+  for (const src of sources) {
+    try {
+      const parsed = schema.safeParse(await fetchBody(src, deps, asText));
+      if (!parsed.success) throw new Upstream(502, "NASA's answer had an unexpected shape");
+      const entry = { fetchedAt: (deps.now?.() ?? new Date()).toISOString(), data: parsed.data, upstream: src.url };
+      memory.set(memoKey, entry);
+      return json(req, 200, { source: "live", ...entry }, maxAge);
+    } catch (e) {
+      if (e instanceof Upstream) err = e;
+    }
   }
+  const last = memory.get(memoKey);
+  // shortcut: per-instance memory only; a cold instance has nothing to fall back on (the client still has its snapshot).
+  if (last) return json(req, 200, { source: "cached", stale: true, ...last }, 60);
+  return json(req, err.status, { error: err.message, upstream: memoKey }, 60);
 }
 
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
@@ -183,20 +174,23 @@ export async function handleDonki(
   const days = (Date.parse(end) - Date.parse(start)) / (DAY * 1000);
   if (days < 0) return bad(req, "startDate must be before endDate");
   if (days > 60) return bad(req, "The window can be at most 60 days");
-  let upstream = `https://api.nasa.gov/DONKI/${type}?startDate=${start}&endDate=${end}`;
+  let query = `${type}?startDate=${start}&endDate=${end}`;
   if (type === "notifications") {
     const t = url.searchParams.get("type") ?? "all";
     if (!NOTIFICATION_TYPES.has(t))
       return bad(req, "Unknown notification type");
-    upstream += `&type=${t}`;
+    query += `&type=${t}`;
   }
+  // CCMC is DONKI's own server (no key, no rate limit) but can be unreachable; the gateway uses our key.
   return proxy(
     req,
-    upstream,
+    [
+      { url: `https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/${query}`, timeoutMs: 3000 },
+      { url: `https://api.nasa.gov/DONKI/${query}`, key: process.env.NASA_API_KEY || "DEMO_KEY", retry: true },
+    ],
     DonkiList,
     HOUR,
     deps,
-    process.env.NASA_API_KEY || "DEMO_KEY",
   );
 }
 
@@ -212,7 +206,7 @@ export async function handleOsdrSearch(
   if (!Number.isInteger(size) || size < 1 || size > 25)
     return bad(req, "size: a whole number from 1 to 25");
   const upstream = `https://osdr.nasa.gov/osdr/data/search?${new URLSearchParams({ term, type: "cgene", size: String(size) })}`;
-  return proxy(req, upstream, OsdrSearch, DAY, deps);
+  return proxy(req, [{ url: upstream, retry: true }], OsdrSearch, DAY, deps);
 }
 
 /** Health: which upstreams answer right now (cheap calls, CDN-cached 5 min). */
@@ -271,3 +265,30 @@ export async function handleStatus(
     300,
   );
 }
+
+const MARS_CRAFT = new Set(["M20", "MSL", "MRO", "MVN", "TGO", "EMM", "ODY"]);
+const attrs = (s: string) => Object.fromEntries([...s.matchAll(/(\w+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+
+/** DSN Now XML → Mars spacecraft being talked to right now, with the real round-trip light time. */
+export function parseDsn(xml: string) {
+  const out: { spacecraft: string; rtltSeconds: number; dish: string; station: string }[] = [];
+  let station = "";
+  let dish = "";
+  for (const m of xml.matchAll(/<(station|dish|target)\b([^>]*)>/g)) {
+    const a = attrs(m[2]);
+    if (m[1] === "station") station = a.friendlyName ?? a.name ?? "";
+    else if (m[1] === "dish") dish = a.name ?? "";
+    else if (MARS_CRAFT.has(a.name) && Number(a.rtlt) > 0)
+      out.push({ spacecraft: a.name, rtltSeconds: Number(a.rtlt), dish, station });
+  }
+  return out;
+}
+
+const DsnXml = z
+  .string()
+  .refine((s) => s.includes("<dsn"), "not DSN Now")
+  .transform(parseDsn);
+
+/** GET /api/dsn/mars: today's real message delay to Mars (CDN cache 60 s). */
+export const handleDsnMars = (req: Request, deps: Deps = {}) =>
+  proxy(req, [{ url: "https://eyes.nasa.gov/dsn/data/dsn.xml", timeoutMs: 5000 }], DsnXml, 60, deps, true);
