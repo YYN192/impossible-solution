@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { may2024Mission } from "../data/mission";
-import { createGame, step } from "./engine";
+import { createGame, stars, step } from "./engine";
 import { MISSION_SOLS, type CrewId, type Domino, type GameState, type JobId, type Plan } from "./types";
 
 const CHOICES: (JobId | undefined)[] = [undefined, "panels", "greenhouse", "shelter", "askEarth", "science"];
@@ -61,6 +61,7 @@ function survey() {
   let badCause = "";
   let outOfRange = 0;
   let demoStory = false;
+  const starCounts = [0, 0, 0, 0];
   for (const plans of allMissions()) {
     const g = play(plans);
     longest = Math.max(longest, chainLength(g.dominoes));
@@ -70,10 +71,45 @@ function survey() {
       for (const c of d.causeIds) if (!badCause && (!seen.has(c) || seen.get(c)! > d.sol)) badCause = `${d.id} ← ${c}`;
       seen.set(d.id, d.sol);
     }
+    starCounts[stars(g).count]++;
     if (Object.values(g.bars).some((v) => v < 0 || v > 10)) outOfRange++;
     if (!demoStory && traces(g, "sol1-panels-skipped", "domino.crewTired")) demoStory = true;
   }
-  return { longest, free, badCause, outOfRange, demoStory };
+  return { longest, free, badCause, outOfRange, demoStory, starCounts };
+}
+
+const JOB_CHOICES = CHOICES.filter((c): c is JobId => c !== undefined);
+
+/**
+ * A job is "better in every situation" if swapping it for any other choice never gives more stars.
+ * Returns the jobs for which NO mission exists where swapping one copy of it (on one sol) for another
+ * choice gives more stars at the end, i.e. the jobs that are a free choice.
+ */
+function dominantJobs(): JobId[] {
+  const beaten = new Set<JobId>();
+  for (const plans of allMissions()) {
+    if (beaten.size === JOB_CHOICES.length) break;
+    let base: number | undefined;
+    for (let sol = 0; sol < plans.length; sol++) {
+      const crew = (Object.keys(plans[sol]) as CrewId[]).filter((c) => !beaten.has(plans[sol][c]!));
+      for (const c of crew) {
+        const job = plans[sol][c]!;
+        if (beaten.has(job)) continue;
+        base ??= stars(play(plans)).count;
+        for (const other of CHOICES) {
+          if (other === job) continue;
+          const swapped = plans.map((p) => ({ ...p }));
+          if (other) swapped[sol][c] = other;
+          else delete swapped[sol][c];
+          if (stars(play(swapped)).count > base) {
+            beaten.add(job);
+            break;
+          }
+        }
+      }
+    }
+  }
+  return JOB_CHOICES.filter((j) => !beaten.has(j));
 }
 
 function traces(g: GameState, fromId: string, toKey: string): boolean {
@@ -90,5 +126,8 @@ describe("whole mission (brute force over all 175,616 plans)", () => {
   it("no plan is free: every mission ends with at least one fallen domino", () => expect(r.free).toBe(0));
   it("every cause points to a domino that already fell", () => expect(r.badCause).toBe(""));
   it("bars always stay between 0 and 10", () => expect(r.outOfRange).toBe(0));
+  it("several different plans reach 2–3★", () => expect(r.starCounts[2] + r.starCounts[3]).toBeGreaterThan(1));
+  it("at least one plan gets only 1★", () => expect(r.starCounts[1]).toBeGreaterThan(0));
+  it("no single job is better in every situation: each one is sometimes the wrong pick", () => expect(dominantJobs()).toEqual([]));
   it("the demo story works: skipping panels on sol 1 can end in a tired astronaut traced back to it", () => expect(r.demoStory).toBe(true));
 });
