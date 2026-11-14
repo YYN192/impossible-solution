@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { ScreenFrame } from "../components/ScreenFrame";
 import { MISSION_SOLS } from "../sim/types";
 import { useNav } from "../state/screen";
-import { ScreenFrame } from "./ScreenFrame";
 
 /** End of sol: the bars animate here once the engine lands (respect reduced motion). */
 export function EndOfSolScreen() {

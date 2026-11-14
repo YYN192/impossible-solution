@@ -52,6 +52,9 @@ export const useNav = create<NavStore>()((set) => ({
   next: () =>
     set((s) => {
       const to = nextNav(s);
+      // The title and final screen both enter a new run through morning 1.
+      // Reset here—not in home()—so returning home preserves the completed run
+      // until the player explicitly starts again.
       if (to.screen === "morning" && to.sol === 1) useGame.getState().reset();
       return to;
     }),
