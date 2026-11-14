@@ -1,6 +1,6 @@
 # The Impossible SOLution
 
-**Live:** _deploying…_
+**Live:** https://yyn192.github.io/impossible-solution/
 
 A browser game for kids aged 7–12: run an outpost, make trade-offs, see the consequences. Built for the NASA Space Apps Challenge 2026 ("Build a Junior Astronaut Mission Trainer"), team SoftUniors, Sofia.
 
