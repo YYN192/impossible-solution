@@ -1,10 +1,26 @@
 # AI usage log
 
-Required in the Space Apps submission. One line per use: when, who, tool, what for, what we kept.
+Required in the Space Apps submission.
+
+## Summary: one row per AI tool
+
+| Tool | What it was used for | Where the output is | Reviewed by us | Notes |
+|---|---|---|---|---|
+| Claude Code with Claude Fable 5.2 | The overnight build, 14–15 Nov 2026: simulation engine, campaigns, data layer, reviewing diffs and merging | `src/sim/`, `src/data/`, `src/state/`, campaign content, merges on `main` | Yes: the lead agent reviewed every diff and ran build and tests before every merge; the `science-checker` agent checked science claims. TODO(team): confirm your own read-through of the final build | Text and code only. Every real number is sourced in `src/data/sources.ts` or disclosed as a game number |
+| Claude Sonnet 5.5 subagents (Claude Code) | UI, CSS, i18n and docs, QA scripts, and reviews (judge, kid-playtester, science-checker, rules-auditor) | `src/` screens and styles, `docs/`, `scripts/qa/`, review notes | Yes: each branch was reviewed by the lead agent, with build and tests green before merge | Text and code only |
+| Claude Code with Claude Opus 5.5 | Earlier work on 14 Nov: scaffold, data layer, app shell, engine tests, kid text, Bulgarian strings, sound library, README, docs (detailed rows below) | Across the repo, see the detailed log | Yes: reviewed by the named team member in each row | Text and code only |
+| pxl (https://github.com/crsolver/claude-pxl, MIT) | Programmatic pixel art: sprites are drawn by code written with Claude, not by an image-generation model | `art-src/pixel/hub.px.js`, PNGs in `src/assets/pixel/` | Yes: each sprite's rendered preview was looked at before export, and the hub was checked in the running game | Original art, cartoon faces of nobody real |
+| Codex | Early local Mars UI prototype and a merge; one failed image-generation attempt (see detailed log) | Procedural sprite script `scripts/generate-pixel-assets.mjs`, page shell | Yes: reviewed by the team | The failed image job produced no asset |
+
+No NASA logos (meatball, worm, seal) appear in any AI-assisted output. No generative image, video or voice models were used for any shipped asset. One early prototype sprite (`astronaut.png`) was made with an image-generation tool on 14 Nov, was never used in the game, and has been deleted from the repo.
+
+## Detailed log
+
+One line per use: when, who, tool, what for, what we kept.
 
 ## Local Mars UI experiment — 2026-11-14
 
-- Generated `src/assets/pixel/astronaut.png` as an original pixel-art player sprite for the Mars base prototype.
+- Generated an early prototype pixel-art player sprite, `src/assets/pixel/astronaut.png`, with an image-generation tool. It was never shown in the game and has since been deleted; the game's sprites are made with pxl code (see above).
 - Used AI assistance to draft the Vite multi-page menu, canvas hub, console shell, styles, and documentation. The implementation is a local trial; it has not been committed or pushed.
 
 | When (Sofia) | Who | Tool | What for | Output used |
