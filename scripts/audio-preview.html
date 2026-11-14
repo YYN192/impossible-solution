@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
-  Development-only sound preview. Not part of the game build (vite.config.ts builds index, mission,
-  hub and console only). Open it with `npm run dev`, then http://localhost:5173/impossible-solution/audio-preview.html
+  Development-only sound preview. Not part of the game build (vite.config.ts builds index,
+  hub and console only). Open it with `npm run dev`, then http://localhost:5173/impossible-solution/scripts/audio-preview.html
 -->
 <html lang="en">
 <head>
@@ -45,7 +45,7 @@
   <div id="list"></div>
 </main>
 <script type="module">
-  const base = new URL(".", location.href);
+  const base = new URL("../", location.href);
   const list = document.getElementById("list");
   const master = document.getElementById("master");
   const useManifestVolume = document.getElementById("useManifestVolume");

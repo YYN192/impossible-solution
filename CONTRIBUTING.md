@@ -153,6 +153,6 @@ public/audio/          63 generated sound effects and loops + audio-manifest.jso
 docs/                  documentation index, full guide, pitch, concept and decision archive
 ```
 
-`index.html` opens the Mars menu, `hub.html` the walkable station, `console.html` the planning prototype, and `mission.html` the upstream mission app with its reports and data sources. All four are in the production build.
+`index.html` opens the Mars menu, `hub.html` the walkable station, and `console.html` the planning console. All three are in the production build and load the same app (`src/main.tsx`), which picks the screen from the page name.
 
 Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/documentation.md`](docs/documentation.md) for the full guide, [`docs/pitch/pitch.html`](docs/pitch/pitch.html) for the pitch deck, and [`docs/audio.md`](docs/audio.md) for the sound library.

@@ -11,7 +11,7 @@ All sounds are made by our own code in `scripts/generate-audio.mjs` using square
 | `node scripts/generate-audio.mjs` | Remakes every WAV, the ambience `.m4a` copies (needs `ffmpeg` on PATH; without it the manifest has no `web` field and the game falls back to WAV) and the manifest (about 3 s). Output is deterministic: same code, byte-identical files. |
 | `node scripts/verify-audio.mjs` | Reads every file back and checks format, duration, peak and average level, clipping, silent edges, seamless loops, and that every file from the brief exists. Exit code 1 on any problem. |
 | `npm test` | Includes `scripts/audio-assets.test.ts`: the manifest matches the files, every file is valid 16-bit 44.1 kHz WAV, and the game's existing sound IDs have files. |
-| `npm run dev`, then open `/impossible-solution/audio-preview.html` | Development-only preview: every sound by category, play/stop, loop stop, a volume slider. It is not part of the game build. |
+| `npm run dev`, then open `/impossible-solution/scripts/audio-preview.html` | Development-only preview: every sound by category, play/stop, loop stop, a volume slider. It lives in `scripts/` and is not part of the game build. |
 
 ## Format and levels
 
