@@ -13,7 +13,7 @@ A browser game for kids aged 7–12 where no choice is free.
 <a href="CONTRIBUTING.md">🤝 Contributing</a> ·
 <a href="CHANGELOG.md">📝 Changelog</a>
 
-[![CI](https://img.shields.io/github/actions/workflow/status/YYN192/impossible-solution/ci.yml?branch=main&label=CI)](https://github.com/YYN192/impossible-solution/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/YYN192/impossible-solution/ci.yml?label=CI)](https://github.com/YYN192/impossible-solution/actions/workflows/ci.yml)
 [![Deploy](https://img.shields.io/github/actions/workflow/status/YYN192/impossible-solution/deploy.yml?branch=main&label=deploy)](https://github.com/YYN192/impossible-solution/actions/workflows/deploy.yml)
 [![Release](https://img.shields.io/github/v/release/YYN192/impossible-solution)](https://github.com/YYN192/impossible-solution/releases)
 [![License](https://img.shields.io/github/license/YYN192/impossible-solution)](LICENSE)
