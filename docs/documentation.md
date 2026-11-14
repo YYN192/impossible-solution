@@ -180,7 +180,7 @@ npm run dev
 
 | Area | What the tests prove |
 | --- | --- |
-| Engine (`src/sim/`) | `step()` is pure and deterministic; a 3-link domino chain exists inside 3 sols; several 2–3 star plans exist; no plan is free; bars stay within 0–10 |
+| Engine (`src/sim/`) | `step()` is pure and deterministic; a 3-link domino chain exists inside 3 sols; several 2–3 star plans and at least one 1-star plan exist; no plan is free and no single job is the best pick every time; bars stay within 0–10; the kid text matches the game numbers |
 | Data layer (`src/data/`) | Live fetch, retry on 429, timeout, cache, snapshot fallback, offline mode, API key never cached; science-check wording |
 | Screens and state | Navigation, morning report picks the fallen domino first, badge never says LIVE for saved data |
 | Copy rules (`src/i18n/en.copy.test.ts`) | No DONKI/mGy/CME/X-ray on any screen, kid sentences of 12 words or fewer, locked Ask Earth wording |

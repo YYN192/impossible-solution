@@ -134,7 +134,7 @@
       "skipped": "You plan tomorrow without a forecast."
     },
     "science": {
-      "done": "You earn 1 science star.",
+      "done": "+1 science. 2 science trips win the science star.",
       "skipped": "No science today."
     },
     "cost_zero": "No power needed",
