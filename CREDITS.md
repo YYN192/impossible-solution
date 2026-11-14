@@ -4,6 +4,13 @@
 
 | Dataset | Link | Used for | Fetched |
 |---|---|---|---|
+| DONKI CME 2024-05-20T05:36:00-CME-001 | https://ccmc.gsfc.nasa.gov/DONKI/view/CME/31034/-1 | Storm on sol 2 of the main mission | 2026-11-14 (snapshot) |
+| DONKI WSA-Enlil runs 19–24 May 2024 (Mars arrival 28 May) | https://api.nasa.gov/DONKI/WSAEnlilSimulations?startDate=2024-05-19&endDate=2024-05-24 | Ask Earth forecast, storm cloud on sol 3 | 2026-11-14 (snapshot) |
+| DONKI WSA-Enlil runs, last 30 days (Mars-only) | https://api.nasa.gov/DONKI/WSAEnlilSimulations | Optional "Today's Sun" mission (live, falls back to snapshot) | live + 2026-11-14 snapshot |
+| Curiosity RAD, 20 May 2024 storm (8.1 mGy) | https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/ | Size of the particle burst | constant |
+| Curiosity RAD surface baseline (Hassler et al., Science 2014) | https://doi.org/10.1126/science.1244797 | Normal daily dose | constant |
+| InSight dust and solar power | https://www.jpl.nasa.gov/news/nasas-insight-waits-out-dust-storm/ | Panel-dust penalty | constant |
+| NSSDC Mars fact sheet (light delay) | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html | Ask Earth delay wording | constant |
 
 ## Libraries (licence)
 

@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "snapshot": "node --env-file=.env scripts/snapshot.mjs"
+    "snapshot": "node scripts/snapshot.mjs"
   },
   "dependencies": {
     "i18next": "^26.7.2",
