@@ -421,5 +421,10 @@
       "hello": "Surface trips are assigned through the mission console.",
       "advice": "Outside jobs collect science or clean panels. Watch the space rays!"
     }
+  },
+  "lang": {
+    "label": "Language",
+    "en": "English",
+    "bg": "Български"
   }
 }

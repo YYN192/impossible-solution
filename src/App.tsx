@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
+import { LanguageToggle } from "./components/LanguageToggle";
 import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
 import { EndOfSolScreen } from "./screens/EndOfSolScreen";
@@ -47,6 +48,7 @@ export default function App() {
   return <div className="expedition">
     <div className="mission-status-bar">
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
+      <LanguageToggle />
       {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => setOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => setOverlay("teacher")}>{t("teacher.open")}</button></nav>}
     </div>
     {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet")}</p>}
