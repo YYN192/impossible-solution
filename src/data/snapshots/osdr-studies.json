@@ -1,0 +1,48 @@
+{
+  "fetchedAt": "2026-11-14T11:17:49.827Z",
+  "source": "https://osdr.nasa.gov/osdr/data/osd/meta/{267,772,766,658} + /osdr/data/search?term=Veggie",
+  "attribution": "NASA Open Science Data Repository (OSDR)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "Real space-biology studies behind the greenhouse and the space-ray meter. Picked by hand; titles and links from OSDR.",
+  "data": {
+    "cards": [
+      {
+        "id": "OSD-267",
+        "topic": "food",
+        "title": "Microbiological and nutritional analysis of lettuce crops grown on the International Space Station-VEG01A",
+        "description": "The ability to grow safe, fresh food to supplement packaged foods of astronauts in space has been an important goal for NASA. Food crops grown in space experience different environmental conditions than plants grown on Earth (e.g., reduced gravity, elevated radiation levels). To study the effects…",
+        "organism": "VEG-01A Lactuca sativa cv. Outredgeous",
+        "released": "21-Feb-2020",
+        "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-267"
+      },
+      {
+        "id": "OSD-772",
+        "topic": "food",
+        "title": "PH-04 Chile Peppers in Space",
+        "description": "Growing plants in spaceflight presents challenges to achieve optimal plant growth and productivity. One of NASA's goals is growing edible crops in spaceflight to supplement the astronauts' diet with fresh vegetables and assess food safety of the crops. It is important to understand the optimal…",
+        "organism": "Q1-1-Swab1",
+        "released": "09-Sep-2025",
+        "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-772"
+      },
+      {
+        "id": "OSD-766",
+        "topic": "food",
+        "title": "The microbial communities of a tomato crop grown in Veggie under different lighting regimes on the International Space Station",
+        "description": "The VEG-05 experiment was conducted on ISS between 12/14/2022-3/24/2023 (101 days) to investigate tomato-growth responses and plant-microbiome differences due to two lighting recipes: 90%R:10%B as the “red-rich” treatment and 50%R:50%B as the “blue-rich” treatment. A ground control was performed…",
+        "organism": "1-VEG-05-F-tomato-SN-01-wick_S1_L001",
+        "released": "21-May-2026",
+        "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-766"
+      },
+      {
+        "id": "OSD-658",
+        "topic": "radiation",
+        "title": "Simulated Galactic Cosmic Ray Exposure Activates Dose-Dependent DNA Repair Response and Downregulates Glucosinolate Pathway in Arabidopsis Seedlings",
+        "description": "This study's objective was to develop an understanding of the biological effects of space radiation on plants with the goal of producing fresh food during long duration space missions to support astronauts' nutritional and psychological needs.10-day-old Arabidopsis seedlings were exposed to…",
+        "organism": "Control_1",
+        "released": "12-Dec-2023",
+        "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-658"
+      }
+    ],
+    "veggieStudies": 23
+  }
+}

@@ -110,5 +110,55 @@
     "todaysSun": {
       "title": "Mission: Today's Sun"
     }
+  },
+  "moreData": {
+    "title": "More real data",
+    "intro": "Real measurements and pictures from NASA, plus ideas from the Canadian Space Agency.",
+    "savedOn": "Saved on {{date}}.",
+    "storm": {
+      "title": "The storm, measured on Mars",
+      "chartLabel": "Radiation measured by the Curiosity rover on Mars, 15 to 25 May 2024. The line jumps up on 20 May 2024.",
+      "body": "On a normal day, Curiosity measured about {{normal}} µGy every hour. On 20 May 2024 it shot up to about {{peak}} µGy an hour. That is about {{times}} times normal! A few days later it was back to normal.",
+      "unit": "µGy (microgray) is a tiny unit for how much radiation something soaks up.",
+      "inGame": "In the game: this is why the space-ray meter jumps in a particle burst, and why the shelter matters.",
+      "axisNormal": "normal",
+      "source": "Data: {{attribution}}. Each point on the line is a one-hour average."
+    },
+    "site": {
+      "title": "Where is our base?",
+      "body": "Our pretend base is at Gale Crater on Mars. The real Curiosity rover works there.",
+      "alt": "Map of Gale Crater on Mars seen from above: a big round crater with a mountain in the middle",
+      "credit": "Map: {{credit}}",
+      "explore": "Explore Mars yourself in NASA Mars Trek"
+    },
+    "pictures": {
+      "title": "Real pictures",
+      "dust": "NASA's InSight lander got so dusty that its solar panels made much less power.",
+      "storm": "During the 20 May 2024 storm, space rays hit Curiosity's camera and made white specks.",
+      "credit": "Picture: {{credit}} (NASA Image and Video Library)"
+    },
+    "plants": {
+      "title": "Real plants grown in space",
+      "body": "Astronauts really grew food on the International Space Station. Scientists keep what they learned in NASA's space-biology library (OSDR).",
+      "count": "Search OSDR for “Veggie”, the space garden, and you find {{n}} studies.",
+      "food": "Food",
+      "radiation": "Space rays",
+      "health": "Health"
+    },
+    "sun": {
+      "title": "What the Sun did this month",
+      "body": "In the 30 days up to {{date}}, NASA counted {{flares}} solar flares ({{big}} big ones) and {{cmes}} storm clouds (CMEs).",
+      "note": "NASA watches the Sun from near Earth. Most of these storms never reach Mars."
+    },
+    "apod": {
+      "title": "Space picture of the day",
+      "body": "“{{title}}”, {{date}}. Picture: {{credit}}.",
+      "open": "See it on NASA's Astronomy Picture of the Day"
+    },
+    "teach": {
+      "title": "For teachers and families",
+      "body": "Free activities from the Canadian Space Agency, to keep exploring after the game."
+    },
+    "disclaimer": "Uses NASA open data and Canadian Space Agency resources. This project is not affiliated with or endorsed by NASA or the Canadian Space Agency."
   }
 }

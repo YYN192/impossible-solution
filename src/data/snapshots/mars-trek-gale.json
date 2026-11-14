@@ -1,0 +1,43 @@
+{
+  "fetchedAt": "2026-11-14T11:17:54.110Z",
+  "source": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml",
+  "attribution": "NASA Mars Trek (NASA/JPL-Caltech, USGS) — Viking MDIM 2.1 colour mosaic",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "A map of the area around Gale Crater, where Curiosity measured the 20 May 2024 storm. Our pretend base sits here.",
+  "data": {
+    "layer": "Mars_Viking_MDIM21_ClrMosaic_global_232m",
+    "site": {
+      "name": "Gale Crater",
+      "lat": -5.4,
+      "lon": 137.8
+    },
+    "zoom": 6,
+    "tiles": [
+      {
+        "row": 33,
+        "col": 112,
+        "image": "data/trek/6_33_112.jpg",
+        "remote": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/6/33/112.jpg"
+      },
+      {
+        "row": 33,
+        "col": 113,
+        "image": "data/trek/6_33_113.jpg",
+        "remote": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/6/33/113.jpg"
+      },
+      {
+        "row": 34,
+        "col": 112,
+        "image": "data/trek/6_34_112.jpg",
+        "remote": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/6/34/112.jpg"
+      },
+      {
+        "row": 34,
+        "col": 113,
+        "image": "data/trek/6_34_113.jpg",
+        "remote": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/6/34/113.jpg"
+      }
+    ],
+    "explore": "https://trek.nasa.gov/mars/"
+  }
+}

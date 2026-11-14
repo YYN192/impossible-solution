@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
 import { SNAPSHOT_DATES } from "../data/donki";
 import { DataBadge } from "../components/DataBadge";
+import { MoreRealData } from "./MoreRealData";
 import type { DataSource } from "../data/http";
 import { JOBS, NIGHT, type JobId } from "../sim/types";
 import "./DataSources.css";
@@ -47,6 +48,8 @@ export function DataSources({
         ))}
       </ul>
       <p className="sources__note">{t("dataSources.savedOn", { date })}</p>
+
+      <MoreRealData />
 
       <section aria-labelledby="game-numbers-title">
         <h3 id="game-numbers-title">{t("dataSources.gameNumbers")}</h3>

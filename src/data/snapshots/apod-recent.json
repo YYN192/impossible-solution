@@ -1,0 +1,72 @@
+{
+  "fetchedAt": "2026-11-14T11:18:58.235Z",
+  "source": "https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=7",
+  "attribution": "Astronomy Picture of the Day (NASA / Michigan Tech). Each picture has its own credit and copyright.",
+  "license": "Per picture — most APODs are third-party copyrighted. We only link and show the credit; we never copy the picture.",
+  "about": "The last 7 Astronomy Pictures of the Day, as links for the \"explore more\" list.",
+  "data": [
+    {
+      "date": "2026-11-14",
+      "title": "Apollo 12 and Surveyor 3",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-14-apollo-12-and-surveyor-3/",
+      "mediaType": "image",
+      "credit": "Apollo 12, Alan Bean - Stereo Image Copyright: Kevin Frank",
+      "copyrighted": true,
+      "alt": "Astronaut standing next to Surveyor 3 on the Moon."
+    },
+    {
+      "date": "2026-11-13",
+      "title": "NGC 206 and the Star Clouds of Andromeda",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-13-ngc-206-and-the-star-clouds-of-andromeda/",
+      "mediaType": "image",
+      "credit": "David Cruz",
+      "copyrighted": true,
+      "alt": "Close up of NGC 206 in the Andromeda galaxy."
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Moon, Venus and Spica Meet",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-12-moon-venus-and-spica-meet/",
+      "mediaType": "image",
+      "credit": "Włodzimierz Bubak",
+      "copyrighted": true,
+      "alt": "A crescent moon and bright Venus appear beyond a mountain in a rural area at dusk."
+    },
+    {
+      "date": "2026-11-11",
+      "title": "NGC 4449: Small Galaxy, Big Impact",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-11-ngc-4449-small-galaxy-big-impact/",
+      "mediaType": "image",
+      "credit": "NASA, ESA, A. Aloisi (STScI/ESA), and the Hubble Heritage (STScI/AURA)-ESA/Hubble Collaboration",
+      "copyrighted": true,
+      "alt": "A large smear of stars, almost shaped like a bow-tie, covers most of the image. The center of the \"bow\" is full of pink clumps of gas, while the outsides consist of blue-white stars, streaks of dark dust, and more pink globs of gas."
+    },
+    {
+      "date": "2026-11-10",
+      "title": "Saturn Behind the Moon",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-10-saturn-behind-the-moon/",
+      "mediaType": "image",
+      "credit": "Roberto Ortu",
+      "copyrighted": true,
+      "alt": "The curving surface of the Moon occupies the lower half of the image. Just above center the planet Saturn appears, far in the distance."
+    },
+    {
+      "date": "2026-11-09",
+      "title": "Rigel and the Witch Head Nebula",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-9-rigel-and-the-witch-head-nebula/",
+      "mediaType": "image",
+      "credit": "Piotr Czerski",
+      "copyrighted": true,
+      "alt": "A starfield filled with red glowing gas is seen surroinging a bright blue star near the center. To the upper right of the star is an unusually shaped blue-tinted nebula."
+    },
+    {
+      "date": "2026-11-08",
+      "title": "Major Fireball Meteor",
+      "page": "https://science.nasa.gov/image-article/apod-2026-november-8-major-fireball-meteor/",
+      "mediaType": "image",
+      "credit": "Ollie Taylor",
+      "copyrighted": true,
+      "alt": "A mountainous landscape with snow and trees is seen below a starry sky. A pink band is visible on the horizon. Coming down from the sky is a bright meteor trail. Just above the meteor are the stars of the Big Dipper. Please see the explanation for more detailed information."
+    }
+  ]
+}
