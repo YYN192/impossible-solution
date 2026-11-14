@@ -179,10 +179,11 @@ describe("jobs: cost today, and cost if skipped", () => {
   });
 
   it("panels skipped → dust: efficiency × 0.65 and tomorrow's power about a third lower", () => {
-    const r = step(initialState(), plan("science"), []);
+    // 6 − greenhouse 2 − shelter 1 − air machine 2 = 1 left, + dusty solar.
+    const r = step(initialState(), plan("greenhouse", "shelter", "science"), []);
     expect(r.state.panelEfficiency).toBeCloseTo(ENGINE.dustFactor);
     expect(ENGINE.dustFactor).toBeCloseTo(0.65);
-    expect(r.state.bars.power).toBeCloseTo(6 - NIGHT.airMachinePower + NIGHT.solarPowerAtFullEfficiency * 0.65);
+    expect(r.state.bars.power).toBeCloseTo(1 + NIGHT.solarPowerAtFullEfficiency * 0.65);
     expect(ids(r.fell)).toContain("sol1-panels-skipped");
     const low = r.fell.find((d) => d.id === "sol2-power-low");
     expect(low?.causeIds).toEqual(["sol1-panels-skipped"]);
@@ -315,9 +316,10 @@ describe("particle burst", () => {
   });
 
   it("each extra astronaut outside adds more", () => {
-    const one = step(initialState(), plan("science"), [burstOn(1)]).state.bars.dose;
-    const two = step(initialState(), plan("science", "panels"), [burstOn(1)]).state.bars.dose;
-    expect(two - one).toBeCloseTo(DOSE.burstOutside - DOSE.burstInside);
+    // Sheltered, so the meter doesn't hit its 10 cap.
+    const one = step(initialState(), plan("science", "shelter"), [burstOn(1)]).state.bars.dose;
+    const two = step(initialState(), plan("science", "shelter", "panels"), [burstOn(1)]).state.bars.dose;
+    expect(two - one).toBeCloseTo((DOSE.burstOutside - DOSE.burstInside) * DOSE.shelterFactor);
   });
 
   it("a shelter built the sol before halves the burst", () => {
