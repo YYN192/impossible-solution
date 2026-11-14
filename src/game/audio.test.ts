@@ -71,6 +71,9 @@ describe("audio engine", () => {
   it("plays through Web Audio, and mute sets the master volume to 0 and skips new sounds", async () => {
     const { gains, started, fetch } = fakeAudio();
     const { audio, useAudio } = await import("./audio");
+    audio.playSfx("door");
+    expect(fetch).not.toHaveBeenCalled(); // nothing before the first user gesture
+    audio.unlock(); // what the first tap does: create the context + preload the small UI set
     audio.playSfx("menu");
     await vi.waitFor(() => expect(started).toHaveLength(1));
     expect(fetch).toHaveBeenCalledWith(
@@ -89,7 +92,7 @@ describe("audio engine", () => {
   it("never fetches music while the Music volume is 0 (the default)", async () => {
     const { fetch } = fakeAudio();
     const { audio } = await import("./audio");
-    window.dispatchEvent(new Event("pointerdown"));
+    audio.unlock();
     audio.playMusic("mars-base-ambience");
     expect(
       fetch.mock.calls

@@ -705,7 +705,8 @@
       "channels": 1,
       "loop": true,
       "volume": 0.25,
-      "trigger": "Background loop in the Mars station hub"
+      "trigger": "Background loop in the Mars station hub",
+      "web": "/audio/ambience/mars-base-ambience.m4a"
     },
     {
       "id": "mission-console-ambience",
@@ -716,7 +717,8 @@
       "channels": 1,
       "loop": true,
       "volume": 0.2,
-      "trigger": "Background loop while the mission console is open"
+      "trigger": "Background loop while the mission console is open",
+      "web": "/audio/ambience/mission-console-ambience.m4a"
     },
     {
       "id": "space-menu-ambience",
@@ -727,7 +729,8 @@
       "channels": 2,
       "loop": true,
       "volume": 0.25,
-      "trigger": "Background loop on the main menu (never autoplay; start after the first click)"
+      "trigger": "Background loop on the main menu (never autoplay; start after the first click)",
+      "web": "/audio/ambience/space-menu-ambience.m4a"
     }
   ]
 }

@@ -42,11 +42,13 @@ export const sounds = new Map<string, Sound>();
 for (const s of manifest.sounds as {
   id: string;
   path: string;
+  /** Smaller compressed copy (big loops only); the WAV stays the source of truth. */
+  web?: string;
   volume: number;
   aliases?: string[];
 }[]) {
   const sound = {
-    url: import.meta.env.BASE_URL + s.path.slice(1),
+    url: import.meta.env.BASE_URL + (s.web ?? s.path).slice(1),
     volume: s.volume,
   };
   sounds.set(s.id, sound);
@@ -138,7 +140,7 @@ useAudio.subscribe((prefs) => {
 
 function play(id: string, kind: Kind) {
   const sound = sounds.get(id);
-  const c = context(kind === "sfx");
+  const c = context(false); // created only by the gesture listener below
   if (!sound || !c || !audible(kind)) return;
   const asked = performance.now();
   return load(sound.url).then((buffer) => {
@@ -163,20 +165,21 @@ function startMusic() {
   });
 }
 
-if (typeof window !== "undefined") {
-  const unlock = () => {
-    const first = !ctx;
-    if (context(true) && first) {
-      for (const id of PRELOAD) void load(sounds.get(id)!.url);
-      startMusic();
-    }
-  };
+/** Create/resume the context and preload the UI set. Must run inside a user gesture. */
+function unlock() {
+  const first = !ctx;
+  if (context(true) && first) {
+    for (const id of PRELOAD) void load(sounds.get(id)!.url);
+    startMusic();
+  }
+}
+if (typeof window !== "undefined")
   for (const type of ["pointerdown", "keydown", "touchend", "click"])
     window.addEventListener(type, unlock, { capture: true, passive: true });
-}
 
 /** Original 8-bit sounds from public/audio (see docs/audio.md). Never autoplays: nothing sounds before the first tap. */
 export const audio = {
+  unlock,
   playSfx: (id: string, gapMs = id === "volume-change" ? 150 : 70) => {
     if (id === "step")
       id = (stepFlip = !stepFlip)

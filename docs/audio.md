@@ -1,6 +1,6 @@
 # Sound library
 
-63 original 8-bit sounds for the game: 60 one-shot effects and 3 ambience loops. They live in `public/audio/<category>/<id>.wav`, and `public/audio/audio-manifest.json` lists every file with its trigger and default volume. Nothing is wired into the game yet: `src/game/audio.ts` stays silent until the files are registered (see Integration).
+63 original 8-bit sounds for the game: 60 one-shot effects and 3 ambience loops. They live in `public/audio/<category>/<id>.wav`, and `public/audio/audio-manifest.json` lists every file with its trigger and default volume. The 3 ambience loops also ship as AAC `.m4a` (manifest field `web`, 5.1 MB → 0.54 MB), which the game plays instead of the WAV. `src/game/audio.ts` plays them (see Integration).
 
 All sounds are made by our own code in `scripts/generate-audio.mjs` using square, triangle and sine oscillators, a noise channel, envelopes and gentle filters. No samples, recordings or third-party audio are used, and the sounds are not NASA recordings. Licence: Apache-2.0, like the rest of the project.
 
@@ -8,7 +8,7 @@ All sounds are made by our own code in `scripts/generate-audio.mjs` using square
 
 | Command | What it does |
 | --- | --- |
-| `node scripts/generate-audio.mjs` | Remakes every WAV and the manifest (about 2 s). Output is deterministic: same code, byte-identical files. |
+| `node scripts/generate-audio.mjs` | Remakes every WAV, the ambience `.m4a` copies (needs `ffmpeg` on PATH; without it the manifest has no `web` field and the game falls back to WAV) and the manifest (about 3 s). Output is deterministic: same code, byte-identical files. |
 | `node scripts/verify-audio.mjs` | Reads every file back and checks format, duration, peak and average level, clipping, silent edges, seamless loops, and that every file from the brief exists. Exit code 1 on any problem. |
 | `npm test` | Includes `scripts/audio-assets.test.ts`: the manifest matches the files, every file is valid 16-bit 44.1 kHz WAV, and the game's existing sound IDs have files. |
 | `npm run dev`, then open `/impossible-solution/audio-preview.html` | Development-only preview: every sound by category, play/stop, loop stop, a volume slider. It is not part of the game build. |
@@ -22,21 +22,15 @@ All sounds are made by our own code in `scripts/generate-audio.mjs` using square
 
 ## Integration
 
-Register every file (and its aliases) with the existing audio module once at startup. Paths in the manifest start at the site root, so prefix them with Vite's base URL:
+`src/game/audio.ts` imports the manifest and maps every id and alias to its file (`BASE_URL` + path; `web` copy when present). Playback uses the Web Audio API:
 
-```ts
-import manifest from "../../public/audio/audio-manifest.json";
-import { audio } from "./audio";
+- One `AudioContext`, created on the player's first tap or key press (never before, so nothing autoplays). The same gesture preloads a small UI set (menu, steps, console, crew select/assign; about 150 KB). Every other sound is fetched the first time it plays and its decoded `AudioBuffer` is cached, so rapid sounds such as footsteps reuse one buffer instead of creating audio elements.
+- Gain chain: per-sound manifest `volume` → Sound effects / Music bus → Master → speakers. The Settings sliders and the Sound on/off button (status bar, `aria-pressed`) set these gains; preferences persist in `localStorage` (`sol:audio`).
+- **Music is off by default** (Music slider 0%). The hub and console ambience loops are only downloaded once a player raises it.
+- The same id is never stacked: at most one play per 70 ms (150 ms for `volume-change`). A one-shot that arrives more than 400 ms late on a slow network is skipped.
+- jsdom has no Web Audio, so in tests every call is a no-op. `scripts/audio-assets.test.ts` checks that every quoted id inside `audio.playSfx`/`playMusic` in `src/` exists in the manifest.
 
-const base = import.meta.env.BASE_URL; // "/impossible-solution/"
-for (const s of manifest.sounds) {
-  const url = base + s.path.slice(1);
-  audio.register(s.id, url);
-  for (const alias of s.aliases ?? []) audio.register(alias, url);
-}
-```
-
-The game already calls `audio.playSfx` with these IDs. They are aliases in the manifest, so they work as soon as the files are registered:
+Existing game IDs (aliases in the manifest):
 
 | Game ID (in code) | Sound | Called from |
 | --- | --- | --- |
@@ -50,13 +44,28 @@ The game already calls `audio.playSfx` with these IDs. They are aliases in the m
 | `assign` | `job-assign` | `PlanScreen.tsx`, giving a job |
 | `resolve` | `plan-confirm` | `PlanScreen.tsx`, ending the sol |
 
+Sounds called by their manifest id:
+
+| Moment | Sound | Where |
+| --- | --- | --- |
+| Pointer moves onto a menu button | `menu-hover` | `MainMenu.tsx` |
+| Settings / Data Sources / For teachers open | `menu-open` | `MainMenu.tsx`, `App.tsx` |
+| Back, close, Quit, ← Menu, close dialogue, Home | `menu-back` | `MainMenu.tsx`, `App.tsx`, `MarsHub.tsx`, `FinalScreen.tsx` |
+| Volume slider moves | `volume-change` | `MainMenu.tsx` |
+| Sound off / on | `mute` / `unmute` | `audio.mute` (status-bar toggle, Settings) |
+| EN / BG toggle | `console-button` | `LanguageToggle.tsx` |
+| Walking (alternating) | `player-step-metal-1` / `-2` | `step` in `audio.ts` |
+| Hub ambience (only if Music > 0) | `mars-base-ambience` | `MarsHub.tsx` |
+| Console opens | `console-boot` + `mission-console-ambience` | `ConsolePage.tsx` |
+| Return to base | `console-close` | `ConsolePage.tsx` |
+| Unassign a crew member | `job-remove` | `PlanScreen.tsx` |
+| Ask Earth chosen | `earth-message-send` | `PlanScreen.tsx` |
+| End-of-sol screen | `sol-end`, then the worst bar: `resource-critical` / `air-warning` / `power-decrease` / `radiation-increase`, or `resource-stable` | `EndOfSolScreen.tsx` |
+| Next morning | `next-sol` | `EndOfSolScreen.tsx` |
+| Morning report (sol 2+) | `morning-report` | `MorningScreen.tsx` |
+| Storm / particle burst / Earth's answer in the report | `storm-warning` / `particle-burst` / `earth-message-receive` | `MorningScreen.tsx` |
+| Each step of the final domino fall (synced with the CSS fall; none with reduced motion) | `domino-fall` | `FinalScreen.tsx` |
+| Outcome after the chain | `mission-success` (2–3 stars, full mission) / `mission-failure` | `FinalScreen.tsx` |
+| Try a different plan | `replay-start` | `FinalScreen.tsx` |
+
 Every other sound's intended trigger is in its manifest entry (`trigger`) and on the preview page.
-
-### Things to handle when wiring them in
-
-- **Per-sound volume:** `audio.ts` does not use the manifest's `volume` yet. Multiply it in when playing.
-- **Dialogue blips:** play `npc-dialogue` at most once every ~70 ms, never once per letter.
-- **Footsteps:** alternate `player-step-metal-1` and `-2`. `MarsHub.tsx` already limits steps to one per 330 ms.
-- **Volume slider:** play `volume-change` at most a few times per second while dragging.
-- **Ambience:** play the loops through `audio.playMusic` (it loops and uses the Music volume). Never autoplay. Start `space-menu-ambience` only after the player's first click, as browsers require.
-- **Mute:** play `mute` just before muting and `unmute` just after unmuting, so both are heard.
