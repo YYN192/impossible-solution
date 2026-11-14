@@ -1,0 +1,146 @@
+{
+  "fetchedAt": "2026-11-14T09:00:42.673Z",
+  "source": "https://api.nasa.gov/DONKI/WSAEnlilSimulations?startDate=2024-05-19&endDate=2024-05-24",
+  "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "about": "WSA-Enlil model runs 19–24 May 2024. The CME of 23 May was forecast to reach Mars on 28 May; the 20 May CME was not forecast to hit Mars.",
+  "data": [
+    {
+      "simulationID": "WSA-ENLIL/31037/1",
+      "modelCompletionTime": "2024-05-20T15:29Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31037/-1",
+      "cmeIDs": [
+        "2024-05-20T05:36Z"
+      ],
+      "impactList": [
+        {
+          "location": "Solar Orbiter",
+          "arrivalTime": "2024-05-21T06:05Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31038/1",
+      "modelCompletionTime": "2024-05-20T15:45Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31038/-1",
+      "cmeIDs": [
+        "2024-05-20T05:36Z"
+      ],
+      "impactList": [
+        {
+          "location": "Juno",
+          "arrivalTime": "2024-05-31T19:50Z",
+          "isGlancingBlow": false
+        },
+        {
+          "location": "Solar Orbiter",
+          "arrivalTime": "2024-05-21T06:12Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31040/1",
+      "modelCompletionTime": "2024-05-20T16:06Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31040/-1",
+      "cmeIDs": [],
+      "impactList": [
+        {
+          "location": "OSIRIS-APEX",
+          "arrivalTime": "2024-05-21T20:00Z",
+          "isGlancingBlow": true
+        },
+        {
+          "location": "Solar Orbiter",
+          "arrivalTime": "2024-05-21T00:18Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31041/1",
+      "modelCompletionTime": "2024-05-20T16:23Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31041/-1",
+      "cmeIDs": [],
+      "impactList": [
+        {
+          "location": "Juno",
+          "arrivalTime": "2024-05-30T07:45Z",
+          "isGlancingBlow": false
+        },
+        {
+          "location": "OSIRIS-APEX",
+          "arrivalTime": "2024-05-21T20:00Z",
+          "isGlancingBlow": true
+        },
+        {
+          "location": "Solar Orbiter",
+          "arrivalTime": "2024-05-21T00:18Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31103/1",
+      "modelCompletionTime": "2024-05-23T17:36Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1",
+      "cmeIDs": [
+        "2024-05-23T04:24Z",
+        "2024-05-23T10:12Z",
+        "2024-05-23T13:25Z"
+      ],
+      "impactList": [
+        {
+          "location": "Mars",
+          "arrivalTime": "2024-05-28T11:30Z",
+          "isGlancingBlow": true
+        },
+        {
+          "location": "OSIRIS-APEX",
+          "arrivalTime": "2024-05-27T03:00Z",
+          "isGlancingBlow": true
+        },
+        {
+          "location": "Parker Solar Probe",
+          "arrivalTime": "2024-05-25T19:02Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31114/1",
+      "modelCompletionTime": "2024-05-23T20:10Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31114/-1",
+      "cmeIDs": [
+        "2024-05-22T17:24Z"
+      ],
+      "impactList": [
+        {
+          "location": "Solar Orbiter",
+          "arrivalTime": "2024-05-25T14:18Z",
+          "isGlancingBlow": false
+        }
+      ]
+    },
+    {
+      "simulationID": "WSA-ENLIL/31138/1",
+      "modelCompletionTime": "2024-05-24T18:16Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31138/-1",
+      "cmeIDs": [
+        "2024-05-24T03:12Z"
+      ],
+      "impactList": [
+        {
+          "location": "Mars",
+          "arrivalTime": "2024-05-29T12:00Z",
+          "isGlancingBlow": true
+        },
+        {
+          "location": "Parker Solar Probe",
+          "arrivalTime": "2024-05-26T14:00Z",
+          "isGlancingBlow": true
+        }
+      ]
+    }
+  ]
+}
