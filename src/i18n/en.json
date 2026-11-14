@@ -30,15 +30,29 @@
     "noPowerGreenhouse": "Not enough power to run the greenhouse lights.",
     "noPowerShelter": "Not enough power to build up the shelter.",
     "noPowerAskEarth": "Not enough power to call Earth.",
-    "outsideStorm": "Astronauts were outside during the storm."
+    "outsideStorm": "Astronauts were outside during the storm.",
+    "noSignal": "No signal: Earth was below the horizon.",
+    "coldNight": "The night was too cold. Plants in the greenhouse froze.",
+    "doseFull": "The space-ray meter is full. The crew had to go home early."
   },
   "event": {
     "burst": {
-      "may2024": "The Sun just blasted a space-ray storm!"
+      "may2024": "The Sun just blasted a space-ray storm!",
+      "sep2017": "The Sun fired a space-ray storm at Mars!",
+      "oct2021": "A space-ray storm from the Sun reached Mars!",
+      "moonMay2024": "The solar storm passed the Moon."
     },
     "stormCloud": {
       "may2024": "A storm cloud from the Sun reached Mars.",
-      "today": "A real storm cloud from the Sun is heading for Mars."
+      "today": "A real storm cloud from the Sun is heading for Mars.",
+      "sep2017": "A storm cloud from the Sun brushed past Mars."
+    },
+    "dust": {
+      "insight2022": "A dust storm dimmed the Sun. The panels made less power.",
+      "opportunity2018": "A giant dust storm hid the Sun. The panels made little power."
+    },
+    "shadow": {
+      "moon": "The Sun slipped behind a ridge. The panels made little power."
     }
   },
   "earth": {
@@ -442,5 +456,191 @@
   },
   "sound": {
     "toggle": "Sound on/off"
+  },
+  "campaign": {
+    "storm": {
+      "name": "The Storm Season",
+      "where": "Mars",
+      "hook": "Can you keep 3 astronauts safe through a real solar storm?",
+      "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Plan each sol with care.",
+      "real": "Every storm here is real. A NASA rover measured each one on Mars.",
+      "planners": "Real crews hide in a shielded corner of their ship during solar storms."
+    },
+    "dust": {
+      "name": "Dust Season",
+      "where": "Mars",
+      "hook": "Dust stopped a real Mars lander. Can your base keep its lights on?",
+      "brief": "Dust falls on the panels every sol. Less light means less power. Pick a site and keep the base warm.",
+      "real": "Dust cut the power of NASA's InSight lander to about one tenth.",
+      "planners": "The InSight team dropped sand next to a panel. The wind then carried some dust away."
+    },
+    "moon": {
+      "name": "South Pole Outpost",
+      "where": "The Moon",
+      "hook": "Sunlight, ice or a view of Earth? You cannot have all three.",
+      "brief": "NASA studied 13 landing spots near the Moon's south pole. Some are sunny. Some are near ice. Choose yours.",
+      "real": "NASA chose those spots for sunlight, radio contact with Earth and ice.",
+      "planners": "Planners look for long sunlight, a view of Earth and safe ground."
+    }
+  },
+  "beat": {
+    "chose": "You chose: {{choice}}.",
+    "siteMars": {
+      "title": "Where do we land?",
+      "text": "Three real places. A real NASA robot worked in each one.",
+      "gale": {
+        "label": "Gale Crater",
+        "real": "Curiosity measured −71 °C at night here. Reading from 25 August 2026."
+      },
+      "elysium": {
+        "label": "Elysium Planitia",
+        "real": "Dust piled up on the InSight lander here for four years."
+      },
+      "meridiani": {
+        "label": "Meridiani Planum",
+        "real": "Wind sometimes blew the dust off the Opportunity rover here."
+      }
+    },
+    "wipe": {
+      "title": "Dust on the panels",
+      "text": "Go outside and wipe them? Every wipe is time under space rays.",
+      "none": {
+        "label": "Leave the dust"
+      },
+      "half": {
+        "label": "Wipe half of the panels"
+      },
+      "all": {
+        "label": "Wipe every panel"
+      }
+    },
+    "upgrade": {
+      "title": "Build one upgrade",
+      "text": "You have spare parts for one upgrade. Building it costs power today.",
+      "brush": {
+        "label": "Panel brush: dust sticks less"
+      },
+      "shelf": {
+        "label": "Greenhouse shelf: more food each harvest"
+      },
+      "walls": {
+        "label": "Thicker shelter walls: fewer space rays"
+      },
+      "none": {
+        "label": "Build nothing and save the power"
+      }
+    },
+    "radio": {
+      "title": "Radio Earth",
+      "text": "The sky is full of dust. Ask Earth how long it will last?",
+      "call": {
+        "label": "Send the question"
+      },
+      "skip": {
+        "label": "Stay quiet and save the power"
+      }
+    },
+    "radioMoon": {
+      "title": "Radio Earth",
+      "text": "Earth is close. The answer comes back in seconds. Ask about the Sun?",
+      "call": {
+        "label": "Call Earth now"
+      },
+      "skip": {
+        "label": "Stay quiet and save the power"
+      }
+    },
+    "cold": {
+      "title": "A very cold night",
+      "text": "Tonight will be bitter cold. The plants may freeze.",
+      "heat": {
+        "label": "Turn the heater up"
+      },
+      "huddle": {
+        "label": "Let the greenhouse get cold"
+      }
+    },
+    "devil": {
+      "title": "A dust devil!",
+      "text": "A tall swirl of wind is passing the base. Wind can clean panels.",
+      "tilt": {
+        "label": "Tilt the panels into the wind"
+      },
+      "shut": {
+        "label": "Keep everything closed"
+      }
+    },
+    "crew": {
+      "title": "{{crew}} needs help",
+      "text": "{{crew}} is worn out and very hungry.",
+      "meal": {
+        "label": "Give an extra meal"
+      },
+      "rest": {
+        "label": "Give a day of rest"
+      }
+    },
+    "rover": {
+      "title": "One last drive",
+      "text": "The rover can fetch rock samples. Far rocks cost more power.",
+      "near": {
+        "label": "Drive to the near rocks"
+      },
+      "far": {
+        "label": "Drive to the far crater"
+      },
+      "stay": {
+        "label": "Keep the rover at home"
+      }
+    },
+    "siteMoon": {
+      "title": "Where do we build?",
+      "text": "Three real places near the Moon's south pole. Each one lacks something.",
+      "malapert": {
+        "label": "Malapert Massif",
+        "real": "A very tall mountain. It gets much light and can sometimes see Earth."
+      },
+      "shackleton": {
+        "label": "Peak near Shackleton",
+        "real": "A high crater rim, sunny most of the year. Earth is often hidden."
+      },
+      "haworth": {
+        "label": "Haworth",
+        "real": "Close to dark craters that may hold ice. Earth is often hidden."
+      }
+    },
+    "skywatch": {
+      "title": "Sky watch",
+      "text": "A huge eruption on the Sun! It points away from the Moon. Shelter anyway?",
+      "shelter": {
+        "label": "Yes: get the shelter ready"
+      },
+      "work": {
+        "label": "No: keep working"
+      }
+    },
+    "ice": {
+      "title": "Drive for ice",
+      "text": "Ice hides in craters that never see the Sun. Ice becomes water and air.",
+      "rim": {
+        "label": "Scoop ice at the crater rim"
+      },
+      "deep": {
+        "label": "Drive deep into the dark crater"
+      },
+      "stay": {
+        "label": "Stay in the sunlight"
+      }
+    },
+    "lastDay": {
+      "title": "The last day",
+      "text": "There is time for one more job before you leave.",
+      "sample": {
+        "label": "Collect one more rock sample"
+      },
+      "charge": {
+        "label": "Charge the batteries for the next crew"
+      }
+    }
   }
 }

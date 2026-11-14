@@ -141,6 +141,18 @@ export const LearningResource = z.object({
 });
 export type LearningResource = z.infer<typeof LearningResource>;
 
+/** One eruption of the storm pool, with the WSA-Enlil forecasts that name Mars (may be none). */
+export const PoolStorm = z.object({
+  activityID: z.string(),
+  startTime: z.string(),
+  activeRegionNum: z.number().nullable(),
+  link: z.url(),
+  speeds: z.array(z.number()),
+  marsHits: z.array(
+    z.object({ arrival: z.string(), glancing: z.boolean().nullable(), speed: z.number().nullable(), link: z.url() }),
+  ),
+});
+
 /** name of the file in snapshots/ → schema. `required: false` = the game works without it (e.g. not downloaded yet). */
 export const SCHEMAS = {
   "cme-2024-05-20": { schema: envelope(z.array(Cme).min(1)), required: true },
@@ -161,6 +173,7 @@ export const SCHEMAS = {
     required: false,
   },
   "mars-trek-gale": { schema: envelope(MarsSite), required: true },
+  "storm-pool": { schema: envelope(z.array(PoolStorm).length(2)), required: true },
   "csa-resources": {
     schema: envelope(z.array(LearningResource).min(1)),
     required: true,

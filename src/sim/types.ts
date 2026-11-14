@@ -40,12 +40,52 @@ export interface GameState {
   /** Every effect that happened so far, for the domino chain. */
   dominoes: Domino[];
   over: boolean;
+  /** Campaign rules for this run. Missing = the classic 3-sol Mars mission (CLASSIC_RULES). */
+  rules?: Rules;
+  /** The last beat choice that hurt a resource: the next problem with that resource names it as a cause. */
+  blame?: Partial<Record<Blame, string>>;
+  /** The crew radioed Earth in a beat today: the answer comes with the next morning (like the Ask Earth job). */
+  radioed?: boolean;
+}
+
+export type Blame = "power" | "air" | "food" | "dose";
+
+/**
+ * The numbers a campaign (and a site or an upgrade inside it) may change. All are GAME NUMBERS;
+ * the real data decides which way they move (a dusty site, a sunlit ridge, a cold night).
+ */
+export interface Rules {
+  /** Mission length in sols (on the Moon: Earth days). */
+  sols: number;
+  /** Power the clean panels make per sol. */
+  solar: number;
+  /** Panel efficiency × this for every sol nobody cleans them. */
+  dustFactor: number;
+  /** Power the heater needs every night (0 = warm enough). Unpaid: the plants freeze, food −1. */
+  heater: number;
+  /** Power the air machine needs every night. */
+  airMachinePower: number;
+  /** Shelter multiplies the space-ray dose by this. */
+  shelterFactor: number;
+  /** Food from one greenhouse job. */
+  foodGain: number;
+  /** Science trips needed for the science star. */
+  scienceGoal: number;
+  /** Sols when Earth is out of view (Moon sites): Ask Earth and the radio get no signal. */
+  earthHidden: number[];
 }
 
 /** A storm or other outside event on a given sol. Comes from the data layer (snapshot or live). */
 export interface StormEvent {
   sol: number;
-  kind: "particleBurst" | "stormCloud";
+  /** particleBurst and stormCloud raise the dose; dustStorm cuts the solar power of that sol. */
+  kind: "particleBurst" | "stormCloud" | "dustStorm";
+  /** Real event id shown in play, e.g. the DONKI activity ID. */
+  id?: string;
+  /** Dose of this storm in game units, scaled from its real measurement. Missing = the DOSE / ENGINE defaults. */
+  dose?: { inside: number; outside: number };
+  /** dustStorm: the panels make solar × this on that sol (from the real power record). */
+  solar?: number;
   /** Text key for the kid-facing caption, e.g. 'event.burst.may2024' */
   captionKey: string;
   /** Data provenance shown in Data Sources and on the chip. */
@@ -56,6 +96,10 @@ export interface EarthAnswer {
   dustTomorrow: "clear" | "dusty";
   /** Sols until a storm cloud (CME) reaches Mars, if one is forecast. */
   stormCloudInSols?: number;
+  /** A dust storm is on: how many more sols it lasts, from the morning this answer arrives. */
+  dustStormSols?: number;
+  /** Chance of a particle burst on the morning this answer arrives. Earth can give a chance, never the hour. */
+  burstRisk?: "high" | "low";
   source: DataRef;
 }
 
@@ -84,6 +128,36 @@ export interface StepResult {
   fell: Domino[];
 }
 
+/**
+ * One beat choice (site, dilemma, wipe, radio, upgrade, rover, sky watch): what it changes.
+ * Every interaction outside the plan screen goes through `act(state, action)` in the engine.
+ */
+export interface Action {
+  /** Domino id suffix, unique in the campaign, e.g. 'site-gale' → domino 'sol1-site-gale'. */
+  id: string;
+  icon: string;
+  textKey: string;
+  source?: DataRef;
+  /** Added to the resources now. Power is a cost when negative: the choice needs that much power. */
+  effect?: {
+    power?: number;
+    air?: number;
+    food?: number;
+    science?: number;
+    dose?: number;
+    /** Panels are wiped up to this efficiency (clean panels stay clean). */
+    panelEfficiency?: number;
+    /** Shelter stays up at least this many sols, today included. */
+    shelterSols?: number;
+    /** These astronauts rest today (cannot work). */
+    tired?: CrewId[];
+  };
+  /** Lasting rule changes (a site, an upgrade). */
+  rules?: Partial<Rules>;
+  /** Radio Earth: "night" = the answer comes next morning (Mars), "now" = at once (Moon, 1.3 s). */
+  ask?: "night" | "now";
+}
+
 /** The engine contract. Must be pure and deterministic: same input → same output. */
 export type Step = (
   state: GameState,
@@ -91,6 +165,7 @@ export type Step = (
   events: StormEvent[],
 ) => StepResult;
 
+/** Length of the classic mission. Campaigns set their own in Rules.sols: use `rulesOf(state).sols`. */
 export const MISSION_SOLS = 3;
 
 /**
@@ -142,20 +217,35 @@ export const JOBS: Record<
   },
 };
 
-/** Nightly needs (game numbers). The air machine runs on power; no power → air drops. */
+/** Nightly needs (game numbers). The air machine runs on power: with power the air goes up, without it the air drops. */
 export const NIGHT = {
   airMachinePower: 2,
   airLossWithoutPower: 3,
+  /** The machine cleans a little more air than the crew breathes. */
+  airGainWithPower: 1,
   solarPowerAtFullEfficiency: 6,
 };
 
-/** Dose per sol in game units. burstOutside = 39 × normalDay (8.1 mGy vs 0.21 mGy/day, Curiosity RAD, real ratio). burstInside and shelterFactor are game numbers. */
+/** Dose per sol in game units (all game numbers). The big burst stands for the real 20 May 2024 storm, whose worst hour was about 74 times the quiet level (Curiosity RAD); smaller real storms carry their own dose (StormEvent.dose). */
 export const DOSE = {
   normalDay: 0.2,
   outsideExtra: 0.3,
   burstOutside: 7.8,
   burstInside: 2,
   shelterFactor: 0.5,
-  /** Top of the space-ray meter: above the worst 3-sol mission (≈ 21.4), so a storm never hits the cap. */
-  meterMax: 25,
+  /** Top of the space-ray meter. A full meter ends the mission: the crew has to go home early. One astronaut outside in the real burst (7.8) does not fill it. */
+  meterMax: 15,
+};
+
+/** The classic 3-sol Mars mission. Campaigns start from this and change a few numbers. */
+export const CLASSIC_RULES: Rules = {
+  sols: MISSION_SOLS,
+  solar: NIGHT.solarPowerAtFullEfficiency,
+  dustFactor: 0.65,
+  heater: 0,
+  airMachinePower: NIGHT.airMachinePower,
+  shelterFactor: DOSE.shelterFactor,
+  foodGain: 1,
+  scienceGoal: 2,
+  earthHidden: [],
 };

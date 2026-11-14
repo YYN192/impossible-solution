@@ -64,14 +64,15 @@ describe("space-ray blame", () => {
     );
   });
 
-  it("the meter never saturates, so the storm always shows its real jump", () => {
+  it("the meter shows the storm's jump; when it fills up, the mission ends (never a silent cap)", () => {
     for (const a of JOB_IDS)
       for (const b of JOB_IDS) {
         const p: Plan = { a1: a, a2: b, a3: "science" };
         const before = play([p, p]);
         const after = play([p], before);
-        expect(after.bars.dose).toBeLessThan(DOSE.meterMax);
+        if (before.over) continue;
         expect(after.bars.dose).toBeGreaterThan(before.bars.dose);
+        if (after.bars.dose >= DOSE.meterMax) expect(after.over).toBe(true);
       }
   });
 });
