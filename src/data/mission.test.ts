@@ -73,3 +73,19 @@ describe("mission setup", () => {
     expect(m.dataSource).toBe("snapshot");
   });
 });
+
+describe("Today's Sun sol mapping (gap tests)", () => {
+  const now = new Date("2026-11-14T10:00:00Z");
+  const at = (iso: string) => todaysSunMission([{ simulationID: "x", arrival: iso }], "network", now.getTime(), now).events[0].sol;
+  it("a storm cloud arriving in about 1 day lands on sol 2", () => expect(at("2026-11-15T10:00Z")).toBe(2));
+  it("a storm cloud arriving in about 2 days lands on sol 3", () => expect(at("2026-11-16T10:00Z")).toBe(3));
+  it("far-future and already-arrived storm clouds land on the last sol", () => {
+    expect(at("2026-11-30T10:00Z")).toBe(3);
+    expect(at("2026-11-01T10:00Z")).toBe(3);
+  });
+  it("Earth's sol-1 answer counts down to the storm cloud", () => {
+    const m = todaysSunMission([{ simulationID: "x", arrival: "2026-11-16T10:00Z" }], "network", now.getTime(), now);
+    expect(m.forecasts[1].stormCloudInSols).toBe(1);
+    expect(m.forecasts[2].stormCloudInSols).toBe(0);
+  });
+});

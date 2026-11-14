@@ -71,3 +71,18 @@ describe("getJson", () => {
     expect(stripKey("https://x/y?api_key=SECRET")).toBe("https://x/y");
   });
 });
+
+describe("getJson fallbacks (gap tests)", () => {
+  it("uses the stale cache before the snapshot when the network fails", async () => {
+    localStorage.setItem("sol:cache:" + URL_, JSON.stringify({ t: 1, v: [{ id: "old" }] }));
+    server.use(http.get(URL_, () => HttpResponse.error()));
+    const r = await getJson({ url: URL_, schema: Thing, retries: 0, snapshot });
+    expect(r).toMatchObject({ source: "stale-cache", data: [{ id: "old" }], fetchedAt: 1 });
+  });
+
+  it("gives up on a hanging server after the timeout and uses the snapshot", async () => {
+    server.use(http.get(URL_, async () => { await new Promise((r) => setTimeout(r, 500)); return HttpResponse.json([{ id: "late" }]); }));
+    const r = await getJson({ url: URL_, schema: Thing, retries: 0, timeoutMs: 50, snapshot });
+    expect(r.source).toBe("snapshot");
+  });
+});
