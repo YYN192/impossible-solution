@@ -1,0 +1,26 @@
+{
+  "fetchedAt": "2026-11-14T09:00:31.234Z",
+  "source": "https://api.nasa.gov/DONKI/CME?startDate=2024-05-20&endDate=2024-05-20",
+  "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "about": "The far-side solar eruption of 20 May 2024. Curiosity RAD measured 8.1 mGy on the Mars surface from its particle burst.",
+  "data": [
+    {
+      "activityID": "2024-05-20T05:36:00-CME-001",
+      "startTime": "2024-05-20T05:36Z",
+      "note": "Fast halo CME visible in SOHO LASCO C2/C3 and STEREO A COR2. The source is believed to be backsided, with moving field lines and EUV wave visible in SDO AIA 171/193 at 2024-05-20T05:22Z. A filament eruption and C6.7 flare peaking at 2024-05-20T05:54Z from Active Region 3683 (approx. S24W65) occurred around the same time, but was determined not be the source of this fast halo CME due to location and timing.",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/31034/-1",
+      "analyses": [
+        {
+          "speed": 2678,
+          "type": "R",
+          "halfAngle": 45
+        },
+        {
+          "speed": 1927,
+          "type": "O",
+          "halfAngle": 43
+        }
+      ]
+    }
+  ]
+}
