@@ -52,3 +52,15 @@
   color: #b5c8d5;
   line-height: 1.4;
 }
+/* Change band on the preview meters (#10) and a small pop/tick on every tap. */
+.plan-screen .meter-track{position:relative}
+.plan-screen .meter-delta{position:absolute;top:0;bottom:0;transition:left .45s ease,width .45s ease;opacity:.85}
+.plan-screen .meter-delta.better{background:#7fe0a0}
+.plan-screen .meter-delta.worse{background:repeating-linear-gradient(135deg,#ff7b7b 0,#ff7b7b 4px,#7a2b2b 4px,#7a2b2b 8px)}
+.plan-screen .meter-track>span{transition:width .45s ease}
+.plan-screen .meter-change{display:inline-block;animation:plan-tick .35s ease-out}
+.plan-screen .job-choice.assigned{animation:plan-pop .25s ease-out}
+.plan-screen .mini-domino{animation:plan-tick .3s ease-out}
+@keyframes plan-pop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes plan-tick{0%{transform:translateY(-4px);opacity:.3}100%{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.plan-screen *{animation:none!important;transition:none!important}}
