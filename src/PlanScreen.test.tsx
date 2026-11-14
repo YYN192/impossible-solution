@@ -54,6 +54,13 @@ describe("PlanScreen (#9)", () => {
     ).toBe(String(DOSE.meterMax));
   });
 
+  it("tells the player to pick an astronaut when a job is tapped first", () => {
+    render(<PlanScreen />);
+    fireEvent.click(btn(t("jobs.panels")));
+    expect(screen.getAllByText(t("play.pickCrewFirst")).length).toBeGreaterThan(0);
+    expect(useSession.getState().draft).toEqual({});
+  });
+
   it("disables a tired astronaut", () => {
     useGame.setState({ state: { ...useGame.getState().state, tired: ["a1"] } });
     render(<PlanScreen />);

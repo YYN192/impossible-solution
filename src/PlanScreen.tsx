@@ -49,6 +49,7 @@ export default function PlanScreen() {
   const assign = useSession((s) => s.assign);
   const [selected, select] = useState<CrewId | null>(null);
   const [confirmIdle, setConfirmIdle] = useState(false);
+  const [nudge, setNudge] = useState(false);
   const resolved = useRef(false);
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
@@ -114,6 +115,7 @@ export default function PlanScreen() {
                   aria-label={t("crew.name", { n: i + 1 })}
                   onClick={() => {
                     select(id);
+                    setNudge(false);
                     setConfirmIdle(false);
                     focusNext.current = "job";
                     audio.playSfx("select");
@@ -156,11 +158,13 @@ export default function PlanScreen() {
                   type="button"
                   className={`job-choice ${owner ? "assigned" : ""}`}
                   key={id}
-                  disabled={!selected}
+                  aria-disabled={!selected}
                   aria-label={t(`jobs.${id}`)}
                   aria-pressed={Boolean(owner)}
                   onClick={() => {
-                    if (selected) assign(selected, id);
+                    if (!selected) { setNudge(true); audio.playSfx("select"); return; }
+                    setNudge(false);
+                    assign(selected, id);
                     select(null);
                     focusNext.current = "crew";
                     audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
@@ -188,7 +192,7 @@ export default function PlanScreen() {
           <div className="planner-guidance" aria-live="polite">
             {selected
               ? t("play.chooseJob", { n: crew.indexOf(selected) + 1 })
-              : t("play.chooseCrew")}
+              : nudge ? t("play.pickCrewFirst") : t("play.chooseCrew")}
           </div>
         </div>
         <aside className="plan-outlook">
