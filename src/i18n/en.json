@@ -366,7 +366,8 @@
     "earthInbox": "A message you earned from Earth",
     "knownStorm": "Today's space weather",
     "crewReady": "Crew ready",
-    "allAssigned": "Everyone has a job."
+    "allAssigned": "Everyone has a job.",
+    "tomorrow": "tomorrow"
   },
   "world": {
     "menu": "Menu",

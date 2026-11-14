@@ -1,0 +1,54 @@
+/* Plan screen only (#9, #10). Scoped under .plan-screen; global layout lives in expedition.css. */
+.plan-screen .skip-heading {
+  font-size: 0.8rem;
+  margin: 18px 0 8px;
+  color: #bed5df;
+}
+.plan-screen .skip-dominoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.plan-screen .mini-domino {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #192c3f;
+  border: 1px solid #3a5065;
+  border-left: 4px solid var(--warm);
+}
+.plan-screen .mini-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.plan-screen .mini-effect,
+.plan-screen .mini-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.plan-screen .mini-link img {
+  width: 22px;
+  height: 22px;
+}
+.plan-screen .mini-link small {
+  font-size: 0.6rem;
+  color: var(--warm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.plan-screen .mini-arrow {
+  font-size: 0.9rem;
+  color: #8ba6b9;
+}
+.plan-screen .mini-text {
+  font-size: 0.68rem;
+  color: #b5c8d5;
+  line-height: 1.4;
+}
