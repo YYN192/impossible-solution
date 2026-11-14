@@ -2,6 +2,8 @@
 
 This is an original, procedural pixel-art set for the Mars game. PNGs are drawn at their native dimensions with hard pixel edges and transparent backgrounds where the asset is a sprite. The code that generates them is `scripts/generate-pixel-assets.mjs`; rerun it with `node scripts/generate-pixel-assets.mjs` after changing the drawing source. It recreates the library and `asset-manifest.json`.
 
+**Hub art is now drawn with pxl** (floors, walls, player, commander/engineer/scientist, assistant drone, mission console, crate: 49 PNGs). Source: `art-src/pixel/hub.px.js`. Rebuild with `node <pxl>/bin/pxl.js build art-src/pixel/hub.px.js --out <tmp>` (Node ≥ 22.18), then `node art-src/pixel/export.mjs <tmp>`; the export refuses any size change. Rerunning `generate-pixel-assets.mjs` overwrites these files, so run the pxl export after it.
+
 ## Current integration
 
 The app is a React screen-based mission planner, not a Canvas tile game. The title screen uses `backgrounds/mars-menu-hero.png`, and its Start button uses the pixel treatment in `src/index.css`. Player, NPC, tile, console, item, and UI sprites are prepared for future screen/game use; no room renderer or movement system exists to consume them yet.
