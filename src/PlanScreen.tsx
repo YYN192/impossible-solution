@@ -48,14 +48,14 @@ export default function PlanScreen() {
           <img src={asset(`characters/npcs/${portraits[i]}-portrait`)} alt="" />
           <span><strong>{t("crew.name", { n: i + 1 })}</strong><small>{state.tired.includes(id) ? t("crew.tired") : plan[id] ? t(`jobs.${plan[id]}`) : t("crew.idle")}</small></span>
         </button>
-        {plan[id] && <button type="button" className="unassign" onClick={() => assign(id)} aria-label={t("play.clearCrew", { n: i + 1 })}>×</button>}
+        {plan[id] && <button type="button" className="unassign" onClick={() => { assign(id); audio.playSfx("job-remove"); }} aria-label={t("play.clearCrew", { n: i + 1 })}>×</button>}
       </div>)}</div>
       <h2 className="step-label">{t("play.jobsStep")}</h2>
       <div className="job-list">{jobIds.map((id, i) => {
         const owner = crew.find((c) => plan[c] === id);
         return <button type="button" className={`job-choice ${owner ? "assigned" : ""}`} key={id}
           disabled={!selected} aria-label={t(`jobs.${id}`)} aria-pressed={Boolean(owner)}
-          onClick={() => { if (selected) assign(selected, id); select(null); audio.playSfx("assign"); }}>
+          onClick={() => { if (selected) assign(selected, id); select(null); audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign"); }}>
           <span className="job-number">0{i + 1}</span><img src={asset(`items/${jobArt[id]}`)} alt="" />
           <span className="job-copy"><strong>{t(`jobs.${id}`)}</strong><small>{t(`jobInfo.${id}.done`)}</small>
             <span className="job-cost">{t("jobInfo.cost", { count: JOBS[id].powerCost })}{JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}</span></span>

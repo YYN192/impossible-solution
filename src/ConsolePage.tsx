@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { audio } from "./game/audio";
 import { useTranslation } from "react-i18next";
 import { useNav } from "./state/screen";
 import { useGame } from "./state/game";
@@ -13,8 +14,9 @@ export default function ConsolePage({ children, onExit }: { children: ReactNode;
   const events = useMission((s) => s.setup?.events);
   // A separate earned inbox, not a change to pickMorning's one-extra-line contract.
   const showInbox = screen === "morning" && answer && events?.some((e) => e.sol === sol);
+  useEffect(() => { audio.playSfx("console-boot"); audio.playMusic("mission-console-ambience"); return audio.stopMusic; }, []);
   return <main className="mission-console">
-    <header className="console-top"><button onClick={onExit}>← {t("world.return")}</button><div><span className="eyebrow">{t("world.name")}</span><b>{t("world.console")}</b></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
+    <header className="console-top"><button onClick={() => { audio.playSfx("console-close"); onExit(); }}>← {t("world.return")}</button><div><span className="eyebrow">{t("world.name")}</span><b>{t("world.console")}</b></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
     <div className="sol-navigation" aria-label={t("play.progress")}>{[1, 2, 3].map((day) => <span key={day} aria-current={day === sol ? "step" : undefined} className={day <= sol ? "reached" : ""}><i />{t("final.sol", { sol: day })}</span>)}</div>
     <div className="console-content">{showInbox && <aside className="earth-inbox" aria-label={t("play.earthInbox")}>
       <img src={asset("characters/robots/mission-control-hologram-portrait")} alt="" /><div><strong>{t("play.earthInbox")}</strong>

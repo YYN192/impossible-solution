@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { audio } from "../game/audio";
 import { DominoCard } from "../components/DominoCard";
 import { ScreenFrame } from "../components/ScreenFrame";
 import {
@@ -47,6 +49,13 @@ export function MorningReportView({
   const { t } = useTranslation();
   const next = useNav((s) => s.next);
   const { headline, cause, extra } = report;
+  const alert = extra?.kind === "event" ? extra.event.kind : extra?.kind;
+  useEffect(() => {
+    if (sol > 1) audio.playSfx("morning-report"); // sol 1 opens with the console boot sound
+    if (!alert) return;
+    const timer = setTimeout(() => audio.playSfx(alert === "particleBurst" ? "particle-burst" : alert === "stormCloud" ? "storm-warning" : "earth-message-receive"), 1300);
+    return () => clearTimeout(timer);
+  }, [sol, alert]);
 
   return (
     <ScreenFrame title={t("morning.heading", { sol })}>

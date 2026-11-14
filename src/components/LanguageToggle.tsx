@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { audio } from "../game/audio";
 import { LANGS } from "../i18n";
 import "./LanguageToggle.css";
 
@@ -14,7 +15,7 @@ export function LanguageToggle() {
           lang={lng}
           aria-label={t(`lang.${lng}`)}
           aria-pressed={i18n.language === lng}
-          onClick={() => void i18n.changeLanguage(lng)}
+          onClick={() => { audio.playSfx("console-button"); void i18n.changeLanguage(lng); }}
         >
           {lng.toUpperCase()}
         </button>

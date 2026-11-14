@@ -27,6 +27,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     } else { setDialogue(near); setPage(0); }
   }, [near, activating, dialogue, onConsole]);
   useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => { audio.playMusic("mars-base-ambience"); return audio.stopMusic; }, []);
   useEffect(() => { canvas.current?.focus(); }, []);
   useEffect(() => {
     const c = canvas.current;
@@ -67,12 +68,12 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", clear); document.removeEventListener("visibilitychange", clear); };
   }, [interact, dialogue, activating]);
-  const closeDialogue = () => { setDialogue(undefined); canvas.current?.focus(); };
+  const closeDialogue = () => { audio.playSfx("menu-back"); setDialogue(undefined); canvas.current?.focus(); };
   const dialogueBox = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
   const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue}-portrait`;
   return <main className="station">
-    <header className="station-header"><button onClick={onMenu}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
+    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
     <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>
     <div className={`world-viewport ${activating ? "activating" : ""}`}>
       <canvas ref={canvas} width={640} height={384} tabIndex={0} aria-label={t("world.canvas")} />
