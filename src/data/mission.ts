@@ -5,7 +5,8 @@
  * How the engine/UI uses it:
  *   - `events` → pass to step(state, plan, events); each event has the sol it happens on.
  *   - `forecasts[sol]` → if the crew did Ask Earth on `sol`, show forecasts[sol] in the NEXT morning's report
- *     (state.earthAnswer). Earth's answer = real DONKI forecast (WSA-Enlil, Mars-only).
+ *     (state.earthAnswer). Earth's answer: storm-cloud part = real DONKI WSA-Enlil forecast (Mars-only);
+ *     dust part = game-invented (DONKI does not forecast Mars dust).
  */
 import type { EarthAnswer, StormEvent } from "../sim/types";
 import { MISSION_SOLS } from "../sim/types";
@@ -13,7 +14,7 @@ import { getRecentMarsForecasts, may2024MarsHits, SNAPSHOT_DATES, type MarsHit }
 import type { DataSource } from "./http";
 import { isLive } from "./http";
 import type { Flags } from "./flags";
-import { DONKI_ENLIL_MAY23, INSIGHT_DUST, RAD_STORM } from "./sources";
+import { DONKI_ENLIL_MAY23, earthAnswerRef, RAD_STORM } from "./sources";
 
 export type MissionKind = "may2024" | "todaysSun";
 
@@ -34,13 +35,14 @@ export interface MissionSetup {
 /**
  * Main mission (also ?demo=1): based on May 2024.
  *   Sol 2: particle burst, no warning possible (20 May 2024, Curiosity RAD 8.1 mGy).
- *   Sol 3: storm cloud arrives (23 May 2024 CME, forecast to reach Mars 28 May; days squeezed into sols).
+ *   Sol 3: storm cloud arrives (23 May 2024 CME, forecast to brush past Mars 28 May; days squeezed into sols).
  *   Ask Earth on sol 1 → sol 2 morning: "dusty tomorrow" + "storm cloud in 1 sol".
  *   Ask Earth on sol 2 → sol 3 morning: "storm cloud arrives today".
  */
 export function may2024Mission(): MissionSetup {
   const cloud = may2024MarsHits.find((h) => h.arrival.startsWith("2024-05-28"));
   const cloudRef = { ...DONKI_ENLIL_MAY23, fetched: SNAPSHOT_DATES.may2024 };
+  const answerRef = earthAnswerRef(cloudRef);
   return {
     kind: "may2024",
     titleKey: "mission.may2024.title",
@@ -49,9 +51,9 @@ export function may2024Mission(): MissionSetup {
       ...(cloud ? [{ sol: 3, kind: "stormCloud" as const, captionKey: "event.cloud.may2024", source: cloudRef }] : []),
     ],
     forecasts: {
-      1: { dustTomorrow: "dusty", stormCloudInSols: cloud ? 1 : undefined, source: cloudRef },
-      2: { dustTomorrow: "clear", stormCloudInSols: cloud ? 0 : undefined, source: cloudRef },
-      3: { dustTomorrow: "clear", source: INSIGHT_DUST },
+      1: { dustTomorrow: "dusty", stormCloudInSols: cloud ? 1 : undefined, source: answerRef },
+      2: { dustTomorrow: "clear", stormCloudInSols: cloud ? 0 : undefined, source: answerRef },
+      3: { dustTomorrow: "clear", source: answerRef },
     },
     dataSource: "snapshot",
     dataFetchedAt: Date.parse(SNAPSHOT_DATES.may2024),
@@ -79,7 +81,7 @@ export function todaysSunMission(hits: MarsHit[], source: DataSource, fetchedAt:
   };
   const forecasts: Record<number, EarthAnswer> = {};
   for (let s = 1; s <= MISSION_SOLS; s++) {
-    forecasts[s] = { dustTomorrow: s === 1 ? "dusty" : "clear", stormCloudInSols: sol > s ? sol - s - 1 : undefined, source: ref };
+    forecasts[s] = { dustTomorrow: s === 1 ? "dusty" : "clear", stormCloudInSols: sol > s ? sol - s - 1 : undefined, source: earthAnswerRef(ref) };
   }
   return {
     kind: "todaysSun",

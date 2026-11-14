@@ -35,7 +35,7 @@ export const INSIGHT_DUST: DataRef = {
 };
 
 export const LIGHT_DELAY: DataRef = {
-  label: "Radio signals take 3 to 22 minutes between Earth and Mars",
+  label: "Worked out from the Earth–Mars distance (55 to 401 million km, NASA fact sheet) and the speed of light: 3 to 22 minutes",
   url: "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
   mode: "constant",
 };
@@ -47,16 +47,22 @@ export const DONKI_CME_MAY20: DataRef = {
 };
 
 export const DONKI_ENLIL_MAY23: DataRef = {
-  label: "NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud of 23 May 2024 was forecast to reach Mars on 28 May",
-  url: "https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/WSAEnlilSimulations?startDate=2024-05-19&endDate=2024-05-24",
+  label: "NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud of 23 May 2024 was forecast to brush past Mars on 28 May",
+  url: "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1",
   mode: "snapshot",
 };
+
+/** Earth's answer = storm-cloud forecast (real, DONKI) + dust forecast (game number). */
+export const earthAnswerRef = (cloud: DataRef): DataRef => ({
+  ...cloud,
+  label: `Storm-cloud forecast: ${cloud.label}. The dust forecast is a game number.`,
+});
 
 export const REAL_FACTS: RealFact[] = [
   {
     id: "burst",
     what: "Radiation from the 20 May 2024 solar storm, measured on Mars",
-    value: "8.1 mGy (milligray) absorbed dose, about one day",
+    value: "8.1 mGy (8,100 micrograys) absorbed dose from one storm",
     usedFor: "How much the space-ray meter jumps in a particle burst",
     ref: RAD_STORM,
   },
@@ -91,14 +97,14 @@ export const REAL_FACTS: RealFact[] = [
   {
     id: "cme",
     what: "The 20 May 2024 eruption in NASA's DONKI database",
-    value: "CME 2024-05-20T05:36Z, about 1,900 km/s, from the far side of the Sun",
+    value: "CME 2024-05-20T05:36Z, about 1,900 to 2,700 km/s, from the far side of the Sun (the side facing away from Earth), scientists think",
     usedFor: "The storm on sol 2 of the main mission",
     ref: DONKI_CME_MAY20,
   },
   {
     id: "forecast",
     what: "A storm cloud forecast to hit Mars",
-    value: "CME of 23 May 2024, forecast arrival at Mars 28 May 2024 11:30 UTC",
+    value: "CME of 23 May 2024, forecast to brush past Mars on 28 May 2024 around 11:30 UTC",
     usedFor: "What Earth's answer tells you: a storm cloud is coming",
     ref: DONKI_ENLIL_MAY23,
   },
@@ -110,5 +116,7 @@ export const SIMPLIFICATIONS: string[] = [
   "Our sols are short rounds. Real storm clouds take several days to reach Mars; we squeeze that into a sol or two.",
   "Job costs (power, food, the size of each bar) are game numbers we chose so the game is fair and fun.",
   "The space-ray meter uses game units. The size of a storm compared with a normal day is real.",
+  "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
+  "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
   "Real: the 20 May 2024 storm, normal Mars radiation, the dust effect on solar panels, and the message delay.",
 ];
