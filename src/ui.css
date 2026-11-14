@@ -124,3 +124,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visib
 /* Pixelify Sans Cyrillic is hard to read at small sizes (kids misread "сол"): Bulgarian uses bold Nunito for headings and buttons. */
 :root:lang(bg) { --font-pixel: var(--font-body); }
 :root:lang(bg) :is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge) { font-weight: 700; }
+/* A 44 px link inside a chip must grow the chip, not spill onto the next card. */
+p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35rem; }
+/* A job card with no astronaut picked yet looks "not ready" but still answers when tapped. */
+.job-choice[aria-disabled="true"] { border-style: dashed; color: #cfdae4; }

@@ -33,7 +33,7 @@ function audit({ touch, rules }) {
   const label = (e) => `<${e.tagName.toLowerCase()}${e.className && typeof e.className === "string" ? "." + e.className.split(" ")[0] : ""}> "${name(e)}"`;
   const visible = (e) => {
     const r = e.getBoundingClientRect(), s = getComputedStyle(e);
-    return r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.display !== "none" && !e.closest("[inert],[hidden]");
+    return r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.display !== "none" && !e.closest("[inert],[hidden]") && !(e.closest("details:not([open])") && !e.closest("summary"));
   };
   if (rules.includes("a") && document.documentElement.scrollWidth > innerWidth)
     out.push(["FAIL", `[a] horizontal scroll: scrollWidth ${document.documentElement.scrollWidth} > ${innerWidth}`]);
@@ -98,7 +98,7 @@ check("layout", async () => {
   for (const [w, h] of VIEWPORTS) {
     const size = `${w}x${h}`, phone = PHONES.has(size);
     for (const screen of Object.keys(SCREENS)) {
-      const page = await newPage(w, h, phone ? { hasTouch: true, isMobile: true } : {});
+      const page = await newPage(w, h, { reducedMotion: "reduce", ...(phone ? { hasTouch: true, isMobile: true } : {}) });
       try {
         await SCREENS[screen](page);
         await page.waitForTimeout(300);
@@ -407,7 +407,7 @@ check("labels", async () => {
   for (const lang of ["en", "bg"]) for (const [w, h] of LABEL_VIEWPORTS) {
     const phone = w < 500 || h < 500;
     for (const screen of ["menu", "hub", "morning", "plan", "endSol", "final", "dataSources", "teacherCard"]) {
-      const page = await newPage(w, h, phone ? { hasTouch: true, isMobile: true } : {});
+      const page = await newPage(w, h, { reducedMotion: "reduce", ...(phone ? { hasTouch: true, isMobile: true } : {}) });
       try {
         await SCREENS[screen](page);
         if (lang === "bg") { await page.getByRole("button", { name: "Български", exact: true }).click(); await page.waitForTimeout(250); }
