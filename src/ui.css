@@ -120,3 +120,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visib
   .mission-status-bar nav button { flex: 1 1 auto; }
   .console-top > button, .station-header > button { flex: 1 1 auto; }
 }
+
+/* Pixelify Sans Cyrillic is hard to read at small sizes (kids misread "сол"): Bulgarian uses bold Nunito for headings and buttons. */
+:root:lang(bg) { --font-pixel: var(--font-body); }
+:root:lang(bg) :is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge) { font-weight: 700; }
