@@ -4,9 +4,11 @@
  *   2. network with timeout + retry/backoff → validated with zod
  *   3. stale cache                          → "last known good"
  *   4. bundled snapshot                     → the game never breaks
+ * With proxyUrl, step 2 asks our own backend (/api/*, envelope {source, fetchedAt, upstream, data}) first,
+ * and NASA directly only when there is no backend (static hosting) — not when the backend says NASA is down.
  * Adapted from the team's prep notes (api-resilience patterns, Apache-2.0).
  */
-import type { ZodType } from "zod";
+import { z, type ZodType } from "zod";
 
 export type DataSource = "network" | "cache" | "stale-cache" | "snapshot";
 
@@ -26,6 +28,10 @@ export interface GetJsonOptions<T> {
   retries?: number;
   /** Returned when network and cache both fail. */
   snapshot?: { data: T; fetchedAt: number };
+  /** Our backend for the same data (answers an envelope). Tried before `url`. */
+  proxyUrl?: string;
+  /** After a failed refresh, skip the network for this long (saved data at once). */
+  failTtlMs?: number;
   /** Skip the network entirely (?offline=1). */
   offline?: boolean;
   fetchImpl?: typeof fetch;
@@ -42,6 +48,7 @@ export class HttpError extends Error {
 }
 
 const CACHE_PREFIX = "sol:cache:";
+const FAIL_PREFIX = "sol:fail:";
 
 interface CacheEntry<T> {
   t: number;
@@ -78,6 +85,13 @@ function parseRetryAfter(header: string | null): number | undefined {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const Envelope = z.object({
+  source: z.enum(["live", "cached"]),
+  fetchedAt: z.string(),
+  upstream: z.string(),
+  data: z.unknown(),
+});
 
 async function fetchOnce(url: string, timeoutMs: number, fetchImpl: typeof fetch): Promise<unknown> {
   const ctrl = new AbortController();
@@ -120,6 +134,8 @@ async function getJsonOnce<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
     retries = 2,
     snapshot,
     offline = false,
+    proxyUrl,
+    failTtlMs = 0,
     fetchImpl = globalThis.fetch?.bind(globalThis),
   } = opts;
 
@@ -139,8 +155,26 @@ async function getJsonOnce<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
     return { data: cached.v, source: "cache", fetchedAt: cached.t };
   }
 
+  const failedAt = Number(globalThis.localStorage?.getItem(FAIL_PREFIX + cacheKey) ?? 0);
+  if (failTtlMs && Date.now() - failedAt < failTtlMs) return fallback(cached);
+
   let lastErr: unknown;
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  let tryDirect = true;
+  if (proxyUrl) {
+    try {
+      const env = Envelope.parse(await fetchOnce(proxyUrl, timeoutMs, fetchImpl));
+      const data = schema.parse(env.data);
+      const fetchedAt = Date.parse(env.fetchedAt) || Date.now();
+      if (env.source === "cached") return { data, source: "stale-cache", fetchedAt };
+      writeCache(cacheKey, data);
+      return { data, source: "network", fetchedAt };
+    } catch (err) {
+      lastErr = err;
+      // Backend answered "NASA is down / rate-limited": asking NASA ourselves would only fail the same way.
+      tryDirect = !(err instanceof HttpError && [429, 502, 503, 504].includes(err.status));
+    }
+  }
+  for (let attempt = 0; tryDirect && attempt <= retries; attempt++) {
     try {
       const data = schema.parse(await fetchOnce(url, timeoutMs, fetchImpl));
       writeCache(cacheKey, data);
@@ -152,9 +186,18 @@ async function getJsonOnce<T>(opts: GetJsonOptions<T>): Promise<Result<T>> {
       await sleep(Math.min(base, 5_000));
     }
   }
+  try {
+    if (failTtlMs) globalThis.localStorage?.setItem(FAIL_PREFIX + cacheKey, String(Date.now()));
+  } catch {
+    /* storage is a convenience */
+  }
   if (import.meta.env?.DEV) console.warn("[data] falling back for", cacheKey, lastErr);
   return fallback(cached, lastErr);
 }
 
 /** Is this result real-time data (badge LIVE) or saved data (badge SNAPSHOT)? Never call a snapshot live. */
 export const isLive = (s: DataSource) => s === "network" || s === "cache";
+
+/** Badge text: LIVE only for an answer fetched just now; CACHED for a kept real answer; SAVED for bundled snapshots. */
+export const badgeKind = (s: DataSource): "live" | "cached" | "saved" =>
+  s === "network" ? "live" : s === "snapshot" ? "saved" : "cached";

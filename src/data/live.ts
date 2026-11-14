@@ -14,12 +14,10 @@ import {
   summarizeSpaceWeather,
 } from "../../scripts/ingest/normalize.mjs";
 import { dataClient } from "./client";
+import { donkiUrls, FAIL_TTL_MS, ymd } from "./donki";
 import { ApodEntry, SpaceWeather } from "./datasets";
 import { getJson, type Result } from "./http";
 
-const DONKI = "https://api.nasa.gov/DONKI";
-const KEY = "DEMO_KEY";
-const ymd = (d: Date) => d.toISOString().slice(0, 10);
 
 /** DONKI answers "" or null when nothing happened. */
 const LenientList = z.preprocess(
@@ -51,7 +49,8 @@ export async function liveSpaceWeather(
   const snapshot = await snapshotOf(dataClient.getSpaceWeather());
   const one = (path: string, extra = "") =>
     getJson({
-      url: `${DONKI}/${path}?startDate=${start}&endDate=${end}${extra}&api_key=${KEY}`,
+      ...donkiUrls(path, start, end, extra),
+      failTtlMs: FAIL_TTL_MS,
       cacheKey: `donki:${path}:${start}`,
       schema: LenientList,
       offline: opts.offline,
@@ -107,6 +106,7 @@ export async function liveApod(
   const r = await getJson({
     url: "https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=7",
     cacheKey: "apod:recent",
+    failTtlMs: FAIL_TTL_MS,
     schema: ApodList,
     offline: opts.offline,
     retries: opts.retries,

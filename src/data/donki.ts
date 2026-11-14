@@ -10,8 +10,22 @@ import recentSnap from "./snapshots/enlil-mars-recent.json";
 import may2024Snap from "./snapshots/enlil-mars-2024-05.json";
 
 /** DEMO_KEY is NASA's public shared key (30 requests/hour per player IP). Not a secret; results are cached 6 h. */
-const GATEWAY = "https://api.nasa.gov/DONKI";
+export const DONKI = "https://api.nasa.gov/DONKI";
 const PUBLIC_KEY = "DEMO_KEY";
+/** Our backend (Vercel /api, holds the real key). Build-time, not secret. Empty on static hosting (GitHub Pages). */
+const API_BASE = String(import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+export const ymd = (d: Date) => d.toISOString().slice(0, 10);
+/** A failed refresh is not retried for an hour: saved data shows at once (Data Sources, Today's Sun). */
+export const FAIL_TTL_MS = 60 * 60_000;
+
+/** Where to ask for one DONKI list: our backend first (if any), NASA directly with DEMO_KEY as fallback. */
+export function donkiUrls(type: string, start: string, end: string, extra = "") {
+  const q = `startDate=${start}&endDate=${end}${extra}`;
+  return {
+    url: `${DONKI}/${type}?${q}&api_key=${PUBLIC_KEY}`,
+    proxyUrl: API_BASE ? `${API_BASE}/donki/${type}?${q}` : undefined,
+  };
+}
 
 const Impact = z.object({
   location: z.string(),
@@ -86,18 +100,19 @@ export function marsHits(sims: Sim[]): MarsHit[] {
   return hits.sort((a, b) => b.arrival.localeCompare(a.arrival));
 }
 
-const ymd = (d: Date) => d.toISOString().slice(0, 10);
-
 /** Live "Today's Sun": Mars-bound storm clouds in the last 30 days. Falls back to the bundled snapshot. */
 export async function getRecentMarsForecasts(
   opts: { offline?: boolean; now?: Date; fetchImpl?: typeof fetch } = {},
 ): Promise<Result<MarsHit[]>> {
   const now = opts.now ?? new Date();
   const start = new Date(now.getTime() - 30 * 864e5);
-  const url = `${GATEWAY}/WSAEnlilSimulations?startDate=${ymd(start)}&endDate=${ymd(now)}&api_key=${PUBLIC_KEY}`;
   const r = await getJson({
-    url,
+    ...donkiUrls("WSAEnlilSimulations", ymd(start), ymd(now)),
     cacheKey: "donki:enlil:recent",
+    // Kids are waiting on "Preparing your mission…": one quick try, then saved data.
+    retries: 0,
+    timeoutMs: 4_000,
+    failTtlMs: FAIL_TTL_MS,
     schema: SimList,
     offline: opts.offline,
     fetchImpl: opts.fetchImpl,

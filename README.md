@@ -6,7 +6,8 @@
 
 A browser game for kids aged 7–12 where no choice is free.
 
-<a href="https://yyn192.github.io/impossible-solution/"><strong>▶ Play now</strong></a> ·
+<a href="https://impossible-solution.vercel.app"><strong>▶ Play now</strong></a> ·
+<a href="https://yyn192.github.io/impossible-solution/">Mirror (GitHub Pages)</a> ·
 <a href="#quick-start">🚀 Quick start</a> ·
 <a href="#nasa-data">🛰️ NASA data</a> ·
 <a href="docs/README.md">📚 Docs</a> ·
@@ -58,7 +59,7 @@ Needs Git and Node.js 22 LTS (20.19+ works). Then open http://localhost:5173/imp
 | ------------ | ----------------------------------------------------------------------------------------- |
 | `?offline=1` | Never uses the network; reads bundled NASA/CSA snapshots only                             |
 | `?demo=1`    | Runs the deterministic video scenario and implies offline mode                            |
-| `?sun=today` | Uses current Mars-bound DONKI forecasts when available, otherwise shows the saved mission |
+| `?sun=today` | Uses current Mars-bound DONKI forecasts when available, otherwise shows the saved mission. Also the main-menu choice "Today's real Sun" |
 | `?lang=bg`   | Starts in Bulgarian                                                                       |
 
 `?demo=1&offline=1` is the regression-tested recording URL. It always uses the same May 2024 storm data, starting state and three-sol plan.
@@ -66,6 +67,30 @@ Needs Git and Node.js 22 LTS (20.19+ works). Then open http://localhost:5173/imp
 ## NASA data
 
 The game uses InSight's dusty solar panels, the 20 May 2024 solar storm that Curiosity measured on Mars, and DONKI space-weather forecasts. Every source is listed in the in-game **Where our numbers come from** screen and in [`CREDITS.md`](CREDITS.md). Saved data is never labelled live.
+
+## Hosting and backend
+
+Two hosts build the same code:
+
+| Host | URL | Base path | Backend |
+| --- | --- | --- | --- |
+| Vercel (main) | https://impossible-solution.vercel.app | `/` (`BASE_PATH=/`) | yes: `api/` functions, `VITE_API_BASE=/api` |
+| GitHub Pages (fallback) | https://yyn192.github.io/impossible-solution/ | `/impossible-solution/` (default) | no: the browser calls DONKI directly with DEMO_KEY, else saved data |
+
+Backend endpoints (`api/`, Vercel Node functions, allowlisted, never an open proxy). Each answers
+`{source: "live" | "cached", fetchedAt, upstream, data}` (`stale: true` when it is the last good copy), or a JSON error (400 bad input, 502 NASA error, 504 timeout):
+
+| Endpoint | Upstream | CDN cache |
+| --- | --- | --- |
+| `GET /api/donki/:type?startDate&endDate` (`CME`, `WSAEnlilSimulations`, `GST`, `FLR`, `SEP`, `notifications&type=`) | CCMC DONKI (no key) first, then `api.nasa.gov/DONKI` with our key; max 60-day window | 1 h + SWR |
+| `GET /api/osdr/search?term&size` (size 1–25) | `osdr.nasa.gov/osdr/data/search` | 1 day + SWR |
+| `GET /api/dsn/mars` | DSN Now `dsn.xml` → Mars spacecraft + round-trip light time | 60 s |
+| `GET /api/status` | which upstreams answer now, and whether a personal key is set | 5 min |
+
+The NASA key lives only in Vercel → Settings → Environment Variables → `NASA_API_KEY` (server-side; DEMO_KEY if unset).
+`?offline=1` and `?demo=1` never call `/api`. Code: `api/_lib/nasa.ts` (tests next to it).
+
+## Project map
 
 To refresh the saved data, see [Contributing](CONTRIBUTING.md#5-commands-and-data).
 

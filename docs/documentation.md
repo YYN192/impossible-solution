@@ -8,7 +8,7 @@ The Impossible SOLution is a browser game for kids aged 7–12 in which they run
 
 | | |
 | --- | --- |
-| Play it | [yyn192.github.io/impossible-solution](https://yyn192.github.io/impossible-solution/) |
+| Play it | [impossible-solution.vercel.app](https://impossible-solution.vercel.app) (mirror: [GitHub Pages](https://yyn192.github.io/impossible-solution/)) |
 | Source code | [github.com/YYN192/impossible-solution](https://github.com/YYN192/impossible-solution) |
 | Challenge | NASA Space Apps Challenge 2026: Build a Junior Astronaut Mission Trainer |
 | Team | SoftUniors, Sofia |

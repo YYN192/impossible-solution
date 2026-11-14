@@ -12,7 +12,7 @@ body:
     id: steps
     attributes:
       label: Steps to see it
-      placeholder: "1. Open https://yyn192.github.io/impossible-solution/?demo=1\n2. ..."
+      placeholder: "1. Open https://impossible-solution.vercel.app/?demo=1\n2. ..."
     validations:
       required: true
   - type: input

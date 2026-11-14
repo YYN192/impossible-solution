@@ -11,6 +11,8 @@ interface MissionStore {
   status: "idle" | "loading" | "ready";
   setup?: MissionSetup;
   load: (flags?: Flags) => Promise<void>;
+  /** Start over with other flags (main menu: "Today's real Sun" / "The May 2024 storm"). */
+  reload: (flags?: Flags) => Promise<void>;
 }
 
 let inflight: Promise<void> | undefined;
@@ -22,10 +24,17 @@ export const useMission = create<MissionStore>()((set, get) => ({
     if (get().status === "ready") return Promise.resolve();
     if (get().status === "loading" && inflight) return inflight;
     set({ status: "loading" });
-    inflight = getMissionSetup(flags).then((setup) => {
+    const p: Promise<void> = getMissionSetup(flags).then((setup) => {
+      if (inflight !== p) return; // a newer choice (menu: which Sun) replaced this load
       set({ status: "ready", setup });
       inflight = undefined;
     });
-    return inflight;
+    inflight = p;
+    return p;
+  },
+  reload: (flags = readFlags()) => {
+    inflight = undefined;
+    set({ status: "idle", setup: undefined });
+    return get().load(flags);
   },
 }));

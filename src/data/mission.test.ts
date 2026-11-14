@@ -62,7 +62,7 @@ describe("mission setup", () => {
   });
 
   it("Today's Sun labels live data as live and saved data as snapshot", () => {
-    const hit = [{ simulationID: "x", arrival: "2026-11-13T12:00Z" }];
+    const hit = [{ simulationID: "x", arrival: "2026-11-15T12:00Z" }];
     const now = new Date("2026-11-14T10:00:00Z");
     expect(todaysSunMission(hit, "network", now.getTime(), now).events[0].source.mode).toBe("live");
     expect(todaysSunMission(hit, "snapshot", now.getTime(), now).events[0].source.mode).toBe("snapshot");
@@ -79,9 +79,14 @@ describe("Today's Sun sol mapping (gap tests)", () => {
   const at = (iso: string) => todaysSunMission([{ simulationID: "x", arrival: iso }], "network", now.getTime(), now).events[0].sol;
   it("a storm cloud arriving in about 1 day lands on sol 2", () => expect(at("2026-11-15T10:00Z")).toBe(2));
   it("a storm cloud arriving in about 2 days lands on sol 3", () => expect(at("2026-11-16T10:00Z")).toBe(3));
-  it("far-future and already-arrived storm clouds land on the last sol", () => {
-    expect(at("2026-11-30T10:00Z")).toBe(3);
-    expect(at("2026-11-01T10:00Z")).toBe(3);
+  it("far-future storm clouds land on the last sol", () => expect(at("2026-11-30T10:00Z")).toBe(3));
+  it("a storm cloud that already reached Mars is never shown as 'heading for Mars'", () => {
+    for (const iso of ["2026-11-13T12:00Z", "2026-11-14T04:00Z"]) {
+      const m = todaysSunMission([{ simulationID: "x", arrival: iso }], "network", now.getTime(), now);
+      expect(m.kind).toBe("may2024");
+      expect(m.dataSource).toBe("snapshot");
+      expect(m.noticeKey).toBe("notice.sunPassed");
+    }
   });
   it("Earth's sol-1 answer counts down to the storm cloud", () => {
     const m = todaysSunMission([{ simulationID: "x", arrival: "2026-11-16T10:00Z" }], "network", now.getTime(), now);

@@ -2,7 +2,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
-import { getJson, stripKey } from "./http";
+import { badgeKind, getJson, stripKey } from "./http";
 
 const Thing = z.array(z.object({ id: z.string() }));
 const URL_ = "https://api.test/things";
@@ -93,5 +93,64 @@ describe("getJson in-flight dedupe", () => {
     const [a, b] = await Promise.all([getJson({ url: URL_, schema: Thing }), getJson({ url: URL_, schema: Thing })]);
     expect(calls).toBe(1);
     expect(a.data).toEqual(b.data);
+  });
+});
+
+describe("getJson through our backend (proxyUrl)", () => {
+  const API = "https://game.test/api/things";
+  const env = (source: "live" | "cached", data: unknown) =>
+    HttpResponse.json({ source, fetchedAt: "2026-11-14T10:00:00.000Z", upstream: URL_, data });
+  let direct = 0;
+  const directOk = http.get(URL_, () => (direct++, HttpResponse.json([{ id: "direct" }])));
+  afterEach(() => { direct = 0; });
+
+  it("uses the backend first and keeps NASA's fetch time", async () => {
+    server.use(http.get(API, () => env("live", [{ id: "a" }])), directOk);
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing });
+    expect(r).toMatchObject({ source: "network", data: [{ id: "a" }], fetchedAt: Date.parse("2026-11-14T10:00:00Z") });
+    expect(direct).toBe(0);
+  });
+
+  it("an answer the backend only had saved is not called live", async () => {
+    server.use(http.get(API, () => env("cached", [{ id: "a" }])));
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing });
+    expect(r.source).toBe("stale-cache");
+  });
+
+  it("calls NASA directly when there is no backend (static hosting)", async () => {
+    server.use(http.get(API, () => new HttpResponse(null, { status: 404 })), directOk);
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing, retries: 0 });
+    expect(r).toMatchObject({ source: "network", data: [{ id: "direct" }] });
+  });
+
+  it("does not hammer NASA directly when the backend says NASA is down", async () => {
+    server.use(http.get(API, () => HttpResponse.json({ error: "timeout" }, { status: 504 })), directOk);
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing, retries: 0, snapshot });
+    expect(r.source).toBe("snapshot");
+    expect(direct).toBe(0);
+  });
+
+  it("remembers a failure for failTtlMs: no new requests, saved data at once", async () => {
+    server.use(http.get(API, () => (calls++, HttpResponse.json({ error: "x" }, { status: 502 }))));
+    await getJson({ url: URL_, proxyUrl: API, schema: Thing, retries: 0, snapshot, failTtlMs: 60_000 });
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing, retries: 0, snapshot, failTtlMs: 60_000 });
+    expect(r.source).toBe("snapshot");
+    expect(calls).toBe(1);
+  });
+
+  it("offline never calls the backend either", async () => {
+    server.use(http.get(API, () => (calls++, env("live", []))));
+    const r = await getJson({ url: URL_, proxyUrl: API, schema: Thing, offline: true, snapshot });
+    expect(r.source).toBe("snapshot");
+    expect(calls).toBe(0);
+  });
+});
+
+describe("badgeKind", () => {
+  it("is LIVE only for a fresh answer, CACHED for kept answers, SAVED for snapshots", () => {
+    expect(badgeKind("network")).toBe("live");
+    expect(badgeKind("cache")).toBe("cached");
+    expect(badgeKind("stale-cache")).toBe("cached");
+    expect(badgeKind("snapshot")).toBe("saved");
   });
 });

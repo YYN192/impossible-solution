@@ -94,7 +94,9 @@
       "live": "LIVE",
       "saved": "SAVED DATA",
       "liveTitle": "Real NASA data, downloaded just now",
-      "savedTitle": "Real NASA data, saved on {{date}}"
+      "savedTitle": "Real NASA data, saved on {{date}}",
+      "cached": "KEPT DATA",
+      "cachedTitle": "Real NASA data, downloaded on {{date}} and kept"
     }
   },
   "dataSources": {
@@ -260,7 +262,8 @@
     "back": "Back"
   },
   "notice": {
-    "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission."
+    "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission.",
+    "sunPassed": "The newest storm cloud from the Sun has already passed Mars, so you get the May 2024 mission."
   },
   "mission": {
     "may2024": {
@@ -347,7 +350,11 @@
     "unmute": "Unmute sound",
     "silent": "Music is off at first. Slide it up if you like.",
     "loading": "Preparing your mission…",
-    "edition": "THE IMPOSSIBLE SOLUTION · JUNIOR EXPEDITION"
+    "edition": "THE IMPOSSIBLE SOLUTION · JUNIOR EXPEDITION",
+    "sunToday": "Today's real Sun",
+    "sunTodayHint": "Play with what the Sun is really doing now.",
+    "sunMay": "The May 2024 storm",
+    "sunMayHint": "Play the big storm that really hit Mars in May 2024."
   },
   "play": {
     "lowerBetter": "Lower is better",
