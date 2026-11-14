@@ -9,7 +9,8 @@
  * Output: public/audio/<category>/<id>.wav (PCM 16-bit, 44.1 kHz) + public/audio/audio-manifest.json
  * Run: node scripts/generate-audio.mjs
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -630,6 +631,10 @@ for (const s of SOUNDS) {
   const file = join(ROOT, "public", rel);
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, wav(channels));
+  // The big ambience loops (1–3 MB as WAV) also ship as AAC .m4a (~10x smaller) when ffmpeg exists.
+  // MP4 stores the encoder delay, so browsers decode the exact length and the loop stays seamless.
+  const web = s.cat === "ambience" ? file.replace(/\.wav$/, ".m4a") : undefined;
+  if (web) spawnSync("ffmpeg", ["-v", "error", "-y", "-i", file, "-c:a", "aac", "-b:a", "96k", "-map_metadata", "-1", "-fflags", "+bitexact", web]);
   manifest.sounds.push({
     id: s.id,
     path: `/${rel}`,
@@ -641,6 +646,7 @@ for (const s of SOUNDS) {
     volume: s.volume,
     trigger: s.trigger,
     ...(s.aliases ? { aliases: s.aliases } : {}),
+    ...(web && existsSync(web) ? { web: `/${rel.replace(/\.wav$/, ".m4a")}` } : {}),
   });
 }
 

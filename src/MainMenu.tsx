@@ -19,22 +19,25 @@ export default function MainMenu({ onPlay, onSources, onTeacher, ready, resume }
       <h1>{t("app.name")}</h1><p className="menu-tagline">{t("menu.tagline")}</p>
       <div className="menu-landscape"><img src={asset("backgrounds/mars-menu-hero")} alt="" /><span>{t("menu.coordinates")}</span></div>
       <div className="mission-facts"><span><b>03</b>{t("menu.crew")}</span><span><b>03</b>{t("menu.days")}</span><span><b>01</b>{t("menu.home")}</span></div>
-    </div><section className="menu-panel">
+    </div><section className="menu-panel" onPointerOver={(e) => {
+      const button = (e.target as Element).closest("button:not(:disabled)");
+      if (button && !button.contains(e.relatedTarget as Node | null)) audio.playSfx("menu-hover");
+    }}>
       <div className="panel-rivets" aria-hidden="true">+ <span>+</span></div>
       {!settings ? <>
         <p className="eyebrow">{t("menu.welcome")}</p><h2>{t("menu.ready")}</h2><p>{t("menu.intro")}</p>
         <button className="primary launch-button" disabled={!ready} onClick={() => { audio.playSfx("menu"); onPlay(); }}><span aria-hidden="true">▶</span>{!ready ? t("menu.loading") : resume ? t("menu.resume") : t("title.start")}</button>
-        <button onClick={() => showSettings(true)}>{t("menu.settings")}</button>
+        <button onClick={() => { audio.playSfx("menu-open"); showSettings(true); }}>{t("menu.settings")}</button>
         <button onClick={onSources}>{t("dataSources.open")}</button>
         <button onClick={onTeacher}>{t("teacher.open")}</button>
-        <button className="quiet-button" onClick={() => { window.close(); setQuit(true); }}>{t("menu.quit")}</button>
+        <button className="quiet-button" onClick={() => { audio.playSfx("menu-back"); window.close(); setQuit(true); }}>{t("menu.quit")}</button>
         {quit && <p role="status">{t("menu.closeTab")}</p>}
         <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" /></p>
       </> : <>
         <p className="eyebrow">{t("menu.preferences")}</p><h2>{t("menu.settings")}</h2>
-        {(["master", "music", "sfx"] as const).map((key) => <label className="volume-control" key={key}>{t(`menu.${key}`)}<span>{Math.round(prefs[key] * 100)}%</span><input type="range" min={0} max={100} value={Math.round(prefs[key] * 100)} onChange={(e) => useAudio.setState({ [key]: Number(e.target.value) / 100 })} /></label>)}
+        {(["master", "music", "sfx"] as const).map((key) => <label className="volume-control" key={key}>{t(`menu.${key}`)}<span>{Math.round(prefs[key] * 100)}%</span><input type="range" min={0} max={100} value={Math.round(prefs[key] * 100)} onChange={(e) => { useAudio.setState({ [key]: Number(e.target.value) / 100 }); audio.playSfx("volume-change"); }} /></label>)}
         <button aria-pressed={prefs.muted} onClick={() => audio.mute(!prefs.muted)}>{prefs.muted ? t("menu.unmute") : t("menu.mute")}</button>
-        <p className="note">{t("menu.silent")}</p><button className="primary" onClick={() => showSettings(false)}>{t("dataSources.back")}</button>
+        <p className="note">{t("menu.silent")}</p><button className="primary" onClick={() => { audio.playSfx("menu-back"); showSettings(false); }}>{t("dataSources.back")}</button>
       </>}
       <div className="panel-rivets" aria-hidden="true">+ <span>+</span></div>
     </section></div>

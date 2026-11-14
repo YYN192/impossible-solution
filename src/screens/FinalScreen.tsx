@@ -9,6 +9,7 @@ import { useBest } from "../state/best";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
 import { buildChains } from "./final/buildChains";
+import { audio } from "../game/audio";
 
 export type { Stars };
 
@@ -51,6 +52,16 @@ export function FinalView({
     if (!demo) record(stars.count);
   }, [demo, record, stars.count]);
 
+  const longest = Math.max(0, ...chains.map((c) => c.length));
+  const won = !endedEarly && stars.count >= 2;
+  useEffect(() => {
+    // Chains fall side by side, so one tick per step; none when the animation is off.
+    const falls = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? 0 : longest;
+    const timers = Array.from({ length: falls }, (_, i) => setTimeout(() => audio.playSfx("domino-fall"), i * FALL_STEP_MS + 300));
+    timers.push(setTimeout(() => audio.playSfx(won ? "mission-success" : "mission-failure"), falls * FALL_STEP_MS + 600));
+    return () => timers.forEach(clearTimeout);
+  }, [longest, won]);
+
   return (
     <ScreenFrame
       title={endedEarly ? t("final.endedEarly") : t("final.heading")}
@@ -72,10 +83,10 @@ export function FinalView({
       )}
 
       <div className="actions">
-        <button type="button" className="primary" onClick={restart}>
+        <button type="button" className="primary" onClick={() => { audio.playSfx("replay-start"); restart(); }}>
           {t("final.tryAgain")}
         </button>
-        <button type="button" onClick={home}>
+        <button type="button" onClick={() => { audio.playSfx("menu-back"); home(); }}>
           {t("final.home")}
         </button>
       </div>

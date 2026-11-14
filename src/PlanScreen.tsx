@@ -138,7 +138,7 @@ export default function PlanScreen() {
                   <button
                     type="button"
                     className="unassign"
-                    onClick={() => assign(id)}
+                    onClick={() => { assign(id); audio.playSfx("job-remove"); }}
                     aria-label={t("play.clearCrew", { n: i + 1 })}
                   >
                     ×
@@ -163,7 +163,7 @@ export default function PlanScreen() {
                     if (selected) assign(selected, id);
                     select(null);
                     focusNext.current = "crew";
-                    audio.playSfx("assign");
+                    audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
                   }}
                 >
                   <span className="job-number">0{i + 1}</span>

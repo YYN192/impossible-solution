@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
 import { LanguageToggle } from "./components/LanguageToggle";
+import { SoundToggle } from "./components/SoundToggle";
+import { audio } from "./game/audio";
 import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
 import { EndOfSolScreen } from "./screens/EndOfSolScreen";
@@ -27,6 +29,8 @@ export default function App() {
   const [place, setPlace] = useState<Place>("menu");
   const [overlay, setOverlay] = useState<null | "sources" | "teacher">(null);
   const directEntry = useRef(false);
+  const openOverlay = (o: "sources" | "teacher") => { audio.playSfx("menu-open"); setOverlay(o); };
+  const closeOverlay = () => { audio.playSfx("menu-back"); setOverlay(null); };
   const openConsole = useCallback(() => setPlace("console"), []);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {
@@ -48,12 +52,12 @@ export default function App() {
   return <div className="expedition">
     <div className="mission-status-bar">
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
-      <LanguageToggle />
-      {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => setOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => setOverlay("teacher")}>{t("teacher.open")}</button></nav>}
+      <LanguageToggle /><SoundToggle />
+      {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
     </div>
     {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet")}</p>}
-    {overlay ? <main className="information-panel">{overlay === "teacher" ? <TeacherCard onBack={() => setOverlay(null)} /> : <DataSources onBack={() => setOverlay(null)} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
-      : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} onPlay={play} onSources={() => setOverlay("sources")} onTeacher={() => setOverlay("teacher")} />
+    {overlay ? <main className="information-panel">{overlay === "teacher" ? <TeacherCard onBack={closeOverlay} /> : <DataSources onBack={closeOverlay} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
+      : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} onPlay={play} onSources={() => openOverlay("sources")} onTeacher={() => openOverlay("teacher")} />
       : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />
       : <ConsolePage onExit={() => setPlace("hub")}>{Current && <Current key={`${screen}-${sol}`} />}</ConsolePage>}
   </div>;

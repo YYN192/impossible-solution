@@ -34,6 +34,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   }, [near, activating, dialogue, onConsole]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => { audio.playMusic("mars-base-ambience"); return audio.stopMusic; }, []);
   useEffect(() => { canvas.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => {
     const c = canvas.current;
@@ -89,12 +90,12 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     const target = tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
     held.current.clear(); goal.current = target; pending.current = target.entity?.id;
   };
-  const closeDialogue = () => { setDialogue(undefined); canvas.current?.focus({ preventScroll: true }); };
+  const closeDialogue = () => { audio.playSfx("menu-back"); setDialogue(undefined); canvas.current?.focus({ preventScroll: true }); };
   const dialogueBox = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
   const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue}-portrait`;
   return <main className="station">
-    <header className="station-header"><button onClick={onMenu}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
+    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
     <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} onPointerDown={tap} />

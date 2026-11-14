@@ -78,8 +78,21 @@ describe("sound library (public/audio)", () => {
     }
   });
 
-  it("has a file for every sound ID the game already plays (audio.playSfx)", () => {
-    const aliases = new Set(manifest.sounds.flatMap((s) => s.aliases ?? []));
-    for (const id of ["menu", "step", "console", "door", "npc", "dialogue", "select", "assign", "resolve"]) expect(aliases, id).toContain(id);
+  it("has a file for every sound ID the game plays (every quoted id inside audio.playSfx / playMusic in src)", () => {
+    const known = new Set(manifest.sounds.flatMap((s) => [s.id, ...(s.aliases ?? [])]));
+    const used = new Set<string>();
+    const walk = (dir: string) => {
+      for (const f of readdirSync(dir)) {
+        const p = join(dir, f);
+        if (statSync(p).isDirectory()) walk(p);
+        else if (/\.tsx?$/.test(f) && !f.includes(".test.")) {
+          for (const call of readFileSync(p, "utf8").matchAll(/audio\.play(?:Sfx|Music)\(([^)]*)\)/g))
+            for (const [, id] of call[1].matchAll(/"([^"]+)"/g)) if (!["askEarth", "particleBurst", "stormCloud"].includes(id)) used.add(id);
+        }
+      }
+    };
+    walk(join(process.cwd(), "src"));
+    expect(used.size).toBeGreaterThan(30);
+    for (const id of used) expect(known, id).toContain(id);
   });
 });

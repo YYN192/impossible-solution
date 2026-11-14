@@ -1,4 +1,7 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { audio } from "../game/audio";
+import { ENGINE } from "../sim/engine";
 import { DominoCard } from "../components/DominoCard";
 import { ResourceMeters } from "../components/ResourceMeters";
 import { ScreenFrame } from "../components/ScreenFrame";
@@ -14,11 +17,18 @@ export function EndOfSolScreen() {
   const { sol, next } = useNav();
   const { state, fell } = useGame();
   const before = useSession((s) => s.before);
+  useEffect(() => {
+    const { power, air, dose } = useGame.getState().state.bars;
+    const timers = [setTimeout(() => audio.playSfx("sol-end"), 300), setTimeout(() => audio.playSfx(
+      power <= 1 || air <= 2 || dose >= ENGINE.doseLimit ? "resource-critical" : air <= 4 ? "air-warning"
+        : power < ENGINE.lowPowerToday ? "power-decrease" : dose >= ENGINE.doseLimit - 2 ? "radiation-increase" : "resource-stable"), 1800)];
+    return () => timers.forEach(clearTimeout);
+  }, []);
   return <ScreenFrame title={t("endSol.heading", { sol })}>
     <div className="night-banner"><img src={asset("backgrounds/mars-menu-space")} alt="" /><p>{t("play.nightSummary")}</p></div>
     <ResourceMeters bars={state.bars} previous={before} />
     <div className="small-counters"><span>{t("bars.food")} <b>{state.food}</b></span><span>{t("bars.science")} <b>{state.science}</b></span></div>
     <div className="night-results">{fell.filter((d) => d.causeIds.length > 0 || d.source).map((d) => <DominoCard key={d.id} domino={d} />)}</div>
-    <div className="actions"><button type="button" className="primary" onClick={next}>{sol >= MISSION_SOLS ? t("endSol.seeResults") : t("endSol.nextMorning")}</button></div>
+    <div className="actions"><button type="button" className="primary" onClick={() => { audio.playSfx("next-sol"); next(); }}>{sol >= MISSION_SOLS ? t("endSol.seeResults") : t("endSol.nextMorning")}</button></div>
   </ScreenFrame>;
 }

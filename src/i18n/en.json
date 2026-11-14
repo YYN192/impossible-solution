@@ -345,7 +345,7 @@
     "sfx": "Sound effects",
     "mute": "Mute sound",
     "unmute": "Unmute sound",
-    "silent": "Sound controls are ready. No sound files are installed yet.",
+    "silent": "Music is off at first. Slide it up if you like.",
     "loading": "Preparing your mission…",
     "edition": "THE IMPOSSIBLE SOLUTION · JUNIOR EXPEDITION"
   },
@@ -432,5 +432,8 @@
     "label": "Language",
     "en": "English",
     "bg": "Български"
+  },
+  "sound": {
+    "toggle": "Sound on/off"
   }
 }
