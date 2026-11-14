@@ -6,3 +6,4 @@ Required in the Space Apps submission. One line per use: when, who, tool, what f
 |---|---|---|---|---|
 | Sat 14 Nov 10:00 | Yavor | Claude Code (Claude Opus 5.5) | Scaffold the Vite + React + TS project, licence/credits/log files | Project skeleton |
 | Sat 14 Nov 10:30 | Yavor | Claude Code (Claude Opus 5.5) + judge/kid-playtester subagents | Score concept options, simulated kid feedback, draft concept doc | Concept decisions in docs/concept.md (team reviewed) |
+| Sat 14 Nov 10:25–11:15 | Yavor | Claude Code + judge, kid-playtester, science-checker agents + llm-council skill (5 advisors, 5 peer reviews, chairman) | Weak points of concept v1, add/cut decisions | concept.md v2, plan.md, src/sim/types.ts draft; transcript in docs/council/ |
