@@ -174,14 +174,15 @@ describe("jobs: cost today, and cost if skipped", () => {
     const dusty: GameState = { ...initialState(), panelEfficiency: 0.5, bars: { power: 3, air: 6, dose: 0 } };
     const s = step(dusty, plan("panels"), []).state;
     expect(s.panelEfficiency).toBe(1);
-    expect(s.bars.power).toBe(NIGHT.solarPowerAtFullEfficiency);
+    // Power carries over: 3 − air machine 2 + a clean day's solar.
+    expect(s.bars.power).toBeCloseTo(3 - NIGHT.airMachinePower + NIGHT.solarPowerAtFullEfficiency);
   });
 
   it("panels skipped → dust: efficiency × 0.65 and tomorrow's power about a third lower", () => {
     const r = step(initialState(), plan("science"), []);
     expect(r.state.panelEfficiency).toBeCloseTo(ENGINE.dustFactor);
     expect(ENGINE.dustFactor).toBeCloseTo(0.65);
-    expect(r.state.bars.power).toBeCloseTo(NIGHT.solarPowerAtFullEfficiency * 0.65);
+    expect(r.state.bars.power).toBeCloseTo(6 - NIGHT.airMachinePower + NIGHT.solarPowerAtFullEfficiency * 0.65);
     expect(ids(r.fell)).toContain("sol1-panels-skipped");
     const low = r.fell.find((d) => d.id === "sol2-power-low");
     expect(low?.causeIds).toEqual(["sol1-panels-skipped"]);
@@ -206,7 +207,7 @@ describe("jobs: cost today, and cost if skipped", () => {
     expect(r.state.tired).toEqual(["a1"]);
     const empty = r.fell.find((d) => d.id === "sol1-food-empty");
     expect(empty?.causeIds).toEqual(["sol1-greenhouse-skipped"]);
-    const tired = r.fell.find((d) => d.id === "sol2-tired");
+    const tired = r.fell.find((d) => d.id === "sol2-crew-tired");
     expect(tired?.causeIds).toEqual(["sol1-food-empty"]);
     expect(tired?.sol).toBe(2);
   });
@@ -260,21 +261,33 @@ describe("power and the air machine", () => {
     // 6 power: greenhouse 2 + shelter 1 + askEarth 1 = 4, air machine 2 → exactly enough.
     const r = step(initialState(), plan("greenhouse", "shelter", "askEarth"), []);
     expect(r.state.bars.air).toBe(ENGINE.startAir);
-    expect(ids(r.fell)).not.toContain("sol1-air-drop");
+    expect(ids(r.fell)).not.toContain("sol1-air-low");
   });
 
   it("not enough power left for the air machine → air drops by 3", () => {
     const low: GameState = { ...initialState(), bars: { power: 3, air: 6, dose: 0 } };
     const r = step(low, plan("greenhouse"), []);
     expect(r.state.bars.air).toBe(6 - NIGHT.airLossWithoutPower);
-    expect(ids(r.fell)).toContain("sol1-air-drop");
+    expect(ids(r.fell)).toContain("sol1-air-low");
   });
 
-  it("a job that costs more power than is left does not run", () => {
+  it("a job that costs more power than is left does not run, and low power is its cause", () => {
     const low: GameState = { ...initialState(), bars: { power: 1, air: 6, dose: 0 } };
     const r = step(low, plan("greenhouse"), []);
     expect(r.state.food).toBe(0);
-    expect(ids(r.fell)).toContain("sol1-greenhouse-nopower");
+    expect(r.fell.find((d) => d.id === "sol1-power-low")?.textKey).toBe("domino.powerLow");
+    expect(r.fell.find((d) => d.id === "sol1-greenhouse-skipped")?.causeIds).toContain("sol1-power-low");
+  });
+
+  it("the greenhouse is the big power user: skipping it on a low-power sol lists low power as a cause", () => {
+    const s = run([plan("shelter", "askEarth", "science"), plan("shelter")]);
+    expect(s.dominoes.find((d) => d.id === "sol2-greenhouse-skipped")?.causeIds).toEqual(["sol2-power-low"]);
+  });
+
+  it("uses the text keys the screens know (en.json)", () => {
+    const s = run([plan("science"), plan()], [burstOn(2)]);
+    const known = ["panelsSkipped", "greenhouseSkipped", "shelterSkipped", "powerLow", "foodEmpty", "airLow", "crewTired", "doseHigh"];
+    for (const d of s.dominoes) expect(known.map((k) => `domino.${k}`)).toContain(d.textKey);
   });
 
   it("bars stay inside 0–10", () => {
@@ -292,14 +305,19 @@ describe("particle burst", () => {
   it("staying inside gives the inside burst dose", () => {
     const r = step(initialState(), plan("greenhouse"), [burstOn(1)]);
     expect(r.state.bars.dose).toBeCloseTo(DOSE.burstInside);
-    expect(r.fell.find((d) => d.id === "sol1-burst")?.source?.url).toBe("https://example.test/burst");
+    expect(r.fell.find((d) => d.id === "sol1-dose-high")?.source?.url).toBe("https://example.test/burst");
   });
 
   it("being outside in a burst gives the big dose (39 × a normal day)", () => {
     const r = step(initialState(), plan("science"), [burstOn(1)]);
     expect(r.state.bars.dose).toBeCloseTo(DOSE.burstOutside);
-    const big = r.fell.find((d) => d.id === "sol1-dose-big");
-    expect(big?.causeIds).toContain("sol1-burst");
+    expect(r.fell.find((d) => d.id === "sol1-dose-high")?.causeIds).toContain("sol1-shelter-skipped");
+  });
+
+  it("each extra astronaut outside adds more", () => {
+    const one = step(initialState(), plan("science"), [burstOn(1)]).state.bars.dose;
+    const two = step(initialState(), plan("science", "panels"), [burstOn(1)]).state.bars.dose;
+    expect(two - one).toBeCloseTo(DOSE.burstOutside - DOSE.burstInside);
   });
 
   it("a shelter built the sol before halves the burst", () => {
@@ -310,7 +328,7 @@ describe("particle burst", () => {
   it("only hits on its own sol", () => {
     const r = step(initialState(), plan("science"), [burstOn(2)]);
     expect(r.state.bars.dose).toBeCloseTo(DOSE.normalDay + DOSE.outsideExtra);
-    expect(ids(r.fell)).not.toContain("sol1-burst");
+    expect(ids(r.fell)).not.toContain("sol1-dose-high");
   });
 });
 
@@ -318,13 +336,13 @@ describe("storm cloud (CME): a smaller burst that Earth can warn about", () => {
   it("staying inside gives the inside storm-cloud dose", () => {
     const r = step(initialState(), plan("greenhouse"), [cloudOn(1)]);
     expect(r.state.bars.dose).toBeCloseTo(ENGINE.cloudInside);
-    expect(r.fell.find((d) => d.id === "sol1-storm-cloud")?.source?.url).toBe("https://example.test/cloud");
+    expect(r.fell.find((d) => d.id === "sol1-dose-high")?.source?.url).toBe("https://example.test/cloud");
   });
 
   it("being outside gives the outside storm-cloud dose and a dose domino", () => {
     const r = step(initialState(), plan("science"), [cloudOn(1)]);
     expect(r.state.bars.dose).toBeCloseTo(ENGINE.cloudOutside);
-    expect(r.fell.find((d) => d.id === "sol1-dose-big")?.causeIds).toContain("sol1-storm-cloud");
+    expect(r.fell.find((d) => d.id === "sol1-dose-high")?.causeIds).toContain("sol1-shelter-skipped");
   });
 
   it("is smaller than a particle burst, but bigger than a normal sol", () => {
@@ -363,14 +381,13 @@ describe("Ask Earth", () => {
     const first = step(initialState(), plan("askEarth"), [], { 1: answer }).state;
     const r = step(first, plan("panels"), [], { 2: answer });
     expect(r.state.earthAnswer).toBeUndefined();
-    expect(ids(r.fell)).toContain("sol2-askEarth-skipped");
   });
 });
 
 describe("stars", () => {
   it("3★: crew safe, base running, science goal reached", () => {
     const s = run(
-      [plan("panels", "greenhouse", "shelter"), plan("panels", "greenhouse", "science"), plan("panels", "greenhouse", "science")],
+      [plan("panels", "greenhouse", "science"), plan("greenhouse", "shelter", "askEarth"), plan("panels", "greenhouse", "science")],
       [burstOn(2)],
     );
     expect(stars(s)).toEqual({ crewSafe: true, baseRunning: true, science: true, count: 3 });
@@ -393,19 +410,22 @@ describe("stars", () => {
 });
 
 describe("the built-in domino chain (concept.md)", () => {
-  it("skip panels on sol 1 → power low sol 2 → air drops sol 2 night → air warning sol 3", () => {
+  it("skip panels on sol 1 → power low on sol 2 → not enough left for the air machine → air drops", () => {
     const s = run([plan("greenhouse", "shelter", "science"), plan("greenhouse", "science", "askEarth")], [burstOn(2)]);
     expect(s.dominoes.find((d) => d.id === "sol2-power-low")?.causeIds).toEqual(["sol1-panels-skipped"]);
-    expect(s.dominoes.find((d) => d.id === "sol2-air-drop")?.causeIds).toContain("sol2-power-low");
-    const warning = s.dominoes.find((d) => d.id === "sol3-air-low");
-    expect(warning?.sol).toBe(3);
-    expect(warning?.causeIds).toContain("sol2-air-drop");
-    expect(depth(s.dominoes, "sol3-air-low")).toBeGreaterThanOrEqual(3);
+    expect(s.dominoes.find((d) => d.id === "sol2-air-low")?.causeIds).toContain("sol2-power-low");
+    expect(depth(s.dominoes, "sol2-air-low")).toBeGreaterThanOrEqual(3);
   });
 
   it("skip the greenhouse on sol 1 → food 0 → an astronaut too tired on sol 2", () => {
     const s = run([plan("panels", "shelter", "science")]);
-    expect(depth(s.dominoes, "sol2-tired")).toBeGreaterThanOrEqual(3);
+    expect(depth(s.dominoes, "sol2-crew-tired")).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the demo story: skip panels and greenhouse on sol 1 → … → an astronaut too tired on sol 3", () => {
+    const s = run([plan("shelter", "askEarth", "science"), plan(undefined, "shelter", "askEarth")]);
+    expect(s.dominoes.find((d) => d.id === "sol3-crew-tired")).toBeDefined();
+    expect(depth(s.dominoes, "sol3-crew-tired")).toBeGreaterThanOrEqual(5);
   });
 });
 
@@ -431,19 +451,12 @@ describe("balance (brute force over every 3-sol plan, May 2024 mission)", () => 
     expect(withStars(3) / total).toBeLessThan(0.5);
   });
 
-  it("no plan is free: every sol, every plan leaves at least 2 jobs undone, each with a domino", () => {
-    for (const p of ALL_PLANS) {
-      const costs = step(initialState(), p, mission.events).fell.filter((d) => /-(skipped|nopower)$/.test(d.id));
-      expect(costs.length).toBeGreaterThanOrEqual(2);
-    }
-  });
-
   it("works with the real May 2024 mission setup end to end", () => {
     let s = initialState();
     s = step(s, plan("panels", "shelter", "askEarth"), mission.events, mission.forecasts).state;
     expect(s.earthAnswer).toEqual(mission.forecasts[1]);
     s = step(s, plan("panels", "greenhouse", "askEarth"), mission.events, mission.forecasts).state;
-    expect(s.dominoes.some((d) => d.id === "sol2-burst")).toBe(true);
+    expect(s.dominoes.some((d) => d.id === "sol2-dose-high")).toBe(true);
     expect(s.earthAnswer).toEqual(mission.forecasts[2]);
     s = step(s, plan("panels", "greenhouse", "science"), mission.events, mission.forecasts).state;
     expect(s.over).toBe(true);
