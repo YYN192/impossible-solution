@@ -1,0 +1,114 @@
+{
+  "app": {
+    "name": "The Impossible SOLution",
+    "disclaimer": "Uses NASA open data. Not affiliated with or endorsed by NASA."
+  },
+  "title": {
+    "solLine": "A sol is one day on Mars.",
+    "start": "Start mission"
+  },
+  "common": {
+    "solOf": "Sol {{sol}} of {{total}}",
+    "next": "Next"
+  },
+  "morning": {
+    "heading": "Good morning! Sol {{sol}}",
+    "goPlan": "Plan the day",
+    "firstDay": "First morning on Mars. Everything works.",
+    "nothingFell": "Nothing broke overnight. Good plan!",
+    "because": "because"
+  },
+  "domino": {
+    "panelsSkipped": "Nobody cleaned the solar panels.",
+    "greenhouseSkipped": "Nobody ran the greenhouse lights.",
+    "shelterSkipped": "Nobody built up the shelter.",
+    "powerLow": "Power is low today.",
+    "foodEmpty": "The food ran out.",
+    "airLow": "The air is getting thin.",
+    "crewTired": "One astronaut is too tired to work.",
+    "doseHigh": "The space-ray meter jumped up."
+  },
+  "event": {
+    "burst": {
+      "may2024": "The Sun just blasted a space-ray storm!"
+    },
+    "stormCloud": {
+      "may2024": "A storm cloud from the Sun reached Mars.",
+      "today": "A real storm cloud from the Sun is heading for Mars."
+    }
+  },
+  "earth": {
+    "answer": "📡 Earth says: {{dust}}, and {{storm}}.",
+    "dust": {
+      "clear": "clear skies tomorrow",
+      "dusty": "dusty skies tomorrow"
+    },
+    "storm": {
+      "none": "no storm cloud is coming",
+      "coming_one": "a storm cloud arrives in {{count}} sol",
+      "coming_other": "a storm cloud arrives in {{count}} sols"
+    }
+  },
+  "chip": {
+    "live": "Live NASA data",
+    "snapshot": "Real NASA data (saved)",
+    "constant": "Real NASA number",
+    "source": "source"
+  },
+  "plan": {
+    "heading": "Plan sol {{sol}}",
+    "endSol": "End sol"
+  },
+  "endSol": {
+    "heading": "Night falls on sol {{sol}}",
+    "nextMorning": "Go to sleep",
+    "seeResults": "See how it went"
+  },
+  "final": {
+    "heading": "Mission over",
+    "tryAgain": "Try a different plan",
+    "home": "Back to start"
+  },
+  "data": {
+    "badge": {
+      "live": "LIVE",
+      "saved": "SAVED DATA",
+      "liveTitle": "Real NASA data, downloaded just now",
+      "savedTitle": "Real NASA data, saved on {{date}}"
+    }
+  },
+  "dataSources": {
+    "open": "Where our numbers come from",
+    "title": "Where our numbers come from",
+    "intro": "This game uses real NASA science. Here is every real number, where it comes from, and what the game makes up.",
+    "real": "Real NASA data",
+    "inGame": "In the game",
+    "savedOn": "Saved NASA space-weather data was downloaded on {{date}}.",
+    "gameNumbers": "Game numbers",
+    "gameNumbersIntro": "We chose these numbers so the game is fair and fun. Each one is a game number, not a NASA measurement.",
+    "power": "{{n}} power",
+    "outside": "outside (more space rays)",
+    "airMachine": "Air machine, every night",
+    "doseUnits": "The space-ray meter uses game units. Only the size of a storm compared with a normal day is real.",
+    "simplifies": "What this game simplifies",
+    "back": "Back"
+  },
+  "jobs": {
+    "panels": "Clean solar panels",
+    "greenhouse": "Run greenhouse lights",
+    "shelter": "Build up the shelter",
+    "askEarth": "Ask Earth",
+    "science": "Science trip"
+  },
+  "notice": {
+    "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission."
+  },
+  "mission": {
+    "may2024": {
+      "title": "Mission: May 2024"
+    },
+    "todaysSun": {
+      "title": "Mission: Today's Sun"
+    }
+  }
+}

@@ -13,3 +13,4 @@
 .sources__simple li { margin-bottom: 0.4rem; }
 .sources__note { color: var(--muted, #9aa3bd); font-size: 0.9rem; }
 .sources__back { min-height: 44px; min-width: 44px; padding: 0.6rem 1.4rem; margin-top: 1.5rem; border-radius: 10px; border: 0; background: #e0603a; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.sources h2:focus { outline: none; }

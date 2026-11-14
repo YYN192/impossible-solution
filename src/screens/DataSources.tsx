@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { REAL_FACTS, SIMPLIFICATIONS } from "../data/sources";
 import { SNAPSHOT_DATES } from "../data/donki";
 import { DataBadge } from "../components/DataBadge";
@@ -5,35 +7,7 @@ import type { DataSource } from "../data/http";
 import { JOBS, NIGHT, type JobId } from "../sim/types";
 import "./DataSources.css";
 
-// TODO(#12/#15): move these strings into src/i18n/en.json once i18next is set up.
-const COPY = {
-  title: "Where our numbers come from",
-  intro:
-    "This game uses real NASA science. Here is every real number, where it comes from, and what the game makes up.",
-  real: "Real NASA data",
-  colWhat: "What",
-  colValue: "Real value",
-  colUse: "In the game",
-  simplifies: "What this game simplifies",
-  gameNumbers: "Game numbers",
-  gameNumbersIntro:
-    "We chose these numbers so the game is fair and fun. Each one is a game number, not a NASA measurement.",
-  jobs: {
-    panels: "Clean solar panels",
-    greenhouse: "Run greenhouse lights",
-    shelter: "Build up the shelter",
-    askEarth: "Ask Earth",
-    science: "Science trip",
-  } satisfies Record<JobId, string>,
-  outside: "outside (more space rays)",
-  airMachine: "Air machine, every night",
-  doseUnits:
-    "The space-ray meter uses game units. Only the size of a storm compared with a normal day is real.",
-  snapshotNote: "Saved NASA space-weather data was downloaded on",
-  back: "Back",
-  footer: "Uses NASA open data. Not affiliated with or endorsed by NASA.",
-};
-
+/** Every real number with its source, the game numbers, and what the game simplifies (#7). */
 export function DataSources({
   onBack,
   missionSource = "snapshot",
@@ -43,30 +17,28 @@ export function DataSources({
   missionSource?: DataSource;
   missionFetchedAt?: number;
 }) {
-  const saved = new Date(SNAPSHOT_DATES.may2024).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const { t, i18n } = useTranslation();
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => title.current?.focus(), []);
+  const date = new Date(SNAPSHOT_DATES.may2024).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" });
   return (
     <section className="sources" aria-labelledby="sources-title">
       <header className="sources__head">
-        <h2 id="sources-title">{COPY.title}</h2>
-        <DataBadge
-          source={missionSource}
-          fetchedAt={missionFetchedAt ?? Date.parse(SNAPSHOT_DATES.may2024)}
-        />
+        <h2 id="sources-title" ref={title} tabIndex={-1}>
+          {t("dataSources.title")}
+        </h2>
+        <DataBadge source={missionSource} fetchedAt={missionFetchedAt ?? Date.parse(SNAPSHOT_DATES.may2024)} />
       </header>
-      <p>{COPY.intro}</p>
+      <p>{t("dataSources.intro")}</p>
 
-      <h3>{COPY.real}</h3>
+      <h3>{t("dataSources.real")}</h3>
       <ul className="sources__list">
         {REAL_FACTS.map((f) => (
           <li key={f.id} className="sources__item">
             <p className="sources__what">{f.what}</p>
             <p className="sources__value">{f.value}</p>
             <p className="sources__use">
-              <span className="sources__label">{COPY.colUse}:</span> {f.usedFor}
+              <span className="sources__label">{t("dataSources.inGame")}:</span> {f.usedFor}
             </p>
             <a href={f.ref.url} target="_blank" rel="noreferrer">
               {f.ref.label}
@@ -74,28 +46,26 @@ export function DataSources({
           </li>
         ))}
       </ul>
-      <p className="sources__note">
-        {COPY.snapshotNote} {saved}.
-      </p>
+      <p className="sources__note">{t("dataSources.savedOn", { date })}</p>
 
       <section aria-labelledby="game-numbers-title">
-        <h3 id="game-numbers-title">{COPY.gameNumbers}</h3>
-        <p>{COPY.gameNumbersIntro}</p>
+        <h3 id="game-numbers-title">{t("dataSources.gameNumbers")}</h3>
+        <p>{t("dataSources.gameNumbersIntro")}</p>
         <ul className="sources__simple">
           {(Object.keys(JOBS) as JobId[]).map((id) => (
             <li key={id} data-job={id}>
-              {COPY.jobs[id]}: {JOBS[id].powerCost} power
-              {JOBS[id].outside ? `, ${COPY.outside}` : ""}
+              {t(`jobs.${id}`)}: {t("dataSources.power", { n: JOBS[id].powerCost })}
+              {JOBS[id].outside ? `, ${t("dataSources.outside")}` : ""}
             </li>
           ))}
           <li>
-            {COPY.airMachine}: {NIGHT.airMachinePower} power
+            {t("dataSources.airMachine")}: {t("dataSources.power", { n: NIGHT.airMachinePower })}
           </li>
-          <li>{COPY.doseUnits}</li>
+          <li>{t("dataSources.doseUnits")}</li>
         </ul>
       </section>
 
-      <h3>{COPY.simplifies}</h3>
+      <h3>{t("dataSources.simplifies")}</h3>
       <ul className="sources__simple">
         {SIMPLIFICATIONS.map((s) => (
           <li key={s}>{s}</li>
@@ -104,10 +74,9 @@ export function DataSources({
 
       {onBack ? (
         <button type="button" className="sources__back" onClick={onBack}>
-          {COPY.back}
+          {t("dataSources.back")}
         </button>
       ) : null}
-      <p className="sources__note">{COPY.footer}</p>
     </section>
   );
 }
