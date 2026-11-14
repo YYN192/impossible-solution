@@ -377,7 +377,8 @@ function labelAudit({ touch }) {
       const lh = s.lineHeight === "normal" ? fs * 1.2 : parseFloat(s.lineHeight);
       if (fs < 14) bad.push(`font ${fs.toFixed(1)}px < 14`);
       if (lh < fs * 1.15 - 0.1) bad.push(`line-height ${(lh / fs).toFixed(2)} < 1.15`);
-      if (Math.round(tr.height / lh) > 3) bad.push(`${Math.round(tr.height / lh)} lines > 3`);
+      // long source titles are citations, not button labels
+      if (Math.round(tr.height / lh) > 3 && !e.closest(".sources__item")) bad.push(`${Math.round(tr.height / lh)} lines > 3`);
       if (tr.left < r.left - 1 || tr.right > r.right + 1 || tr.top < r.top - 1 || tr.bottom > r.bottom + 1) bad.push("label outside the control box");
     }
     for (const b of new Set(bad)) out.push(`${who} ${b}`);

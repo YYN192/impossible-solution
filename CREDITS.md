@@ -31,6 +31,8 @@ Licences read from each package's `license` field in `node_modules`.
 
 | Library | Where | Licence |
 |---|---|---|
+| playwright-core | QA harness only (`scripts/qa`, dev dependency) | Apache-2.0 |
+| @fontsource/pixelify-sans, @fontsource/nunito | Self-hosted fonts (see Fonts) | OFL-1.1 |
 | react, react-dom | runtime | MIT |
 | i18next, react-i18next | runtime | MIT |
 | zod | runtime | MIT |
@@ -58,7 +60,14 @@ Licences read from each package's `license` field in `node_modules`.
 
 ## Fonts
 
-The game uses system fonts only. Nothing is downloaded. The pitch deck (`docs/pitch/pitch.html`, not part of the game) loads Fredoka and Nunito Sans from Google Fonts (SIL Open Font License 1.1).
+The game self-hosts two fonts through npm (latin + cyrillic, weights 400 and 700, served from our own origin; nothing is fetched from Google):
+
+| Font | Where | Licence | Link |
+|---|---|---|---|
+| Pixelify Sans (Stefie Justprince) via `@fontsource/pixelify-sans` | Headings, buttons, labels | SIL OFL 1.1 | https://fontsource.org/fonts/pixelify-sans |
+| Nunito (Vernon Adams, Jacques Le Bailly, Manvel Shmavonyan, Alexei Vanyashin) via `@fontsource/nunito` | Paragraphs and kid text | SIL OFL 1.1 | https://fontsource.org/fonts/nunito |
+
+ The pitch deck (`docs/pitch/pitch.html`, not part of the game) loads Fredoka and Nunito Sans from Google Fonts (SIL Open Font License 1.1).
 
 No NASA logos, the NASA "meatball" or the NASA "worm" are used anywhere.
 

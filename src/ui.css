@@ -1,0 +1,122 @@
+/* Shared 8-bit UI system. Loaded LAST (see main.tsx) so one button system covers every screen.
+   Rules: WCAG 2.2 SC 2.5.8 target size (44 px, 48 px on touch), SC 1.4.10 reflow, SC 1.4.4 resize text,
+   rem units, text-wrap + overflow-wrap so labels never clip, hard-edged borders and stepped shadows, no new motion.
+   Fonts: Pixelify Sans (OFL) for headings/buttons/labels, Nunito (OFL) for paragraphs. */
+:root {
+  --font-pixel: "Pixelify Sans", ui-monospace, Consolas, monospace;
+  --font-body: "Nunito", system-ui, "Segoe UI", sans-serif;
+  --tap: 44px;
+  --px: 3px;
+  --ink: #080b12;
+  --steel: #687586;
+  --silver: #b8c4d0;
+  --btn: #1c2b3d;
+  --btn-hover: #2a4156;
+  font-family: var(--font-body);
+}
+@media (pointer: coarse) { :root { --tap: 48px; } }
+html { -webkit-text-size-adjust: 100%; }
+body { font-size: 1rem; }
+img, canvas, .world-viewport, .menu-landscape img { image-rendering: pixelated; }
+
+/* Paragraphs and list text: readable Nunito, never below 1rem. (!important beats the many one-off minified sizes.) */
+p, li, dd, summary + * { font-family: var(--font-body); }
+p, li { font-size: max(1rem, 1em) !important; line-height: 1.5; overflow-wrap: anywhere; }
+.eyebrow, .note, .chip, .sol-tag, .chain-sol, .console-footer, .menu-bottom, .meter-label, .step-label, .menu-landscape span,
+.mission-facts > span, .sol-navigation > span, .planner-guidance, .meter-change, .meter-value small, .resource-meter > small,
+.job-number, .world-objective > span:last-child, .station-tip, .data-badge { font-size: 0.875rem !important; }
+.note, .chip, .chain-sol, .station-tip, .planner-guidance { line-height: 1.4; }
+
+/* Headings and labels: pixel font. */
+h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .mission-facts, .data-badge {
+  font-family: var(--font-pixel); letter-spacing: 0; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto;
+}
+.menu-story h1 { letter-spacing: 0; text-shadow: 3px 3px 0 var(--ink); }
+.eyebrow { letter-spacing: 0.06em; }
+
+/* ONE button system: every button, button-like control and summary. */
+button, [role="button"], summary, .sources__back {
+  font-family: var(--font-pixel);
+  font-size: 1rem !important;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0.55rem 1rem;
+  border: var(--px) solid var(--silver);
+  border-radius: 0;
+  background: var(--btn);
+  color: #e8f0f7;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-wrap: balance;
+  box-shadow: inset calc(var(--px) * -1) calc(var(--px) * -1) 0 #0006, inset var(--px) var(--px) 0 #ffffff1f, 4px 4px 0 var(--ink);
+  transition: none;
+}
+button:hover:not(:disabled) { background: var(--btn-hover); border-color: #fff; }
+button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: inset var(--px) var(--px) 0 #0006, 2px 2px 0 var(--ink); }
+button:disabled { opacity: 1; color: #aab6c2; background: #141d29; border-color: var(--steel); box-shadow: none; }
+button.primary { background: #83d9f4; border-color: #e8f0f7; color: #08202a; font-weight: 700; }
+button.primary:hover:not(:disabled) { background: #b6ecfb; }
+button[aria-pressed="true"]:not(.job-choice):not(.sound-toggle):not(.crew-tile > button) { background: #83d9f4; border-color: #e8f0f7; color: #08202a; }
+button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 6px #4c9ce5; }
+.quiet-button, .go-console { background: transparent; border-color: var(--steel); box-shadow: none; color: #cfdae4; }
+
+/* Rows of buttons share height and padding. */
+.actions { align-items: stretch; }
+.actions > button { display: inline-flex; align-items: center; justify-content: center; }
+.mission-status-bar { flex-wrap: wrap; row-gap: 6px; }
+.mission-status-bar nav { flex-wrap: wrap; gap: 8px; }
+.mission-status-bar nav button, .go-console, .lang-toggle button, .sound-toggle, .console-top > button, .station-header > button, .sources__back {
+  font-size: 1rem !important; padding: 0.4rem 0.9rem; min-height: var(--tap); min-width: var(--tap); border: var(--px) solid var(--silver); text-decoration: none;
+}
+.lang-toggle button { padding: 0.4rem 0.6rem; }
+.lang-toggle button + button { border-left-width: var(--px); margin-left: -3px; }
+.sound-toggle { padding: 0.4rem; }
+.whats-this__button { font-size: 1rem !important; line-height: 1.2 !important; min-height: var(--tap) !important; min-width: var(--tap) !important; padding: 0; }
+.interaction-guide button { min-width: 0; width: min(100%, 22rem); }
+.interaction-guide button kbd, button kbd { font-size: 0.875rem; margin-left: 0.5rem; border-width: 2px; padding: 0 0.35rem; }
+.dpad button { padding: 0; font-size: 1.5rem !important; }
+.crew-tile > button:first-child, .job-choice { box-shadow: none; text-align: left; font-family: var(--font-body); font-size: 1rem !important; }
+.crew-tile > button:first-child { text-align: center; border: 0; background: none; }
+.crew-tile .unassign { border: 0; box-shadow: none; min-height: var(--tap); min-width: var(--tap); }
+.job-choice { border: var(--px) solid #5b7388; background: #142536; }
+.job-choice.assigned { border-color: #65bf83; background: #1a3542; }
+.job-choice:disabled { color: #e8f0f7; }
+.job-copy strong { font-family: var(--font-pixel); font-size: 1rem; font-weight: 400; }
+.job-copy small, .job-cost, .job-owner, .crew-tile small { font-size: 0.875rem; line-height: 1.35; font-family: var(--font-body); }
+.crew-tile strong { font-family: var(--font-pixel); font-size: 1rem; font-weight: 400; }
+.crew-tile small { min-height: 0; }
+.crew-tile { border-width: var(--px); }
+.crew-tile.selected { outline: 3px solid #83d9f4; outline-offset: 2px; }
+
+/* Links that act as buttons (source chips): readable and tappable. */
+.sources__item a { display: block; overflow-wrap: anywhere; font-size: 0.875rem; line-height: 1.3; min-height: var(--tap); padding: 0.55rem 0; }
+.chip a {
+  display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); min-width: var(--tap);
+  font-size: 0.875rem; line-height: 1.2; padding: 0 0.4rem;
+}
+.chip { border: 2px solid #3b5a78; padding: 0.4rem 0.7rem; }
+
+/* Panels: hard 3 px borders, stepped shadows, no rounding, no blur. */
+.menu-panel, .information-panel, .mission-console, .npc-dialogue, .plan-outlook, .stars, .chain, .earth-inbox, .sources__item, .data-badge, .sol-tag, .domino {
+  border-radius: 0;
+}
+.menu-panel, .information-panel, .mission-console, .npc-dialogue { border: var(--px) solid #52687b; box-shadow: 6px 6px 0 #020811; }
+.plan-outlook, .stars, .chain, .earth-inbox, .domino { border-width: var(--px); }
+.sol-tag { border-width: var(--px); }
+.science-details summary { min-height: var(--tap); display: flex; align-items: center; font-size: 1rem !important; border: 0; box-shadow: none; background: none; text-align: left; padding: 0.4rem 0; }
+.npc-dialogue .actions { margin-top: 1rem; }
+.npc-dialogue[open] { flex-wrap: wrap; }
+
+/* Narrow screens: give wrapping room, never clip. */
+@media (max-width: 480px) {
+  .actions > button { flex: 1 1 100%; }
+  .mission-status-bar nav { width: 100%; }
+  .mission-status-bar nav button { flex: 1 1 auto; }
+  .console-top > button, .station-header > button { flex: 1 1 auto; }
+}
