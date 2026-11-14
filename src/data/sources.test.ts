@@ -1,8 +1,10 @@
 /** Science-check findings (Sat 14 Nov) pinned as tests, so the wording can't drift back. */
 import { describe, expect, it } from "vitest";
-import { DONKI_ENLIL_MAY23, LIGHT_DELAY, REAL_FACTS, SIMPLIFICATIONS } from "./sources";
+import { DONKI_ENLIL_MAY23, LIGHT_DELAY, REAL_FACTS, SIMPLIFICATION_KEYS } from "./sources";
 import { may2024Mission, todaysSunMission } from "./mission";
 import may from "./snapshots/enlil-mars-2024-05.json";
+import { JARGON } from "../i18n/jargon";
+import i18n from "../i18n";
 
 const fact = (id: string) => REAL_FACTS.find((f) => f.id === id)!;
 
@@ -35,7 +37,7 @@ describe("science check: real-data wording", () => {
   });
 
   it("the simplifies card says the dust forecast is made up and the dates differ", () => {
-    const all = SIMPLIFICATIONS.join(" ");
+    const all = SIMPLIFICATION_KEYS.map((k) => i18n.t(k)).join(" ");
     expect(all).toMatch(/computer forecast, not a measurement/i);
     expect(all).toMatch(/dust forecast is made up/i);
     expect(all).toMatch(/2012.13/);
@@ -54,6 +56,20 @@ describe("science check: Earth's answer credits DONKI only for the storm cloud",
     const m = todaysSunMission([{ simulationID: "x", arrival: "2026-11-16T10:00Z" }], "network", now.getTime(), now);
     for (const a of Object.values(m.forecasts)) {
       expect(a.source.label).toMatch(/dust.*game/i);
+    }
+  });
+});
+
+describe("kid chips never show dataset jargon (DONKI, Enlil, CME …)", () => {
+  const now = new Date("2026-11-14T10:00:00Z");
+  const missions = [
+    may2024Mission(),
+    todaysSunMission([{ simulationID: "x", arrival: "2026-11-16T10:00Z" }], "network", now.getTime(), now),
+  ];
+  it("every event and Earth's-answer label is plain words", () => {
+    for (const m of missions) {
+      const labels = [...m.events.map((e) => e.source.label), ...Object.values(m.forecasts).map((a) => a.source.label)];
+      for (const label of labels) for (const bad of JARGON) expect(label).not.toMatch(bad);
     }
   });
 });

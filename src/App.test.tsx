@@ -41,3 +41,25 @@ describe("App shell", () => {
     expect(i18n.exists("title.doesNotExist" as never)).toBe(false);
   });
 });
+
+describe("Title 'What's this?' (#16)", () => {
+  beforeEach(() => useNav.setState(START));
+  afterEach(cleanup);
+  it("explains what a sol is", () => {
+    render(<App />);
+    click("What's this? Sol");
+    screen.getByText(/40 minutes longer than an Earth day/);
+  });
+});
+
+describe("Teacher card link (#18)", () => {
+  beforeEach(() => useNav.setState(START));
+  afterEach(cleanup);
+  it("opens from the top bar and Back returns to the game", () => {
+    render(<App />);
+    click(t("teacher.open"));
+    expect(document.activeElement?.textContent).toBe(t("teacher.title"));
+    click(t("teacher.back"));
+    expect(heading().textContent).toBe("The Impossible SOLution");
+  });
+});
