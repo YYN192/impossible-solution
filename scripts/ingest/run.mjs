@@ -7,11 +7,31 @@
 //
 // Output: src/data/snapshots/<name>.json (bundled into the game) and public/data/{img,trek}/ (pictures).
 // A failed source keeps its last good file. NASA_API_KEY comes from the environment; it is never written.
-// Local runs: read NASA_API_KEY from app/.env if it exists (Node 20.12+). The value is never printed.
-try {
-  process.loadEnvFile?.(new URL('../../.env', import.meta.url))
-} catch {
-  /* no .env: DEMO_KEY (30 requests/hour per IP) */
+// Local runs: NASA_API_KEY from app/.env, or from the team repo's .env one folder up. The value is never printed.
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+const envFiles = ['../../.env', '../../../.env'].map((p) => fileURLToPath(new URL(p, import.meta.url)))
+let envUsed = null
+if (!process.env.NASA_API_KEY) {
+  for (const f of envFiles) {
+    if (!existsSync(f)) continue
+    try {
+      process.loadEnvFile(f)
+    } catch (e) {
+      console.warn(`! could not read ${f}: ${e.message}`)
+      continue
+    }
+    if (process.env.NASA_API_KEY) {
+      envUsed = f
+      break
+    }
+  }
+}
+{
+  const k = process.env.NASA_API_KEY
+  const who = !k || k === 'DEMO_KEY' ? 'DEMO_KEY (30 requests/hour per IP)' : `personal key (${k.length} characters)`
+  console.log(`NASA key: ${who}${envUsed ? ` from ${envUsed}` : k ? ' from the environment' : ''}`)
+  if (k && /^["'\s]|["'\s]$/.test(k)) console.warn('! NASA_API_KEY starts or ends with a quote or space — remove it')
 }
 const { readSnapshot, writeSnapshot } = await import('./lib.mjs')
 const { SOURCES } = await import('./sources.mjs')

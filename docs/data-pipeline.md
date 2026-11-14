@@ -46,7 +46,7 @@ A failed source prints `✘` and **keeps its last good file**; empty answers are
 
 ## The NASA key
 
-- Local: `NASA_API_KEY=…` in `app/.env` (gitignored). `run.mjs` loads it itself; the value is never printed or written (`writeSnapshot` refuses a file containing it).
+- Local: `NASA_API_KEY=…` in `app/.env` or the team repo's root `.env` (both gitignored). `run.mjs` loads it itself and prints `NASA key: personal key (40 characters)` or `DEMO_KEY`; the value is never printed or written (`writeSnapshot` refuses a file containing it).
 - CI: repository secret `NASA_API_KEY` (Settings → Secrets and variables → Actions, or `gh secret set NASA_API_KEY` typed in your own terminal).
 - Never a `VITE_*` variable. The browser only ever uses `DEMO_KEY`.
 - Rotate: get a new key at https://api.nasa.gov, replace the secret and `.env`; nothing else changes.
@@ -74,3 +74,11 @@ Saved data renders first; the live call runs in the background (timeout → retr
 6 h localStorage cache → stale cache → saved snapshot). Two calls for the same URL at once share one
 request (StrictMode). Each card shows LIVE or SAVED with the time. `?offline=1` and `npm test` never call out.
 The browser uses DEMO_KEY only (public, 30 requests/hour per player IP; 5 DONKI calls per player per 6 h).
+
+## Known outages
+
+- **14 Nov 2026: `api.nasa.gov/DONKI/FLR` answers 404 for every date range** (backend path `/DONKI-API/get/FLR/`);
+  SEP, CME, GST, IPS, HSS and notifications work. Each DONKI part is fetched separately; a missing part is
+  recorded in `missing` and its counts are `null`, and the card says the flare list was not available
+  instead of showing "0 flares". CME missing, or more than 2 parts missing → the whole refresh is refused.
+- CCMC (`kauai.ccmc.gsfc.nasa.gov`) unreachable from the venue network; the gateway is used instead.

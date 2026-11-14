@@ -1,7 +1,8 @@
 {
-  "fetchedAt": "2026-11-14T09:00:42.673Z",
+  "fetchedAt": "2026-11-14T12:04:30.631Z",
   "source": "https://api.nasa.gov/DONKI/WSAEnlilSimulations?startDate=2024-05-19&endDate=2024-05-24",
   "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
   "about": "WSA-Enlil model runs 19–24 May 2024. The CME of 23 May was forecast to reach Mars on 28 May; the 20 May CME was not forecast to hit Mars.",
   "data": [
     {

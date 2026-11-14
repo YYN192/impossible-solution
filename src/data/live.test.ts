@@ -54,7 +54,7 @@ describe("liveSpaceWeather (DONKI, last 30 days)", () => {
     server.use(http.get("https://api.nasa.gov/DONKI/*", () => new HttpResponse(null, { status: 429, headers: { "Retry-After": "0" } })));
     const r = await liveSpaceWeather({ now, retries: 0 }).catch((e) => e);
     // Without a saved file the caller gets an error and hides the card; with one, source is "snapshot".
-    if (r instanceof Error) expect(r.message).toMatch(/429|No data|snapshot/i);
+    if (r instanceof Error) expect(r.message).toMatch(/429|No data|snapshot|missing/i);
     else expect(r.source).toBe("snapshot");
   });
 
@@ -86,5 +86,22 @@ describe("liveApod (science.nasa.gov)", () => {
     const r = await liveApod({ retries: 0 });
     expect(r.source).toBe("snapshot");
     expect(r.data.page).toMatch(/^https:\/\//);
+  });
+});
+
+describe("liveSpaceWeather when one DONKI part is down", () => {
+  it("is still LIVE for the parts that answered, and marks the missing one", async () => {
+    server.use(
+      http.get("https://api.nasa.gov/DONKI/FLR", () => HttpResponse.json({ status: 404, error: "Not Found" }, { status: 404 })),
+      donki("SEP", []),
+      donki("CME", [{ activityID: "C1", startTime: "2026-11-01T00:00Z" }]),
+      donki("GST", []),
+      donki("notifications", []),
+    );
+    const r = await liveSpaceWeather({ now, retries: 0 });
+    expect(r.source).toBe("network");
+    expect(r.data.counts.flares).toBeNull();
+    expect(r.data.counts.cmes).toBe(1);
+    expect(r.data.missing).toEqual(["flr"]);
   });
 });

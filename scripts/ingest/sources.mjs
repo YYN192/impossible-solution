@@ -79,22 +79,28 @@ export const SOURCES = [
     async run() {
       const now = new Date()
       const q = range(30, now)
-      const [flr, sep, cme, gst, notifications] = [
-        await donki(`/FLR?${q}`),
-        await donki(`/SEP?${q}`),
-        await donki(`/CME?${q}`),
-        await donki(`/GST?${q}`),
-        await donki(`/notifications?${q}&type=all`),
-      ]
+      // Each part on its own: one broken endpoint (FLR answered 404 on 14 Nov 2026) must not sink the rest.
+      const parts = { flr: `/FLR?${q}`, sep: `/SEP?${q}`, cme: `/CME?${q}`, gst: `/GST?${q}`, notifications: `/notifications?${q}&type=all` }
+      const got = {}
+      const missing = []
+      let src = null
+      for (const [k, path] of Object.entries(parts)) {
+        try {
+          const r = await donki(path)
+          got[k] = r.data
+          src ??= r.source
+        } catch (e) {
+          console.warn(`    ${k} unavailable: ${e.message}`)
+          missing.push(k)
+        }
+      }
+      if (missing.includes('cme') || missing.length > 2) throw new Error(`too many DONKI parts missing: ${missing.join(', ')}`)
       return {
-        source: `${flr.source.split('/FLR')[0]}/{FLR,SEP,CME,GST,notifications}?${q}`,
+        source: `${src.split('/', 4).slice(0, 4).join('/')}/{FLR,SEP,CME,GST,notifications}?${q}`,
         attribution: DONKI_ATTR,
         license: NASA_LICENSE,
         about: 'What the Sun did in the last 30 days, as seen from near Earth: flares, particle events, CMEs, geomagnetic storms. Context only — most of these never reach Mars.',
-        data: summarizeSpaceWeather(
-          { flr: flr.data, sep: sep.data, cme: cme.data, gst: gst.data, notifications: notifications.data },
-          { start: ymd(daysAgo(30, now)), end: ymd(now) },
-        ),
+        data: summarizeSpaceWeather(got, { start: ymd(daysAgo(30, now)), end: ymd(now) }, { missing }),
       }
     },
   },

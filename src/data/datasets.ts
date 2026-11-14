@@ -29,11 +29,11 @@ const Cme = z
 export const SpaceWeather = z.object({
   window: z.object({ start: z.string(), end: z.string() }),
   counts: z.object({
-    flares: z.number().int().min(0),
-    bigFlares: z.number().int().min(0),
-    particleEvents: z.number().int().min(0),
-    cmes: z.number().int().min(0),
-    geomagneticStorms: z.number().int().min(0),
+    flares: z.number().int().min(0).nullable(),
+    bigFlares: z.number().int().min(0).nullable(),
+    particleEvents: z.number().int().min(0).nullable(),
+    cmes: z.number().int().min(0).nullable(),
+    geomagneticStorms: z.number().int().min(0).nullable(),
   }),
   strongestFlare: z
     .object({
@@ -54,6 +54,10 @@ export const SpaceWeather = z.object({
   notifications: z.array(
     z.object({ type: z.string(), issueTime: z.string(), url: z.string() }),
   ),
+  /** DONKI parts that did not answer; their counts are null (never a fake 0). */
+  missing: z
+    .array(z.enum(["flr", "sep", "cme", "gst", "notifications"]))
+    .default([]),
 });
 export type SpaceWeather = z.infer<typeof SpaceWeather>;
 

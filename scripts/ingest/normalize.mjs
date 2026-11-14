@@ -37,7 +37,9 @@ export function flareStrength(classType) {
 }
 
 /** Last-30-days space weather, summarised for a kid card. Message bodies are dropped (long, technical). */
-export function summarizeSpaceWeather(raw, window) {
+/** `missing`: parts that did not answer (e.g. ["flr"]); their counts are null, never 0. */
+export function summarizeSpaceWeather(raw, window, { missing = [] } = {}) {
+  const gone = (k) => missing.includes(k)
   const flr = list(raw.flr);
   const sep = list(raw.sep);
   const cme = list(raw.cme);
@@ -55,11 +57,11 @@ export function summarizeSpaceWeather(raw, window) {
   return {
     window,
     counts: {
-      flares: flr.length,
-      bigFlares: flr.filter((f) => flareStrength(f.classType) >= 30).length,
-      particleEvents: sep.length,
-      cmes: cme.length,
-      geomagneticStorms: gst.length,
+      flares: gone('flr') ? null : flr.length,
+      bigFlares: gone('flr') ? null : flr.filter((f) => flareStrength(f.classType) >= 30).length,
+      particleEvents: gone('sep') ? null : sep.length,
+      cmes: gone('cme') ? null : cme.length,
+      geomagneticStorms: gone('gst') ? null : gst.length,
     },
     strongestFlare: strongest
       ? {
@@ -79,6 +81,7 @@ export function summarizeSpaceWeather(raw, window) {
         }
       : null,
     strongestStormKp: kps.length ? Math.max(...kps) : null,
+    missing: [...missing],
     notifications: [...notes]
       .sort(byTimeDesc("messageIssueTime"))
       .slice(0, 5)

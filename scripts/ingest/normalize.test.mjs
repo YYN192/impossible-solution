@@ -301,3 +301,23 @@ describe("trekTile (Mars Trek WMTS, equirectangular)", () => {
     });
   });
 });
+
+describe('summarizeSpaceWeather with a part missing (e.g. DONKI FLR answering 404)', () => {
+  const s = summarizeSpaceWeather(
+    { flr: undefined, sep: [], cme: [{ activityID: 'C1', startTime: '2026-11-01T00:00Z' }], gst: [], notifications: [] },
+    { start: 'a', end: 'b' },
+    { missing: ['flr'] },
+  )
+  it('says "unknown" (null) instead of claiming 0 flares', () => {
+    expect(s.counts.flares).toBeNull()
+    expect(s.counts.bigFlares).toBeNull()
+    expect(s.strongestFlare).toBeNull()
+    expect(s.missing).toEqual(['flr'])
+  })
+  it('still counts the parts that answered', () => {
+    expect(s.counts.cmes).toBe(1)
+  })
+  it('lists nothing as missing when every part answered', () => {
+    expect(summarizeSpaceWeather({ flr: [], sep: [], cme: [], gst: [], notifications: [] }, { start: 'a', end: 'b' }).missing).toEqual([])
+  })
+})

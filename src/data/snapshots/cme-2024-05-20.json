@@ -1,7 +1,8 @@
 {
-  "fetchedAt": "2026-11-14T09:00:31.234Z",
+  "fetchedAt": "2026-11-14T12:04:30.235Z",
   "source": "https://api.nasa.gov/DONKI/CME?startDate=2024-05-20&endDate=2024-05-20",
   "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
   "about": "The far-side solar eruption of 20 May 2024. Curiosity RAD measured 8.1 mGy on the Mars surface from its particle burst.",
   "data": [
     {

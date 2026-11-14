@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-14T11:37:19.453Z",
+  "fetchedAt": "2026-11-14T12:04:32.497Z",
   "source": "https://visualization.osdr.nasa.gov/radlab/api/?instrument_id=MSL-RAD-Surface&absorbed_dose_rate&timestamp>=2024-05-15&timestamp<2024-05-26&format=json",
   "attribution": "NASA Open Science Data Repository (OSDR) RadLab — Curiosity Radiation Assessment Detector (MSL RAD), surface",
   "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",

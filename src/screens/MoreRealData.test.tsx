@@ -128,3 +128,28 @@ describe("MoreRealData live refresh (DONKI + APOD, saved data first)", () => {
     await waitFor(() => expect(card.textContent).toMatch(/SAVED/), { timeout: 4000 });
   });
 });
+
+describe("MoreRealData Sun card with the flare list missing", () => {
+  const server = setupServer();
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+  afterEach(() => {
+    server.resetHandlers();
+    localStorage.clear();
+  });
+  afterAll(() => server.close());
+
+  it("does not claim 0 flares; says the flare list was not available", async () => {
+    server.use(
+      http.get("https://api.nasa.gov/DONKI/FLR", () => new HttpResponse(null, { status: 404 })),
+      http.get("https://api.nasa.gov/DONKI/CME", () => HttpResponse.json([{ activityID: "C1", startTime: "2026-11-01T00:00Z" }])),
+      http.get("https://api.nasa.gov/DONKI/*", () => HttpResponse.json([])),
+      http.get("https://science.nasa.gov/*", () => HttpResponse.error()),
+    );
+    render(<MoreRealData live />);
+    const card = await screen.findByRole("region", { name: /what the sun did/i });
+    await within(card).findByText(/LIVE/);
+    expect(card.textContent).not.toMatch(/0 solar flares/);
+    expect(card.textContent).toMatch(/1 storm cloud/);
+    expect(card.textContent).toMatch(/flare list was not available/i);
+  });
+});
