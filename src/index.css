@@ -1,14 +1,68 @@
 :root {
   color-scheme: light dark;
-  font-family: system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  font-family: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
   line-height: 1.5;
   --bg: #0b1020;
   --fg: #e8ecf8;
   --muted: #9aa3bd;
 }
-body { margin: 0; background: var(--bg); color: var(--fg); }
-.shell { max-width: 40rem; margin: 0 auto; padding: 2rem 1rem; }
-.note { color: var(--muted); font-size: 0.9rem; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+.shell {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+.note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.screen h1 {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+.screen h1:focus {
+  outline: none;
+}
+.lead {
+  font-size: 1.25rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+/* Kid-sized tap targets: ≥ 44 px, visible keyboard focus. */
+button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.6rem 1.25rem;
+  font: inherit;
+  font-size: 1.1rem;
+  border-radius: 0.75rem;
+  border: 2px solid var(--muted);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+button.primary {
+  background: #f08a3c;
+  border-color: #f08a3c;
+  color: #1a0e05;
+  font-weight: 600;
+}
+button:focus-visible {
+  outline: 3px solid #7cc4ff;
+  outline-offset: 3px;
+}
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

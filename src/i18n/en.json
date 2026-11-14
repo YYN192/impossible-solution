@@ -1,0 +1,32 @@
+{
+  "app": {
+    "name": "The Impossible SOLution",
+    "disclaimer": "Uses NASA open data. Not affiliated with or endorsed by NASA."
+  },
+  "title": {
+    "solLine": "A sol is one day on Mars.",
+    "start": "Start mission"
+  },
+  "common": {
+    "solOf": "Sol {{sol}} of {{total}}",
+    "next": "Next"
+  },
+  "morning": {
+    "heading": "Good morning! Sol {{sol}}",
+    "goPlan": "Plan the day"
+  },
+  "plan": {
+    "heading": "Plan sol {{sol}}",
+    "endSol": "End sol"
+  },
+  "endSol": {
+    "heading": "Night falls on sol {{sol}}",
+    "nextMorning": "Go to sleep",
+    "seeResults": "See how it went"
+  },
+  "final": {
+    "heading": "Mission over",
+    "tryAgain": "Try a different plan",
+    "home": "Back to start"
+  }
+}
