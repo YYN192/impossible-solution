@@ -1,0 +1,127 @@
+:root {
+  --dark: #0B1020;
+  --dark2: #161C36;
+  --card-d: #212A4C;
+  --light: #F4EFE7;
+  --light2: #E8DFD1;
+  --ink: #151A2E;
+  --soft-d: #C3CAE0;
+  --soft-l: #474C60;
+  --orange: #F08A3C;
+  --orange-ink: #9E430E;
+  --mars: #D9692A;
+  --blue: #7CC4FF;
+  --blue-ink: #1D5A8C;
+}
+
+body { font-family: 'Nunito Sans', Verdana, sans-serif; }
+
+section {
+  counter-increment: page;
+  box-sizing: border-box;
+  padding: 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+section.content { padding: 128px 128px 160px; }
+
+.dark { background: var(--dark); color: var(--light); }
+.dark2 { background: var(--dark2); color: var(--light); }
+.light { background: var(--light); color: var(--ink); }
+.accent { background: var(--orange); color: var(--ink); }
+
+h1, h2, h3 { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; }
+h1 { font-size: 120px; font-weight: 600; line-height: 1.05; }
+h2 { font-size: 72px; font-weight: 600; line-height: 1.1; }
+h3 { font-size: 44px; font-weight: 600; line-height: 1.15; }
+
+.eyebrow { font-size: 24px; font-weight: 700; letter-spacing: 3px; line-height: 1.3; }
+.dark .eyebrow, .dark2 .eyebrow { color: var(--orange); }
+.light .eyebrow { color: var(--orange-ink); }
+.accent .eyebrow { color: var(--ink); }
+
+.lede { font-size: 32px; line-height: 1.4; }
+.dark .lede, .dark2 .lede { color: var(--soft-d); }
+.light .lede { color: var(--soft-l); }
+.accent .lede { color: var(--ink); }
+
+/* Footer band: one pinned row. */
+.footer {
+  position: absolute;
+  left: 128px;
+  bottom: 64px;
+  width: 1664px;
+  display: flex;
+  justify-content: space-between;
+}
+.foot { font-size: 24px; line-height: 1.3; }
+.dark .foot, .dark2 .foot { color: var(--soft-d); }
+.light .foot { color: var(--soft-l); }
+.pagenum::after { content: counter(page); }
+
+/* Cards */
+.row { display: flex; gap: 32px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+.card { flex: 1; border-radius: 24px; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+.dark .card, .dark2 .card { background: var(--card-d); }
+.light .card { background: var(--light2); }
+.icon { font-size: 64px; line-height: 1.1; }
+.cardtitle { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.2; }
+.cardtext { font-size: 24px; line-height: 1.4; }
+.dark .cardtext, .dark2 .cardtext { color: var(--soft-d); }
+.light .cardtext { color: var(--soft-l); }
+.tag { font-size: 24px; font-weight: 700; line-height: 1.3; }
+.dark .tag, .dark2 .tag { color: var(--blue); }
+.light .tag { color: var(--blue-ink); }
+.light .tag-orange { color: var(--orange-ink); }
+.dark2 .tag-real { color: var(--orange); }
+
+/* Cover */
+.cover { justify-content: space-between; }
+.cover-text { width: 1040px; display: flex; flex-direction: column; gap: 32px; }
+.cover-title { color: var(--light); }
+.cover-sub { color: var(--orange); }
+.mars { position: absolute; left: 1232px; top: 260px; width: 560px; height: 560px; background: var(--mars); }
+.moon { position: absolute; left: 1150px; top: 210px; width: 72px; height: 72px; background: #8E8A99; }
+
+/* Domino chain */
+.chain { display: flex; align-items: stretch; }
+.domino {
+  flex: 1;
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--light);
+  color: var(--ink);
+  box-shadow: 0 12px 0 #0A0E1C;
+}
+.domino-sol { font-size: 24px; font-weight: 700; letter-spacing: 2px; color: var(--orange-ink); }
+.domino-icon { font-size: 72px; line-height: 1.1; }
+.domino-text { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.25; }
+.link { width: 72px; height: 0px; align-self: center; color: var(--orange); border-width: 6px; }
+
+/* Quote */
+.quote { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 72px; font-weight: 600; line-height: 1.15; }
+.play { font-size: 44px; font-weight: 700; line-height: 1.2; }
+
+/* Tables */
+.data-table { font-size: 24px; line-height: 1.35; color: var(--light); }
+.data-table .col-real { color: var(--orange); }
+
+/* Columns for real vs game */
+.cols { display: flex; gap: 48px; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 20px; border-radius: 24px; padding: 40px; }
+.col-real-box { background: var(--card-d); border: 4px solid var(--orange); }
+.col-game-box { background: var(--card-d); border: 4px solid var(--blue); }
+.list { font-size: 28px; line-height: 1.45; color: var(--soft-d); }
+
+/* Motion: the plain rules above are the finished look. */
+.rise { animation: rise 500ms cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 110ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+.fade { animation: fade 700ms ease-out both; animation-delay: calc(var(--i, 0) * 110ms); }
+@keyframes fade { from { opacity: 0; } }
+.tip { animation: tip 520ms cubic-bezier(.2,.8,.3,1.2) both; animation-delay: calc(var(--i, 0) * 180ms); }
+@keyframes tip { from { opacity: 0; transform: translateY(-40px) rotate(-8deg); } }
