@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Impossible SOLution — Pitch</title>
+<!-- Built from docs/pitch/source (the Slides deck on claude.ai). Arrow keys or Page Up/Down move between slides; N shows or hides speaker notes. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap">
+<style>
+* { margin: 0 }
+html { background: #05070F; }
+body { font: 32px/1.2 sans-serif; }
+body { counter-reset: page; }
+.slide-wrap { width: 1920px; margin: 0 auto 48px; counter-increment: page; }
+section { width: 1920px; height: 1080px; overflow: hidden; position: relative; isolation: isolate; }
+section > aside { display: none; }
+.notes { display: none; box-sizing: border-box; padding: 24px 32px; font: 28px/1.5 'Nunito Sans', Verdana, sans-serif; color: #C3CAE0; background: #161C36; border-top: 4px solid #F08A3C; }
+body.show-notes .notes { display: block; }
+x-shape { display: block; }
+x-shape[kind="ellipse"] { border-radius: 50%; }
+.mars, .moon { z-index: -1; }
+x-connector.link { display: block; position: relative; border-top: 6px solid #F08A3C; }
+x-connector.link::after { content: ""; position: absolute; right: -4px; top: -15px; border: 12px solid transparent; border-left: 18px solid #F08A3C; border-right: 0; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .35em .6em; border-bottom: 2px solid #ffffff22; }
+.hint { position: fixed; right: 16px; bottom: 12px; font: 14px/1.4 system-ui, sans-serif; color: #9aa3bd; background: #0B1020cc; padding: 6px 10px; border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+:root {
+  --dark: #0B1020;
+  --dark2: #161C36;
+  --card-d: #212A4C;
+  --light: #F4EFE7;
+  --light2: #E8DFD1;
+  --ink: #151A2E;
+  --soft-d: #C3CAE0;
+  --soft-l: #474C60;
+  --orange: #F08A3C;
+  --orange-ink: #9E430E;
+  --mars: #D9692A;
+  --blue: #7CC4FF;
+  --blue-ink: #1D5A8C;
+}
+
+body { font-family: 'Nunito Sans', Verdana, sans-serif; }
+
+section {
+  counter-increment: page;
+  box-sizing: border-box;
+  padding: 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+section.content { padding: 128px 128px 160px; }
+
+.dark { background: var(--dark); color: var(--light); }
+.dark2 { background: var(--dark2); color: var(--light); }
+.light { background: var(--light); color: var(--ink); }
+.accent { background: var(--orange); color: var(--ink); }
+
+h1, h2, h3 { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; }
+h1 { font-size: 120px; font-weight: 600; line-height: 1.05; }
+h2 { font-size: 72px; font-weight: 600; line-height: 1.1; }
+h3 { font-size: 44px; font-weight: 600; line-height: 1.15; }
+
+.eyebrow { font-size: 24px; font-weight: 700; letter-spacing: 3px; line-height: 1.3; }
+.dark .eyebrow, .dark2 .eyebrow { color: var(--orange); }
+.light .eyebrow { color: var(--orange-ink); }
+.accent .eyebrow { color: var(--ink); }
+
+.lede { font-size: 32px; line-height: 1.4; }
+.dark .lede, .dark2 .lede { color: var(--soft-d); }
+.light .lede { color: var(--soft-l); }
+.accent .lede { color: var(--ink); }
+
+/* Footer band: one pinned row. */
+.footer {
+  position: absolute;
+  left: 128px;
+  bottom: 64px;
+  width: 1664px;
+  display: flex;
+  justify-content: space-between;
+}
+.foot { font-size: 24px; line-height: 1.3; }
+.dark .foot, .dark2 .foot { color: var(--soft-d); }
+.light .foot { color: var(--soft-l); }
+.pagenum::after { content: counter(page); }
+
+/* Cards */
+.row { display: flex; gap: 32px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+.card { flex: 1; border-radius: 24px; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+.dark .card, .dark2 .card { background: var(--card-d); }
+.light .card { background: var(--light2); }
+.icon { font-size: 64px; line-height: 1.1; }
+.cardtitle { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.2; }
+.cardtext { font-size: 24px; line-height: 1.4; }
+.dark .cardtext, .dark2 .cardtext { color: var(--soft-d); }
+.light .cardtext { color: var(--soft-l); }
+.tag { font-size: 24px; font-weight: 700; line-height: 1.3; }
+.dark .tag, .dark2 .tag { color: var(--blue); }
+.light .tag { color: var(--blue-ink); }
+.light .tag-orange { color: var(--orange-ink); }
+.dark2 .tag-real { color: var(--orange); }
+
+/* Cover */
+.cover { justify-content: space-between; }
+.cover-text { width: 1040px; display: flex; flex-direction: column; gap: 32px; }
+.cover-title { color: var(--light); }
+.cover-sub { color: var(--orange); }
+.mars { position: absolute; left: 1232px; top: 260px; width: 560px; height: 560px; background: var(--mars); }
+.moon { position: absolute; left: 1150px; top: 210px; width: 72px; height: 72px; background: #8E8A99; }
+
+/* Domino chain */
+.chain { display: flex; align-items: stretch; }
+.domino {
+  flex: 1;
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--light);
+  color: var(--ink);
+  box-shadow: 0 12px 0 #0A0E1C;
+}
+.domino-sol { font-size: 24px; font-weight: 700; letter-spacing: 2px; color: var(--orange-ink); }
+.domino-icon { font-size: 72px; line-height: 1.1; }
+.domino-text { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.25; }
+.link { width: 72px; height: 0px; align-self: center; color: var(--orange); border-width: 6px; }
+
+/* Quote */
+.quote { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-size: 72px; font-weight: 600; line-height: 1.15; }
+.play { font-size: 44px; font-weight: 700; line-height: 1.2; }
+
+/* Tables */
+.data-table { font-size: 24px; line-height: 1.35; color: var(--light); }
+.data-table .col-real { color: var(--orange); }
+
+/* Columns for real vs game */
+.cols { display: flex; gap: 48px; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 20px; border-radius: 24px; padding: 40px; }
+.col-real-box { background: var(--card-d); border: 4px solid var(--orange); }
+.col-game-box { background: var(--card-d); border: 4px solid var(--blue); }
+.list { font-size: 28px; line-height: 1.45; color: var(--soft-d); }
+
+/* Motion: the plain rules above are the finished look. */
+.rise { animation: rise 500ms cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 110ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+.fade { animation: fade 700ms ease-out both; animation-delay: calc(var(--i, 0) * 110ms); }
+@keyframes fade { from { opacity: 0; } }
+.tip { animation: tip 520ms cubic-bezier(.2,.8,.3,1.2) both; animation-delay: calc(var(--i, 0) * 180ms); }
+@keyframes tip { from { opacity: 0; transform: translateY(-40px) rotate(-8deg); } }
+
+.slide-wrap > section { counter-increment: none; }
+</style>
+</head>
+<body>
+<section id="cover" class="dark cover" data-transition="fade">
+<x-shape kind="ellipse" class="mars fade" style="--i:0"></x-shape>
+<x-shape kind="ellipse" class="moon fade" style="--i:3"></x-shape>
+<p class="eyebrow">NASA SPACE APPS CHALLENGE 2026 · SOFIA</p>
+<div class="cover-text">
+<h1 class="cover-title rise" style="--i:1">The Impossible<br>SOLution</h1>
+<h3 class="cover-sub rise" style="--i:2">Fix it now, or pay for it later.</h3>
+<p class="lede rise" style="--i:3">A Mars-base game for kids aged 7–12, built on real NASA data.</p>
+</div>
+<p class="lede">Team SoftUniors · Challenge: Build a Junior Astronaut Mission Trainer</p>
+<aside>Hi, we are SoftUniors from Sofia. Our game is The Impossible SOLution. A sol is one day on Mars. Kids run a Mars base for three sols, and there is never enough power or people for every job. (~10 s)</aside>
+</section>
+<section id="problem" class="light content" data-transition="fade">
+<p class="eyebrow">THE PROBLEM</p>
+<h2 class="rise" style="--i:0">Kids see what happens on Mars. They never see the choices behind it.</h2>
+<p class="lede rise" style="--i:1">Rover photos and landing videos show the results. A real mission is a chain of trade-offs: power, air, people and time. Skip one job today, and you pay for it later.</p>
+<div class="row">
+<div class="card rise" style="--i:2"><p class="icon">⚡</p><p class="cardtitle">Never enough power</p><p class="cardtext">Dust covers the solar panels.</p></div>
+<div class="card rise" style="--i:3"><p class="icon">👩‍🚀</p><p class="cardtitle">Never enough people</p><p class="cardtext">3 astronauts, 5 jobs, every sol.</p></div>
+<div class="card rise" style="--i:4"><p class="icon">📡</p><p class="cardtitle">Earth is far away</p><p class="cardtext">Help can’t always arrive in time.</p></div>
+</div>
+<div class="footer"><p class="foot">The Impossible SOLution · SoftUniors</p><p class="foot pagenum"></p></div>
+<aside>The problem: kids see Mars outcomes, never the decisions. Photos show a rover on the surface, not the choices it took to keep it running. On a real base there is never enough power, never enough people, and Earth is minutes away. (~15 s)</aside>
+</section>
+<section id="game" class="dark content" data-transition="fade">
+<p class="eyebrow">THE GAME</p>
+<h2>3 sols, 3 astronauts, 5 jobs. Two jobs always stay undone.</h2>
+<div class="row">
+<div class="card rise" style="--i:0"><p class="icon">🧽</p><p class="cardtitle">Clean the panels</p><p class="cardtext">Skipped: about a third less power tomorrow.</p></div>
+<div class="card rise" style="--i:1"><p class="icon">🥬</p><p class="cardtitle">Greenhouse lights</p><p class="cardtext">Skipped: less food, then a tired astronaut.</p></div>
+<div class="card rise" style="--i:2"><p class="icon">🛡️</p><p class="cardtitle">Build the shelter</p><p class="cardtext">Skipped: no cover if a storm hits.</p></div>
+<div class="card rise" style="--i:3"><p class="icon">📡</p><p class="cardtitle">Ask Earth</p><p class="cardtext">Skipped: you plan tomorrow blind.</p></div>
+<div class="card rise" style="--i:4"><p class="icon">🔬</p><p class="cardtitle">Science trip</p><p class="cardtext">Skipped: no science star.</p></div>
+</div>
+<p class="lede">One mission takes about 8 minutes. Every job costs something today. Every skipped job costs something later.</p>
+<div class="footer"><p class="foot">The Impossible SOLution · SoftUniors</p><p class="foot pagenum"></p></div>
+<aside>Each sol you tap an astronaut, then a job. Three astronauts, five jobs, so two jobs are always left undone. Each card shows its cost right away. Skip the panels and tomorrow's power drops by about a third, just like InSight's dusty panels. (~20 s)</aside>
+</section>
+<section id="domino" class="dark2 content" data-transition="fade">
+<p class="eyebrow">THE DOMINO CHAIN</p>
+<h2>At the end, kids trace every problem back to the choice that caused it.</h2>
+<div class="chain">
+<div class="domino tip" style="--i:0"><p class="domino-sol">SOL 1</p><p class="domino-icon">🧽✗</p><p class="domino-text">Nobody cleaned the solar panels.</p></div>
+<x-connector class="link fade" style="--i:1" head="end"></x-connector>
+<div class="domino tip" style="--i:1"><p class="domino-sol">SOL 2</p><p class="domino-icon">⚡↓</p><p class="domino-text">Power is low today.</p></div>
+<x-connector class="link fade" style="--i:2" head="end"></x-connector>
+<div class="domino tip" style="--i:2"><p class="domino-sol">SOL 2</p><p class="domino-icon">🥬0</p><p class="domino-text">No power for the lights. The food ran out.</p></div>
+<x-connector class="link fade" style="--i:3" head="end"></x-connector>
+<div class="domino tip" style="--i:3"><p class="domino-sol">SOL 3</p><p class="domino-icon">😴</p><p class="domino-text">One astronaut is too tired to work.</p></div>
+</div>
+<p class="lede">Losing never feels like punishment: “Mission ended early. Here is what caused it.” Then Try a different plan, same start.</p>
+<div class="footer"><p class="foot">Chain links come from the game engine and are checked by automated tests</p><p class="foot pagenum"></p></div>
+<aside>This is our wow moment. At the end, the dominoes fall: one astronaut is too tired on sol 3, because the food ran out on sol 2, because power was low, because on sol 1 nobody cleaned the panels. Kids see their own choice cause a problem two days later. Then they try a different plan. (~25 s) [Check: replace with the real chain from the ?demo=1 run if it differs.]</aside>
+</section>
+<section id="storms" class="light content" data-transition="fade">
+<p class="eyebrow">TWO REAL STORMS</p>
+<h2>Earth can warn you about only one of them.</h2>
+<div class="row">
+<div class="card rise" style="--i:0"><p class="tag tag-orange">PARTICLE BURST · 20 MAY 2024</p><p class="icon">☢️</p><p class="cardtitle">Arrives in tens of minutes</p><p class="cardtext">No warning from Earth can beat it. Curiosity measured 8.1 mGy on Mars from this one storm: about 39 normal days of radiation at once.</p></div>
+<div class="card rise" style="--i:1"><p class="tag">STORM CLOUD (CME) · 23 MAY 2024</p><p class="icon">🌩️</p><p class="cardtitle">Takes days to reach Mars</p><p class="cardtext">NASA’s DONKI forecast said it would brush past Mars on 28 May. Earth can warn you, if you spent a worker to Ask Earth.</p></div>
+</div>
+<p class="lede rise" style="--i:2">Ask Earth: “Your message takes about 12 minutes to reach Earth. Scientists study it overnight. Their answer is waiting for you in the morning.”</p>
+<div class="footer"><p class="foot">Sources: JPL / Curiosity RAD release, May 2024 · NASA DONKI WSA-Enlil</p><p class="foot pagenum"></p></div>
+<aside>Two kinds of storm, both real. A particle burst arrives in tens of minutes, so no warning from Earth can beat it. On 20 May 2024 Curiosity measured 8.1 milligray from one storm, about 39 normal Mars days at once. A storm cloud takes days, so Earth can warn you, but only if you spent a worker to Ask Earth. Help from Earth can't beat a particle blast. (~25 s)</aside>
+</section>
+<section id="data" class="dark content" data-transition="fade">
+<p class="eyebrow">REAL NASA DATA</p>
+<h2>Every real number has a source</h2>
+<table class="data-table">
+<tr><th style="width:34%">Real data</th><th style="width:28%">Real value</th><th style="width:38%">In the game</th></tr>
+<tr><td>InSight lander, 2022 dust storm</td><td class="col-real">425 → 275 Wh per sol (≈ −35%)</td><td>Skip cleaning: about ⅓ less power tomorrow</td></tr>
+<tr><td>Curiosity RAD, 20 May 2024 storm</td><td class="col-real">8.1 mGy from one storm</td><td>How far the space-ray meter jumps in a burst</td></tr>
+<tr><td>Curiosity RAD baseline (Hassler et al., 2014)</td><td class="col-real">0.21 mGy per day</td><td>Normal daily rise; the burst ≈ 39 normal days</td></tr>
+<tr><td>DONKI CME 2024-05-20T05:36Z</td><td class="col-real">The 20 May eruption</td><td>The storm on sol 2 of the main mission</td></tr>
+<tr><td>DONKI WSA-Enlil, Mars arrivals only</td><td class="col-real">23 May CME → Mars on 28 May</td><td>Ask Earth: “a storm cloud is coming”</td></tr>
+<tr><td>Earth–Mars light delay (NSSDC)</td><td class="col-real">3–22 minutes one way</td><td>Ask Earth wording</td></tr>
+</table>
+<div class="footer"><p class="foot">Live DONKI data when online; saved snapshot offline, badged SAVED DATA, never called live</p><p class="foot pagenum"></p></div>
+<aside>Every number in the game either has a NASA source or is labelled game number on our Data Sources screen. InSight's dust storm drives the panel penalty. Curiosity's radiation detector gives the storm size versus a normal day. DONKI's WSA-Enlil forecasts, filtered to Mars only, drive what Earth tells you. The game fetches live DONKI data and falls back to a saved snapshot, with an honest badge. (~20 s)</aside>
+</section>
+<section id="honest" class="dark2 content" data-transition="fade">
+<p class="eyebrow">BEING HONEST</p>
+<h2>What this game simplifies</h2>
+<div class="cols">
+<div class="col col-real-box rise" style="--i:0">
+<p class="tag tag-real">REAL NASA SCIENCE</p>
+<ul class="list">
+<li>The 20 May 2024 solar storm, measured on Mars</li>
+<li>Normal radiation on the Mars surface</li>
+<li>Dust cutting solar power by about a third</li>
+<li>The 3–22 minute Earth–Mars message delay</li>
+<li>DONKI’s storm-cloud forecast for Mars</li>
+</ul>
+</div>
+<div class="col col-game-box rise" style="--i:1">
+<p class="tag">GAME NUMBERS</p>
+<ul class="list">
+<li>3 crew and 5 jobs (a real base has more)</li>
+<li>Short sols: a days-long storm cloud fits in 1–2 sols</li>
+<li>Job costs and the size of each bar</li>
+<li>Space-ray meter units (the storm-vs-normal ratio is real)</li>
+<li>Earth’s dust forecast</li>
+</ul>
+</div>
+</div>
+<p class="lede">Inside the game, every number says what it is: real NASA number or game number.</p>
+<div class="footer"><p class="foot">The Impossible SOLution · SoftUniors</p><p class="foot pagenum"></p></div>
+<aside>We are honest about what we simplify. Real: the storm, normal radiation, the dust effect, the message delay and the forecast. Game numbers: the crew size, short sols, job costs, the meter's units and the dust forecast. This card is in the game too, on the Data Sources screen. (~15 s)</aside>
+</section>
+<section id="playtest" class="light content" data-transition="fade">
+<p class="eyebrow">DOES IT TEACH?</p>
+<h2>Saturday 18:00: a real kid played it.</h2>
+<div class="row">
+<div class="card rise" style="--i:0"><p class="icon">💬</p><p class="cardtitle">What they said</p><p class="cardtext">“[Playtest quote: fill in after Saturday 18:00]”</p></div>
+<div class="card rise" style="--i:1"><p class="icon">👀</p><p class="cardtitle">What we saw</p><p class="cardtext">[Observation: e.g. which domino they explained back to us]</p></div>
+<div class="card rise" style="--i:2"><p class="icon">🔧</p><p class="cardtitle">What we changed</p><p class="cardtext">[Fix made after the playtest]</p></div>
+</div>
+<p class="lede">Player age: [__]. Played [__] missions. Best score: [__]★.</p>
+<div class="footer"><p class="foot">Guardian present · no recording, photos or names of the child</p><p class="foot pagenum"></p></div>
+<aside>Proof it teaches. On Saturday at 18:00 a real kid aged 7 to 12 played it with a guardian present. [Say the quote and the one observation that shows they understood a cause-and-effect chain, then the fix we made.] (~20 s)</aside>
+</section>
+<section id="classroom" class="dark content" data-transition="fade">
+<p class="eyebrow">MADE FOR CLASSROOMS</p>
+<h2>One lesson: play, talk, play again.</h2>
+<div class="grid3">
+<div class="card rise" style="--i:0"><p class="icon">⏱️</p><p class="cardtitle">8-minute mission</p><p class="cardtext">3 sols fit twice into one lesson.</p></div>
+<div class="card rise" style="--i:1"><p class="icon">🍎</p><p class="cardtitle">Teacher card</p><p class="cardtext">A lesson goal and 3 questions to talk about.</p></div>
+<div class="card rise" style="--i:2"><p class="icon">🔒</p><p class="cardtitle">No login</p><p class="cardtext">No accounts. No data collected.</p></div>
+<div class="card rise" style="--i:3"><p class="icon">🌍</p><p class="cardtitle">English, then Bulgarian</p><p class="cardtext">Every sentence lives in one text file, ready to translate.</p></div>
+<div class="card rise" style="--i:4"><p class="icon">📴</p><p class="cardtitle">Works offline</p><p class="cardtext">Saved NASA data ships with the game.</p></div>
+<div class="card rise" style="--i:5"><p class="icon">🙌</p><p class="cardtitle">For every kid</p><p class="cardtext">Big buttons, keyboard and touch, calm motion.</p></div>
+</div>
+<div class="footer"><p class="foot">Open source (Apache-2.0) · 176 automated tests · runs in any browser</p><p class="foot pagenum"></p></div>
+<aside>It is built for a real classroom: one mission is about 8 minutes, so a class can play, discuss with the teacher card, and play again. No login and no data collected. Every sentence is in one text file, so Bulgarian comes from the same keys. It works offline with saved NASA data, and it is usable by every kid: big buttons, keyboard and touch, and reduced motion. [Before the pitch: confirm the teacher card and Bulgarian toggle shipped; change these two cards if not.] (~20 s)</aside>
+</section>
+<section id="close" class="accent cover">
+<p class="eyebrow">WHAT A CLASS TAKES AWAY</p>
+<p class="quote rise" style="--i:0">“On Mars, every choice costs something, and help from Earth can’t always arrive in time.”</p>
+<div>
+<p class="play rise" style="--i:1">Play it: yyn192.github.io/impossible-solution</p>
+<p class="lede">Team SoftUniors · Sofia · Uses NASA open data. Not affiliated with or endorsed by NASA.</p>
+</div>
+<aside>That is the one sentence we want every class to remember: on Mars, every choice costs something, and help from Earth can't always arrive in time. You can play it right now at the link. Thank you! (~10 s)</aside>
+</section>
+<p class="hint">← → move between slides · N toggles speaker notes</p>
+<script>
+const sections = [...document.querySelectorAll('body > section')];
+for (const s of sections) {
+  const wrap = document.createElement('div'); wrap.className = 'slide-wrap';
+  s.before(wrap); wrap.append(s);
+  const aside = s.querySelector('aside');
+  if (aside) { const n = document.createElement('p'); n.className = 'notes'; n.textContent = aside.textContent; wrap.append(n); }
+}
+const fit = () => { document.body.style.zoom = Math.min(1, (innerWidth - 32) / 1920); };
+fit(); addEventListener('resize', fit);
+const current = () => { let best = 0, d = Infinity; sections.forEach((s, i) => { const t = Math.abs(s.getBoundingClientRect().top); if (t < d) { d = t; best = i; } }); return best; };
+addEventListener('keydown', e => {
+  if (e.key === 'n' || e.key === 'N') { document.body.classList.toggle('show-notes'); return; }
+  const step = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key) ? 1 : ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key) ? -1 : 0;
+  if (!step) return;
+  e.preventDefault();
+  const next = sections[Math.max(0, Math.min(sections.length - 1, current() + step))];
+  next.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+});
+</script>
+</body>
+</html>
