@@ -173,6 +173,10 @@ export const SCHEMAS = {
     required: false,
   },
   "mars-trek-gale": { schema: envelope(MarsSite), required: true },
+  "dsn-mars": {
+    schema: envelope(z.array(z.object({ spacecraft: z.string(), rtltSeconds: z.number(), dish: z.string(), station: z.string() })).min(1)),
+    required: true,
+  },
   "storm-pool": { schema: envelope(z.array(PoolStorm).length(2)), required: true },
   "csa-resources": {
     schema: envelope(z.array(LearningResource).min(1)),

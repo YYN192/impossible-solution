@@ -8,8 +8,11 @@
  *     (state.earthAnswer). Earth's answer: storm-cloud part = real DONKI WSA-Enlil forecast (Mars-only);
  *     dust part = game-invented (DONKI does not forecast Mars dust).
  */
-import type { EarthAnswer, GameState, StormEvent } from "../sim/types";
-import { MISSION_SOLS } from "../sim/types";
+import { buildRun, type Beat, type Place, type Run } from "../sim/campaign";
+import type { EarthAnswer, GameState, Rules, StormEvent } from "../sim/types";
+import { CLASSIC_RULES, MISSION_SOLS } from "../sim/types";
+import { campaignById } from "./campaigns";
+import { getMarsDelay, MOON_DELAY_INFO, type LightDelay } from "./dsn";
 import {
   getRecentMarsForecasts,
   may2024MarsHits,
@@ -22,7 +25,7 @@ import type { Flags } from "./flags";
 import { DEMO_START } from "./demo";
 import { DONKI_ENLIL_MAY23, earthAnswerRef, RAD_STORM } from "./sources";
 
-export type MissionKind = "may2024" | "todaysSun";
+export type MissionKind = "may2024" | "todaysSun" | "campaign";
 
 export interface MissionSetup {
   kind: MissionKind;
@@ -38,6 +41,51 @@ export interface MissionSetup {
   noticeKey?: string;
   /** Fixed start overrides. Omitted for ordinary missions, which use the engine default. */
   initialState?: Partial<Pick<GameState, "food" | "panelEfficiency">>;
+  /** The run: which campaign, which seed (shown on the final screen; `?seed=` replays it). */
+  campaignId: string;
+  seed: number;
+  place: Place;
+  rules: Rules;
+  /** At most one beat per sol, between the morning report and the plan. */
+  beats: Record<number, Beat>;
+  /** The real storm this run replays (classic mission), for the storm card. */
+  stormId?: string;
+  /** Radio delay to Earth: today's Deep Space Network reading for Mars, a constant for the Moon. */
+  delay: LightDelay;
+}
+
+/** The saved Mars delay (14 Nov 2026): every setup starts with it; getMissionSetup swaps in today's. */
+const SAVED_DELAY = await getMarsDelay({ offline: true });
+const CLASSIC = {
+  campaignId: "storm",
+  seed: 0,
+  place: "mars" as const,
+  rules: CLASSIC_RULES,
+  beats: {},
+  delay: SAVED_DELAY,
+};
+
+/** Today's date as a number (UTC), e.g. 20261115: the daily mission's seed, the same for everyone. */
+export const dailySeed = (now: Date): number => Number(now.toISOString().slice(0, 10).replaceAll("-", ""));
+
+/** One run of a campaign: bundled real data, picked by the seed. */
+export function campaignMission(id: string, seed: number): MissionSetup {
+  const run: Run = buildRun(campaignById(id), seed);
+  return {
+    ...CLASSIC,
+    kind: "campaign",
+    titleKey: `campaign.${run.campaignId}.name`,
+    events: run.events,
+    forecasts: {},
+    dataSource: "snapshot",
+    dataFetchedAt: Date.parse(SNAPSHOT_DATES.may2024),
+    campaignId: run.campaignId,
+    seed,
+    place: run.place,
+    rules: run.rules,
+    beats: run.beats,
+    ...(run.stormId ? { stormId: run.stormId } : {}),
+  };
 }
 
 /**
@@ -52,6 +100,8 @@ export function may2024Mission(): MissionSetup {
   const cloudRef = { ...DONKI_ENLIL_MAY23, fetched: SNAPSHOT_DATES.may2024 };
   const answerRef = earthAnswerRef(cloudRef);
   return {
+    ...CLASSIC,
+    stormId: "may2024",
     kind: "may2024",
     titleKey: "mission.may2024.title",
     events: [
@@ -135,6 +185,7 @@ export function todaysSunMission(
     };
   }
   return {
+    ...CLASSIC,
     kind: "todaysSun",
     titleKey: "mission.todaysSun.title",
     events: [
@@ -155,13 +206,33 @@ export function todaysSunMission(
 export async function getMissionSetup(
   flags: Flags,
   now: Date = new Date(),
+  fetchImpl?: typeof fetch,
 ): Promise<MissionSetup> {
+  const setup = await pickMission(flags, now, fetchImpl);
+  if (setup.place === "moon") return withDelay(setup, MOON_DELAY_INFO);
+  // The demo and offline play never touch the network: they keep the saved reading.
+  if (flags.offline) return setup;
+  return withDelay(setup, await getMarsDelay({ fetchImpl }));
+}
+
+async function pickMission(flags: Flags, now: Date, fetchImpl?: typeof fetch): Promise<MissionSetup> {
   if (flags.demo) return demoMission();
-  if (!flags.todaysSun) return may2024Mission();
-  try {
-    const r = await getRecentMarsForecasts({ offline: flags.offline, now });
-    return todaysSunMission(r.data, r.source, r.fetchedAt, now);
-  } catch {
-    return { ...may2024Mission(), noticeKey: "notice.sunQuiet" };
+  if (flags.todaysSun) {
+    try {
+      const r = await getRecentMarsForecasts({ offline: flags.offline, now, fetchImpl });
+      return todaysSunMission(r.data, r.source, r.fetchedAt, now);
+    } catch {
+      return { ...may2024Mission(), noticeKey: "notice.sunQuiet" };
+    }
   }
+  const seed = flags.seed ?? (flags.daily ? dailySeed(now) : 100_000 + Math.floor(Math.random() * 900_000));
+  return campaignMission(flags.campaign ?? "storm", seed);
+}
+
+/** Put the radio delay on the setup and on the radio beat's real-data card. */
+function withDelay(setup: MissionSetup, delay: LightDelay): MissionSetup {
+  const beats = Object.fromEntries(
+    Object.entries(setup.beats).map(([sol, b]) => [sol, b.type === "radio" ? { ...b, card: delay.ref } : b]),
+  );
+  return { ...setup, delay, beats };
 }

@@ -1,0 +1,8 @@
+{
+  "fetchedAt": "2026-11-14T16:00:00.000Z",
+  "source": "https://eyes.nasa.gov/dsn/data/dsn.xml",
+  "attribution": "NASA/JPL-Caltech Deep Space Network Now",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "Round-trip light time of the radio link to Perseverance (M20) on Mars, read on 14 Nov 2026. 1,320 s there and back = 11 minutes each way. JPL Horizons agreed (1.3244 AU).",
+  "data": [{ "spacecraft": "M20", "rtltSeconds": 1320, "dish": "DSS24", "station": "Goldstone" }]
+}
