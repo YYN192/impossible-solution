@@ -113,12 +113,13 @@ export function todaysSunMission(
   if (!newest) {
     return { ...may2024Mission(), noticeKey: "notice.sunQuiet" };
   }
+  // Already reached Mars: never tell kids it is "heading for Mars".
+  if (Date.parse(newest.arrival) < now.getTime()) {
+    return { ...may2024Mission(), noticeKey: "notice.sunPassed" };
+  }
   const days = Math.round((Date.parse(newest.arrival) - now.getTime()) / 864e5);
-  // Future arrival: show it on the sol it would arrive (capped). Past arrival (already hit): last sol.
-  const sol = Math.min(
-    MISSION_SOLS,
-    Math.max(2, days >= 0 ? days + 1 : MISSION_SOLS),
-  );
+  // Show it on the sol it would arrive (capped to the mission).
+  const sol = Math.min(MISSION_SOLS, Math.max(2, days + 1));
   const ref = {
     label: `NASA's space weather forecast: a storm cloud reaching Mars on ${newest.arrival.slice(0, 10)}`,
     url: newest.link ?? "https://kauai.ccmc.gsfc.nasa.gov/DONKI/",

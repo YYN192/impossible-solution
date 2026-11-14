@@ -23,7 +23,7 @@ type Place = "menu" | "hub" | "console";
 export default function App() {
   const { t } = useTranslation();
   const { screen, sol } = useNav();
-  const { setup, load } = useMission();
+  const { setup, load, reload } = useMission();
   const [place, setPlace] = useState<Place>("menu");
   const [overlay, setOverlay] = useState<null | "sources" | "teacher">(null);
   const directEntry = useRef(false);
@@ -33,16 +33,24 @@ export default function App() {
     if (!setup || directEntry.current) return;
     directEntry.current = true;
     // Legacy pages share the same app, stores and URL flags.
-    const name = window.location.pathname.split("/").pop();
-    if (name === "hub.html" || name === "console.html") {
+    // Vercel serves clean URLs (/hub), GitHub Pages the file name (/hub.html).
+    const name = window.location.pathname.split("/").pop()?.replace(/\.html$/, "");
+    if (name === "hub" || name === "console") {
       if (useNav.getState().screen === "title") useNav.getState().next();
-      setPlace(name === "hub.html" ? "hub" : "console");
+      setPlace(name);
     }
   }, [setup]);
   const visiblePlace = screen === "title" ? "menu" : place;
   const play = () => {
     if (screen === "title") { useSession.getState().clearPlan(); useNav.getState().next(); }
     setPlace("hub");
+  };
+  const chooseSun = (today: boolean) => {
+    const q = new URLSearchParams(window.location.search);
+    if (today) q.set("sun", "today"); else q.delete("sun");
+    const search = q.toString();
+    window.history.replaceState({}, "", `${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`);
+    void reload();
   };
   const Current = screen !== "title" ? SCREENS[screen] : null;
   return <div className="expedition">
@@ -51,9 +59,9 @@ export default function App() {
       <LanguageToggle />
       {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => setOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => setOverlay("teacher")}>{t("teacher.open")}</button></nav>}
     </div>
-    {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet")}</p>}
+    {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}
     {overlay ? <main className="information-panel">{overlay === "teacher" ? <TeacherCard onBack={() => setOverlay(null)} /> : <DataSources onBack={() => setOverlay(null)} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
-      : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} onPlay={play} onSources={() => setOverlay("sources")} onTeacher={() => setOverlay("teacher")} />
+      : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} onPlay={play} onSources={() => setOverlay("sources")} onTeacher={() => setOverlay("teacher")} onChooseSun={chooseSun} />
       : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />
       : <ConsolePage onExit={() => setPlace("hub")}>{Current && <Current key={`${screen}-${sol}`} />}</ConsolePage>}
   </div>;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dataClient, publicUrl, type Loaded } from "../data/client";
-import { isLive, type Result } from "../data/http";
+import { badgeKind, type Result } from "../data/http";
 import { liveApod, liveSpaceWeather } from "../data/live";
 import type {
   ApodEntry,
@@ -153,9 +153,9 @@ export function MoreRealData({ live = false }: { live?: boolean }) {
     });
   /** Honest per-card label: LIVE only for data fetched now (or cached from a fetch), else SAVED + date. */
   const fresh = (r: Result<unknown>) => (
-    <p className={`sources__note more__fresh ${isLive(r.source) ? "more__fresh--live" : ""}`}>
+    <p className={`sources__note more__fresh ${badgeKind(r.source) === "live" ? "more__fresh--live" : ""}`}>
       {t("moreData.fresh", {
-        label: isLive(r.source) ? t("data.badge.live") : t("data.badge.saved"),
+        label: t(`data.badge.${badgeKind(r.source)}`),
         date: new Date(r.fetchedAt).toLocaleString(i18n.language, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
       })}
     </p>

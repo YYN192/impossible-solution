@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
 import { audio, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
+import { readFlags } from "./data/flags";
 const stars = Array.from({ length: 48 }, (_, i) => ({ left: `${(i * 37 + 13) % 100}%`, top: `${(i * 61 + 7) % 100}%`, animationDelay: `${-(i % 11)}s` }));
-export default function MainMenu({ onPlay, onSources, onTeacher, ready, resume }: {
-  onPlay: () => void; onSources: () => void; onTeacher: () => void; ready: boolean; resume: boolean;
+export default function MainMenu({ onPlay, onSources, onTeacher, onChooseSun, ready, resume }: {
+  onPlay: () => void; onSources: () => void; onTeacher: () => void; onChooseSun?: (today: boolean) => void; ready: boolean; resume: boolean;
 }) {
+  const flags = readFlags();
   const { t } = useTranslation();
   const [settings, showSettings] = useState(false);
   const [quit, setQuit] = useState(false);
@@ -23,6 +25,10 @@ export default function MainMenu({ onPlay, onSources, onTeacher, ready, resume }
       <div className="panel-rivets" aria-hidden="true">+ <span>+</span></div>
       {!settings ? <>
         <p className="eyebrow">{t("menu.welcome")}</p><h2>{t("menu.ready")}</h2><p>{t("menu.intro")}</p>
+        {!resume && !flags.offline && onChooseSun && <div role="group" aria-label={t("menu.sunToday")}>
+          {[false, true].map((today) => <button key={String(today)} aria-pressed={flags.todaysSun === today} onClick={() => flags.todaysSun !== today && onChooseSun(today)}>{t(today ? "menu.sunToday" : "menu.sunMay")}</button>)}
+          <p className="note">{t(flags.todaysSun ? "menu.sunTodayHint" : "menu.sunMayHint")}</p>
+        </div>}
         <button className="primary launch-button" disabled={!ready} onClick={() => { audio.playSfx("menu"); onPlay(); }}><span aria-hidden="true">▶</span>{!ready ? t("menu.loading") : resume ? t("menu.resume") : t("title.start")}</button>
         <button onClick={() => showSettings(true)}>{t("menu.settings")}</button>
         <button onClick={onSources}>{t("dataSources.open")}</button>
