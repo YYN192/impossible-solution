@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { configDefaults } from 'vitest/config'
 
 // https://vite.dev/config/
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
@@ -29,6 +30,8 @@ export default defineConfig({
     maxWorkers: 4,
     environment: 'jsdom',
     passWithNoTests: true,
+    // Agent worktrees and linked skills live under .claude/ and bring their own tests.
+    exclude: [...configDefaults.exclude, '.claude/**'],
     setupFiles: ['./src/test/setup.ts'],
   },
 })
