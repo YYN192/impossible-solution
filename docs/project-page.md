@@ -27,7 +27,6 @@ TODO(team): link to the demo video (30 seconds, English, no faces or voices of u
 ## Final project link
 
 Play: https://impossible-solution.vercel.app
-Mirror (GitHub Pages): https://yyn192.github.io/impossible-solution/
 Code: https://github.com/YYN192/impossible-solution (Apache-2.0)
 
 ## Detailed description

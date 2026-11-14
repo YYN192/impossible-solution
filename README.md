@@ -7,7 +7,6 @@
 It turns real NASA storm and radiation data into hard choices, so kids learn that on Mars every decision costs something and the cost can arrive days later.
 
 <a href="https://impossible-solution.vercel.app"><strong>▶ Play now: https://impossible-solution.vercel.app</strong></a> ·
-<a href="https://yyn192.github.io/impossible-solution/">Mirror (GitHub Pages)</a> ·
 <a href="#quick-start">🚀 Quick start</a> ·
 <a href="#nasa-data">🛰️ NASA data</a> ·
 <a href="docs/README.md">📚 Docs</a> ·
