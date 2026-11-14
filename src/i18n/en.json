@@ -388,6 +388,7 @@
     "right": "Move right",
     "explore": "Explore your home on Mars.",
     "openConsole": "Open mission console",
+    "goConsole": "Skip the walk: go to the console",
     "interact": "Interact",
     "tip": "Meet your crew. They have useful advice.",
     "crewChannel": "CREW CHANNEL",
