@@ -1,0 +1,117 @@
+<!doctype html>
+<!--
+  Development-only sound preview. Not part of the game build (vite.config.ts builds index, mission,
+  hub and console only). Open it with `npm run dev`, then http://localhost:5173/impossible-solution/audio-preview.html
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound preview · The Impossible SOLution (dev only)</title>
+<style>
+  :root { color-scheme: dark; --bg: #0b1020; --panel: #142233; --line: #2f4458; --fg: #e8ecf8; --muted: #9aa3bd; --cyan: #8be0db; --warm: #f08a3c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; background: #0a131f; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 1.05rem; margin: 0; }
+  header .note { color: var(--muted); font-size: .8rem; margin: 0; }
+  label { display: inline-flex; gap: 8px; align-items: center; font-size: .85rem; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px 20px 40px; }
+  section { margin: 22px 0; }
+  h2 { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; }
+  .sound { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); }
+  .sound.playing { border-color: var(--warm); }
+  .sound p { margin: 0; grid-column: 2; font-size: .78rem; color: var(--muted); }
+  .sound code { font-size: .8rem; color: var(--fg); }
+  .tag { font-size: .7rem; color: var(--warm); margin-left: 6px; }
+  button { min-width: 44px; min-height: 44px; border: 1px solid #52687b; background: #152639; color: var(--fg); font: inherit; cursor: pointer; }
+  button:hover { border-color: var(--cyan); }
+  button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+  .sound button { grid-row: span 3; }
+  #error { color: #ff9d8a; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sound preview <span class="tag">dev only</span></h1>
+  <label>Volume <input id="master" type="range" min="0" max="100" value="70"></label>
+  <label><input id="useManifestVolume" type="checkbox" checked> use each sound's default volume</label>
+  <button id="stopAll" type="button">■ Stop all</button>
+  <p class="note">Original sounds made by <code>scripts/generate-audio.mjs</code>. Game cues, not NASA recordings.</p>
+</header>
+<main>
+  <p id="error" role="alert"></p>
+  <div id="list"></div>
+</main>
+<script type="module">
+  const base = new URL(".", location.href);
+  const list = document.getElementById("list");
+  const master = document.getElementById("master");
+  const useManifestVolume = document.getElementById("useManifestVolume");
+  const playing = new Map(); // id -> { audio, card, button }
+
+  const gain = (s) => (master.value / 100) * (useManifestVolume.checked ? s.volume : 1);
+  function stop(id) {
+    const p = playing.get(id);
+    if (!p) return;
+    p.audio.pause();
+    p.card.classList.remove("playing");
+    p.button.textContent = p.loop ? "▶" : "▶";
+    p.button.setAttribute("aria-label", `Play ${id}`);
+    playing.delete(id);
+  }
+  function play(s, card, button) {
+    if (playing.has(s.id)) return stop(s.id);
+    const audio = new Audio(new URL(s.path.replace(/^\//, ""), base));
+    audio.loop = s.loop;
+    audio.volume = gain(s);
+    audio.onended = () => stop(s.id);
+    playing.set(s.id, { audio, card, button, loop: s.loop, sound: s });
+    card.classList.add("playing");
+    button.textContent = "■";
+    button.setAttribute("aria-label", `Stop ${s.id}`);
+    audio.play().catch((e) => { document.getElementById("error").textContent = `${s.id}: ${e.message}`; stop(s.id); });
+  }
+  const sync = () => { for (const p of playing.values()) p.audio.volume = gain(p.sound); };
+  master.addEventListener("input", sync);
+  useManifestVolume.addEventListener("change", sync);
+  document.getElementById("stopAll").addEventListener("click", () => [...playing.keys()].forEach(stop));
+
+  try {
+    const manifest = await (await fetch(new URL("audio/audio-manifest.json", base))).json();
+    const byCat = Map.groupBy ? Map.groupBy(manifest.sounds, (s) => s.category) : manifest.sounds.reduce((m, s) => m.set(s.category, [...(m.get(s.category) ?? []), s]), new Map());
+    for (const [cat, sounds] of byCat) {
+      const section = document.createElement("section");
+      const h = document.createElement("h2");
+      h.textContent = `${cat} (${sounds.length})`;
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      for (const s of sounds) {
+        const card = document.createElement("div");
+        card.className = "sound";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "▶";
+        button.setAttribute("aria-label", `Play ${s.id}`);
+        button.addEventListener("click", () => play(s, card, button));
+        const name = document.createElement("p");
+        name.innerHTML = "<code></code>";
+        name.querySelector("code").textContent = s.path.split("/").pop();
+        if (s.loop) name.insertAdjacentHTML("beforeend", '<span class="tag">LOOP</span>');
+        const meta = document.createElement("p");
+        meta.textContent = `${s.duration.toFixed(2)} s · ${s.channels === 2 ? "stereo" : "mono"} · default volume ${s.volume}${s.aliases ? ` · game id: ${s.aliases.join(", ")}` : ""}`;
+        const trigger = document.createElement("p");
+        trigger.textContent = s.trigger;
+        card.append(button, name, meta, trigger);
+        grid.append(card);
+      }
+      section.append(h, grid);
+      list.append(section);
+    }
+  } catch (e) {
+    document.getElementById("error").textContent = `Could not load audio/audio-manifest.json: ${e.message}`;
+  }
+</script>
+</body>
+</html>

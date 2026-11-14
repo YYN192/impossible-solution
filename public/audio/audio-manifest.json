@@ -1,0 +1,733 @@
+{
+  "generatedBy": "scripts/generate-audio.mjs",
+  "license": "Apache-2.0 (original, synthesised by this project; no samples or third-party audio)",
+  "format": {
+    "container": "wav",
+    "encoding": "pcm_s16le",
+    "sampleRate": 44100,
+    "bitDepth": 16
+  },
+  "note": "Paths are relative to the site root. In the app, prefix them with import.meta.env.BASE_URL (\"/impossible-solution/\"). Game sound cues, not NASA recordings.",
+  "sounds": [
+    {
+      "id": "menu-hover",
+      "path": "/audio/ui/menu-hover.wav",
+      "category": "ui",
+      "duration": 0.06,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.4,
+      "trigger": "Pointer or keyboard focus moves onto a menu button"
+    },
+    {
+      "id": "menu-select",
+      "path": "/audio/ui/menu-select.wav",
+      "category": "ui",
+      "duration": 0.17,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "A menu button is pressed (Start mission, Settings, Data Sources)",
+      "aliases": [
+        "menu"
+      ]
+    },
+    {
+      "id": "menu-back",
+      "path": "/audio/ui/menu-back.wav",
+      "category": "ui",
+      "duration": 0.16,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Back button or closing a panel"
+    },
+    {
+      "id": "menu-error",
+      "path": "/audio/ui/menu-error.wav",
+      "category": "ui",
+      "duration": 0.24,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A choice is not allowed (e.g. a button that cannot be used yet)"
+    },
+    {
+      "id": "menu-open",
+      "path": "/audio/ui/menu-open.wav",
+      "category": "ui",
+      "duration": 0.17,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A menu, settings panel or overlay opens"
+    },
+    {
+      "id": "player-step-metal-1",
+      "path": "/audio/player/player-step-metal-1.wav",
+      "category": "player",
+      "duration": 0.09,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.3,
+      "trigger": "Footstep on the station's metal floor (alternate with -2; throttle to ~3 per second)",
+      "aliases": [
+        "step"
+      ]
+    },
+    {
+      "id": "player-step-metal-2",
+      "path": "/audio/player/player-step-metal-2.wav",
+      "category": "player",
+      "duration": 0.09,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.3,
+      "trigger": "Footstep variation (alternate with -1 so walking does not sound repetitive)"
+    },
+    {
+      "id": "player-interact",
+      "path": "/audio/player/player-interact.wav",
+      "category": "player",
+      "duration": 0.13,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "Player presses E / Interact near a console, crew member or door"
+    },
+    {
+      "id": "player-equipment",
+      "path": "/audio/player/player-equipment.wav",
+      "category": "player",
+      "duration": 0.32,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Astronaut uses a tool or piece of equipment"
+    },
+    {
+      "id": "player-celebrate",
+      "path": "/audio/player/player-celebrate.wav",
+      "category": "player",
+      "duration": 0.72,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "Small personal success (a goal reached, a star earned)"
+    },
+    {
+      "id": "door-open",
+      "path": "/audio/station/door-open.wav",
+      "category": "station",
+      "duration": 0.45,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A sliding door in the station opens",
+      "aliases": [
+        "door"
+      ]
+    },
+    {
+      "id": "door-close",
+      "path": "/audio/station/door-close.wav",
+      "category": "station",
+      "duration": 0.45,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A sliding door in the station closes"
+    },
+    {
+      "id": "airlock-open",
+      "path": "/audio/station/airlock-open.wav",
+      "category": "station",
+      "duration": 0.95,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "The airlock to the Mars surface opens"
+    },
+    {
+      "id": "airlock-close",
+      "path": "/audio/station/airlock-close.wav",
+      "category": "station",
+      "duration": 0.95,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "The airlock closes and seals"
+    },
+    {
+      "id": "machine-beep",
+      "path": "/audio/station/machine-beep.wav",
+      "category": "station",
+      "duration": 0.2,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.4,
+      "trigger": "Small working-equipment indicator (a machine finishes a cycle)"
+    },
+    {
+      "id": "machine-warning",
+      "path": "/audio/station/machine-warning.wav",
+      "category": "station",
+      "duration": 0.62,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A machine needs attention (not dangerous)"
+    },
+    {
+      "id": "station-ventilation",
+      "path": "/audio/station/station-ventilation.wav",
+      "category": "station",
+      "duration": 4,
+      "format": "wav",
+      "channels": 1,
+      "loop": true,
+      "volume": 0.3,
+      "trigger": "Background loop near vents (play quietly, loop)"
+    },
+    {
+      "id": "station-machinery",
+      "path": "/audio/station/station-machinery.wav",
+      "category": "station",
+      "duration": 4,
+      "format": "wav",
+      "channels": 1,
+      "loop": true,
+      "volume": 0.3,
+      "trigger": "Background loop near engineering machines (play quietly, loop)"
+    },
+    {
+      "id": "console-activate",
+      "path": "/audio/console/console-activate.wav",
+      "category": "console",
+      "duration": 0.38,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "Player activates the mission console",
+      "aliases": [
+        "console"
+      ]
+    },
+    {
+      "id": "console-boot",
+      "path": "/audio/console/console-boot.wav",
+      "category": "console",
+      "duration": 1.15,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "The console screen starts up"
+    },
+    {
+      "id": "console-button",
+      "path": "/audio/console/console-button.wav",
+      "category": "console",
+      "duration": 0.05,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "A button on the console is pressed"
+    },
+    {
+      "id": "console-data",
+      "path": "/audio/console/console-data.wav",
+      "category": "console",
+      "duration": 0.48,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.4,
+      "trigger": "The console is working out a result (data processing)"
+    },
+    {
+      "id": "console-close",
+      "path": "/audio/console/console-close.wav",
+      "category": "console",
+      "duration": 0.36,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "The console closes or shuts down"
+    },
+    {
+      "id": "console-success",
+      "path": "/audio/console/console-success.wav",
+      "category": "console",
+      "duration": 0.46,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "The console finishes a calculation successfully"
+    },
+    {
+      "id": "npc-dialogue",
+      "path": "/audio/npc/npc-dialogue.wav",
+      "category": "npc",
+      "duration": 0.05,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.35,
+      "trigger": "Text appears in a crew dialogue box. Throttle: at most one blip every ~70 ms, never one per letter",
+      "aliases": [
+        "dialogue"
+      ]
+    },
+    {
+      "id": "npc-confirm",
+      "path": "/audio/npc/npc-confirm.wav",
+      "category": "npc",
+      "duration": 0.21,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A crew member answers or a dialogue opens",
+      "aliases": [
+        "npc"
+      ]
+    },
+    {
+      "id": "robot-beep-1",
+      "path": "/audio/npc/robot-beep-1.wav",
+      "category": "npc",
+      "duration": 0.3,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Pip the maintenance drone talks (first variation)"
+    },
+    {
+      "id": "robot-beep-2",
+      "path": "/audio/npc/robot-beep-2.wav",
+      "category": "npc",
+      "duration": 0.28,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Pip the maintenance drone talks (second variation)"
+    },
+    {
+      "id": "robot-move",
+      "path": "/audio/npc/robot-move.wav",
+      "category": "npc",
+      "duration": 0.36,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.4,
+      "trigger": "A robot or drone moves (small servo motor)"
+    },
+    {
+      "id": "drone-hover",
+      "path": "/audio/npc/drone-hover.wav",
+      "category": "npc",
+      "duration": 2,
+      "format": "wav",
+      "channels": 1,
+      "loop": true,
+      "volume": 0.3,
+      "trigger": "Background loop while the drone is on screen (loop, quiet)"
+    },
+    {
+      "id": "astronaut-select",
+      "path": "/audio/planning/astronaut-select.wav",
+      "category": "planning",
+      "duration": 0.1,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Player taps a crew member on the plan screen",
+      "aliases": [
+        "select"
+      ]
+    },
+    {
+      "id": "job-assign",
+      "path": "/audio/planning/job-assign.wav",
+      "category": "planning",
+      "duration": 0.2,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "A crew member is placed on a job card",
+      "aliases": [
+        "assign"
+      ]
+    },
+    {
+      "id": "job-remove",
+      "path": "/audio/planning/job-remove.wav",
+      "category": "planning",
+      "duration": 0.18,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "A job assignment is undone"
+    },
+    {
+      "id": "job-complete",
+      "path": "/audio/planning/job-complete.wav",
+      "category": "planning",
+      "duration": 0.36,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "A job is done during the night (shown in the end-of-sol report)"
+    },
+    {
+      "id": "job-skipped",
+      "path": "/audio/planning/job-skipped.wav",
+      "category": "planning",
+      "duration": 0.42,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "A job was left undone (a soft 'this may matter later' cue)"
+    },
+    {
+      "id": "plan-confirm",
+      "path": "/audio/planning/plan-confirm.wav",
+      "category": "planning",
+      "duration": 0.62,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "Player locks in the plan / ends the sol",
+      "aliases": [
+        "resolve"
+      ]
+    },
+    {
+      "id": "power-increase",
+      "path": "/audio/resources/power-increase.wav",
+      "category": "resources",
+      "duration": 0.36,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "The power bar goes up"
+    },
+    {
+      "id": "power-decrease",
+      "path": "/audio/resources/power-decrease.wav",
+      "category": "resources",
+      "duration": 0.42,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "The power bar goes down (e.g. dusty panels)"
+    },
+    {
+      "id": "air-warning",
+      "path": "/audio/resources/air-warning.wav",
+      "category": "resources",
+      "duration": 0.85,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Air is getting low (gentle life-support warning)"
+    },
+    {
+      "id": "radiation-increase",
+      "path": "/audio/resources/radiation-increase.wav",
+      "category": "resources",
+      "duration": 0.72,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "The space-ray meter goes up"
+    },
+    {
+      "id": "resource-critical",
+      "path": "/audio/resources/resource-critical.wav",
+      "category": "resources",
+      "duration": 0.92,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "A bar is about to hit zero (important, not scary)"
+    },
+    {
+      "id": "resource-stable",
+      "path": "/audio/resources/resource-stable.wav",
+      "category": "resources",
+      "duration": 0.52,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "A bar is back in the safe zone"
+    },
+    {
+      "id": "storm-warning",
+      "path": "/audio/events/storm-warning.wav",
+      "category": "events",
+      "duration": 1.25,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Earth's forecast says a storm cloud is coming"
+    },
+    {
+      "id": "particle-burst",
+      "path": "/audio/events/particle-burst.wav",
+      "category": "events",
+      "duration": 1.45,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "A solar particle burst hits (the 20 May 2024 storm sol)"
+    },
+    {
+      "id": "earth-message-send",
+      "path": "/audio/events/earth-message-send.wav",
+      "category": "events",
+      "duration": 0.72,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Ask Earth: the message is sent"
+    },
+    {
+      "id": "earth-message-receive",
+      "path": "/audio/events/earth-message-receive.wav",
+      "category": "events",
+      "duration": 0.82,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Earth's answer arrives in the morning"
+    },
+    {
+      "id": "earth-forecast",
+      "path": "/audio/events/earth-forecast.wav",
+      "category": "events",
+      "duration": 0.46,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A forecast line appears in the morning report"
+    },
+    {
+      "id": "morning-report",
+      "path": "/audio/mission/morning-report.wav",
+      "category": "mission",
+      "duration": 1.2,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "A new sol starts: the morning report appears"
+    },
+    {
+      "id": "sol-end",
+      "path": "/audio/mission/sol-end.wav",
+      "category": "mission",
+      "duration": 1.45,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "Night falls: end-of-sol transition"
+    },
+    {
+      "id": "next-sol",
+      "path": "/audio/mission/next-sol.wav",
+      "category": "mission",
+      "duration": 1.2,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Moving on to the next sol"
+    },
+    {
+      "id": "mission-success",
+      "path": "/audio/mission/mission-success.wav",
+      "category": "mission",
+      "duration": 2.45,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.65,
+      "trigger": "The mission ends with the base running (final screen, 2–3 stars)"
+    },
+    {
+      "id": "mission-failure",
+      "path": "/audio/mission/mission-failure.wav",
+      "category": "mission",
+      "duration": 2.05,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Mission ended early: gentle and encouraging, before the domino chain"
+    },
+    {
+      "id": "science-discovery",
+      "path": "/audio/mission/science-discovery.wav",
+      "category": "mission",
+      "duration": 0.92,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.6,
+      "trigger": "A science trip earns science, or the science star is reached"
+    },
+    {
+      "id": "domino-fall",
+      "path": "/audio/domino/domino-fall.wav",
+      "category": "domino",
+      "duration": 0.12,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "One domino tips over on the final screen"
+    },
+    {
+      "id": "domino-reveal",
+      "path": "/audio/domino/domino-reveal.wav",
+      "category": "domino",
+      "duration": 0.38,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.5,
+      "trigger": "A cause-and-effect link is revealed"
+    },
+    {
+      "id": "domino-complete",
+      "path": "/audio/domino/domino-complete.wav",
+      "category": "domino",
+      "duration": 1.25,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "The whole domino chain has been traced back to its first cause"
+    },
+    {
+      "id": "replay-start",
+      "path": "/audio/domino/replay-start.wav",
+      "category": "domino",
+      "duration": 0.62,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.55,
+      "trigger": "Player presses Try a different plan"
+    },
+    {
+      "id": "volume-change",
+      "path": "/audio/settings/volume-change.wav",
+      "category": "settings",
+      "duration": 0.04,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.4,
+      "trigger": "A volume slider moves (play at most a few times per second)"
+    },
+    {
+      "id": "mute",
+      "path": "/audio/settings/mute.wav",
+      "category": "settings",
+      "duration": 0.18,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "Sound is muted (play just before muting)"
+    },
+    {
+      "id": "unmute",
+      "path": "/audio/settings/unmute.wav",
+      "category": "settings",
+      "duration": 0.18,
+      "format": "wav",
+      "channels": 1,
+      "loop": false,
+      "volume": 0.45,
+      "trigger": "Sound is turned back on"
+    },
+    {
+      "id": "mars-base-ambience",
+      "path": "/audio/ambience/mars-base-ambience.wav",
+      "category": "ambience",
+      "duration": 16,
+      "format": "wav",
+      "channels": 1,
+      "loop": true,
+      "volume": 0.25,
+      "trigger": "Background loop in the Mars station hub"
+    },
+    {
+      "id": "mission-console-ambience",
+      "path": "/audio/ambience/mission-console-ambience.wav",
+      "category": "ambience",
+      "duration": 12,
+      "format": "wav",
+      "channels": 1,
+      "loop": true,
+      "volume": 0.2,
+      "trigger": "Background loop while the mission console is open"
+    },
+    {
+      "id": "space-menu-ambience",
+      "path": "/audio/ambience/space-menu-ambience.wav",
+      "category": "ambience",
+      "duration": 16,
+      "format": "wav",
+      "channels": 2,
+      "loop": true,
+      "volume": 0.25,
+      "trigger": "Background loop on the main menu (never autoplay; start after the first click)"
+    }
+  ]
+}

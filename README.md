@@ -159,13 +159,15 @@ src/screens/           title, reports, planner placeholder, sources and final ch
 src/state/             Zustand stores for navigation, mission setup, game state and best score
 src/test/fixtures/     shared test fixtures (not production data)
 src/demo.test.tsx      full-UI regression test that replays the demo twice
-src/i18n/en.json       every kid-facing sentence (bg.json later)
+src/i18n/              en.json + bg.json: every kid-facing sentence, same keys in both
 scripts/ingest/        canonical data download, validation and normalization pipeline
+scripts/generate-audio.mjs  original 8-bit sound library (see docs/audio.md)
 public/data/           tracked images and Mars map tiles served beside the app
+public/audio/          63 generated sound effects and loops + audio-manifest.json
 docs/                  documentation index, full guide, pitch, concept and decision archive
 ```
 
-Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/documentation.md`](docs/documentation.md) for the full project guide, and [`docs/pitch/pitch.html`](docs/pitch/pitch.html) for the pitch deck.
+Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/documentation.md`](docs/documentation.md) for the full project guide, [`docs/pitch/pitch.html`](docs/pitch/pitch.html) for the pitch deck, and [`docs/audio.md`](docs/audio.md) for the sound library.
 
 ## 6. Team rules
 
