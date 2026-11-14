@@ -245,11 +245,12 @@ describe("jobs: cost today, and cost if skipped", () => {
   });
 
   it("shelter halves the dose today and tomorrow", () => {
-    const r1 = step(initialState(), plan("shelter", "science"), []);
+    // Greenhouse every sol so nobody gets tired (food 0 → a1 too tired to work).
+    const r1 = step(initialState(), plan("shelter", "science", "greenhouse"), []);
     expect(r1.state.bars.dose).toBeCloseTo((DOSE.normalDay + DOSE.outsideExtra) * DOSE.shelterFactor);
-    const r2 = step(r1.state, plan("science"), []);
+    const r2 = step(r1.state, plan("greenhouse", "science"), []);
     expect(r2.state.bars.dose - r1.state.bars.dose).toBeCloseTo((DOSE.normalDay + DOSE.outsideExtra) * DOSE.shelterFactor);
-    const r3 = step(r2.state, plan("science"), []);
+    const r3 = step(r2.state, plan("greenhouse", "science"), []);
     expect(r3.state.bars.dose - r2.state.bars.dose).toBeCloseTo(DOSE.normalDay + DOSE.outsideExtra);
   });
 });
@@ -302,7 +303,7 @@ describe("particle burst", () => {
   });
 
   it("a shelter built the sol before halves the burst", () => {
-    const s = run([plan("shelter"), plan("science")], [burstOn(2)]);
+    const s = run([plan("shelter", "greenhouse"), plan("science", "greenhouse")], [burstOn(2)]);
     expect(s.bars.dose).toBeCloseTo(DOSE.normalDay * DOSE.shelterFactor + DOSE.burstOutside * DOSE.shelterFactor);
   });
 
