@@ -8,7 +8,8 @@ import { defineConfig } from 'vite'
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
-  base: '/impossible-solution/',
+  // GitHub Pages serves /impossible-solution/; Vercel builds with BASE_PATH=/.
+  base: process.env.BASE_PATH ?? '/impossible-solution/',
   plugins: [react()],
   build: {
     rollupOptions: {

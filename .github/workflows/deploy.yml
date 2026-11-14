@@ -35,7 +35,8 @@ jobs:
         continue-on-error: true
         env:
           NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
-        run: npm run ingest -- --group=${{ inputs.group || 'recent' }}
+          GROUP: ${{ inputs.group || 'recent' }}
+        run: npm run ingest -- --group="$GROUP"
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
