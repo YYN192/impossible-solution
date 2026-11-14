@@ -43,11 +43,33 @@ Built for the NASA Space Apps Challenge 2026 ("Build a Junior Astronaut Mission 
 | ------------ | ----------------------------------------------------------------------------------------- |
 | `?offline=1` | Never uses the network; reads bundled NASA/CSA snapshots only                             |
 | `?demo=1`    | Runs the deterministic video scenario and implies offline mode                            |
-| `?sun=today` | Uses current Mars-bound DONKI forecasts when available, otherwise shows the saved mission |
+| `?sun=today` | Uses current Mars-bound DONKI forecasts when available, otherwise shows the saved mission. Also the main-menu choice "Today's real Sun" |
 
 `?demo=1&offline=1` is the regression-tested recording URL. It always uses the same May 2024 storm data, starting state and three-sol plan.
 
 **NASA key (for data refreshes):** copy `.env.example` to `.env` and put your free key from https://api.nasa.gov after `NASA_API_KEY=`. Never commit `.env`, and never put the key in a `VITE_*` variable. The canonical pipeline is `npm run ingest`; `npm run snapshot` remains as a compatibility alias for the team's existing workflow. See [`docs/data-pipeline.md`](docs/data-pipeline.md) for source-specific commands and safeguards.
+
+## Hosting and backend
+
+Two hosts build the same code:
+
+| Host | URL | Base path | Backend |
+| --- | --- | --- | --- |
+| Vercel (main) | the Vercel project `impossible-solution` (production URL once the project is imported) | `/` (`BASE_PATH=/`) | yes: `api/` functions, `VITE_API_BASE=/api` |
+| GitHub Pages (fallback) | https://yyn192.github.io/impossible-solution/ | `/impossible-solution/` (default) | no: the browser calls DONKI directly with DEMO_KEY, else saved data |
+
+Backend endpoints (`api/`, Vercel Node functions, allowlisted, never an open proxy). Each answers
+`{source: "live" | "cached", fetchedAt, upstream, data}` (`stale: true` when it is the last good copy), or a JSON error (400 bad input, 502 NASA error, 504 timeout):
+
+| Endpoint | Upstream | CDN cache |
+| --- | --- | --- |
+| `GET /api/donki/:type?startDate&endDate` (`CME`, `WSAEnlilSimulations`, `GST`, `FLR`, `SEP`, `notifications&type=`) | CCMC DONKI (no key) first, then `api.nasa.gov/DONKI` with our key; max 60-day window | 1 h + SWR |
+| `GET /api/osdr/search?term&size` (size 1–25) | `osdr.nasa.gov/osdr/data/search` | 1 day + SWR |
+| `GET /api/dsn/mars` | DSN Now `dsn.xml` → Mars spacecraft + round-trip light time | 60 s |
+| `GET /api/status` | which upstreams answer now, and whether a personal key is set | 5 min |
+
+The NASA key lives only in Vercel → Settings → Environment Variables → `NASA_API_KEY` (server-side; DEMO_KEY if unset).
+`?offline=1` and `?demo=1` never call `/api`. Code: `api/_lib/nasa.ts` (tests next to it).
 
 ## Project map
 
