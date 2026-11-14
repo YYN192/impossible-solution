@@ -61,15 +61,45 @@ Each person has their own branch:
 | Danislav   | `ui/reports` | `src/App.tsx`, `src/screens/` (title, morning, final), `src/i18n/` setup |
 | Nikolay P. | `copy/text`  | `src/i18n/en.json`, `CREDITS.md`, `docs/`                                |
 
-**Start of a work session:**
+**Start of a work session** (do this every time, so you have everyone's newest work):
 
 ```bash
 git switch <your-branch>      # e.g. git switch ui/planner
 git pull                      # get your branch's latest
-git merge origin/main         # get everyone else's merged work (after: git fetch)
+git fetch                     # download everyone else's work
+git merge origin/main         # add the newest main into your branch
+npm install                   # install any new libraries someone added
+npm run dev
 ```
 
-Shortcut for the last two: `git fetch && git merge origin/main`.
+Always run `npm install` after pulling or merging. If you skip it and someone added a library, you get errors like `Cannot find module` or `Failed to resolve import`.
+
+**Just want to play the newest version** (not working on a branch):
+
+```bash
+cd impossible-solution
+git switch main
+git pull
+npm install
+npm run dev
+```
+
+**Git says "your local changes would be overwritten"?** You have unsaved work. Either commit it first (`git add -A && git commit -m "WIP"`), or put it aside, update, and bring it back:
+
+```bash
+git stash                     # put your changes aside
+git pull                      # (or the merge commands above)
+git stash pop                 # bring your changes back
+```
+
+**Still broken after updating?** Reinstall the libraries from scratch:
+
+```bash
+# macOS
+rm -rf node_modules && npm install
+# Windows (PowerShell)
+Remove-Item -Recurse -Force node_modules; npm install
+```
 
 **Save and share your work** (every 30–60 min, small steps):
 
