@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { GAME_NUMBERS } from "../data/gameNumbers";
 import { REAL_FACTS, SIMPLIFICATION_KEYS } from "../data/sources";
-import en from "../i18n/en.json";
 import { DataSources } from "./DataSources";
+import i18n from "../i18n";
 
 describe("DataSources screen", () => {
   it("lists every real fact with a working-looking source link", () => {
@@ -23,9 +23,7 @@ describe("DataSources screen", () => {
   it("shows the 'What this game simplifies' card", () => {
     render(<DataSources />);
     for (const key of SIMPLIFICATION_KEYS)
-      expect(
-        screen.getByText(en.dataSources.simplificationItems[key]),
-      ).toBeTruthy();
+      expect(screen.getByText(i18n.t(key))).toBeTruthy();
   });
   it("labels saved data honestly", () => {
     render(<DataSources />);
@@ -48,15 +46,13 @@ describe("DataSources game numbers (#7)", () => {
       const row = rows[0];
       expect(row!.textContent).toMatch(/game number/i);
       expect(row!.textContent).toContain(String(descriptor.value));
-      if (descriptor.skipped)
-        expect(row!.textContent).toContain(descriptor.skipped);
     }
   });
 
   it("covers every current job, nightly, dose, engine, and demo mechanic", () => {
     const jobIds = ["panels", "greenhouse", "shelter", "askEarth", "science"];
     const expected = [
-      ...jobIds.flatMap((id) => [`job-power-${id}`, `job-outcome-${id}`]),
+      ...jobIds.map((id) => `job-power-${id}`),
       "mission-sols",
       "night-air-power",
       "night-air-loss",
@@ -75,6 +71,9 @@ describe("DataSources game numbers (#7)", () => {
       "cloud-dose-outside",
       "safe-dose-limit",
       "science-goal",
+      "food-gain",
+      "food-loss",
+      "science-gain",
       "demo-start-food",
       "demo-start-panels",
     ];

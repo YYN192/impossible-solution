@@ -4,9 +4,9 @@
  * Verified by the science-checker agent on Sat 14 Nov 2026.
  */
 import type { DataRef } from "../sim/types";
+import { SNAPSHOT_DATES } from "./donki";
 
 const CHECKED_AT = "2026-11-14T12:04:30.000Z";
-const MAY_2024_DONKI_FETCHED_AT = "2026-11-14T12:04:30.631Z";
 type DatedDataRef = DataRef & { fetched: string };
 
 export interface RealFact {
@@ -55,15 +55,16 @@ export const DONKI_CME_MAY20: DatedDataRef = {
     "NASA's space weather database (DONKI): the 20 May 2024 solar eruption",
   url: "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/31034/-1",
   mode: "snapshot",
-  fetched: "2026-11-14T12:04:30.235Z",
+  fetched: SNAPSHOT_DATES.cmeMay2024,
 };
 
 export const DONKI_ENLIL_MAY23: DatedDataRef = {
+  // Kid chip text: no dataset names here (the Data Sources facts name DONKI WSA-Enlil).
   label:
-    "NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud of 23 May 2024 was forecast to brush past Mars on 28 May",
+    "NASA's space weather forecast: a storm cloud of 23 May 2024 was forecast to brush past Mars on 28 May",
   url: "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1",
   mode: "snapshot",
-  fetched: MAY_2024_DONKI_FETCHED_AT,
+  fetched: SNAPSHOT_DATES.may2024,
 };
 
 /** Earth's answer = storm-cloud forecast (real, DONKI) + dust forecast (game number). */
@@ -129,13 +130,16 @@ export const REAL_FACTS: RealFact[] = [
   },
 ];
 
-/** Localized things the game invents or simplifies (#16 final copy). */
+/**
+ * Things the game invents or simplifies, as en.json keys (simplifies.*) so BG can translate them.
+ * Shown on the "What this game simplifies" card.
+ */
 export const SIMPLIFICATION_KEYS = [
-  "crew",
-  "sols",
-  "jobs",
-  "doseScale",
-  "forecast",
-  "dates",
-  "real",
+  "simplifies.crew",
+  "simplifies.sols",
+  "simplifies.costs",
+  "simplifies.dose",
+  "simplifies.forecast",
+  "simplifies.dates",
+  "simplifies.real",
 ] as const;

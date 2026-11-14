@@ -8,7 +8,7 @@
  *     (state.earthAnswer). Earth's answer: storm-cloud part = real DONKI WSA-Enlil forecast (Mars-only);
  *     dust part = game-invented (DONKI does not forecast Mars dust).
  */
-import type { EarthAnswer, StormEvent } from "../sim/types";
+import type { EarthAnswer, GameState, StormEvent } from "../sim/types";
 import { MISSION_SOLS } from "../sim/types";
 import {
   getRecentMarsForecasts,
@@ -19,7 +19,7 @@ import {
 import type { DataSource } from "./http";
 import { isLive } from "./http";
 import type { Flags } from "./flags";
-import { DEMO_START_FOOD, DEMO_START_PANEL_EFFICIENCY } from "./demo";
+import { DEMO_START } from "./demo";
 import { DONKI_ENLIL_MAY23, earthAnswerRef, RAD_STORM } from "./sources";
 
 export type MissionKind = "may2024" | "todaysSun";
@@ -36,9 +36,8 @@ export interface MissionSetup {
   dataFetchedAt: number;
   /** Set when "Today's Sun" was asked for but no Mars-bound storm was found. Text key for the kid message. */
   noticeKey?: string;
-  /** Fixed scenario override. Omitted for ordinary missions, which use the engine default. */
-  startingFood?: number;
-  startingPanelEfficiency?: number;
+  /** Fixed start overrides. Omitted for ordinary missions, which use the engine default. */
+  initialState?: Partial<Pick<GameState, "food" | "panelEfficiency">>;
 }
 
 /**
@@ -95,8 +94,7 @@ export function may2024Mission(): MissionSetup {
 export function demoMission(): MissionSetup {
   return {
     ...may2024Mission(),
-    startingFood: DEMO_START_FOOD,
-    startingPanelEfficiency: DEMO_START_PANEL_EFFICIENCY,
+    initialState: DEMO_START,
   };
 }
 
@@ -122,7 +120,7 @@ export function todaysSunMission(
     Math.max(2, days >= 0 ? days + 1 : MISSION_SOLS),
   );
   const ref = {
-    label: `NASA's space weather forecast (DONKI WSA-Enlil): a storm cloud reaching Mars on ${newest.arrival.slice(0, 10)}`,
+    label: `NASA's space weather forecast: a storm cloud reaching Mars on ${newest.arrival.slice(0, 10)}`,
     url: newest.link ?? "https://kauai.ccmc.gsfc.nasa.gov/DONKI/",
     mode: isLive(source) ? ("live" as const) : ("snapshot" as const),
     fetched: new Date(fetchedAt).toISOString(),

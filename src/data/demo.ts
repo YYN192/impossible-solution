@@ -1,8 +1,10 @@
-import type { Plan } from "../sim/types";
+import type { GameState, Plan } from "../sim/types";
 
 /** Fixed saved-scenario start: low reserves and panels already dusty after the Mars weather. */
-export const DEMO_START_FOOD = 0;
-export const DEMO_START_PANEL_EFFICIENCY = 0.5;
+export const DEMO_START = {
+  food: 0,
+  panelEfficiency: 0.5,
+} as const satisfies Pick<GameState, "food" | "panelEfficiency">;
 
 /**
  * Recording path for `?demo=1`.

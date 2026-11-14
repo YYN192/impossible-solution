@@ -109,12 +109,10 @@
     "gameNumbersIntro": "We chose these numbers so the game is fair and fun. Each one is a game number, not a NASA measurement.",
     "gameNumberItems": {
       "jobPower": "{{job}} power cost: {{value}} power",
-      "jobOutcome": "{{job}} outcome when done: {{value}}; when skipped: {{skipped}}",
       "value": "{{name}}: {{value}}"
     },
     "gameNumberNames": {
       "jobPower": "Job power cost",
-      "jobOutcome": "Job outcome",
       "missionSols": "Mission length (short sols)",
       "nightAirPower": "Air-machine power cost each night",
       "nightAirLoss": "Air lost when the machine cannot run",
@@ -133,20 +131,23 @@
       "cloudDoseOutside": "Storm-cloud dose outside",
       "safeDoseLimit": "Safe-crew dose limit",
       "scienceGoal": "Science goal",
+      "foodGain": "Food made when the greenhouse runs",
+      "foodLoss": "Food used when the greenhouse is skipped",
+      "scienceGain": "Science earned by one science trip",
       "demoStartFood": "Saved demo's starting food",
       "demoStartPanels": "Saved demo's starting panel efficiency"
     },
-    "simplificationItems": {
-      "crew": "3 crew members is a game number chosen for this game.",
-      "sols": "Short sols are game rounds. Real storm clouds take several days to reach Mars; we squeeze that into a sol or two.",
-      "jobs": "Job numbers, including power and food costs and the size of each bar, are game numbers chosen so the game is fair and fun.",
-      "doseScale": "The space-ray meter uses game units. The size of a storm compared with a normal day is real.",
-      "forecast": "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
-      "dates": "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
-      "real": "Real: the storm, normal radiation dose, dust effect on solar panels, and Earth–Mars message delay."
-    },
     "simplifies": "What this game simplifies",
     "back": "Back"
+  },
+  "simplifies": {
+    "crew": "This game has 3 crew members. A real base would have many more people and jobs.",
+    "sols": "Our short sols are game rounds. Real storm clouds take several days to reach Mars; we squeeze that into a sol or two.",
+    "costs": "Job costs (power, food, the size of each bar) are game numbers we chose so the game is fair and fun.",
+    "dose": "The space-ray meter uses game units. The size of a storm compared with a normal day is real.",
+    "forecast": "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
+    "dates": "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
+    "real": "Real: the 20 May 2024 storm, normal Mars radiation, the dust effect on solar panels, and the message delay."
   },
   "jobs": {
     "panels": "Clean solar panels",
@@ -154,6 +155,105 @@
     "shelter": "Build up the shelter",
     "askEarth": "Ask Earth",
     "science": "Science trip"
+  },
+  "jobInfo": {
+    "panels": {
+      "done": "Clean panels make full power tomorrow.",
+      "skipped": "Dust builds up. Less power tomorrow."
+    },
+    "greenhouse": {
+      "done": "The plants grow 1 food.",
+      "skipped": "1 less food. No food makes someone too tired."
+    },
+    "shelter": {
+      "done": "Fewer space rays today and tomorrow.",
+      "skipped": "No cover if a space-ray storm hits."
+    },
+    "askEarth": {
+      "done": "Earth's answer comes tomorrow morning.",
+      "skipped": "You plan tomorrow without a forecast."
+    },
+    "science": {
+      "done": "+1 science. 2 science trips win the science star.",
+      "skipped": "No science today."
+    },
+    "cost_zero": "No power needed",
+    "cost_one": "Uses {{count}} power",
+    "cost_other": "Uses {{count}} power",
+    "outside": "Outside: more space rays"
+  },
+  "crew": {
+    "name": "Astronaut {{n}}",
+    "tired": "Too tired to work today",
+    "idle": "No job yet",
+    "idleWarning": "An astronaut with no job is a wasted worker."
+  },
+  "planHelp": {
+    "howTo": "Tap an astronaut. Then tap a job.",
+    "leftUndone_one": "{{count}} job is left undone.",
+    "leftUndone_other": "{{count}} jobs are left undone.",
+    "tomorrow": "tomorrow",
+    "notEnoughPower": "Not enough power for this job."
+  },
+  "bars": {
+    "power": "Power",
+    "air": "Air",
+    "dose": "Space-ray meter",
+    "food": "Food",
+    "science": "Science"
+  },
+  "help": {
+    "whatsThis": "What's this?",
+    "close": "Got it",
+    "sol": {
+      "title": "Sol",
+      "text": "A sol is one day on Mars. It is about 40 minutes longer than an Earth day."
+    },
+    "power": {
+      "title": "Power",
+      "text": "Solar panels turn sunlight into power. Jobs inside the base use some."
+    },
+    "air": {
+      "title": "Air",
+      "text": "The air machine makes air to breathe. It needs power every night."
+    },
+    "dose": {
+      "title": "Space-ray meter",
+      "text": "Space rays come from the Sun and from deep space. Scientists call them radiation. Too much is bad for astronauts, so keep this meter low."
+    },
+    "food": {
+      "title": "Food",
+      "text": "The greenhouse grows food under lamps. With no food, an astronaut gets too tired to work."
+    },
+    "dust": {
+      "title": "Dust",
+      "text": "Mars dust settles on solar panels. Dusty panels make less power. A dust storm cut a real lander's power by about a third."
+    },
+    "burst": {
+      "title": "Space-ray storm",
+      "text": "Sometimes the Sun blasts out space rays. They reach Mars in under an hour. That is too fast for Earth to warn you."
+    },
+    "stormCloud": {
+      "title": "Storm cloud",
+      "text": "A storm cloud is a huge gas cloud from the Sun. It takes days to reach Mars. So Earth can see it coming and warn you."
+    },
+    "askEarth": {
+      "title": "Ask Earth",
+      "text": "Your message takes about 12 minutes to reach Earth. Scientists study it overnight. Their answer is waiting for you in the morning."
+    }
+  },
+  "teacher": {
+    "title": "For teachers",
+    "goal": "On Mars, every choice costs something, and help from Earth can't always arrive in time.",
+    "howTo": "Play one mission (about 8 minutes). Talk about the questions. Then play again.",
+    "questionsTitle": "Talk about it",
+    "q1": "Who waited for Earth's answer? Was it worth the wait?",
+    "q2": "Which skipped job hurt your base the most? How did you find out?",
+    "q3": "Why can Earth warn you about a storm cloud but not about a space-ray storm?",
+    "realTitle": "What is real",
+    "real": "The 20 May 2024 solar storm, normal Mars radiation, dust on solar panels, and the Earth–Mars message delay are real NASA science. Job costs are game numbers.",
+    "open": "For teachers",
+    "back": "Back"
   },
   "notice": {
     "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission."

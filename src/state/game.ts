@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { DEMO_START_FOOD, DEMO_START_PANEL_EFFICIENCY } from "../data/demo";
+import { DEMO_START } from "../data/demo";
 import { readFlags } from "../data/flags";
 import { createGame, step } from "../sim/engine";
 import type { Domino, GameState, Plan } from "../sim/types";
@@ -22,20 +22,10 @@ interface GameStore {
 /** Use the loaded scenario when available; the URL fallback also covers a very fast Start click. */
 const createMissionGame = (): GameState => {
   const setup = useMission.getState().setup;
-  const demo = readFlags().demo;
-  const startingFood =
-    setup?.startingFood ?? (demo ? DEMO_START_FOOD : undefined);
-  const startingPanelEfficiency =
-    setup?.startingPanelEfficiency ??
-    (demo ? DEMO_START_PANEL_EFFICIENCY : undefined);
+  const initialState =
+    setup?.initialState ?? (readFlags().demo ? DEMO_START : undefined);
   const state = createGame();
-  return {
-    ...state,
-    ...(startingFood === undefined ? {} : { food: startingFood }),
-    ...(startingPanelEfficiency === undefined
-      ? {}
-      : { panelEfficiency: startingPanelEfficiency }),
-  };
+  return { ...state, ...initialState };
 };
 
 export const useGame = create<GameStore>()((set, get) => ({

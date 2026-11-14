@@ -1,15 +1,12 @@
 import { ENGINE } from "../sim/engine";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT, type JobId } from "../sim/types";
-import { DEMO_START_FOOD, DEMO_START_PANEL_EFFICIENCY } from "./demo";
+import { DEMO_START } from "./demo";
 
 export type GameNumberKey =
-  | "dataSources.gameNumberItems.jobPower"
-  | "dataSources.gameNumberItems.jobOutcome"
-  | "dataSources.gameNumberItems.value";
+  "dataSources.gameNumberItems.jobPower" | "dataSources.gameNumberItems.value";
 
 type GameNumberName =
   | "jobPower"
-  | "jobOutcome"
   | "missionSols"
   | "nightAirPower"
   | "nightAirLoss"
@@ -28,6 +25,9 @@ type GameNumberName =
   | "cloudDoseOutside"
   | "safeDoseLimit"
   | "scienceGoal"
+  | "foodGain"
+  | "foodLoss"
+  | "scienceGain"
   | "demoStartFood"
   | "demoStartPanels";
 
@@ -38,7 +38,6 @@ export interface GameNumberDescriptor {
   nameKey: `dataSources.gameNumberNames.${GameNumberName}`;
   value: string | number;
   jobId?: JobId;
-  skipped?: string;
 }
 
 const jobs = Object.entries(JOBS) as [JobId, (typeof JOBS)[JobId]][];
@@ -49,23 +48,13 @@ const jobs = Object.entries(JOBS) as [JobId, (typeof JOBS)[JobId]][];
  * exhaustive rendering test. Real measurements remain in REAL_FACTS instead.
  */
 export const GAME_NUMBERS: GameNumberDescriptor[] = [
-  ...jobs.flatMap(([jobId, job]) => [
-    {
-      id: `job-power-${jobId}`,
-      labelKey: "dataSources.gameNumberItems.jobPower" as const,
-      nameKey: "dataSources.gameNumberNames.jobPower" as const,
-      value: job.powerCost,
-      jobId,
-    },
-    {
-      id: `job-outcome-${jobId}`,
-      labelKey: "dataSources.gameNumberItems.jobOutcome" as const,
-      nameKey: "dataSources.gameNumberNames.jobOutcome" as const,
-      value: job.ifDone,
-      skipped: job.ifSkipped,
-      jobId,
-    },
-  ]),
+  ...jobs.map(([jobId, job]) => ({
+    id: `job-power-${jobId}`,
+    labelKey: "dataSources.gameNumberItems.jobPower" as const,
+    nameKey: "dataSources.gameNumberNames.jobPower" as const,
+    value: job.powerCost,
+    jobId,
+  })),
   value("mission-sols", "missionSols", MISSION_SOLS),
   value("night-air-power", "nightAirPower", NIGHT.airMachinePower),
   value("night-air-loss", "nightAirLoss", NIGHT.airLossWithoutPower),
@@ -88,8 +77,11 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("cloud-dose-outside", "cloudDoseOutside", ENGINE.cloudOutside),
   value("safe-dose-limit", "safeDoseLimit", ENGINE.doseLimit),
   value("science-goal", "scienceGoal", ENGINE.scienceGoal),
-  value("demo-start-food", "demoStartFood", DEMO_START_FOOD),
-  value("demo-start-panels", "demoStartPanels", DEMO_START_PANEL_EFFICIENCY),
+  value("food-gain", "foodGain", ENGINE.foodGain),
+  value("food-loss", "foodLoss", ENGINE.foodLoss),
+  value("science-gain", "scienceGain", ENGINE.scienceGain),
+  value("demo-start-food", "demoStartFood", DEMO_START.food),
+  value("demo-start-panels", "demoStartPanels", DEMO_START.panelEfficiency),
 ];
 
 function value(

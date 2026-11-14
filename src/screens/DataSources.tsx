@@ -98,7 +98,6 @@ export function DataSources({
               {t(item.labelKey, {
                 name: t(item.nameKey),
                 value: item.value,
-                skipped: item.skipped,
                 job: item.jobId ? t(`jobs.${item.jobId}`) : undefined,
               })}
             </li>
@@ -109,7 +108,7 @@ export function DataSources({
       <h3>{t("dataSources.simplifies")}</h3>
       <ul className="sources__simple">
         {SIMPLIFICATION_KEYS.map((key) => (
-          <li key={key}>{t(`dataSources.simplificationItems.${key}`)}</li>
+          <li key={key}>{t(key)}</li>
         ))}
       </ul>
 

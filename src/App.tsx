@@ -7,6 +7,7 @@ import { EndOfSolScreen } from "./screens/EndOfSolScreen";
 import { FinalScreen } from "./screens/FinalScreen";
 import { MorningScreen } from "./screens/MorningScreen";
 import { StandInPlanScreen } from "./screens/StandInPlanScreen";
+import { TeacherCard } from "./screens/TeacherCard";
 import { TitleScreen } from "./screens/TitleScreen";
 import { useMission } from "./state/mission";
 import { useNav, type Screen } from "./state/screen";
@@ -26,7 +27,9 @@ export default function App() {
   const sol = useNav((s) => s.sol);
   const setup = useMission((s) => s.setup);
   const load = useMission((s) => s.load);
-  const [showSources, setShowSources] = useState(false);
+  /** A grown-up page shown over the game (the game keeps its place underneath). */
+  const [overlay, setOverlay] = useState<null | "sources" | "teacher">(null);
+  const close = () => setOverlay(null);
 
   // Load the mission (storm events, Earth's forecasts, data source) once at start.
   // Reads ?demo=1, ?offline=1, ?sun=today from the URL.
@@ -46,23 +49,34 @@ export default function App() {
         ) : (
           <span />
         )}
-        {!showSources ? (
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => setShowSources(true)}
-          >
-            {t("dataSources.open")}
-          </button>
+        {!overlay ? (
+          <span className="topbar__links">
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => setOverlay("sources")}
+            >
+              {t("dataSources.open")}
+            </button>
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => setOverlay("teacher")}
+            >
+              {t("teacher.open")}
+            </button>
+          </span>
         ) : null}
       </div>
       {setup?.noticeKey ? (
         <p className="notice">{t(setup.noticeKey as "notice.sunQuiet")}</p>
       ) : null}
 
-      {showSources ? (
+      {overlay === "teacher" ? (
+        <TeacherCard onBack={close} />
+      ) : overlay === "sources" ? (
         <DataSources
-          onBack={() => setShowSources(false)}
+          onBack={close}
           missionSource={setup?.dataSource}
           missionFetchedAt={setup?.dataFetchedAt}
           liveData={!readFlags().offline && import.meta.env.MODE !== "test"}

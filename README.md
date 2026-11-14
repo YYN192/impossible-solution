@@ -162,8 +162,10 @@ src/demo.test.tsx      full-UI regression test that replays the demo twice
 src/i18n/en.json       every kid-facing sentence (bg.json later)
 scripts/ingest/        canonical data download, validation and normalization pipeline
 public/data/           tracked images and Mars map tiles served beside the app
-docs/                  project documentation; see docs/README.md for its status map
+docs/                  documentation index, full guide, pitch, concept and decision archive
 ```
+
+Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/documentation.md`](docs/documentation.md) for the full project guide, and [`docs/pitch/pitch.html`](docs/pitch/pitch.html) for the pitch deck.
 
 ## 6. Team rules
 
