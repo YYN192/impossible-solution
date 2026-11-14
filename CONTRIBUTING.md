@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping! This is a NASA Space Apps 2026 hackathon project by team **SoftUniors**. The team works from issues: see the [open issues](https://github.com/YYN192/impossible-solution/issues), or [good first issues](https://github.com/YYN192/impossible-solution/labels/good%20first%20issue) if you are new.
+Thanks for helping! This is a NASA Space Apps 2026 hackathon project by team **SoftUniors**. The team works from issues: see the [open issues](https://github.com/YYN192/impossible-solution/issues), or [good first issues](https://github.com/YYN192/impossible-solution/labels/good%20first%20issue) if you are new. Team brief: [`docs/team-brief.pdf`](docs/team-brief.pdf).
 
 Found a bug or have an idea? [Open an issue](https://github.com/YYN192/impossible-solution/issues/new/choose). Questions go to [Discussions](https://github.com/YYN192/impossible-solution/discussions).
 
@@ -117,3 +117,42 @@ git push
 - Every number has a source or is labelled "game number". Never call saved data "live".
 - New library, icon, font or AI use → a row in `CREDITS.md` / `docs/ai-usage-log.md` the same day. No NASA logos.
 - No photos, faces or voices of team members (we're under 18) in the video or project page.
+
+## 5. Commands and data
+
+| Command            | What it does                                           |
+| ------------------ | ------------------------------------------------------ |
+| `npm run dev`      | Run locally with live reload                           |
+| `npm test`         | Run the Vitest tests once                              |
+| `npm run build`    | Type-check and build into `dist/` (what gets deployed) |
+| `npm run preview`  | Serve the built `dist/` locally                        |
+| `npm run ingest`   | Refresh NASA/CSA snapshots and media                   |
+| `npm run snapshot` | Compatibility alias for `npm run ingest`               |
+
+**Refreshing the data:** copy `.env.example` to `.env` and put your free key from https://api.nasa.gov after `NASA_API_KEY=`, then run `npm run ingest`. Never commit `.env`, and never put the key in a `VITE_*` variable. See [`docs/data-pipeline.md`](docs/data-pipeline.md) for source-specific commands and safeguards.
+
+## 6. Project map
+
+```
+src/sim/types.ts       shared contract + job cause/effect table (read this first)
+src/sim/               game engine (pure TypeScript, no React)
+src/data/              mission/data boundary, resilient clients and source metadata
+src/data/demo.ts       deterministic recording start, plans and expected causal chain
+src/data/gameNumbers.ts engine-derived registry of every disclosed game number
+src/data/snapshots/    saved NASA/CSA JSON used by the offline game
+src/components/        reusable interface components shared by screens
+src/screens/           title, reports, planner placeholder, sources and final chain
+src/state/             Zustand stores for navigation, mission setup, game state and best score
+src/test/fixtures/     shared test fixtures (not production data)
+src/demo.test.tsx      full-UI regression test that replays the demo twice
+src/i18n/              en.json + bg.json: every kid-facing sentence, same keys in both
+scripts/ingest/        canonical data download, validation and normalization pipeline
+scripts/generate-audio.mjs  original 8-bit sound library (see docs/audio.md)
+public/data/           tracked images and Mars map tiles served beside the app
+public/audio/          63 generated sound effects and loops + audio-manifest.json
+docs/                  documentation index, full guide, pitch, concept and decision archive
+```
+
+`index.html` opens the Mars menu, `hub.html` the walkable station, `console.html` the planning prototype, and `mission.html` the upstream mission app with its reports and data sources. All four are in the production build.
+
+Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/documentation.md`](docs/documentation.md) for the full guide, [`docs/pitch/pitch.html`](docs/pitch/pitch.html) for the pitch deck, and [`docs/audio.md`](docs/audio.md) for the sound library.
