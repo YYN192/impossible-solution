@@ -314,6 +314,32 @@ describe("particle burst", () => {
   });
 });
 
+describe("storm cloud (CME): a smaller burst that Earth can warn about", () => {
+  it("staying inside gives the inside storm-cloud dose", () => {
+    const r = step(initialState(), plan("greenhouse"), [cloudOn(1)]);
+    expect(r.state.bars.dose).toBeCloseTo(ENGINE.cloudInside);
+    expect(r.fell.find((d) => d.id === "sol1-storm-cloud")?.source?.url).toBe("https://example.test/cloud");
+  });
+
+  it("being outside gives the outside storm-cloud dose and a dose domino", () => {
+    const r = step(initialState(), plan("science"), [cloudOn(1)]);
+    expect(r.state.bars.dose).toBeCloseTo(ENGINE.cloudOutside);
+    expect(r.fell.find((d) => d.id === "sol1-dose-big")?.causeIds).toContain("sol1-storm-cloud");
+  });
+
+  it("is smaller than a particle burst, but bigger than a normal sol", () => {
+    expect(ENGINE.cloudInside).toBeLessThan(DOSE.burstInside);
+    expect(ENGINE.cloudOutside).toBeLessThan(DOSE.burstOutside);
+    expect(ENGINE.cloudInside).toBeGreaterThan(DOSE.normalDay);
+    expect(ENGINE.cloudOutside).toBeGreaterThan(DOSE.normalDay + DOSE.outsideExtra);
+  });
+
+  it("a shelter halves it", () => {
+    const s = run([plan("shelter", "greenhouse"), plan("science", "greenhouse")], [cloudOn(2)]);
+    expect(s.bars.dose).toBeCloseTo(DOSE.normalDay * DOSE.shelterFactor + ENGINE.cloudOutside * DOSE.shelterFactor);
+  });
+});
+
 describe("Ask Earth", () => {
   const answer: EarthAnswer = {
     dustTomorrow: "dusty",
