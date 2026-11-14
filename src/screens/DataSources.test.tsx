@@ -21,3 +21,25 @@ describe("DataSources screen", () => {
     expect(screen.getByRole("status").textContent).toContain("SAVED DATA");
   });
 });
+
+describe("DataSources game numbers (#7)", () => {
+  it("lists every job's power cost from the engine table, labelled as a game number", async () => {
+    const { JOBS } = await import("../sim/types");
+    render(<DataSources />);
+    const section = screen.getByRole("region", { name: /game numbers/i });
+    for (const [id, job] of Object.entries(JOBS)) {
+      const row = section.querySelector(`[data-job="${id}"]`);
+      expect(row, `row for ${id}`).not.toBeNull();
+      expect(row!.textContent).toContain(`${job.powerCost} power`);
+    }
+    expect(section.textContent).toMatch(/game number/i);
+  });
+
+  it("shows the nightly air-machine cost and that the dose scale is a game unit", async () => {
+    const { NIGHT } = await import("../sim/types");
+    render(<DataSources />);
+    const section = screen.getByRole("region", { name: /game numbers/i });
+    expect(section.textContent).toContain(`${NIGHT.airMachinePower} power`);
+    expect(section.textContent).toMatch(/space-ray meter/i);
+  });
+});
