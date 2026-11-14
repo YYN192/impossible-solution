@@ -48,7 +48,9 @@ describe("complete expedition", () => {
     await launch();
     const setup = useMission.getState().setup!;
     const start = useGame.getState().state;
-    const plans: JobId[][] = [["greenhouse", "shelter", "askEarth"], ["panels", "greenhouse", "shelter"], ["panels", "greenhouse", "science"]];
+    // Skipping shelter on sol 1 lets the sol 2 particle burst raise the dose, so the final chain
+    // carries a real-data source. Nobody gets tired, so every crew button stays clickable.
+    const plans: JobId[][] = [["greenhouse", "panels", "askEarth"], ["panels", "greenhouse", "science"], ["panels", "greenhouse", "shelter"]];
     for (let sol = 1; sol <= 3; sol++) {
       expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("morning.heading", { sol }));
       if (sol === 2) screen.getByRole("complementary", { name: t("play.earthInbox") });
