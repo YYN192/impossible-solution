@@ -1,0 +1,15 @@
+.sources { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.sources__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.sources h2 { margin: 0; font-size: 1.6rem; }
+.sources h3 { margin-top: 2rem; font-size: 1.15rem; }
+.sources__list { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+.sources__item { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 0.9rem 1rem; }
+.sources__item p { margin: 0 0 0.35rem; }
+.sources__what { font-weight: 700; }
+.sources__value { color: #ffcf8a; }
+.sources__label { color: var(--muted, #9aa3bd); }
+.sources__item a { color: #9cc3ff; display: inline-block; padding: 0.4rem 0; min-height: 44px; line-height: 1.4; }
+.sources__item a:focus-visible, .sources__back:focus-visible { outline: 3px solid #ffcf8a; outline-offset: 2px; }
+.sources__simple li { margin-bottom: 0.4rem; }
+.sources__note { color: var(--muted, #9aa3bd); font-size: 0.9rem; }
+.sources__back { min-height: 44px; min-width: 44px; padding: 0.6rem 1.4rem; margin-top: 1.5rem; border-radius: 10px; border: 0; background: #e0603a; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }

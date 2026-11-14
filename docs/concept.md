@@ -35,8 +35,8 @@ Skip panels (sol 1) → power −⅓ (sol 2) → not enough power for both the g
 
 ## Storms: two kinds, both real
 
-1. **Particle burst** — arrives in **tens of minutes**, so no warning from Earth can beat it. Data: **20 May 2024**; Curiosity's radiation detector (RAD) measured **8.1 mGy** in about a day, which is **more than a month of normal Mars radiation** (normal: 0.21 mGy/day, 0.64 mSv/day, Hassler et al. 2014). The DONKI record for that event is **CME 2024-05-20T05:36:00-CME-001**. Kid text: "The Sun just blasted a storm! A real Mars rover measured one like this on 20 May 2024." Do **not** say "30 chest X-rays".
-2. **Storm cloud (CME)** — takes **days**, so Earth _can_ warn you. Data: DONKI WSA-Enlil forecast that the **23 May 2024 CME reaches Mars on 28 May 11:30 UTC**. This is what Ask Earth reveals.
+1. **Particle burst** — arrives in **tens of minutes**, so no warning from Earth can beat it. Data: **20 May 2024**; Curiosity's radiation detector (RAD) measured **8.1 mGy** from that one storm, as much as **more than a month of normal Mars radiation** (normal: 0.21 mGy/day, 0.64 mSv/day, Hassler et al. 2014). The DONKI record for that event is **CME 2024-05-20T05:36:00-CME-001**. Kid text: "The Sun just blasted a storm! A real Mars rover measured one like this on 20 May 2024." Do **not** say "30 chest X-rays".
+2. **Storm cloud (CME)** — takes **days**, so Earth _can_ warn you. Data: DONKI WSA-Enlil forecast that the **23 May 2024 CME would brush past Mars on 28 May ~11:30 UTC** (glancing blow). Earth's dust forecast is a game number. This is what Ask Earth reveals.
 
 **Ask Earth wording:** "Your message takes about 12 minutes to reach Earth. Scientists study it overnight. Their answer is waiting for you in the morning."
 
