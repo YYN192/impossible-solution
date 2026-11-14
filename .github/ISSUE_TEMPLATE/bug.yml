@@ -1,0 +1,22 @@
+name: Bug report
+description: Something in the game is broken or wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to see it
+      placeholder: "1. Open https://yyn192.github.io/impossible-solution/?demo=1\n2. ..."
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: e.g. iPhone 13, Safari
