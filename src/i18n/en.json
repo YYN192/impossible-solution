@@ -464,7 +464,7 @@
       "hook": "Can you keep 3 astronauts safe through a real solar storm?",
       "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Plan each sol with care.",
       "real": "Every storm here is real. A NASA rover measured each one on Mars.",
-      "planners": "Real crews hide in a shielded corner of their ship during solar storms."
+      "planners": "Real crews hide in a shielded corner during solar storms."
     },
     "dust": {
       "name": "Dust Season",
