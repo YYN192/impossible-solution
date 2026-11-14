@@ -179,3 +179,7 @@ Start with [`docs/README.md`](docs/README.md) for the documentation map, [`docs/
 
 Apache-2.0. Data sources, libraries and AI use: `CREDITS.md` and `docs/ai-usage-log.md`.
 Uses NASA open data. Not affiliated with or endorsed by NASA.
+
+## UI branch entry points
+
+`index.html` opens the Mars menu, `hub.html` opens the walkable station, and `console.html` opens the planning prototype. `mission.html` opens the upstream mission app with its reports and data sources. All four pages are included in the production build.

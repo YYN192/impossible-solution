@@ -1,0 +1,18 @@
+/** Vite resolves all sprite URLs at build time, including separate animation frames. */
+const urls = import.meta.glob<string>(["../assets/pixel/**/*.png", "!../assets/pixel/astronaut.png"], {
+  eager: true, query: "?url", import: "default",
+});
+export function asset(path: string): string {
+  const url = urls[`../assets/pixel/${path}.png`];
+  if (!url) throw new Error(`Unknown pixel asset: ${path}`);
+  return url;
+}
+const images = new Map<string, HTMLImageElement>();
+export function getSprite(path: string): HTMLImageElement {
+  let image = images.get(path);
+  if (!image) { image = new Image(); image.src = asset(path); images.set(path, image); }
+  return image;
+}
+export type Facing = "front" | "back" | "left" | "right";
+export const playerSprite = (facing: Facing, frame?: number) =>
+  `characters/player/astronaut-${frame === undefined ? `idle-${facing}` : `walk-${facing}-${frame + 1}`}`;

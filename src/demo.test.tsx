@@ -1,38 +1,53 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "./App";
-import { DEMO_CHAIN_IDS } from "./data/demo";
+import { DEMO_CHAIN_IDS, demoPlanForSol } from "./data/demo";
+import { useSession } from "./game/session";
 import i18n from "./i18n";
+import type { CrewId } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
 import { START, useNav } from "./state/screen";
 
 const t = i18n.t.bind(i18n);
+const crewNumber: Record<CrewId, number> = { a1: 1, a2: 2, a3: 3 };
+const click = (name: string | RegExp) =>
+  fireEvent.click(screen.getByRole("button", { name }));
+
+function resetStores() {
+  useNav.setState(START);
+  useMission.setState({ status: "idle", setup: undefined });
+  useGame.getState().reset();
+  useSession.setState({ position: { x: 320, y: 212, facing: "back" }, draft: {}, before: undefined });
+}
 
 describe("?demo=1 recording path (#6)", () => {
   beforeEach(() => {
     window.history.replaceState({}, "", "/?demo=1&offline=1");
-    useNav.setState(START);
-    useMission.setState({ status: "idle", setup: undefined });
-    useGame.getState().reset();
+    resetStores();
   });
   afterEach(() => window.history.replaceState({}, "", "/"));
 
   async function playThroughUi() {
     const view = render(<App />);
-    await screen.findByRole("status");
-    fireEvent.click(screen.getByRole("button", { name: t("title.start") }));
+    const start = await screen.findByRole("button", { name: t("title.start") });
+    await waitFor(() => expect((start as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(start);
+    const consoleButton = await screen.findByRole("button", { name: /Open mission console/ });
+    await waitFor(() => expect((consoleButton as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(consoleButton);
 
     for (let sol = 1; sol <= 3; sol++) {
-      fireEvent.click(
-        screen.getByRole("button", { name: t("morning.goPlan") }),
-      );
-      fireEvent.click(screen.getByRole("button", { name: t("plan.endSol") }));
-      fireEvent.click(
-        screen.getByRole("button", {
-          name: sol === 3 ? t("endSol.seeResults") : t("endSol.nextMorning"),
-        }),
-      );
+      await screen.findByRole("heading", { name: t("morning.heading", { sol }) });
+      click(t("morning.goPlan"));
+      for (const [crew, job] of Object.entries(demoPlanForSol(sol))) {
+        click(t("crew.name", { n: crewNumber[crew as CrewId] }));
+        click(t(`jobs.${job}`));
+      }
+      click(/End sol/);
+      // Leaving a crew member idle on purpose asks for a second click.
+      if (screen.queryByRole("alert")) click(new RegExp(t("play.confirmEnd")));
+      click(sol === 3 ? t("endSol.seeResults") : t("endSol.nextMorning"));
     }
 
     const state = structuredClone(useGame.getState().state);
@@ -43,9 +58,7 @@ describe("?demo=1 recording path (#6)", () => {
   it("drives the real UI to the same saved storm, start, and causal chain twice", async () => {
     const first = await playThroughUi();
 
-    useNav.setState(START);
-    useMission.setState({ status: "idle", setup: undefined });
-    useGame.getState().reset();
+    resetStores();
     const second = await playThroughUi();
 
     expect(second).toEqual(first);

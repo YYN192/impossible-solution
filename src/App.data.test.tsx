@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import i18n from "./i18n";
@@ -22,7 +22,8 @@ describe("App + data layer (#5, #7, #8)", () => {
 
   it("loads the mission on start and shows an honest SAVED DATA badge", async () => {
     render(<App />);
-    const badge = await screen.findByRole("status");
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain(t("data.badge.saved")));
+    const badge = screen.getByRole("status");
     expect(badge.textContent).toContain(t("data.badge.saved"));
     expect(badge.textContent).not.toContain(t("data.badge.live"));
     expect(useMission.getState().setup?.kind).toBe("may2024");
@@ -30,7 +31,8 @@ describe("App + data layer (#5, #7, #8)", () => {
 
   it("opens Data Sources from any screen and goes back to the same screen", async () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: t("title.start") }));
+    await screen.findByRole("button", { name: t("title.start") });
+    act(() => useNav.setState({ screen: "morning", sol: 1 }));
     const morning = h1().textContent;
     fireEvent.click(screen.getByRole("button", { name: t("dataSources.open") }));
     const title = await screen.findByRole("heading", { name: t("dataSources.title") });
