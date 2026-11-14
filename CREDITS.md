@@ -19,6 +19,10 @@
 
 ## Assets (author, licence, link)
 
+| Asset | Author | Licence | Notes |
+|---|---|---|---|
+| `src/assets/pixel/astronaut.png` | OpenAI image generation | Generated for this prototype | Original pixel-art astronaut; generated 2026-11-14 |
+
 ## Reference code
 
 - Generic API resilience patterns adapted from the team's prep notes (Apache-2.0).
