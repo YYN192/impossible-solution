@@ -16,7 +16,7 @@ export function buildChains(all: Domino[]): Domino[][] {
     (d) => d.causeIds.length > 0 && !isCause.has(d.id),
   );
 
-  return problems.reverse().map((problem) => {
+  const walks = problems.reverse().map((problem) => {
     const chain = [problem];
     const seen = new Set([problem.id]);
     let current = problem;
@@ -31,4 +31,16 @@ export function buildChains(all: Domino[]): Domino[][] {
     }
     return chain;
   });
+
+  // Longest story first (stable: ties stay newest first). A later chain stops at the first
+  // domino an earlier chain already showed, so no root is repeated.
+  const shown = new Set<string>();
+  return walks
+    .sort((a, b) => b.length - a.length)
+    .map((chain) => {
+      const join = chain.findIndex((d) => shown.has(d.id));
+      const cut = join === -1 ? chain : chain.slice(0, join + 1);
+      for (const d of cut) shown.add(d.id);
+      return cut;
+    });
 }

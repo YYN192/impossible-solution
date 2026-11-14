@@ -2,6 +2,7 @@ import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { DominoCard } from "../components/DominoCard";
 import { ScreenFrame } from "../components/ScreenFrame";
+import { readFlags } from "../data/flags";
 import { stars as starsOf, type Stars } from "../sim/engine";
 import { MISSION_SOLS, type Domino } from "../sim/types";
 import { useBest } from "../state/best";
@@ -43,16 +44,21 @@ export function FinalView({
   const best = useBest((s) => s.best);
   const record = useBest((s) => s.record);
   const chains = buildChains(dominoes);
+  // The ?demo=1 recording must look the same every time: no Best from earlier games.
+  const demo = readFlags().demo;
 
   useEffect(() => {
-    record(stars.count);
-  }, [record, stars.count]);
+    if (!demo) record(stars.count);
+  }, [demo, record, stars.count]);
 
   return (
     <ScreenFrame
       title={endedEarly ? t("final.endedEarly") : t("final.heading")}
     >
-      <StarRow stars={stars} best={Math.max(best, stars.count)} />
+      <StarRow
+        stars={stars}
+        best={demo ? undefined : Math.max(best, stars.count)}
+      />
 
       {chains.length > 0 ? (
         <>
@@ -77,7 +83,7 @@ export function FinalView({
   );
 }
 
-function StarRow({ stars, best }: { stars: Stars; best: number }) {
+function StarRow({ stars, best }: { stars: Stars; best?: number }) {
   const { t } = useTranslation();
   const goals = [
     { key: "crewSafe", won: stars.crewSafe },
@@ -104,7 +110,9 @@ function StarRow({ stars, best }: { stars: Stars; best: number }) {
           </li>
         ))}
       </ul>
-      <p className="note">{t("final.best", { count: best })}</p>
+      {best !== undefined && (
+        <p className="note">{t("final.best", { count: best })}</p>
+      )}
     </div>
   );
 }

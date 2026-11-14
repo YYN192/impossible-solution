@@ -49,6 +49,19 @@ describe("buildChains", () => {
     ]);
   });
 
+  it("a cause already shown in an earlier chain ends the later chain (shown once more as the joining link)", () => {
+    const all = [
+      d("root"),
+      d("mid", ["root"]),
+      d("endA", ["mid"]),
+      d("endB", ["mid"]),
+    ];
+    expect(ids(buildChains(all))).toEqual([
+      ["endB", "mid", "root"],
+      ["endA", "mid"],
+    ]);
+  });
+
   it("follows the first known cause, skipping unknown ids", () => {
     const all = [d("a"), d("b"), d("c", ["missing", "b", "a"])];
     expect(ids(buildChains(all))).toEqual([["c", "b"]]);

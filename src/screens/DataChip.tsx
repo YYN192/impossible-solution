@@ -11,7 +11,9 @@ export function DataChip({ source }: { source: DataRef }) {
   return (
     <p className="chip" data-mode={source.mode}>
       <span aria-hidden="true">🛰️ </span>
-      <strong>{t(`chip.${source.mode}`)}:</strong> {source.label}{" "}
+      <strong>{t(`chip.${source.mode}`)}:</strong>{" "}
+      {source.value && <b>{source.value} — </b>}
+      {source.label}{" "}
       <a href={source.url} target="_blank" rel="noreferrer">
         {t("chip.source")}
       </a>

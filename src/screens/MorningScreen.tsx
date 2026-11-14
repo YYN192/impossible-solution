@@ -7,6 +7,7 @@ import {
 } from "../components/helpTopics";
 import { WhatsThis } from "../components/WhatsThis";
 import { tDynamic } from "../i18n/dynamic";
+import { knownEvents } from "../sim/engine";
 import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "../state/game";
 import { useMission } from "../state/mission";
@@ -31,7 +32,8 @@ export function MorningScreen() {
     sol,
     fell,
     all: state.dominoes,
-    events: events ?? [],
+    // Bursts come without warning (the end-of-sol report shows them); clouds only once Earth warned.
+    events: knownEvents(state, events ?? []),
     earthAnswer: state.earthAnswer,
   });
   return <MorningReportView sol={sol} report={report} />;

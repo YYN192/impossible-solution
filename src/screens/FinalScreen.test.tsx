@@ -71,6 +71,15 @@ describe("Final screen", () => {
     expect(localStorage.getItem(BEST_KEY)).toBe("2");
   });
 
+  it("?demo=1 never shows or saves a Best score (the recording stays the same)", () => {
+    localStorage.setItem(BEST_KEY, "3");
+    useBest.setState({ best: 3 });
+    window.history.replaceState({}, "", "/?demo=1");
+    render(<FinalView dominoes={[]} stars={stars(2)} />);
+    window.history.replaceState({}, "", "/");
+    expect(document.body.textContent).not.toContain("Best");
+  });
+
   it("no chain when nothing fell", () => {
     render(<FinalView dominoes={[]} stars={stars(3)} />);
     screen.getByText(t("final.noChain"));

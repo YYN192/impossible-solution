@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import i18n from "./i18n";
 import PlanScreen from "./PlanScreen";
 import { useSession } from "./game/session";
-import { step } from "./sim/engine";
-import { JOBS, type JobId, type Plan } from "./sim/types";
+import { may2024Mission } from "./data/mission";
+import { createGame, step } from "./sim/engine";
+import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
 
@@ -27,6 +28,32 @@ beforeEach(() => {
 });
 
 describe("PlanScreen (#9)", () => {
+  it("the preview hides a storm the kid was not warned about (no leak past Ask Earth)", () => {
+    const setup = may2024Mission();
+    const sol2 = step(
+      createGame(),
+      { a1: "greenhouse" },
+      setup.events,
+      setup.forecasts,
+    ).state;
+    useGame.setState({ state: sol2 });
+    useMission.setState({ status: "ready", setup });
+    useSession.setState({ draft: { a1: "science" } });
+    render(<PlanScreen />);
+    const dose = Number(
+      screen
+        .getByRole("meter", { name: t("bars.dose") })
+        .getAttribute("aria-valuenow"),
+    );
+    expect(dose).toBeCloseTo(step(sol2, { a1: "science" }, []).state.bars.dose);
+    // The space-ray meter goes up to DOSE.meterMax, so a real storm never hits the top.
+    expect(
+      screen
+        .getByRole("meter", { name: t("bars.dose") })
+        .getAttribute("aria-valuemax"),
+    ).toBe(String(DOSE.meterMax));
+  });
+
   it("disables a tired astronaut", () => {
     useGame.setState({ state: { ...useGame.getState().state, tired: ["a1"] } });
     render(<PlanScreen />);

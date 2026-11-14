@@ -14,7 +14,7 @@ import { audio } from "./game/audio";
 import { useSession } from "./game/session";
 import { DataChip } from "./screens/DataChip";
 import { ScreenFrame } from "./components/ScreenFrame";
-import { step } from "./sim/engine";
+import { knownEvents, step } from "./sim/engine";
 import {
   JOBS,
   MISSION_SOLS,
@@ -68,8 +68,15 @@ export default function PlanScreen() {
     target?.focus();
   });
   // Pure engine preview; no parallel simulation in the interface.
+  // Only storms the kid was told about: a surprise burst must not leak through the preview.
   const preview = useMemo(
-    () => step(state, plan, setup?.events ?? [], setup?.forecasts),
+    () =>
+      step(
+        state,
+        plan,
+        knownEvents(state, setup?.events ?? []),
+        setup?.forecasts,
+      ),
     [state, plan, setup],
   );
   const idle = crew.filter(
