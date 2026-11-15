@@ -58,3 +58,5 @@ html{font-size:clamp(16px,.45vw + 10px,22px)}
 .storm-dialog{position:fixed;inset:0;margin:auto;max-height:calc(100dvh - 24px);overflow:auto}
 .storm-dialog[open]{margin:auto!important}
 .storm-dialog{border-color:#f5c542!important}
+/* Today's Sun card: real DONKI facts with an honest label; the link is a full tap target. */
+.sun-card p{margin:.3rem 0}.sun-card__label{display:block;font-size:.75rem;letter-spacing:.06em;color:var(--cyan)}.sun-card__label--saved,.sun-card__label--cached{color:#c9d6e0}.sun-card a{display:inline-flex;align-items:center;min-height:44px;color:var(--cyan)}
