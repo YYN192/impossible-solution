@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DOOR, doorStep, easeInOut } from "./renderWorld";
+import { DOOR, consoleGlow, doorStep, easeInOut } from "./renderWorld";
 
 describe("sliding airlock", () => {
   it("opens in openMs and closes in closeMs, by the clock (any screen refresh rate)", () => {
@@ -36,5 +36,18 @@ describe("sliding airlock", () => {
     const { leaf, light } = DOOR;
     expect(leaf.x + leaf.w).toBeLessThanOrEqual(32 - leaf.x);
     expect(light.y + light.h).toBeLessThanOrEqual(leaf.y);
+  });
+});
+
+describe("console glow (#55)", () => {
+  it("pulses in whole steps, 0 to 3 rings and back, every 1.8 s", () => {
+    const rings = Array.from({ length: 12 }, (_, i) => consoleGlow(i * 300, false, false));
+    expect(rings).toEqual([0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1]);
+  });
+  it("stays still once the mission is running, and with reduced motion", () => {
+    for (let t = 0; t < 1800; t += 100) {
+      expect(consoleGlow(t, false, true)).toBe(0);
+      expect(consoleGlow(t, true, false)).toBe(0);
+    }
   });
 });

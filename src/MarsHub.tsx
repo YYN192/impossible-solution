@@ -12,7 +12,7 @@ import { usePressedKeys } from "./game/pressedKeys";
 import { createWalkFx, idleBob, stepWalkFx } from "./game/walkFx";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
-import { useNav } from "./state/screen";
+import { firstSolStarted, useNav } from "./state/screen";
 import { readFlags } from "./data/flags";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
@@ -107,7 +107,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       // and turns off the walk dust and the idle bounce. Dust follows real movement (pushing into a wall raises none).
       const comfort = useComfort.getState(), reduced = reducedMotion();
       fx = stepWalkFx(fx, { now, moved: player.x !== before.x || player.y !== before.y, walking: moving, x: player.x, y: player.y, facing: player.facing, reduced });
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reduced, comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon", { puffs: fx.puffs, bob: idleBob(fx, now, reduced) });
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reduced, comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon", { puffs: fx.puffs, bob: idleBob(fx, now, reduced) }, firstSolStarted(useNav.getState()));
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
