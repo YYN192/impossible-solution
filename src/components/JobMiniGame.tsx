@@ -4,11 +4,11 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { mistake } from "../game/feedback";
 import {
-  DISH_STEPS, GROW_TARGET, WATER_MAX, STACK_CENTER, STACK_GOAL, TICK_MS,
+  DISH_STEPS, GROW_TARGET, WATER_MAX, STACK_CENTER, STACK_GOAL,
   drop, progress, send, startMiniGame, tap, tick, turn, won, type MiniGame,
 } from "../game/miniGames";
 import { gameKey } from "../game/pressedKeys";
-import { useComfort } from "../state/comfort";
+import { useGameClock } from "../game/useGameClock";
 import type { JobId } from "../sim/types";
 
 /** A pixel sprite (src/assets/pixel): hard edges, scaled by whole pixels in CSS. */
@@ -27,18 +27,11 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const [game, setGame] = useState<MiniGame>(() => startMiniGame(job, seed));
   const box = useRef<HTMLDialogElement>(null);
   const done = won(game);
-  // #77: the clock waits for the first press, can be paused, and runs at half speed in slow mode.
-  const [started, setStarted] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const slow = useComfort((c) => c.slowMiniGames);
+  const { started, paused, togglePause, go } = useGameClock(done, () =>
+    setGame((g) => { const n = tick(g); if (setbackIn(g, n)) mistake("small", box.current); return n; }));
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
   useEffect(() => audio.miniGameOpened(), []);
-  useEffect(() => {
-    if (done || !started || paused) return;
-    const clock = setInterval(() => setGame((g) => { const n = tick(g); if (setbackIn(g, n)) mistake("small", box.current); return n; }), TICK_MS * (slow ? 2 : 1));
-    return () => clearInterval(clock);
-  }, [done, started, paused, slow]);
   // "Great job!" shows for 1 s, then the game goes back to the plan by itself (the latest onClose, without restarting the second).
   const close = useRef(onClose);
   useEffect(() => { close.current = onClose; });
@@ -49,11 +42,8 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
     return () => clearTimeout(back);
   }, [done]);
   const play = (nextGame: MiniGame, sound = "console-button") => {
-    setPaused(false);
-    if (!started) {
-      setStarted(true);
-      if (game.job === "shelter") return; // the first press only starts the sliding block
-    }
+    go();
+    if (!started && game.job === "shelter") return; // the first press only starts the sliding block
     if (nextGame === game) return;
     const missed = "miss" in nextGame && nextGame.miss;
     if (missed) mistake("small", box.current); else audio.playSfx(sound);
@@ -110,7 +100,7 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
         {done
           ? <button type="button" className="primary" autoFocus onClick={() => onClose(true)}>{t("miniGame.finish")} <span aria-hidden="true">→</span></button>
           : <>
-            {started && <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>{t(paused ? "miniGame.resume" : "miniGame.pause")}</button>}
+            {started && <button type="button" aria-pressed={paused} onClick={togglePause}>{t(paused ? "miniGame.resume" : "miniGame.pause")}</button>}
             <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>
           </>}
       </div>

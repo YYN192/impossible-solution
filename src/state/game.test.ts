@@ -2,9 +2,8 @@ import { dominoView } from "../test/icons";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createGame, stars } from "../sim/engine";
+import { createGame, ENGINE, stars } from "../sim/engine";
 import { MISSION_SOLS } from "../sim/types";
-import { JOBS } from "../sim/types";
 import { DEMO_CHAIN_IDS, DEMO_PLANS } from "../data/demo";
 import { readFlags } from "../data/flags";
 import { FinalScreen } from "../screens/FinalScreen";
@@ -109,11 +108,11 @@ describe("game store (real engine)", () => {
 
     const replay = () => {
       useGame.getState().reset();
-      expect(DEMO_PLANS[1].a1).toBe("greenhouse");
+      expect(Object.values(DEMO_PLANS[1])).not.toContain("greenhouse");
       for (const [index, plan] of DEMO_PLANS.entries()) {
         if (index === 1) {
           expect(useGame.getState().state.bars.power).toBeLessThan(
-            JOBS.greenhouse.powerCost,
+            ENGINE.lowPowerToday,
           );
         }
         useGame.getState().endSol(plan);

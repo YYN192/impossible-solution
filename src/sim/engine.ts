@@ -238,6 +238,7 @@ export function step(
     });
   }
 
+  const powerAfterJobs = power;
   // Night: the air machine.
   let air = state.bars.air;
   if (power + EPS < R.airMachinePower) {
@@ -423,7 +424,8 @@ export function step(
     ...(state.rules ? { rules: state.rules } : {}),
     ...(Object.keys(blame).length ? { blame } : {}),
   };
-  return { state: newState, fell };
+  const flow = { power: { sun: powerTomorrow - power, jobs: state.bars.power - powerAfterJobs, night: powerAfterJobs - power } };
+  return { state: newState, fell, flow };
 }
 
 /** Can this beat choice be taken now? (Only power is a price; other effects just happen.) */

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
-import { TICK_MS } from "../game/miniGames";
+import { useGameClock } from "../game/useGameClock";
 import {
   COLUMNS, ICE_SOLID, PILE_MAX, SUN_STEPS, TRAVEL,
   moonPour, moonProgress, moonRead, moonSend, moonTap, moonTick, moonTurn, moonWon, startMoonGame, type MoonGame,
@@ -23,12 +23,12 @@ export function MoonMiniGame({ job, seed, onClose }: { job: JobId; seed: number;
   const box = useRef<HTMLDialogElement>(null);
   const done = moonWon(game);
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
-  useEffect(() => {
-    if (done) { audio.playSfx("job-complete"); return; }
-    const clock = setInterval(() => setGame((g) => moonTick(g)), TICK_MS);
-    return () => clearInterval(clock);
-  }, [done]);
+  // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
+  useEffect(() => audio.miniGameOpened(), []);
+  const { started, paused, togglePause, go } = useGameClock(done, () => setGame((g) => moonTick(g)));
+  useEffect(() => { if (done) audio.playSfx("job-complete"); }, [done]);
   const play = (next: MoonGame, sound = "console-button") => {
+    go();
     if (next === game) return;
     const oops = ("full" in next && next.full) || ("dark" in next && next.dark);
     audio.playSfx(oops ? "menu-error" : sound);
@@ -71,13 +71,17 @@ export function MoonMiniGame({ job, seed, onClose }: { job: JobId; seed: number;
       <p className="note mini-keys">{t(`miniGame.moon.keys.${job}`)}</p>
       <div className="mini-meter" aria-hidden="true">{Array.from({ length: total }, (_, i) => <span key={i} className={i < count ? "on" : ""} />)}</div>
       <p aria-live="polite" className="storm-left">
-        {done ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong> : <Hint game={game} />}
+        {done ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong>
+          : !started ? <span>{t("miniGame.start")}</span> : paused ? <span>{t("miniGame.paused")}</span> : <Hint game={game} />}
         {!done && <span className="mini-count"> {t("miniGame.progress", { done: count, total })}</span>}
       </p>
       <div className="actions">
         {done
           ? <button type="button" className="primary" autoFocus onClick={() => onClose(true)}>{t("miniGame.finish")} <span aria-hidden="true">→</span></button>
-          : <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>}
+          : <>
+            {started && <button type="button" aria-pressed={paused} onClick={togglePause}>{t(paused ? "miniGame.resume" : "miniGame.pause")}</button>}
+            <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>
+          </>}
       </div>
     </div>
   </dialog>;

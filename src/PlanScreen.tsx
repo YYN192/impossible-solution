@@ -29,6 +29,12 @@ import { useMission } from "./state/mission";
 import { useNav } from "./state/screen";
 const crew: CrewId[] = ["a1", "a2", "a3"];
 const jobIds = Object.keys(JOBS) as JobId[];
+const coreJobIds = jobIds.slice(0, 3);
+const amount = (value: number) => Math.abs(Number(value.toFixed(1)));
+const signed = (value: number) => {
+  const rounded = Number(value.toFixed(1));
+  return `${rounded >= 0 ? "+" : "−"}${Math.abs(rounded)}`;
+};
 const jobArt: Record<JobId, string> = {
   panels: "power-cell",
   greenhouse: "mineral-green",
@@ -51,6 +57,7 @@ export default function PlanScreen() {
   const setup = useMission((s) => s.setup);
   const plan = useSession((s) => s.draft);
   const assign = useSession((s) => s.assign);
+  const availableJobIds = state.sol <= 2 ? coreJobIds : jobIds;
   const moon = setup?.place === "moon" ? "moon" : undefined;
   const [selected, select] = useState<CrewId | null>(null);
   // Phones: End sol and a one-line preview stay pinned to the bottom of the screen (#75).
@@ -208,7 +215,8 @@ export default function PlanScreen() {
             <p className="jobs-locked">{t("play.jobsLocked")}</p>
           )}
           <div className={`job-list ${selected ? "" : "locked"}`}>
-            {jobIds.map((id, i) => {
+            {availableJobIds.map((id) => {
+              const i = jobIds.indexOf(id);
               const owner = crew.find((c) => plan[c] === id);
               return (
                 <button
@@ -259,7 +267,12 @@ export default function PlanScreen() {
                   <span className="job-number">0{i + 1}</span>
                   <img src={asset(`items/${jobArt[id]}`)} alt="" />
                   <span className="job-copy">
-                    <strong>{t(`jobs.${id}`)}</strong>
+                    <strong>
+                      {t(`jobs.${id}`)}
+                      {state.sol === 3 && !coreJobIds.includes(id) && (
+                        <span className="job-new">{t("play.newJob")}</span>
+                      )}
+                    </strong>
                     <small>{t(`jobInfo.${id}.done`)}</small>
                     {/* Two pieces, so each wraps as a whole beside the job name (#95). */}
                     <span className="job-cost">
@@ -294,6 +307,17 @@ export default function PlanScreen() {
           <h2>{tRun("play.preview", {}, moon)}</h2>
           <p className="note">{t("play.previewMeaning")}</p>
           <ResourceMeters bars={preview.state.bars} previous={state.bars} />
+          {/* #64: where the power change comes from; the three parts add up to the meter's +/−. */}
+          {preview.flow && (
+            <p className="power-flow">
+              {t("play.flow", {
+                sun: amount(preview.flow.power.sun),
+                jobs: amount(preview.flow.power.jobs),
+                night: amount(preview.flow.power.night),
+                change: signed(preview.flow.power.sun - preview.flow.power.jobs - preview.flow.power.night),
+              })}
+            </p>
+          )}
           <div className="small-counters">
             <span>
               {t("bars.food")} <b>{preview.state.food}</b>
@@ -306,7 +330,7 @@ export default function PlanScreen() {
             {t("play.leftBehind")}
           </h3>
           <ul className="skip-dominoes" aria-labelledby="skip-heading">
-            {jobIds
+            {availableJobIds
               .filter((id) => !Object.values(plan).includes(id))
               .map((id) => {
                 // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art with an x badge.

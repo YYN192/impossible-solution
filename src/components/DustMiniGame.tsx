@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
-import { TICK_MS } from "../game/miniGames";
+import { useGameClock } from "../game/useGameClock";
 import { DUST_JOBS, dustProgress, dustTap, dustTick, dustWon, startDustGame, type DustGame } from "../game/dustMiniGames";
 import { gameKey } from "../game/pressedKeys";
 
@@ -19,12 +19,12 @@ export function DustMiniGame({ job, seed, onClose }: { job: (typeof DUST_JOBS)[n
   const box = useRef<HTMLDialogElement>(null);
   const done = dustWon(game);
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
-  useEffect(() => {
-    if (done) { audio.playSfx("job-complete"); return; }
-    const clock = setInterval(() => setGame((g) => dustTick(g)), TICK_MS);
-    return () => clearInterval(clock);
-  }, [done]);
+  // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
+  useEffect(() => audio.miniGameOpened(), []);
+  const { started, paused, togglePause, go } = useGameClock(done, () => setGame((g) => dustTick(g)));
+  useEffect(() => { if (done) audio.playSfx("job-complete"); }, [done]);
   const play = (next: DustGame) => {
+    go();
     if (next === game) return;
     const tooEarly = next.job === "panels" && next.early;
     audio.playSfx(tooEarly ? "menu-error" : "console-button");
@@ -69,13 +69,17 @@ export function DustMiniGame({ job, seed, onClose }: { job: (typeof DUST_JOBS)[n
       <p aria-live="polite" className="storm-left">
         {done
           ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong>
+          : !started ? <span>{t("miniGame.start")}</span> : paused ? <span>{t("miniGame.paused")}</span>
           : game.job === "panels" && game.early ? <span>{t("miniGame.dust.panels.early")}</span> : null}
         {!done && <span className="mini-count"> {t("miniGame.progress", { done: count, total })}</span>}
       </p>
       <div className="actions">
         {done
           ? <button type="button" className="primary" autoFocus onClick={() => onClose(true)}>{t("miniGame.finish")} <span aria-hidden="true">→</span></button>
-          : <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>}
+          : <>
+            {started && <button type="button" aria-pressed={paused} onClick={togglePause}>{t(paused ? "miniGame.resume" : "miniGame.pause")}</button>}
+            <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>
+          </>}
       </div>
     </div>
   </dialog>;

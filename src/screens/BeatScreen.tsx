@@ -61,7 +61,7 @@ export function BeatScreen() {
   const next = useNav((s) => s.next);
   const setup = useMission((s) => s.setup);
   const state = useGame((s) => s.state);
-  const [done, setDone] = useState<{ fell: Domino; before: Bars } | null>(null);
+  const [done, setDone] = useState<{ fell: Domino; before: Bars; chips: Chip[] } | null>(null);
   // Explore beats open on the map; "Let Pip drive" shows the plain choices instead.
   const [pipDrives, setPipDrives] = useState(false);
   const beat = setup?.beats[sol];
@@ -81,7 +81,7 @@ export function BeatScreen() {
     audio.playSfx(action.ask ? "earth-message-send" : "assign");
     const { power, air, dose } = after.bars;
     if (power <= 1 || air <= 2 || dose >= ENGINE.doseLimit) mistake("big"); else if (dose > before.dose) mistake("small"); // the choice cost something
-    setDone({ fell, before });
+    setDone({ fell, before, chips: effects(action, tt) });
   }
   const choose = (o: BeatOption) => act(o.action);
   const onMap = beat.map && !pipDrives && !done;
@@ -139,6 +139,9 @@ export function BeatScreen() {
       ) : (
         <div className="beat-result" role="status">
           <p className="lead"><Icons icon={done.fell.icon} />{" "}{tDynamic(done.fell.textKey)}</p>
+          <p className="beat-effects beat-changed"><b>{t("beatUi.changed")}</b>{" "}
+            {(done.chips.length ? done.chips : [{ text: t("beatUi.nothing") } as Chip]).map((c) => <span key={`${c.icon}-${c.text}`}>{c.icon && <Icon name={c.icon} />} {c.text}</span>)}
+          </p>
           {done.fell.source && <DataChip source={done.fell.source} />}
           {beat.type === "radio" && (state.earthAnswer && place ? <EarthAnswer answer={state.earthAnswer} /> : state.radioed && <p>{t("beatUi.answerNight")}</p>)}
           <div className="actions">

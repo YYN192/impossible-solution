@@ -36,8 +36,20 @@ describe("beat screen: one interaction per sol, through the engine", () => {
     expect(useGame.getState().state.rules?.heater).toBe(2);
     expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol1-siteMars-gale"]);
     screen.getByText(t("beat.chose", { choice: t("beat.siteMars.gale.label") }));
+    // #64: the result says what the choice changed, not only "You chose X".
+    const result = document.querySelector(".beat-result")!.textContent!;
+    expect(result).toContain(t("beatUi.changed"));
+    expect(result).toContain(t("rule.heater", { n: 2 }));
     fireEvent.click(screen.getByRole("button", { name: new RegExp(t("beatUi.continue")) }));
     expect(useNav.getState()).toMatchObject({ screen: "plan", sol: 1 });
+  });
+
+  it("a choice with no resource effect still reports that nothing changed", () => {
+    open("dust", 3);
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(t("beat.upgrade.none.label")) }));
+    const result = document.querySelector(".beat-result")!.textContent!;
+    expect(result).toContain(t("beatUi.changed"));
+    expect(result).toContain(t("beatUi.nothing"));
   });
 
   it("a choice the base cannot pay for is switched off and says why", () => {
