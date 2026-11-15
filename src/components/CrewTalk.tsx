@@ -111,7 +111,7 @@ export function CrewTalk({
         {step.kind === "text" && (
           <TypedLine
             key={step.key}
-            text={t(step.key)}
+            text={t(step.key as never)}
             blip={blip}
             onNext={() => {
               audio.playSfx("dialogue");
@@ -299,7 +299,7 @@ function JobsDrill({ onWin }: { onWin: () => void }) {
       <p aria-live="polite">
         {picked.length < CREW
           ? t("drills.jobs.left", { count: CREW - picked.length })
-          : t("drills.jobs.done", { job: t(`jobs.${waiting}`) })}
+          : t("drills.jobs.done", { job: t(`jobs.${waiting!}`) })}
       </p>
       <button
         className="primary"
