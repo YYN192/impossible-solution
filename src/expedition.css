@@ -79,3 +79,15 @@ html{font-size:clamp(16px,.45vw + 10px,22px)}
 .radar-days{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;margin-top:8px}.radar-day{min-height:48px;padding:3px;display:flex;flex-direction:column;align-items:center;gap:3px;background:#101A2B;border:2px solid #252C38;color:var(--fg);font:inherit}.radar-day.empty{opacity:.45}button.radar-day{border-color:#687586;cursor:pointer}button.radar-day[aria-pressed=true],button.radar-day:hover{border-color:#83D9F4;background:#123447}
 .radar-date{font-size:.75rem;line-height:1}.radar-marks{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:40px}.radar-mark{display:block;width:6px;height:6px;background:#D86E3B}.radar-mark[data-type=flr]{background:#E6BD5D}.radar-mark[data-type=sep]{background:#83D9F4}.radar-mark[data-type=gst]{background:#65BF83}.radar-mark[data-mars]{background:#E8F0F7;box-shadow:0 0 0 1px #A84730}
 .radar-detail{margin-top:12px;padding:10px;border:2px dashed #48647b;min-height:3.2em}.radar-detail p{margin:0}.radar-detail ul{margin:6px 0 0;padding-left:1.2em}.radar-mars{color:#ffd98a}
+
+/* Engineering bay graphs: chunky pixel bars */
+.eng-graphs{display:grid;gap:12px;margin-top:12px}.eng-graph{background:#0a1624;border:2px solid #48647b;padding:10px}
+.eng-head{display:flex;align-items:center;gap:10px}.eng-head h3{margin:0;font-size:1rem}.eng-icon{image-rendering:pixelated;flex-shrink:0}
+.eng-bars{list-style:none;margin:8px 0;padding:0;display:grid;gap:8px}.eng-bar{display:grid;grid-template-columns:minmax(76px,28%) 1fr auto;align-items:center;gap:8px}
+.eng-label{font-size:.85rem;color:var(--muted)}.eng-value{font-size:.9rem;white-space:nowrap;color:var(--fg)}
+.eng-cells{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}.eng-cells i{display:block;aspect-ratio:1;max-height:22px;background:#101A2B;border:1px solid #252C38}
+.eng-cells i.on{background:var(--c);border-color:var(--c);animation:eng-fill .25s steps(2,end) backwards;animation-delay:calc(var(--i)*40ms)}
+.eng-bar[data-tone=sun]{--c:#E6BD5D}.eng-bar[data-tone=dust]{--c:#A84730}.eng-bar[data-tone=cold]{--c:#83D9F4}.eng-bar[data-tone=ice]{--c:#E8F0F7}.eng-bar[data-tone=calm]{--c:#65BF83}.eng-bar[data-tone=storm]{--c:#D86E3B}
+.eng-caption{margin:0 0 6px;font-weight:700}.eng-graph .chip{font-size:.8rem;margin:0}
+@keyframes eng-fill{from{opacity:0;transform:scale(.4)}}
+@media (prefers-reduced-motion:reduce){.eng-cells i.on{animation:none}}
