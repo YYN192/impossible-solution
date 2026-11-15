@@ -21,7 +21,7 @@
 .beat-option small, .beat-effects { font-family: var(--font-body); font-size: 0.9rem; line-height: 1.35; }
 .beat-real { color: #9fe0d8; }
 .beat-effects { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; }
-.beat-effects > span { background: #0d1622; border: 2px solid #3d4c60; padding: 0.1rem 0.4rem; }
+.beat-effects > span { background: #0d1622; color: #e8f0f7; border: 2px solid #3d4c60; padding: 0.1rem 0.4rem; }
 .beat-cannot { color: #ffb4a2; }
 .beat-result { border: 3px solid #ffd166; padding: 0.8rem; margin: 1rem 0; background: #111c2a; }
 .earth-answer .risk-high { color: #ffb4a2; font-weight: 700; }
