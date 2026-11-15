@@ -534,22 +534,6 @@
     }
   },
   "dialogue": {
-    "commander": {
-      "hello": "Welcome, commander! Three astronauts. Three days. One shared home.",
-      "advice": "Choose each job carefully. Skipped jobs can cause problems tomorrow."
-    },
-    "engineer": {
-      "hello": "I keep our lights on. Mars dust is everywhere!",
-      "advice": "Clean panels make more power. The air machine needs power nightly."
-    },
-    "scientist": {
-      "hello": "Our plants grow food. Our trips collect science.",
-      "advice": "Two science trips earn a star. Keep everyone fed, too!"
-    },
-    "drone": {
-      "hello": "Hello! I'm Pip. I help keep this station running.",
-      "advice": "Build the shelter before space rays arrive. Lower dose is better."
-    },
     "airlock": {
       "hello": "Surface trips are assigned through the mission console.",
       "advice": "Outside jobs collect science or clean panels. Watch the space rays!",
@@ -564,7 +548,7 @@
     },
     "radar": {
       "hello": "This radar shows what the Sun did this week.",
-      "advice": "Tap a mark to see when it happened and how big it was."
+      "advice": "Tap a mark. See when it happened and how big it was."
     }
   },
   "lang": {
@@ -1157,8 +1141,8 @@
       "drillIntro_moon": "Let's practise calling Earth! Send a message. Watch it fly to Earth and back!",
       "mission": {
         "storm": "Our mission lasts 5 sols. Keep all 3 astronauts safe, and collect science for the science star. A real storm from the Sun is coming. Nobody knows which sol!",
-        "dust": "This mission lasts 6 sols. First, you choose where to land. All three places are real. One has freezing nights, one has lots of dust, and one has strong wind.",
-        "moon": "Welcome to the Moon's south pole! We stay 5 days. First, choose a landing spot. Sunny spots, ice spots, a view of Earth: you can't have all three."
+        "dust": "This mission lasts 6 sols. First, you choose where to land. All three places are real. One has freezing nights. One has lots of dust. One has strong wind.",
+        "moon": "Welcome to the Moon's south pole! We stay 5 days. First, choose a landing spot. Sun, ice, a view of Earth: no spot has all three."
       }
     },
     "engineer": {
@@ -1169,9 +1153,9 @@
       "lore2_moon": "Apollo astronauts said Moon dust smelled like burnt gunpowder. It got into their spacesuits.",
       "who_moon": "I grew up fixing bikes. Now I fix a whole Moon base! Moon dust is my enemy. It is sharp and sticky, and it covers our solar panels.",
       "drillIntro": "Let's practise! The wind keeps blowing dust back onto the panels. Get every panel clean at the same time!",
-      "win": "Spotless! On the mission, the Clean solar panels job gives full power the next day.",
+      "win": "Spotless! On the mission, use the Clean solar panels job. It gives full power the next day.",
       "drillIntro_moon": "Let's practise! At the south pole, the Sun stays low. Turn the panel to face it!",
-      "win_moon": "The panel faces the Sun! On the mission, the Clean solar panels job gives full power the next day.",
+      "win_moon": "The panel faces the Sun! On the mission, use the Clean solar panels job. It gives full power the next day.",
       "mission": {
         "storm": "Power is like our pocket money. Sunlight fills it up, and every machine spends it. The air machine needs power every night, or the air runs low.",
         "dust": "Dust is our big enemy here. It falls on the panels every sol, so they make less power. Soon a big dust storm will come. For 2 sols the panels make much less power. Save some power before it hits!",
@@ -1198,15 +1182,15 @@
     "drone": {
       "intro": "Beep boop! I'm Pip, the station drone. I watch the Sun for you.",
       "who": "I was built to read space weather. Sometimes the Sun throws out tiny, very fast bits. We call them space rays.",
-      "intro_moon": "Beep boop! I'm Pip. I watch the Sun, and I keep an eye on Earth up there.",
+      "intro_moon": "Beep boop! I'm Pip. I watch the Sun. I keep an eye on Earth up there, too.",
       "who_moon": "The Moon has no thick air to stop space rays. So I watch the Sun for storms all day.",
       "lore_moon": "From the Moon, Earth hardly moves across the sky. Near the south pole, it hangs low.",
       "lore2_moon": "Footprints on the Moon can last for millions of years. There is no wind to blow them away.",
       "drillIntro": "Drill time! A block slides along the top. Drop it right on the stack to build the shelter.",
-      "win": "Beep! Strong shelter! On the mission, the Build up the shelter job means fewer space rays for everyone.",
+      "win": "Beep! Strong shelter! On the mission, use the Build up the shelter job. Then everyone gets fewer space rays.",
       "drillIntro_moon": "Drill time! The scoop slides by itself. Pour dirt on every part!",
       "mission": {
-        "storm": "I watch the Sun for you. When a solar storm hits, astronauts inside the shelter get fewer space rays. A thicker shelter helps even more.",
+        "storm": "I watch the Sun for you. In a solar storm, astronauts in the shelter get fewer space rays. A thicker shelter helps even more.",
         "dust": "Even during dust season, the Sun can send space rays. Near the end of this mission, I may beep a warning. Then the shelter matters!",
         "moon": "The Moon has no thick air to block space rays. When the Sun sends a storm, get into the shelter fast."
       }

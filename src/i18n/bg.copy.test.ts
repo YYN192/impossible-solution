@@ -27,7 +27,7 @@ const SAME_IN_EVERY_LANGUAGE = new Set(["app.name", "lang.en", "lang.bg", "crew.
 
 const KID_SECTIONS = [
   "title", "common", "morning", "domino", "event", "earth", "plan", "endSol", "final",
-  "jobs", "jobInfo", "crew", "planHelp", "bars", "help", "miniGame", "dialogue", "play",
+  "jobs", "jobInfo", "crew", "planHelp", "bars", "help", "miniGame", "dialogue", "play", "talk",
 ];
 const MAX_WORDS = 14; // Bulgarian needs a few more small words ("се", "не", "за") than English's 12.
 
