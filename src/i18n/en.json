@@ -870,5 +870,53 @@
       "plants": "Plant new seedlings"
     },
     "fixed": "Greenhouse fixed!"
+  },
+  "miniGame": {
+    "eyebrow": "Mini game",
+    "skip": "Skip",
+    "won": "Great job!",
+    "finish": "Back to the plan",
+    "progress": "{{done}} of {{total}}",
+    "panels": {
+      "title": "Beat the dust storm",
+      "lead": "The wind blows dust back! Get every panel clean at once.",
+      "panel": "Panel {{n}}: {{state}}",
+      "dusty": "dusty",
+      "clean": "clean"
+    },
+    "greenhouse": {
+      "title": "Keep the plants growing",
+      "lead": "Tap a plant to water it. Thirsty plants stop growing!",
+      "plant": "Plant {{n}}: {{state}}",
+      "thirsty": "thirsty",
+      "watered": "has water",
+      "grown": "fully grown"
+    },
+    "shelter": {
+      "title": "Stack the shelter blocks",
+      "lead": "A block slides along the top. Drop it on the stack!",
+      "drop": "Drop the block",
+      "now": "Now! Drop it!",
+      "wait": "Wait until it is over the stack.",
+      "oops": "It fell off! Try again."
+    },
+    "askEarth": {
+      "title": "Follow Earth with the dish",
+      "lead": "Earth moves across the sky. Point the dish at it. Send 2 messages!",
+      "left": "Turn left",
+      "right": "Turn right",
+      "send": "Send message",
+      "aimed": "The dish points at Earth! Send!",
+      "notYet": "Turn the dish toward Earth."
+    },
+    "science": {
+      "title": "Catch the shiny rocks",
+      "lead": "Rocks pop up and hide again. Catch 4 shiny ones!",
+      "rock": "Hole {{n}}: {{state}}",
+      "shiny": "shiny rock",
+      "plain": "plain rock",
+      "empty": "empty",
+      "oops": "That was a plain rock. Only shiny ones!"
+    }
   }
 }
