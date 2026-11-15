@@ -91,3 +91,14 @@ html{font-size:clamp(16px,.45vw + 10px,22px)}
 .eng-caption{margin:0 0 6px;font-weight:700}.eng-graph .chip{font-size:.8rem;margin:0}
 @keyframes eng-fill{from{opacity:0;transform:scale(.4)}}
 @media (prefers-reduced-motion:reduce){.eng-cells i.on{animation:none}}
+.storm-clock{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 16px;color:#ff6b6b;background:#28131b;border:2px solid #c94b50;padding:6px 12px;margin:0 0 8px;font-family:var(--font-pixel, "Pixelify Sans", monospace)}.storm-clock strong{font:inherit;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1;font-variant-numeric:tabular-nums}.storm-clock[data-failing]{background:#421720}.storm-dialog>.storm-clock{grid-column:1/-1}
+/* Keep the countdown in the top header, including the compact landscape grid. */
+.station-header:has(> .storm-clock){flex-wrap:wrap}
+.station-header > .storm-clock{order:-2;flex:0 0 100%;width:100%;margin:0;text-align:center}
+/* The full-window mask lives outside the shaking station. No new animation loop. */
+.storm-iris{position:fixed;inset:0;z-index:10000;pointer-events:auto;cursor:wait}
+.storm-iris svg{display:block}
+.storm-iris-hole{r:0;animation:storm-iris-close var(--iris-duration) steps(36,end) var(--iris-delay) both}
+@keyframes storm-iris-close{from{r:var(--iris-radius)}to{r:0}}
+html[data-calm] .storm-iris-hole{animation:none}
+@media(prefers-reduced-motion:reduce){.storm-iris-hole{animation:none}}
