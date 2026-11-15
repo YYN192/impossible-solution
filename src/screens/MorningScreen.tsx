@@ -141,7 +141,7 @@ export function MorningReportView({
         )}
       </div>
 
-      <div className="actions">
+      <div className="actions phone-dock">
         <button type="button" className="primary morning-go" onClick={next}>
           {t("morning.goPlan")} <span aria-hidden="true">→</span>
         </button>

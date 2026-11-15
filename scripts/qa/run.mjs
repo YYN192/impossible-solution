@@ -117,7 +117,7 @@ const resizeActions = {
   hub: async (page) => { await button(page, EN.world.goConsole, { prefix: true }).click(); await button(page, EN.morning.goPlan).waitFor(); },
   hubDialogue: async (page) => { await closeDialogue(page); },
   plan: async (page) => {
-    const c = button(page, fmt(EN.crew.name, { n: 1 })); await c.click();
+    const c = button(page, EN.crew.who[1]); await c.click();
     if ((await c.getAttribute("aria-pressed")) !== "true") throw new Error("crew button did not select");
   },
   final: async (page) => { await restart(page); await heading(page, fmt(EN.morning.heading, { sol: 1 }).replace(/ 1$/, "")).waitFor(); },
@@ -199,7 +199,7 @@ check("reload", async () => {
       await toPlan(page); await assignAll(page); await endSol(page); await nextFromNight(page);
       await toPlan(page);
       const before = await solOnScreen(page);
-      await button(page, fmt(EN.crew.name, { n: 1 })).click();
+      await button(page, EN.crew.who[1]).click(); // crew.name is "$t(crew.who.N)", resolved by i18next, not by this script
       await page.reload();
       if (flag === "demo=1") {
         const fresh = await button(page, EN.title.start).waitFor({ timeout: 6000 }).then(() => true, () => false);
@@ -417,6 +417,94 @@ check("labels", async () => {
       } catch (e) { console.log(`FAIL labels ${lang} ${w}x${h} ${screen}: ${String(e.message).split("\n")[0]}`); fails++; }
       await done(page);
     }
+  }
+  return fails;
+});
+
+// ---- dust: text contrast while the dust storm covers the base (#75) ----
+/** In the page: WCAG contrast of one rendered text, from two screenshots of it (as shown, and with its text made
+ *  transparent). Pixels that change are the text; pixels that stay are what is behind it, dust included. */
+async function contrastOf([shown, hidden]) {
+  const load = async (b64) => {
+    const img = await createImageBitmap(await (await fetch(`data:image/png;base64,${b64}`)).blob());
+    const c = new OffscreenCanvas(img.width, img.height), x = c.getContext("2d");
+    x.drawImage(img, 0, 0);
+    return x.getImageData(0, 0, img.width, img.height).data;
+  };
+  const [p, q] = [await load(shown), await load(hidden)];
+  const lin = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const lum = (d, i) => 0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]);
+  const text = [], back = [];
+  for (let i = 0; i < p.length; i += 4) {
+    const diff = Math.abs(p[i] - q[i]) + Math.abs(p[i + 1] - q[i + 1]) + Math.abs(p[i + 2] - q[i + 2]);
+    if (diff > 120) text.push([diff, lum(p, i)]);
+    else if (diff < 8) back.push(lum(q, i));
+  }
+  if (text.length < 4 || back.length < 4) return null;
+  // The text colour: the most-changed third of its pixels (edges are blended with the background).
+  text.sort((a, b) => b[0] - a[0]);
+  const core = text.slice(0, Math.ceil(text.length / 3)).map(([, l]) => l).sort((a, b) => a - b);
+  const fg = core[Math.floor(core.length / 2)];
+  // The background: its worst tenth (the pixels closest to the text colour), so blotchy dust cannot hide a problem.
+  const ratios = back.map((l) => (Math.max(l, fg) + 0.05) / (Math.min(l, fg) + 0.05)).sort((a, b) => a - b);
+  return ratios[Math.floor(ratios.length / 10)];
+}
+check("dust", async () => {
+  let fails = 0;
+  const AREAS = ".mission-status-bar, .station-header, .storm-objective, .interaction-guide";
+  for (const [w, h] of [[390, 844], [1366, 768], [1920, 1080]]) {
+    const phone = w < 500;
+    const page = await newPage(w, h, { reducedMotion: "reduce", ...(phone ? { hasTouch: true, isMobile: true } : {}) });
+    const tag = `dust ${w}x${h}`;
+    try {
+      // Classic mission, seed 1: the dust storm reaches the base on the morning of sol 2.
+      await openMenu(page, "campaign=classic&seed=1");
+      await startMission(page); await skipToConsole(page); await toPlan(page); await assignAll(page); await endSol(page); await nextFromNight(page);
+      await page.locator(".dust-alarm").waitFor();
+      await page.locator(".dust-alarm .primary").click();
+      await page.locator(".dust-cover.in-world").waitFor();
+      await page.waitForTimeout(300);
+      // Every visible element with its own text inside the areas a player reads during the storm.
+      const count = await page.evaluate((sel) => {
+        let n = 0;
+        for (const area of document.querySelectorAll(sel)) for (const e of [area, ...area.querySelectorAll("*")]) {
+          const r = e.getBoundingClientRect(), s = getComputedStyle(e);
+          const own = [...e.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim());
+          if (own && r.width > 2 && r.height > 2 && s.visibility !== "hidden" && s.display !== "none" && s.position !== "absolute") e.dataset.qaText = String(n++);
+        }
+        return n;
+      }, AREAS);
+      if (!count) { console.log(`FAIL ${tag}: no text found in ${AREAS}`); fails++; }
+      const found = [];
+      for (let i = 0; i < count; i++) {
+        const el = page.locator(`[data-qa-text="${i}"]`);
+        await el.scrollIntoViewIfNeeded();
+        const info = await el.evaluate((e) => {
+          const s = getComputedStyle(e), size = parseFloat(s.fontSize), bold = Number(s.fontWeight) >= 700;
+          // Only the text's own box (+2 px), never the button border or padding around it.
+          let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+          for (const c of e.childNodes) if (c.nodeType === 3 && c.textContent.trim()) {
+            const range = document.createRange(); range.selectNodeContents(c);
+            for (const r of range.getClientRects()) { x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); }
+          }
+          return { name: (e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 36), large: size >= 24 || (bold && size >= 18.66), box: { x0: x0 - 2, y0: y0 - 2, x1: x1 + 2, y1: y1 + 2 } };
+        });
+        const b = info.box;
+        if (!(b.x1 > b.x0)) continue;
+        const clip = { x: Math.max(0, b.x0), y: Math.max(0, b.y0), width: Math.min(b.x1, w) - Math.max(0, b.x0), height: Math.min(b.y1, h) - Math.max(0, b.y0) };
+        if (clip.width < 3 || clip.height < 3) continue;
+        const shown = (await page.screenshot({ clip })).toString("base64");
+        await el.evaluate((e) => { for (const c of [e, ...e.querySelectorAll("*")]) c.style.setProperty("color", "transparent", "important"); });
+        const hidden = (await page.screenshot({ clip })).toString("base64");
+        await el.evaluate((e) => { for (const c of [e, ...e.querySelectorAll("*")]) c.style.removeProperty("color"); });
+        const ratio = await page.evaluate(contrastOf, [shown, hidden]);
+        const need = info.large ? 3 : 4.5;
+        if (ratio !== null && ratio < need) found.push(["FAIL", `"${info.name}" contrast ${ratio.toFixed(2)}:1 under the dust (need ${need}:1)`]);
+      }
+      fails += emit(tag, found);
+      if (SHOTS) await page.screenshot({ path: `docs/qa/dust-${w}x${h}.png` });
+    } catch (e) { console.log(`FAIL ${tag}: ${String(e.message).split("\n")[0]}`); fails++; }
+    await done(page);
   }
   return fails;
 });

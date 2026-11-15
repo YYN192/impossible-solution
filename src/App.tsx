@@ -8,6 +8,7 @@ import { SunCard } from "./components/SunCard";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { SoundToggle } from "./components/SoundToggle";
 import { FullscreenToggle } from "./components/FullscreenToggle";
+import { BarMenu } from "./components/BarMenu";
 import { audio } from "./game/audio";
 import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
@@ -81,8 +82,10 @@ export default function App() {
   return <div className="expedition">
     <div className="mission-status-bar">
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
-      <LanguageToggle /><SoundToggle /><FullscreenToggle />
-      {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
+      <LanguageToggle />
+      <BarMenu><SoundToggle /><FullscreenToggle />
+        {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
+      </BarMenu>
     </div>
     {setup?.sun ? <SunCard sun={setup.sun} notice={setup.noticeKey && t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")} />
       : setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}

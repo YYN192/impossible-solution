@@ -4,6 +4,7 @@ import "./plan.css";
 import { useTranslation } from "react-i18next";
 import { JobMiniGame } from "./components/JobMiniGame";
 import { ResourceMeters } from "./components/ResourceMeters";
+import { usePhone } from "./components/usePhone";
 import { WhatsThis } from "./components/WhatsThis";
 import {
   INSIGHT_DUST,
@@ -53,6 +54,8 @@ export default function PlanScreen() {
   const assign = useSession((s) => s.assign);
   const moon = setup?.place === "moon" ? "moon" : undefined;
   const [selected, select] = useState<CrewId | null>(null);
+  // Phones: End sol and a one-line preview stay pinned to the bottom of the screen (#75).
+  const phone = usePhone();
   const [confirmIdle, setConfirmIdle] = useState(false);
   const [nudge, setNudge] = useState(false);
   // The job's mini game, open right after the job is given (the job is already in the plan).
@@ -104,6 +107,21 @@ export default function PlanScreen() {
     if (result.over && state.sol < rulesOf(state).sols) useNav.getState().endEarly();
     else useNav.getState().next();
   }
+  const endSol = (
+    <>
+      {confirmIdle && (
+        <p role="alert">{t("play.idleConfirm", { count: idle })}</p>
+      )}
+      <button
+        type="button"
+        className="primary end-sol"
+        disabled={!setup}
+        onClick={finish}
+      >
+        {confirmIdle ? t("play.confirmEnd") : tRun("plan.endSol", {}, moon)} →
+      </button>
+    </>
+  );
   return (
     <ScreenFrame title={tRun("plan.heading", { sol: state.sol }, moon)}>
       <p className="lead">{t("planHelp.howTo")}</p>
@@ -260,19 +278,24 @@ export default function PlanScreen() {
                 );
               })}
           </ul>
-          {confirmIdle && (
-            <p role="alert">{t("play.idleConfirm", { count: idle })}</p>
-          )}
-          <button
-            type="button"
-            className="primary end-sol"
-            disabled={!setup}
-            onClick={finish}
-          >
-            {confirmIdle ? t("play.confirmEnd") : tRun("plan.endSol", {}, moon)} →
-          </button>
+          {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
         </aside>
+        {phone && (
+          <div className="plan-bar phone-dock">
+            <p className="plan-bar__preview">
+              <span>{tRun("play.preview", {}, moon)}:</span>
+              {(["power", "air", "dose"] as const).map((key) => (
+                <span className="plan-bar__value" key={key}>
+                  <Icon name={key} />
+                  <span className="visually-hidden">{t(`bars.${key}`)}</span>
+                  {Number(preview.state.bars[key].toFixed(1))}
+                </span>
+              ))}
+            </p>
+            {endSol}
+          </div>
+        )}
       </div>
       {miniGame && (
         <JobMiniGame
