@@ -21,6 +21,10 @@ It turns real NASA storm and radiation data into hard choices, so kids learn tha
 
 <img src="docs/media/demo.gif" alt="Gameplay: pick a mission, walk the Mars base, drive the rover, plan the crew, then a real-data dust storm: wipe the solar panels and fix the greenhouse" width="720">
 
+<a href="docs/media/launch-video.mp4"><img src="docs/media/launch-video.jpg" alt="Launch video poster: The Impossible SOLution, play free at impossible-solution.vercel.app" width="720"></a>
+
+<a href="docs/media/launch-video.mp4"><strong>▶ Watch the 30-second launch video</strong></a>
+
 </div>
 
 ## What is it?
