@@ -16,3 +16,5 @@ export function getSprite(path: string): HTMLImageElement {
 export type Facing = "front" | "back" | "left" | "right";
 export const playerSprite = (facing: Facing, frame?: number) =>
   `characters/player/astronaut-${frame === undefined ? `idle-${facing}` : `walk-${facing}-${frame + 1}`}`;
+// Load every player frame up front: a frame drawn before it loads is blank, which made the astronaut flash.
+if (typeof Image !== "undefined") for (const f of ["front", "back", "left", "right"] as const) for (const n of [undefined, 0, 1, 2, 3]) getSprite(playerSprite(f, n));

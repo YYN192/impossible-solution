@@ -48,7 +48,13 @@ export async function assignAll(page, mode = "mouse") {
     await press(page, crew, mode);
     for (const id of Object.keys(EN.jobs)) {
       const job = button(page, EN.jobs[id]);
-      if ((await job.isEnabled()) && (await job.getAttribute("aria-pressed")) !== "true") { await press(page, job, mode); break; }
+      if ((await job.isEnabled()) && (await job.getAttribute("aria-pressed")) !== "true") {
+        await press(page, job, mode);
+        // Each job opens an optional mini-game: skip it (it never changes the result).
+        const mini = page.locator("dialog.mini-game[open]");
+        if (await mini.isVisible().catch(() => false)) await press(page, mini.getByRole("button", { name: new RegExp("^" + EN.miniGame.skip) }), mode);
+        break;
+      }
     }
   }
 }

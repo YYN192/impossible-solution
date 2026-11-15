@@ -24,6 +24,7 @@ const BY_DOMINO: Record<string, HelpTopic> = {
   "domino.roverHome1": "power",
   "domino.roverHome2": "power",
   "domino.roverStranded": "dose",
+  "domino.roverEmpty": "power",
   "domino.stormPanels": "dust",
   "domino.stormGreenhouse": "food",
 };

@@ -76,7 +76,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
           <button onClick={onSources}>{t("dataSources.open")}</button>
           <button onClick={onTeacher}>{t("teacher.open")}</button>
         </nav>
-        <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" /></p>
+        <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" placement="up" /></p>
       </> : <section className="menu-panel menu-settings">
         <p className="eyebrow">{t("menu.preferences")}</p><h2>{t("menu.settings")}</h2>
         {(["master", "music", "sfx"] as const).map((key) => <label className="volume-control" key={key}>{t(`menu.${key}`)}<span>{Math.round(prefs[key] * 100)}%</span><input type="range" min={0} max={100} value={Math.round(prefs[key] * 100)} onChange={(e) => { useAudio.setState({ [key]: Number(e.target.value) / 100 }); audio.playSfx("volume-change"); }} /></label>)}

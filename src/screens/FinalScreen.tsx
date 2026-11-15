@@ -181,7 +181,7 @@ function RowView({ row, label }: { row: Row; label: number }) {
               </span>
             )}
             <div className="domino-tile">
-              <p className="chain-sol">{tRun("final.sol", { sol: [...new Set(sols)].join(", ") })}</p>
+              <p className="chain-sol">{tRun("final.sol", { sol: [...new Set(sols)].join(", ") }, useMission.getState().setup?.place)}</p>
               <DominoCard domino={domino} fall />
             </div>
           </li>

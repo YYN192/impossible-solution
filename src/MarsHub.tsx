@@ -1,11 +1,11 @@
 import { Icon } from "./components/Icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { asset } from "./game/assets";
 import { audio, musicFor } from "./game/audio";
 import { useMission } from "./state/mission";
 import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
+import { gameKey } from "./game/pressedKeys";
 import { useSession } from "./game/session";
 import { usePressedKeys } from "./game/pressedKeys";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
@@ -14,6 +14,7 @@ import { useNav } from "./state/screen";
 import { readFlags } from "./data/flags";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
+import { CrewTalk } from "./components/CrewTalk";
 import type { StormView } from "./game/renderWorld";
 
 // Physical keys → on-screen hint they light up (keydown on, keyup off).
@@ -30,7 +31,6 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const [arrived, setArrived] = useState(0);
   const [near, setNear] = useState<Entity>();
   const [dialogue, setDialogue] = useState<Entity>();
-  const [page, setPage] = useState(0);
   const [activating, setActivating] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const sol = useGame((s) => s.state.sol);
@@ -63,7 +63,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     if (near.interaction === "console") {
       setActivating(true);
       timer.current = setTimeout(onConsole, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
-    } else { setDialogue(near); setPage(0); }
+    } else setDialogue(near);
   }, [near, activating, dialogue, onConsole, task, alarm, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -105,7 +105,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
-      const key = e.key.toLowerCase();
+      const key = gameKey(e);
       if (["w", "a", "s", "d", "arrowup", "arrowleft", "arrowdown", "arrowright"].includes(key)) {
         // Arrows only stop page scrolling while the game itself has focus.
         if (e.target === canvas.current || e.target === document.body) e.preventDefault();
@@ -113,7 +113,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       }
       if (key === "e" && !e.repeat) live.current.interact();
     };
-    const up = (e: KeyboardEvent) => held.current.delete(e.key.toLowerCase());
+    const up = (e: KeyboardEvent) => held.current.delete(gameKey(e));
     // Leaving the tab or rotating can swallow key-up or pointer-up events: never keep walking afterwards.
     // (Not on "resize": phone address bars resize the page while a finger holds the d-pad.)
     const clear = () => held.current.clear();
@@ -130,37 +130,32 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   };
   const closeDialogue = () => {
     audio.playSfx("menu-back");
-    dialogueBox.current?.close(); // a modal dialog keeps the canvas inert until it is closed, so focus() only works after this
-    setDialogue(undefined); canvas.current?.focus({ preventScroll: true });
+    setDialogue(undefined);
+    // the modal dialog keeps the canvas inert until it unmounts, so focus after React removes it
+    setTimeout(() => canvas.current?.focus({ preventScroll: true }));
   };
-  const dialogueBox = useRef<HTMLDialogElement>(null);
-  useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
-  const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue === "greenhouse" ? "scientist" : dialogue?.dialogue}-portrait`;
   return <main className={stormLeft ? "station in-storm" : "station"}>
-    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{campaign && campaign !== "storm" ? `${tRun(`campaign.${campaign}.where`)} / ${tRun(`campaign.${campaign}.name`)}` : t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{tRun("common.solOf", { sol, total: useMission.getState().setup?.rules.sols ?? 3 }, useMission.getState().setup?.place)}</span></header>
+    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{campaign && campaign !== "storm" ? `${tRun(`campaign.${campaign}.where`)} / ${tRun(`campaign.${campaign}.name`)}` : t("world.location")}</p><h1>{tRun("world.name", {}, setup?.place)}</h1></div><span className="sol-tag">{tRun("common.solOf", { sol, total: useMission.getState().setup?.rules.sols ?? 3 }, useMission.getState().setup?.place)}</span></header>
     {stormLeft ? <div className="world-objective storm-objective"><p><strong><Icon name="dust-storm" /> {t("hubStorm.todo")}</strong></p><ul>
       <li className={panelsDone ? "done" : ""}><Icon name={panelsDone ? "check" : "sun"} /> {t("hubStorm.panels")}</li>
       <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
       : <div className="world-objective"><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
-      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />
+      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
+      {stormLeft > 0 && !alarm && <div className="dust-cover in-world" style={{ opacity: stormLeft * 0.18 }} aria-hidden="true" />}
       {activating && <div className="console-boot" role="status">{t("world.connecting")}</div>}
     </div></div>
     <div className="world-controls"><div className="dpad" aria-label={t("world.movement")}>
       {([['w', '↑', 'up'], ['a', '←', 'left'], ['s', '↓', 'down'], ['d', '→', 'right']] as const).map(([key, symbol, direction]) => <button key={key} className={`move-${direction}`} data-pressed={pressed.has(key) ? "" : undefined} aria-label={t(`world.${direction}`)}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); held.current.add(key); }}
         onPointerUp={() => held.current.delete(key)} onPointerCancel={() => held.current.delete(key)} onLostPointerCapture={() => held.current.delete(key)}>{symbol}</button>)}
-    </div><div className="interaction-guide"><p aria-live="polite">{notice || (near ? t(`world.near.${near.dialogue ?? "console"}`) : t("world.explore"))}</p>
+    </div><div className="interaction-guide"><p aria-live="polite">{notice || (near ? t(`world.near.${near.dialogue ?? "console"}`) : tRun("world.explore", {}, setup?.place))}</p>
       <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd data-pressed={pressed.has("e") ? "" : undefined}>E</kbd></button>
       <button className="quiet-button go-console" disabled={stormLeft > 0} onClick={onConsole}>{t("world.goConsole")} →</button>
     </div><p className="station-tip">{t("world.tip")}</p></div>
-    {dialogue && <dialog ref={dialogueBox} className="npc-dialogue" aria-labelledby="npc-dialogue-title" onCancel={(e) => { e.preventDefault(); closeDialogue(); }}>
-      <img src={asset(portrait)} alt="" /><div><p className="eyebrow">{t("world.crewChannel")}</p><h2 id="npc-dialogue-title">{t(`world.near.${dialogue.dialogue!}`)}</h2>
-        <p className="lead">{t(`dialogue.${dialogue.dialogue!}.${page === 0 ? "hello" : "advice"}`)}</p>
-        <div className="actions">{page === 0 && <button className="primary" onClick={() => { setPage(1); audio.playSfx("dialogue"); }}>{t("common.next")} →</button>}<button onClick={closeDialogue}>{t("help.close")}</button></div></div>
-    </dialog>}
-    {stormLeft > 0 && <div className={alarm ? "dust-cover full" : "dust-cover"} style={{ opacity: alarm ? 1 : stormLeft / 3 }} aria-hidden="true" />}
+    {dialogue?.dialogue && <CrewTalk speaker={dialogue.dialogue} onClose={closeDialogue} />}
+    {stormLeft > 0 && alarm && <div className="dust-cover full" aria-hidden="true" />}
     {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
     {task === "panels" && <PanelsTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
     {task === "greenhouse" && <GreenhouseTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}

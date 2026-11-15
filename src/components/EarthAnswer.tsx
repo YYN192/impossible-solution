@@ -27,7 +27,7 @@ export function EarthAnswer({ answer }: { answer: Answer }) {
     <div className="earth-answer">
       <p><Icon name="radio" /> {earthSentence(t, answer, moon)}</p>
       {answer.burstRisk && <p className={`risk risk-${answer.burstRisk}`}>{t(`earth.risk.${answer.burstRisk}`)}</p>}
-      {answer.dustStormSols !== undefined && <p>{t("earth.dustStorm", { count: answer.dustStormSols })}</p>}
+      {answer.dustStormSols !== undefined && <p>{tRun("earth.dustStorm", { count: answer.dustStormSols }, moon)}</p>}
       {answer.stormCloudInSols !== undefined && <DataChip source={answer.source} />}
       {setup && (
         <>

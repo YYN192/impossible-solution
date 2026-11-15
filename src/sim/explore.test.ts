@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { act, createGame } from "./engine";
-import { buildMap, driveAction, move, reachCost, startDrive, type ExploreMap } from "./explore";
+import { buildMap, drivePower, driveAction, move, ranOutOfPower, reachCost, startDrive, type ExploreMap } from "./explore";
 import { rng } from "./rng";
 import snap from "../data/snapshots/rover-map-gale.json";
 
@@ -111,5 +111,69 @@ describe("the drive is one engine action", () => {
     const action = driveAction(m, startDrive(m));
     expect(action.effect).toEqual({});
     expect(action.textKey).toBe("domino.roverHome0");
+  });
+});
+
+// #66: the rover must really reach a sample, a sample-less trip says so, and the cost is visible up front.
+describe("rover scoring (#66)", () => {
+  it("never leaving the base scores nothing and says the rover stayed", () => {
+    const m = map(3);
+    const a = driveAction(m, startDrive(m));
+    expect(a.effect?.science ?? 0).toBe(0);
+    expect(a.textKey).toBe("domino.roverHome0");
+  });
+
+  it("driving out and back without a sample scores nothing and says so", () => {
+    const m = map(3);
+    const step = [[1, 0], [-1, 0], [0, 1], [0, -1]].find(([dx, dy]) => move(m, startDrive(m), dx, dy) !== startDrive(m) && !m.samples.some((s) => s.x === m.base.x + dx && s.y === m.base.y + dy))!;
+    let d = move(m, startDrive(m), step[0], step[1]);
+    d = move(m, d, -step[0], -step[1]);
+    expect(d.collected).toHaveLength(0);
+    const a = driveAction(m, d);
+    expect(a.effect?.science ?? 0).toBe(0);
+    expect(a.textKey).toBe("domino.roverEmpty");
+  });
+
+  it("samples are never next to the base, so a sample means a real drive", () => {
+    for (let seed = 1; seed < 30; seed++) {
+      const m = map(seed), cost = reachCost(m);
+      for (const s of m.samples) expect(cost[s.y * m.cols + s.x]).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("the power cost shown during the drive is the cost the engine charges", () => {
+    const m = map(3);
+    const d = follow(m, route(m, m.samples[0]));
+    expect(-(driveAction(m, { ...d, ...m.base }).effect?.power ?? 0)).toBe(drivePower(m, d));
+    expect(drivePower(m, startDrive(m))).toBe(0);
+  });
+});
+
+// #68: running out of power away from the base is one clear event, not one per frame or per key press.
+describe("rover runs out of power (#68)", () => {
+  it("fires exactly once, on the step that empties the battery away from the base", () => {
+    const m = map(3);
+    let d = startDrive(m), fired = 0;
+    // Drive back and forth next to the base until the battery is empty, then keep pressing.
+    const [dx, dy] = [[1, 0], [-1, 0], [0, 1], [0, -1]].find(([x, y]) => move(m, d, x, y) !== d)!;
+    for (let i = 0; i < 40; i++) {
+      const next = move(m, d, i % 2 ? -dx : dx, i % 2 ? -dy : dy);
+      if (ranOutOfPower(m, d, next)) fired++;
+      d = next;
+    }
+    expect(d.battery).toBe(0);
+    expect(fired).toBeLessThanOrEqual(1);
+  });
+
+  it("does not fire when the battery hits 0 at the base", () => {
+    const m = map(3);
+    const home = { ...startDrive(m), battery: 0 };
+    expect(ranOutOfPower(m, { ...home, battery: 1 }, home)).toBe(false);
+  });
+
+  it("fires when the battery hits 0 away from the base", () => {
+    const m = map(3);
+    const away = { ...startDrive(m), x: m.base.x + 1, battery: 0 };
+    expect(ranOutOfPower(m, { ...away, battery: 1 }, away)).toBe(true);
   });
 });

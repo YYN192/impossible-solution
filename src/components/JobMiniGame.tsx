@@ -6,6 +6,7 @@ import {
   DISH_STEPS, GROW_TARGET, WATER_MAX, STACK_CENTER, STACK_GOAL, TICK_MS,
   drop, progress, send, startMiniGame, tap, tick, turn, won, type MiniGame,
 } from "../game/miniGames";
+import { gameKey } from "../game/pressedKeys";
 import type { JobId } from "../sim/types";
 
 /** A pixel sprite (src/assets/pixel): hard edges, scaled by whole pixels in CSS. */
@@ -36,15 +37,37 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
     audio.playSfx(missed ? "menu-error" : sound);
     setGame(nextGame);
   };
+  // #63: the keyboard plays every mini-game, by physical key (works on Bulgarian layouts).
+  const onKey = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (done) return;
+    const k = gameKey(e.nativeEvent);
+    if (game.job === "askEarth") {
+      const turnBy = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
+      if (turnBy) { e.preventDefault(); play(turn(game, turnBy)); return; }
+      if (k === " ") { e.preventDefault(); if (game.aim === game.earth) play(send(game), "earth-message-send"); return; }
+    }
+    if (game.job === "shelter" && (k === " " || k === "enter") && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); play(drop(game), "job-assign"); return; }
+    // Grid games: arrows move focus between the tiles.
+    const tile = (e.target as HTMLElement).closest?.(".mini-tile");
+    const step = { arrowleft: -1, arrowright: 1, arrowup: -2, arrowdown: 2 }[k as "arrowleft"];
+    if (tile && step) {
+      e.preventDefault();
+      const tiles = [...tile.parentElement!.querySelectorAll<HTMLElement>(".mini-tile")];
+      const cols = Math.max(1, tiles.filter((x) => x.offsetTop === tiles[0].offsetTop).length);
+      const i = tiles.indexOf(tile as HTMLElement), d = Math.abs(step) === 2 ? Math.sign(step) * (cols === tiles.length ? 0 : cols) : step;
+      tiles[i + d]?.focus();
+    }
+  };
   const { done: count, total } = progress(game);
   const title = `minigame-${job}-title`;
   return <dialog ref={box} className={`npc-dialogue mini-game mini-${job}`} aria-labelledby={title}
-    onCancel={(e) => { e.preventDefault(); onClose(done); }}>
+    onCancel={(e) => { e.preventDefault(); onClose(done); }} onKeyDown={onKey}>
     <div>
       <p className="eyebrow">{t("miniGame.eyebrow")} · <span>{t(`jobs.${job}`)}</span></p>
       <h2 id={title}>{t(`miniGame.${job}.title`)}</h2>
       <p className="lead">{t(`miniGame.${job}.lead`)}</p>
       <div className="mini-board"><Board game={game} play={play} /></div>
+      <p className="note mini-keys">{t(`miniGame.keys.${job}`)}</p>
       <div className="mini-meter" aria-hidden="true">{Array.from({ length: total }, (_, i) => <span key={i} className={i < count ? "on" : ""} />)}</div>
       <p aria-live="polite" className="storm-left">
         {done ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong> : <Hint game={game} />}

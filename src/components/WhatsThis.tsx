@@ -9,7 +9,8 @@ export type HelpTopic = "sol" | "power" | "air" | "dose" | "food" | "dust" | "bu
  * Works with tap, mouse and keyboard: Enter/Space toggles, Escape closes and returns focus.
  * Usage: <h2>{t("bars.dose")} <WhatsThis topic="dose" /></h2>
  */
-export function WhatsThis({ topic }: { topic: HelpTopic }) {
+/** `placement="up"` always opens above the "?" (e.g. just above a footer); otherwise it flips up only when it would run off the bottom. */
+export function WhatsThis({ topic, placement }: { topic: HelpTopic; placement?: "up" }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const id = useId();
@@ -69,7 +70,7 @@ export function WhatsThis({ topic }: { topic: HelpTopic }) {
           id={id}
           ref={bubble}
           role="note"
-          className={up ? "whats-this__bubble whats-this__bubble--up" : "whats-this__bubble"}
+          className={up || placement === "up" ? "whats-this__bubble whats-this__bubble--up" : "whats-this__bubble"}
           style={shift ? { transform: `translateX(calc(-50% + ${shift}px))` } : undefined}
         >
           <strong>{title}</strong> {t(`help.${topic}.text`)}{" "}

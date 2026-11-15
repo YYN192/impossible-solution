@@ -123,10 +123,17 @@ export function move(map: ExploreMap, d: Drive, dx: number, dy: number): Drive {
 
 export const isHome = (map: ExploreMap, d: Drive) => d.x === map.base.x && d.y === map.base.y;
 
+/** #68: the step that empties the battery away from the base (one event, not one per key press). */
+export const ranOutOfPower = (map: ExploreMap, prev: Drive, next: Drive) =>
+  prev.battery > 0 && next.battery === 0 && !isHome(map, next);
+
 /** The whole drive as one engine action: power for the battery used, science for samples brought home. */
+/** Power the drive costs so far (shown live on the rover screen; the same number driveAction charges). */
+export const drivePower = (map: ExploreMap, d: Drive): number => Math.ceil((map.battery - d.battery) / EXPLORE.batteryPerPower);
+
 export function driveAction(map: ExploreMap, d: Drive): Action {
   const used = map.battery - d.battery;
-  const power = used ? -Math.ceil(used / EXPLORE.batteryPerPower) : 0;
+  const power = -drivePower(map, d);
   if (!isHome(map, d))
     return {
       id: "explore-stranded",
@@ -138,7 +145,8 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
   return {
     id: `explore-home${science}`,
     icon: science ? "rover rock" : "rover",
-    textKey: `domino.roverHome${science}`,
+    // Drove out and came back empty-handed: say so, not "stayed at the base".
+    textKey: !science && used ? "domino.roverEmpty" : `domino.roverHome${science}`,
     effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
   };
 }

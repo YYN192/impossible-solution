@@ -24,9 +24,10 @@
     "hideWhy": "Hide",
     "fromEarth": "News from outside",
     "radio": "Message from Earth",
-    "radioTap": "Tap to decode it",
+    "radioTap": "Press to decode it",
     "decoded": "Decoded!",
-    "nasa": "Real NASA data: tap to see where it comes from"
+    "nasa": "Real NASA data: press to see where it comes from",
+    "firstDay_moon": "First morning on the Moon. Everything works."
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -49,7 +50,8 @@
     "roverHome2": "The rover came home with 2 samples.",
     "roverStranded": "The rover got stuck far from home. The crew walked out to tow it.",
     "stormPanels": "You wiped the panels in the dust storm. More power, more radiation.",
-    "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power."
+    "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power.",
+    "roverEmpty": "The rover drove out but came home with no samples."
   },
   "event": {
     "burst": {
@@ -94,7 +96,9 @@
     "dustStorm_other": "The dust storm lasts {{count}} more sols.",
     "delay": "Your message took {{minutes}} minutes each way today.",
     "delayMoon": "Your message took about 1.3 seconds each way.",
-    "delaySaved": "Your message took about {{minutes}} minutes each way. This is a saved reading."
+    "delaySaved": "Your message took about {{minutes}} minutes each way. This is a saved reading.",
+    "dustStorm_moon_one": "The dark spell lasts {{count}} more day.",
+    "dustStorm_moon_other": "The dark spell lasts {{count}} more days."
   },
   "chip": {
     "live": "Live NASA data",
@@ -112,7 +116,12 @@
     "heading": "Night falls on sol {{sol}}",
     "nextMorning": "Go to sleep",
     "seeResults": "See how it went",
-    "heading_moon": "Day {{sol}} is over"
+    "heading_moon": "Day {{sol}} is over",
+    "warn": {
+      "air": "Air is low: {{n}} of 10.",
+      "power": "Power is almost gone: {{n}} of 10.",
+      "dose": "Space rays are too high for the crew."
+    }
   },
   "final": {
     "heading": "Mission over",
@@ -274,7 +283,7 @@
     }
   },
   "planHelp": {
-    "howTo": "Tap an astronaut. Then tap a job.",
+    "howTo": "Choose an astronaut. Then choose a job.",
     "leftUndone_one": "{{count}} job is left undone.",
     "leftUndone_other": "{{count}} jobs are left undone.",
     "tomorrow": "tomorrow",
@@ -498,7 +507,10 @@
       "airlock": "Station airlock",
       "greenhouse": "Greenhouse"
     },
-    "greenhouse": "GREENHOUSE"
+    "greenhouse": "GREENHOUSE",
+    "name_moon": "Artemis Outpost",
+    "canvas_moon": "Moon base. Use WASD or arrow keys. Press E near a console or crew member.",
+    "explore_moon": "Explore your home on the Moon."
   },
   "dialogue": {
     "commander": {
@@ -824,7 +836,9 @@
       "oct2021": "29 October 2021. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
       "moon": "20 May 2024. A NASA spacecraft circling the Moon measured this storm. The rays rose only a little. The storm pointed at Mars.",
       "cloud": "Scientists forecast this storm cloud with a computer model of the Sun's wind."
-    }
+    },
+    "gameEvent": "Game event (not from NASA data)",
+    "alarmShadow": "A dark day!"
   },
   "exploreUi": {
     "battery": "Battery: {{n}} of {{max}}",
@@ -841,7 +855,10 @@
     "right": "Drive right",
     "map": "Map of the Gale Crater area. Use the arrow keys or the buttons to drive.",
     "legend": "Light ground costs 1 battery. Dark, rough ground costs 2. Rocks block the way.",
-    "square": "One square is about 20 km of real Mars."
+    "square": "One square is about 20 km of real Mars.",
+    "cost": "This drive costs {{n}} power so far.",
+    "labLimit": "The lab can test {{max}} samples. More give no extra science.",
+    "noPower": "No power!"
   },
   "hubStorm": {
     "eyebrow": "Alarm",
@@ -861,7 +878,7 @@
     "clear": "Storm damage fixed! Now go to the console.",
     "outside": "Outside the base",
     "panelsTitle": "Wipe every solar panel",
-    "panelsLead": "Tap each dusty panel to wipe it. Being outside gives your crew a little extra radiation (invisible energy from space).",
+    "panelsLead": "Choose each dusty panel to wipe it. Being outside gives your crew a little extra radiation (invisible energy from space).",
     "panel": "Panel {{n}}: {{state}}",
     "dusty": "dusty",
     "clean": "clean",
@@ -894,7 +911,7 @@
     },
     "greenhouse": {
       "title": "Keep the plants growing",
-      "lead": "Tap a plant to water it. Thirsty plants stop growing!",
+      "lead": "Choose a plant to water it. Thirsty plants stop growing!",
       "plant": "Plant {{n}}: {{state}}",
       "thirsty": "thirsty",
       "watered": "has water",
@@ -925,6 +942,95 @@
       "plain": "plain rock",
       "empty": "empty",
       "oops": "That was a plain rock. Only shiny ones!"
+    },
+    "keys": {
+      "panels": "Arrow keys move. Space or Enter wipes.",
+      "greenhouse": "Arrow keys move. Space or Enter waters.",
+      "science": "Arrow keys move. Space or Enter grabs.",
+      "shelter": "Space drops the block.",
+      "askEarth": "← → aim the dish. Space sends."
+    }
+  },
+  "talk": {
+    "next": "Next",
+    "choose": "What do you say?",
+    "ask": {
+      "who": "Who are you?",
+      "tip": "Any tips for me?",
+      "drill": "Let's practise!",
+      "bye": "Bye for now!"
+    },
+    "commander": {
+      "intro": "Welcome to Ares Station, cadet! I'm Commander Nova. I'm so glad you're here.",
+      "who": "I lead this crew. Every sol, I pick who does which job. A sol is one day on Mars. It is about 40 minutes longer than a day on Earth.",
+      "tip": "At the mission console, you give each astronaut one job. There are always more jobs than people. No choice is free!",
+      "drillIntro": "Let's practise. We have 3 astronauts and 4 jobs. Pick 3 jobs for today.",
+      "win": "Well done! See? One job had to wait. At the console, think about which job can wait the least."
+    },
+    "engineer": {
+      "intro": "Hey, cadet! I'm Kai, the engineer. If it hums, I probably fixed it.",
+      "who": "I grew up fixing bikes. Now I fix a whole Mars base! Mars dust is my enemy. It covers our solar panels.",
+      "tip": "Dusty solar panels make less power. Clean panels mean more power for every machine.",
+      "drillIntro": "Quick test! We only have 2 power cells. Choose 2 machines to switch on.",
+      "win": "Great call! The air machine stays on, because we all need to breathe. Something else had to switch off."
+    },
+    "scientist": {
+      "intro": "Hello! I'm Amara. I study Mars rocks, and I grow our food.",
+      "who": "Long, long ago, Gale Crater held a lake. Its rocks still have layers from that water. I read them like a book.",
+      "tip": "Greenhouse lights need power. No light means no harvest. Science trips earn stars, but outside, space rays are stronger.",
+      "drillIntro": "Help me grow a sprout! Look at the bubble. It shows what the plant needs next.",
+      "win": "A harvest! Plants need water and light. On Mars, that light comes from our power."
+    },
+    "drone": {
+      "intro": "Beep boop! I'm Pip, the station drone. I watch the Sun for you.",
+      "who": "I was built to read space weather. Sometimes the Sun throws out tiny, very fast bits. We call them space rays.",
+      "tip": "When I beep a warning, build up the shelter. Water and Mars dirt help block space rays.",
+      "drillIntro": "Drill time! Space rays are coming. Stack the shelter blocks before the timer ends.",
+      "win": "Beep! Safe! Each block lowered your dose. Dose means how much space rays hit your body.",
+      "late": "Bzzt! The rays came before the shelter was done. Your dose went up. Want to try again?"
+    }
+  },
+  "drills": {
+    "back": "Leave the practice",
+    "jobs": {
+      "title": "Job board",
+      "left_one": "{{count}} astronaut is free",
+      "left_other": "{{count}} astronauts are free",
+      "done": "Every astronaut is busy. This job waits: {{job}}",
+      "go": "Start the day"
+    },
+    "power": {
+      "title": "Power switch",
+      "cells_one": "Power cells left: {{count}}",
+      "cells_other": "Power cells left: {{count}}",
+      "noAir": "Uh-oh! Without the air machine, nobody can breathe. Try again.",
+      "go": "Switch on",
+      "air": "Air machine",
+      "lamp": "Greenhouse lights",
+      "radio": "Radio to Earth"
+    },
+    "grow": {
+      "title": "Grow a sprout",
+      "water": "Give water",
+      "light": "Turn on the light",
+      "wrong": "Not that one. Look at the bubble!",
+      "stage": "Growth: {{n}} of {{total}}",
+      "needs": {
+        "water": "it needs water",
+        "light": "it needs light"
+      },
+      "ready": "It is ready to harvest!",
+      "harvest": "Harvest"
+    },
+    "shelter": {
+      "title": "Shelter stack",
+      "time": "Space rays arrive in {{s}} seconds",
+      "safe": "Shelter ready!",
+      "place": "Place a block",
+      "dose": "Dose",
+      "left_one": "{{count}} block left",
+      "left_other": "{{count}} blocks left",
+      "done": "Go inside"
     }
   }
 }

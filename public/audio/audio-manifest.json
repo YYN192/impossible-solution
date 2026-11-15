@@ -452,7 +452,10 @@
       "channels": 1,
       "loop": false,
       "volume": 0.5,
-      "trigger": "The power bar goes down (e.g. dusty panels)"
+      "trigger": "The power bar goes down (e.g. dusty panels)",
+      "aliases": [
+        "rover-power-down"
+      ]
     },
     {
       "id": "air-warning",

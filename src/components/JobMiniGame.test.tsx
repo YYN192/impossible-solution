@@ -115,3 +115,42 @@ describe("JobMiniGame", () => {
     expect(btn(bg.miniGame.skip)).toBeTruthy();
   });
 });
+
+// #63: every mini-game can be played with the keyboard, by physical key (works on Bulgarian layouts too).
+describe("mini-games with the keyboard (#63)", () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+  const key = (code: string, k = "") => fireEvent.keyDown(document.querySelector("dialog.mini-game")!, { code, key: k });
+
+  it("Ask Earth: arrows / A-D aim the dish, Space sends", () => {
+    render(<JobMiniGame job="askEarth" seed={SEED} onClose={vi.fn()} />);
+    const start = column(".dish-here");
+    key(start > 0 ? "ArrowLeft" : "ArrowRight");
+    expect(column(".dish-here")).toBe(start > 0 ? start - 1 : start + 1);
+    key(start > 0 ? "KeyD" : "KeyA", start > 0 ? "в" : "ф"); // Bulgarian letters, same physical keys
+    expect(column(".dish-here")).toBe(start);
+  });
+
+  it("Shelter: Space drops the block", () => {
+    render(<JobMiniGame job="shelter" seed={SEED} onClose={vi.fn()} />);
+    const status = () => document.querySelector(".storm-left")!.textContent;
+    const before = status();
+    key("Space", " ");
+    expect(status()).not.toBe(before); // either a block is placed (progress) or "oops" (a miss)
+  });
+
+  it("grid games: arrow keys move between tiles", () => {
+    render(<JobMiniGame job="panels" seed={SEED} onClose={vi.fn()} />);
+    const tiles = [...document.querySelectorAll<HTMLButtonElement>(".mini-tile")];
+    tiles[0].focus();
+    fireEvent.keyDown(tiles[0], { code: "ArrowRight", key: "ArrowRight" });
+    expect(document.activeElement).toBe(tiles[1]);
+    fireEvent.keyDown(tiles[1], { code: "ArrowLeft", key: "ArrowLeft" });
+    expect(document.activeElement).toBe(tiles[0]);
+  });
+
+  it("shows which keys to use", () => {
+    render(<JobMiniGame job="askEarth" seed={SEED} onClose={vi.fn()} />);
+    screen.getByText(t("miniGame.keys.askEarth"));
+  });
+});

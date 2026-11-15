@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import type { HubStorm } from "../data/hubStorm";
+import { localText } from "../i18n/sourceText";
 
 /** A modal <dialog> that opens on mount; Esc (cancel) calls onClose. */
 function Modal({ label, onClose, className = "", children }: { label: string; onClose: () => void; className?: string; children: React.ReactNode }) {
@@ -14,7 +15,7 @@ function Modal({ label, onClose, className = "", children }: { label: string; on
 
 /** The storm arrives: the whole screen fills with dust and the alarm names the real storm it is like. */
 export function StormAlarm({ storm, onClose }: { storm: HubStorm; onClose: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   useEffect(() => { audio.playSfx("storm-warning"); }, []);
   return <Modal label="storm-title" onClose={onClose} className="dust-alarm">
     <div>
@@ -24,7 +25,7 @@ export function StormAlarm({ storm, onClose }: { storm: HubStorm; onClose: () =>
       <ul className="storm-todo"><li><Icon name="sun" /> {t("hubStorm.panels")}</li><li><Icon name="sprout" /> {t("hubStorm.greenhouse")}</li></ul>
       <aside className="storm-real"><strong>{t("hubStorm.realTitle")}</strong>
         <p>{t(`hubStorm.real.${storm.real}`)}</p>
-        {storm.source && <a href={storm.source.url} target="_blank" rel="noreferrer">{t("hubStorm.source")}: {storm.source.label}</a>}
+        {storm.source && <a href={storm.source.url} target="_blank" rel="noreferrer">{t("hubStorm.source")}: {localText(storm.source.label, i18n.language)}</a>}
       </aside>
       <div className="actions"><button className="primary" autoFocus onClick={onClose}>{t("hubStorm.go")}</button></div>
     </div>
