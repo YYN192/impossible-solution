@@ -23,6 +23,8 @@ async function advance(page, stopAt) {
     await page.waitForTimeout(150);
     for (const [name, sel] of [["final", ".stars"], ["alarm", ".storm-alarm"], ["beat", ".beat-options"]])
       if (name === stopAt && (await page.locator(sel).count())) return name === "beat" ? await page.locator(sel).getAttribute("data-type") : name;
+    // Hands-on beats (#59): switch to the plain cards, which this script knows how to play.
+    if ((await page.locator(".hands-on-switch").count()) && !(await page.locator(".beat-options").count())) { await page.locator(".hands-on-switch").click(); continue; }
     if (await page.locator(".beat-options").count()) {
       const type = await page.locator(".beat-options").getAttribute("data-type");
       if (stopAt === type) return type;

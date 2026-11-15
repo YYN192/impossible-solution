@@ -1233,6 +1233,56 @@
     "soundOff": "Off",
     "headphones": "Headphones help."
   },
+  "handsOn": {
+    "cards": "Show the choices instead",
+    "back": "Do it yourself",
+    "ifNow": "If you go inside now:",
+    "ifSend": "Sending costs:",
+    "wipe": {
+      "hint": "Rub the dust off with your finger or mouse. Keys: ← → pick a panel, Space rubs.",
+      "panel": "Panel {{n}}: {{state}}",
+      "dusty": "dusty",
+      "clean": "clean",
+      "count": "{{n}} of {{total}} panels clean",
+      "inside": "Go back inside"
+    },
+    "build": {
+      "hint": "Drag one part onto the base. Or tap a part, then tap its spot.",
+      "base": "Your base",
+      "pick": "Pick up a part.",
+      "holding": "You are holding: {{part}}. Now choose its spot.",
+      "wrong": "That part goes on the {{spot}}.",
+      "missed": "Drop the part on a spot of the base.",
+      "keep": "Keep the parts and save the power",
+      "spot": {
+        "panels": "Solar panels",
+        "greenhouse": "Greenhouse",
+        "shelter": "Shelter"
+      }
+    },
+    "radio": {
+      "hint": "Hold Send to power the dish. Then watch your question fly to Earth.",
+      "ready": "Earth is {{n}} light-minutes away right now.",
+      "send": "Hold to send",
+      "tooShort": "Hold a little longer. The dish needs power.",
+      "flying": "Your question is flying to Earth",
+      "clock": "{{n}} min",
+      "fast": "Fast-forward the clock",
+      "arrived": "Earth got your question after {{n}} minutes. The answer comes back tonight.",
+      "skip": "Stay quiet and save the power",
+      "mars": "Mars",
+      "earth": "Earth"
+    },
+    "heater": {
+      "hint": "Tonight is very cold. Turn the heater dial, then say good night.",
+      "dial": "Heater dial",
+      "offShort": "Off",
+      "onShort": "On",
+      "off": "Off: the crew huddles together and eats more.",
+      "on": "On: the heater keeps everyone warm.",
+      "go": "Good night"
+    }
+  },
   "engineering": {
     "title": "Engineering bay",
     "lead": "Real NASA numbers, drawn as blocks. A longer bar means a bigger number. For cold, longer means colder.",
