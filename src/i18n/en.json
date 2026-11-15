@@ -348,7 +348,13 @@
     "realTitle": "What is real",
     "real": "The 20 May 2024 solar storm, normal Mars radiation, dust on solar panels, and the Earth–Mars message delay are real NASA science. Job costs are game numbers.",
     "open": "For teachers",
-    "back": "Back"
+    "back": "Back",
+    "codeLabel": "Teacher code",
+    "unlock": "Unlock all missions",
+    "codeHelp": "The code is in the project README, under 'For teachers'.",
+    "codeWrong": "That code is not right. Check the spelling and try again.",
+    "unlocked": "All missions are open on this device.",
+    "lock": "Lock the missions again"
   },
   "notice": {
     "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission.",
@@ -514,7 +520,12 @@
     "greenhouse": "GREENHOUSE",
     "name_moon": "Artemis Outpost",
     "canvas_moon": "Moon base. Use WASD or arrow keys. Press E near a console or crew member.",
-    "explore_moon": "Explore your home on the Moon."
+    "explore_moon": "Explore your home on the Moon.",
+    "objectiveFor": {
+      "storm": "Talk to your crew about the solar storm, then plan your sol at the glowing console.",
+      "dust": "Dust season! Ask Kai about saving power, then plan your sol at the glowing console.",
+      "moon": "Moon base! Ask the crew about sun, ice and Earth, then plan at the glowing console."
+    }
   },
   "dialogue": {
     "commander": {
@@ -1030,82 +1041,54 @@
     "next": "Next",
     "choose": "What do you say?",
     "ask": {
-      "who": "Who are you?",
-      "tip": "Any tips for me?",
       "drill": "Let's practise!",
+      "mission": "What is our mission?",
+      "who": "Who are you?",
       "bye": "Bye for now!"
     },
     "commander": {
       "intro": "Welcome to Ares Station, cadet! I'm Commander Nova. I'm so glad you're here.",
       "who": "I lead this crew. Every sol, I pick who does which job. A sol is one day on Mars. It is about 40 minutes longer than a day on Earth.",
-      "tip": "At the mission console, you give each astronaut one job. There are always more jobs than people. No choice is free!",
-      "drillIntro": "Let's practise. We have 3 astronauts and 4 jobs. Pick 3 jobs for today.",
-      "win": "Well done! See? One job had to wait. At the console, think about which job can wait the least."
+      "drillIntro": "Let's practise calling Earth! Earth moves across the sky. Turn the dish with A and D, or the arrow keys. When it points at Earth, send!",
+      "win": "Message sent! On the mission, the Ask Earth job works like this. Earth's answer comes the next morning.",
+      "mission": {
+        "storm": "Our mission lasts 5 sols. Keep all 3 astronauts safe, and collect science for the science star. A real storm from the Sun is coming. Nobody knows which sol!",
+        "dust": "This mission lasts 6 sols. First, you choose where to land. All three places are real. One has freezing nights, one has lots of dust, and one has strong wind.",
+        "moon": "Welcome to the Moon's south pole! We stay 5 days. First, choose a landing spot. Sunny spots, ice spots, a view of Earth: you can't have all three."
+      }
     },
     "engineer": {
       "intro": "Hey, cadet! I'm Kai, the engineer. If it hums, I probably fixed it.",
       "who": "I grew up fixing bikes. Now I fix a whole Mars base! Mars dust is my enemy. It covers our solar panels.",
-      "tip": "Dusty solar panels make less power. Clean panels mean more power for every machine.",
-      "drillIntro": "Quick test! We only have 2 power cells. Choose 2 machines to switch on.",
-      "win": "Great call! The air machine stays on, because we all need to breathe. Something else had to switch off."
+      "drillIntro": "Let's practise! The wind keeps blowing dust back onto the panels. Get every panel clean at the same time!",
+      "win": "Spotless! On the mission, the Clean solar panels job gives full power the next day.",
+      "mission": {
+        "storm": "Power is like our pocket money. Sunlight fills it up, and every machine spends it. The air machine needs power every night, or the air runs low.",
+        "dust": "Dust is our big enemy here. It falls on the panels every sol, so they make less power. Soon a big dust storm will come. For 2 sols the panels make much less power. Save some power before it hits!",
+        "moon": "Here the Sun stays low in the sky. Crater walls throw long shadows. On a shadow day, our panels make almost no power. Keep some power saved."
+      }
     },
     "scientist": {
       "intro": "Hello! I'm Amara. I study Mars rocks, and I grow our food.",
       "who": "Long, long ago, Gale Crater held a lake. Its rocks still have layers from that water. I read them like a book.",
-      "tip": "Greenhouse lights need power. No light means no harvest. Science trips earn stars, but outside, space rays are stronger.",
-      "drillIntro": "Help me grow a sprout! Look at the bubble. It shows what the plant needs next.",
-      "win": "A harvest! Plants need water and light. On Mars, that light comes from our power."
+      "drillIntro": "Let's practise! Thirsty plants stop growing. Water each plant before it dries out.",
+      "win": "What a harvest! On the mission, the greenhouse needs power for its lights. Then it grows food.",
+      "mission": {
+        "storm": "Science trips outside earn science. But outside, you get more space rays. The greenhouse grows food, if its lights get power.",
+        "dust": "Cold nights need the heater, and the heater needs power. If the heater stops, our plants freeze! On the last sol, the rover can drive out for rock samples. The far crater gives more science, but costs more power.",
+        "moon": "Some craters here never see the Sun. Scientists think they hide ice. Ice can give us water and air. Landing near ice is cold and dark, though."
+      }
     },
     "drone": {
       "intro": "Beep boop! I'm Pip, the station drone. I watch the Sun for you.",
       "who": "I was built to read space weather. Sometimes the Sun throws out tiny, very fast bits. We call them space rays.",
-      "tip": "When I beep a warning, build up the shelter. Water and Mars dirt help block space rays.",
-      "drillIntro": "Drill time! Space rays are coming. Stack the shelter blocks before the timer ends.",
-      "win": "Beep! Safe! Each block lowered your dose. Dose means how much space rays hit your body.",
-      "late": "Bzzt! The rays came before the shelter was done. Your dose went up. Want to try again?"
-    }
-  },
-  "drills": {
-    "back": "Leave the practice",
-    "jobs": {
-      "title": "Job board",
-      "left_one": "{{count}} astronaut is free",
-      "left_other": "{{count}} astronauts are free",
-      "done": "Every astronaut is busy. This job waits: {{job}}",
-      "go": "Start the day"
-    },
-    "power": {
-      "title": "Power switch",
-      "cells_one": "Power cells left: {{count}}",
-      "cells_other": "Power cells left: {{count}}",
-      "noAir": "Uh-oh! Without the air machine, nobody can breathe. Try again.",
-      "go": "Switch on",
-      "air": "Air machine",
-      "lamp": "Greenhouse lights",
-      "radio": "Radio to Earth"
-    },
-    "grow": {
-      "title": "Grow a sprout",
-      "water": "Give water",
-      "light": "Turn on the light",
-      "wrong": "Not that one. Look at the bubble!",
-      "stage": "Growth: {{n}} of {{total}}",
-      "needs": {
-        "water": "it needs water",
-        "light": "it needs light"
-      },
-      "ready": "It is ready to harvest!",
-      "harvest": "Harvest"
-    },
-    "shelter": {
-      "title": "Shelter stack",
-      "time": "Space rays arrive in {{s}} seconds",
-      "safe": "Shelter ready!",
-      "place": "Place a block",
-      "dose": "Dose",
-      "left_one": "{{count}} block left",
-      "left_other": "{{count}} blocks left",
-      "done": "Go inside"
+      "drillIntro": "Drill time! A block slides along the top. Drop it right on the stack to build the shelter.",
+      "win": "Beep! Strong shelter! On the mission, the Build up the shelter job means fewer space rays for everyone.",
+      "mission": {
+        "storm": "I watch the Sun for you. When a solar storm hits, astronauts inside the shelter get fewer space rays. A thicker shelter helps even more.",
+        "dust": "Even during dust season, the Sun can send space rays. Near the end of this mission, I may beep a warning. Then the shelter matters!",
+        "moon": "The Moon has no thick air to block space rays. When the Sun sends a storm, get into the shelter fast."
+      }
     }
   },
   "comfort": {

@@ -153,7 +153,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     {stormLeft ? <div className="world-objective storm-objective"><p><strong><Icon name="dust-storm" /> {t("hubStorm.todo")}</strong></p><ul>
       <li className={panelsDone ? "done" : ""}><Icon name={panelsDone ? "check" : "sun"} /> {t("hubStorm.panels")}</li>
       <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
-      : <div className="world-objective"><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
+      : <div className="world-objective"><p>{campaign && campaign !== "classic" ? t(`world.objectiveFor.${campaign}` as never) : t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
