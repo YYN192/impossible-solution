@@ -37,14 +37,16 @@ describe("Main menu: mission picker", () => {
     expect(onChoose).toHaveBeenCalledWith({ campaign: "dust" });
   });
 
-  it("offers today's real Sun, the daily mission and a surprise", () => {
+  it("offers today's real Sun", () => {
     menu();
     fireEvent.click(screen.getByRole("button", { name: t("menu.sunToday") }));
     expect(onChoose).toHaveBeenLastCalledWith({ today: true });
-    fireEvent.click(screen.getByRole("button", { name: t("run.daily") }));
-    expect(onChoose).toHaveBeenLastCalledWith({ daily: true });
-    fireEvent.click(screen.getByRole("button", { name: t("run.surprise") }));
-    expect(onChoose).toHaveBeenLastCalledWith({ surprise: true });
+  });
+
+  it("has no Daily mission or Surprise me buttons", () => {
+    menu();
+    expect(screen.queryByRole("button", { name: t("run.daily") })).toBeNull();
+    expect(screen.queryByRole("button", { name: t("run.surprise") })).toBeNull();
   });
 
   it("hides today's real Sun offline (?offline=1 / ?demo=1): there is no live Sun without the network", () => {

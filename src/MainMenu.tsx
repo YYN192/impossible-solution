@@ -6,6 +6,7 @@ import { WhatsThis } from "./components/WhatsThis";
 import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { readFlags } from "./data/flags";
 import { tRun } from "./i18n/dynamic";
+import "./menu.css";
 import { isOpen, useProgress } from "./state/progress";
 
 /** What the player picked on the menu. The app turns it into a run (campaign + seed). */
@@ -40,19 +41,16 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
   return <main className="mission-menu">
     <div className="drifting-stars" aria-hidden="true">{stars.map((style, i) => <i key={i} style={style} />)}</div>
     <div className="menu-orbit" aria-hidden="true" />
-    <div className="menu-layout"><div className="menu-story">
-      <p className="eyebrow"><span className="beacon-dot" />{t("menu.eyebrow")}</p>
-      <h1>{t("app.name")}</h1><p className="menu-tagline">{t("menu.tagline")}</p>
-      <div className="menu-landscape"><img src={asset("backgrounds/mars-menu-hero")} alt="" /><span>{t("menu.coordinates")}</span></div>
-      <div className="mission-facts"><span><b>03</b>{t("menu.crew")}</span><span><b>{String(CAMPAIGNS.length).padStart(2, "0")}</b>{t("menu.days")}</span><span><b>01</b>{t("menu.home")}</span></div>
-    </div><section className="menu-panel" onPointerOver={(e) => {
+    <div className="menu-stage" onPointerOver={(e) => {
       const button = (e.target as Element).closest("button:not(:disabled)");
       if (button && !button.contains(e.relatedTarget as Node | null)) audio.playSfx("menu-hover");
     }}>
-      <div className="panel-rivets" aria-hidden="true">+ <span>+</span></div>
       {!settings ? <>
-        <p className="eyebrow">{t("menu.welcome")}</p><h2>{resume ? t("menu.ready") : t("run.pick")}</h2>
-        {!resume && <div className="mission-picker" role="group" aria-label={t("run.pick")}>
+        <header className="menu-head">
+          <p className="eyebrow"><span className="beacon-dot" />{t("menu.eyebrow")}</p>
+          <h1>{t("app.name")}</h1><p className="menu-tagline">{t("menu.tagline")}</p>
+        </header>
+        {resume ? <p className="menu-resume">{t("menu.intro")}</p> : <div className="mission-picker" role="group" aria-label={t("run.pick")}>
           {CAMPAIGNS.map((c) => {
             const open = isOpen(c, progress);
             const moon = c.place === "moon" ? "moon" : undefined;
@@ -65,28 +63,26 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
               <span className="mission-tags">{t("run.realData", { list: c.datasets.join(", ") })}</span>
             </button>;
           })}
-          <div className="mission-extras">
-            {!flags.offline && <button type="button" aria-pressed={flags.todaysSun} onClick={() => pick({ today: true })}>{t("menu.sunToday")}</button>}
-            <button type="button" aria-pressed={flags.daily === true} onClick={() => pick({ daily: true })}>{t("run.daily")}</button>
-            <button type="button" onClick={() => pick({ surprise: true })}>{t("run.surprise")}</button>
-          </div>
-          {special && <p className="note">{flags.todaysSun ? t("run.todayHint") : t("run.dailyHint")}</p>}
         </div>}
-        {resume && <p>{t("menu.intro")}</p>}
-        <button className="primary launch-button" disabled={!ready} onClick={() => { audio.playSfx("menu"); onPlay(); }}><span aria-hidden="true">▶</span>{!ready ? t("menu.loading") : resume ? t("menu.resume") : t("title.start")}</button>
-        {resume && <button onClick={() => { audio.playSfx("menu-back"); onNew(); }}>{t("run.newMission")}</button>}
-        <button onClick={() => { audio.playSfx("menu-open"); showSettings(true); }}>{t("menu.settings")}</button>
-        <button onClick={onSources}>{t("dataSources.open")}</button>
-        <button onClick={onTeacher}>{t("teacher.open")}</button>
+        <div className="menu-actions">
+          <button className="primary launch-button" disabled={!ready} onClick={() => { audio.playSfx("menu"); onPlay(); }}><span aria-hidden="true">▶</span> {!ready ? t("menu.loading") : resume ? t("menu.resume") : t("title.start")}</button>
+          {resume && <button onClick={() => { audio.playSfx("menu-back"); onNew(); }}>{t("run.newMission")}</button>}
+          {!resume && !flags.offline && <button type="button" className="menu-sun" aria-pressed={flags.todaysSun} onClick={() => pick({ today: true })}>{t("menu.sunToday")}</button>}
+          {special && !resume && <p className="note">{flags.todaysSun ? t("run.todayHint") : t("run.dailyHint")}</p>}
+        </div>
+        <nav className="menu-quiet" aria-label={t("menu.settings")}>
+          <button onClick={() => { audio.playSfx("menu-open"); showSettings(true); }}>{t("menu.settings")}</button>
+          <button onClick={onSources}>{t("dataSources.open")}</button>
+          <button onClick={onTeacher}>{t("teacher.open")}</button>
+        </nav>
         <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" /></p>
-      </> : <>
+      </> : <section className="menu-panel menu-settings">
         <p className="eyebrow">{t("menu.preferences")}</p><h2>{t("menu.settings")}</h2>
         {(["master", "music", "sfx"] as const).map((key) => <label className="volume-control" key={key}>{t(`menu.${key}`)}<span>{Math.round(prefs[key] * 100)}%</span><input type="range" min={0} max={100} value={Math.round(prefs[key] * 100)} onChange={(e) => { useAudio.setState({ [key]: Number(e.target.value) / 100 }); audio.playSfx("volume-change"); }} /></label>)}
         <button aria-pressed={prefs.muted} onClick={() => audio.mute(!prefs.muted)}>{prefs.muted ? t("menu.unmute") : t("menu.mute")}</button>
         <p className="note">{t("menu.silent")}</p><button className="primary" onClick={() => { audio.playSfx("menu-back"); showSettings(false); }}>{t("dataSources.back")}</button>
-      </>}
-      <div className="panel-rivets" aria-hidden="true">+ <span>+</span></div>
-    </section></div>
+      </section>}
+    </div>
     <footer className="menu-bottom"><span>{t("menu.edition")}</span><span>{t("app.disclaimer")}</span></footer>
   </main>;
 }
