@@ -77,7 +77,10 @@ describe("?demo=1 recording path (#6)", () => {
     expect(second).toEqual(first);
     expect(first.over).toBe(true);
     const byId = new Map(first.dominoes.map((domino) => [domino.id, domino]));
-    expect(DEMO_CHAIN_IDS.every((id) => byId.has(id))).toBe(true);
+    expect(
+      DEMO_CHAIN_IDS.every((id) => byId.has(id)),
+      `missing demo chain from: ${[...byId.keys()].join(", ")}`,
+    ).toBe(true);
     for (let i = 1; i < DEMO_CHAIN_IDS.length; i++) {
       expect(byId.get(DEMO_CHAIN_IDS[i])?.causeIds).toContain(
         DEMO_CHAIN_IDS[i - 1],

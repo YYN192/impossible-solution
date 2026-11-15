@@ -41,16 +41,16 @@ describe("complete expedition", () => {
     const start = useGame.getState().state;
     // Skipping shelter on sol 1 lets the sol 2 particle burst raise the dose, so the final chain
     // carries a real-data source. Nobody gets tired, so every crew button stays clickable.
-    const plans: JobId[][] = [["greenhouse", "panels", "askEarth"], ["panels", "greenhouse", "science"], ["panels", "greenhouse", "shelter"]];
+    const plans: JobId[][] = [["greenhouse", "panels"], ["panels", "greenhouse", "shelter"], ["panels", "greenhouse", "askEarth"]];
     for (let sol = 1; sol <= 3; sol++) {
       expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("morning.heading", { sol }));
-      if (sol === 2) screen.getByRole("button", { name: new RegExp(t("morning.radio")) });
       click(t("morning.goPlan"));
       for (const [i, job] of plans[sol - 1].entries()) { click(t("crew.name", { n: i + 1 })); click(t(`jobs.${job}`)); }
       const before = useGame.getState().state;
       const expected = step(before, useSession.getState().draft, setup.events, setup.forecasts).state;
       expect(Number(screen.getByRole("meter", { name: t("bars.power") }).getAttribute("aria-valuenow"))).toBe(expected.bars.power);
       click(/End sol/);
+      if (screen.queryByRole("button", { name: new RegExp(t("play.confirmEnd")) })) click(new RegExp(t("play.confirmEnd")));
       expect(useGame.getState().state).toEqual(expected);
       click(sol < 3 ? t("endSol.nextMorning") : t("endSol.seeResults"));
     }

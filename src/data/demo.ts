@@ -15,8 +15,8 @@ export const DEMO_START = {
  * member (sol 3). Keep this free of clocks, randomness, and network data.
  */
 export const DEMO_PLANS = [
-  { a1: "greenhouse", a2: "shelter", a3: "askEarth" },
-  { a1: "greenhouse", a2: "shelter", a3: "askEarth" },
+  { a1: "greenhouse", a2: "shelter" },
+  { a2: "shelter" },
   { a2: "panels", a3: "greenhouse" },
 ] as const satisfies readonly Plan[];
 

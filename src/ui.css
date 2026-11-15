@@ -383,3 +383,6 @@ html[data-contrast] .teacher__bar > :not(.primary) { color: #fff; border-color: 
 .resource-meter.unsafe { border-color: #f5c542; }
 .resource-meter.unsafe > small { color: #ffd77a; }
 .space-watch { margin: 0 0 0.6rem; }
+/* #64: the power flow line under the plan preview. */
+.power-flow { margin: 0.2rem 0 0; font-size: max(1rem, 16px); color: #c3d3de; }
+.job-new { margin-left: 0.5rem; color: #fff; background: #315166; border: 1px solid #8eb7c9; padding: 0.08rem 0.3rem; font-size: 0.75rem; }
