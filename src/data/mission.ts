@@ -60,7 +60,7 @@ export interface MissionSetup {
 /** The saved Mars delay (14 Nov 2026): every setup starts with it; getMissionSetup swaps in today's. */
 const SAVED_DELAY = await getMarsDelay({ offline: true });
 const CLASSIC = {
-  campaignId: "storm",
+  campaignId: "classic",
   seed: 0,
   place: "mars" as const,
   rules: CLASSIC_RULES,

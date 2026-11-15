@@ -38,25 +38,43 @@ async function advance(page, stopAt) {
 
 try {
   browser = await chromium.launch({ channel: "chrome", headless: true }); // never headed
-  // 1. Live light delay.
+  // 0. What does "Today's real Sun" do right now?
   let ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  {
+    const page = await ctx.newPage();
+    await page.goto(base);
+    const sun = page.getByRole("button", { name: EN.menu.sunToday });
+    await sun.waitFor({ timeout: 15000 });
+    await sun.click();
+    await page.waitForTimeout(6000);
+    const note = await page.locator(".availability-note").innerText().catch(() => "(no notice)");
+    const pressed = await page.$$eval(".mission-picker button", (els) => els.map((e) => `${e.textContent.slice(0, 18)}=${e.getAttribute("aria-pressed")}`).join(" | "));
+    const badge = await page.locator(".data-badge").first().innerText().catch(() => "");
+    out.push(`sun today: notice="${note}"; badge="${badge.replace(/\s+/g, " ")}"; buttons: ${pressed}`);
+  }
+  await ctx.close();
+  // 1. Live light delay, on a phone and a laptop.
+  for (const [w, h] of [[390, 844], [1366, 768]]) {
+  ctx = await browser.newContext({ viewport: { width: w, height: h } });
   const api = [];
   ctx.on("response", (r) => r.url().includes("/api/dsn/mars") && api.push(r.status()));
-  let page = await open(ctx, "?teacher=1&campaign=dust&seed=7");
+  const page = await open(ctx, "?teacher=1&campaign=dust&seed=7");
   const got = await advance(page, "radio");
   const delay = got === "radio" ? await page.locator(".beat-delay").textContent() : "(radio beat not reached: " + got + ")";
   const chip = page.locator(".chip", { hasText: "Deep Space Network" }).first();
-  out.push(`dsn: /api/dsn/mars responses ${JSON.stringify(api)}; beat says "${delay}"; chip mode=${await chip.getAttribute("data-mode").catch(() => "none")}; chip="${(await chip.textContent().catch(() => "")).slice(0, 150)}"`);
+  if (got === "radio") await page.screenshot({ path: `docs/qa/radio-live-${w}.png` });
+  out.push(`dsn@${w}: /api/dsn/mars responses ${JSON.stringify(api)}; beat says "${delay}"; chip mode=${await chip.getAttribute("data-mode").catch(() => "none")}; chip="${(await chip.textContent().catch(() => "")).slice(0, 150)}"`);
   await ctx.close();
+  }
   // 2. Storm alarm on the demo path.
-  for (const reducedMotion of ["no-preference", "reduce"]) {
-    ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion });
-    page = await open(ctx, "?demo=1");
+  for (const [reducedMotion, w, h] of [["no-preference", 390, 844], ["no-preference", 1366, 768], ["reduce", 390, 844]]) {
+    ctx = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion });
+    const page = await open(ctx, "?demo=1");
     const saw = await advance(page, "alarm");
     const anim = saw === "alarm" ? await page.locator(".storm-alarm").evaluate((el) => getComputedStyle(el).animationName) : "(no alarm: " + saw + ")";
     const text = saw === "alarm" ? (await page.locator(".storm-alarm").innerText()).replace(/\s+/g, " ").slice(0, 420) : "";
-    out.push(`alarm (${reducedMotion}): animation=${anim}; text="${text}"`);
-    if (saw === "alarm" && reducedMotion === "no-preference") { await page.waitForTimeout(2200); await page.screenshot({ path: "docs/qa/storm-alarm-390.png", fullPage: true }); }
+    out.push(`alarm@${w} (${reducedMotion}): animation=${anim}; text="${text.slice(0, 200)}"`);
+    if (saw === "alarm" && reducedMotion === "no-preference") { await page.waitForTimeout(2200); await page.screenshot({ path: `docs/qa/storm-alarm-${w}.png` }); }
     await ctx.close();
   }
 } finally {

@@ -12,6 +12,7 @@ import { useGame } from "../state/game";
 import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
+import { ExploreBeat } from "./ExploreBeat";
 
 const num = (n: number) => `${n > 0 ? "+" : "−"}${Math.abs(Number(n.toFixed(1)))}`;
 
@@ -54,6 +55,8 @@ export function BeatScreen() {
   const setup = useMission((s) => s.setup);
   const state = useGame((s) => s.state);
   const [done, setDone] = useState<{ fell: Domino; before: Bars } | null>(null);
+  // Explore beats open on the map; "Let Pip drive" shows the plain choices instead.
+  const [pipDrives, setPipDrives] = useState(false);
   const beat = setup?.beats[sol];
   // No beat for this sol (old link, restored run): go on to the plan.
   useEffect(() => {
@@ -63,14 +66,16 @@ export function BeatScreen() {
   const place = setup.place === "moon" ? "moon" : undefined;
   const vars = beat.vars ?? {};
 
-  function choose(o: BeatOption) {
+  function act(action: Action) {
     const before = { ...state.bars };
-    const after = useGame.getState().choose(o.action);
+    const after = useGame.getState().choose(action);
     const fell = after.dominoes.at(-1);
     if (!fell) return;
-    audio.playSfx(o.action.ask ? "earth-message-send" : "assign");
+    audio.playSfx(action.ask ? "earth-message-send" : "assign");
     setDone({ fell, before });
   }
+  const choose = (o: BeatOption) => act(o.action);
+  const onMap = beat.map && !pipDrives && !done;
 
   return (
     <ScreenFrame title={tRun(`beat.${beat.id}.title`, vars)}>
@@ -90,7 +95,13 @@ export function BeatScreen() {
         <span>{t("bars.food")} <b>{state.food}</b></span>
         <span>{t("bars.science")} <b>{state.science}</b></span>
       </div>
-      {!done ? (
+      {onMap && beat.map && (
+        <>
+          <ExploreBeat map={beat.map} onDone={act} />
+          <button type="button" className="explore-switch" onClick={() => setPipDrives(true)}>{t("exploreUi.pip")}</button>
+        </>
+      )}
+      {onMap ? null : !done ? (
         <div className="beat-options" role="group" aria-label={t("beatUi.options")} data-type={beat.type}>
           {beat.options.map((o) => {
             const can = canAct(state, o.action);
@@ -111,6 +122,7 @@ export function BeatScreen() {
               </button>
             );
           })}
+          {beat.map && <button type="button" className="explore-switch" onClick={() => setPipDrives(false)}>{t("exploreUi.back")}</button>}
         </div>
       ) : (
         <div className="beat-result" role="status">

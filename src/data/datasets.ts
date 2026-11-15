@@ -177,6 +177,10 @@ export const SCHEMAS = {
     schema: envelope(z.array(z.object({ spacecraft: z.string(), rtltSeconds: z.number(), dish: z.string(), station: z.string() })).min(1)),
     required: true,
   },
+  "rover-map-gale": {
+    schema: envelope(z.object({ cols: z.number(), rows: z.number(), west: z.number(), north: z.number(), degreesPerCell: z.number(), colors: z.array(z.string().regex(/^#[0-9a-f]{6}$/)).length(256) })),
+    required: true,
+  },
   "storm-pool": { schema: envelope(z.array(PoolStorm).length(2)), required: true },
   "csa-resources": {
     schema: envelope(z.array(LearningResource).min(1)),

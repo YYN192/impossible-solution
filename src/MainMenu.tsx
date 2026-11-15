@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
 import { audio, musicFor, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
-import { CAMPAIGNS } from "./data/campaigns";
+import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { readFlags } from "./data/flags";
 import { tRun } from "./i18n/dynamic";
 import { isOpen, useProgress } from "./state/progress";
@@ -58,6 +58,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
             const moon = c.place === "moon" ? "moon" : undefined;
             return <button type="button" className="mission-card" key={c.id} disabled={!open}
               aria-pressed={!special && campaignId === c.id} onClick={() => pick({ campaign: c.id })}>
+              <img className="mission-art" src={asset(`campaign/card-${c.id}`)} alt="" />
               <strong>{open ? "" : "🔒 "}{tRun(`campaign.${c.id}.name`)}</strong>
               <span className="mission-meta">{tRun(`campaign.${c.id}.where`)} · {tRun("run.sols", { count: c.rules.sols ?? 3 }, moon)} · {t("run.minutes", { count: c.minutes })} · {t(`run.level.${c.difficulty}`)}</span>
               <small>{open ? tRun(`campaign.${c.id}.hook`) : t("run.locked", { name: tRun(`campaign.${c.unlockAfter}.name`) })}</small>

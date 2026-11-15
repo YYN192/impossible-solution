@@ -79,6 +79,12 @@ describe("DataSources game numbers (#7)", () => {
       "meter-max",
       "small-storm-factor",
       "moon-storm-factor",
+      "skill-ask-earth",
+      "skill-panels",
+      "skill-greenhouse",
+      "rover-battery",
+      "rover-battery-per-power",
+      "rover-max-science",
       "demo-start-food",
       "demo-start-panels",
     ];

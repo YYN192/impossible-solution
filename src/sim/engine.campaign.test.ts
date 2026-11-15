@@ -235,3 +235,32 @@ describe("dust storms in Earth's answer and in the chain", () => {
     expect(fell.find((d) => d.id === "sol1-dust-storm")?.textKey).toBe("event.dust.insight2022");
   });
 });
+
+describe("each astronaut is good at one thing", () => {
+  const low = (): GameState => ({ ...createGame(), bars: { power: 4, air: 5, dose: 0 } });
+
+  it("Nova (a1) calls Earth for free", () => {
+    const nova = step(low(), { a1: "askEarth" }, []).state;
+    const kai = step(low(), { a2: "askEarth" }, []).state;
+    expect(nova.bars.power - kai.bars.power).toBe(1);
+    expect(nova.earthAnswer).toBeDefined();
+  });
+
+  it("Kai (a2) cleans the panels so well that tomorrow has 1 more power", () => {
+    const kai = step(low(), { a2: "panels" }, []).state;
+    const amara = step(low(), { a3: "panels" }, []).state;
+    expect(kai.bars.power - amara.bars.power).toBe(ENGINE.skill.panelsPower);
+  });
+
+  it("Amara (a3) grows 1 more food in the greenhouse", () => {
+    const amara = step(low(), { a3: "greenhouse" }, []).state;
+    const nova = step(low(), { a1: "greenhouse" }, []).state;
+    expect(amara.food - nova.food).toBe(ENGINE.skill.greenhouseFood);
+  });
+
+  it("a tired expert brings no skill", () => {
+    const tired = { ...low(), tired: ["a3" as const] };
+    expect(step(tired, { a3: "greenhouse" }, []).state.food).toBe(0);
+  });
+});
+

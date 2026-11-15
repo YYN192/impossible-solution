@@ -33,10 +33,15 @@ describe("mission setup for campaigns", () => {
     expect(noNetwork).not.toHaveBeenCalled();
   });
 
-  it("without a campaign it is the classic storm mission, with a seed to replay it", async () => {
+  it("without a campaign it is The Storm Season (5 sols, a beat every sol), with a seed to replay it", async () => {
     const s = await getMissionSetup(readFlags("?offline=1"), NOW, noNetwork);
     expect(s.campaignId).toBe("storm");
-    expect(s.rules.sols).toBe(3);
+    expect(s.rules.sols).toBe(5);
+    expect(Object.keys(s.beats)).toHaveLength(5);
+    expect(s.beats[1].type).toBe("explore");
+    const quick = await getMissionSetup(readFlags("?campaign=classic&seed=3&offline=1"), NOW, noNetwork);
+    expect(quick.rules.sols).toBe(3);
+    expect(quick.beats).toEqual({});
     expect(Number.isInteger(s.seed)).toBe(true);
     expect(s.events.some((e) => e.kind === "particleBurst")).toBe(true);
     expect(s.stormId).toBeTruthy();
@@ -51,7 +56,7 @@ describe("mission setup for campaigns", () => {
 
   it("the demo is the May 2024 storm with the burst on sol 2, whatever the clock says", async () => {
     const s = await getMissionSetup(readFlags("?demo=1"), NOW, noNetwork);
-    expect(s).toMatchObject({ campaignId: "storm", stormId: "may2024", seed: 0 });
+    expect(s).toMatchObject({ campaignId: "classic", stormId: "may2024", seed: 0 });
     expect(s.events.map((e) => `${e.kind}@${e.sol}`)).toEqual(["particleBurst@2", "stormCloud@3"]);
     expect(await getMissionSetup(readFlags("?demo=1"), new Date("2030-01-01T00:00:00Z"), noNetwork)).toEqual(s);
     expect(noNetwork).not.toHaveBeenCalled();

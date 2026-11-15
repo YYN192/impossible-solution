@@ -33,9 +33,13 @@
     "noPowerShelter": "Not enough power to build up the shelter.",
     "noPowerAskEarth": "Not enough power to call Earth.",
     "outsideStorm": "Astronauts were outside during the storm.",
-    "noSignal": "No signal: Earth was below the horizon.",
+    "noSignal": "No radio today. Earth was hidden from us.",
     "coldNight": "The night was too cold. Plants in the greenhouse froze.",
-    "doseFull": "The space-ray meter is full. The crew had to go home early."
+    "doseFull": "The space-ray meter is full. The crew had to go home early.",
+    "roverHome0": "The rover stayed at the base.",
+    "roverHome1": "The rover came home with 1 sample.",
+    "roverHome2": "The rover came home with 2 samples.",
+    "roverStranded": "The rover got stuck far from home. The crew walked out to tow it."
   },
   "event": {
     "burst": {
@@ -182,7 +186,13 @@
       "airReady": "Air needed at the end for the base star",
       "meterMax": "Top of the space-ray meter (a full meter ends the mission)",
       "smallStormFactor": "Small storm: dose as a multiple of a normal day (real peak: about 3 times)",
-      "moonStormFactor": "May 2024 storm at the Moon: multiple of a normal day (real: about 1.3 times)"
+      "moonStormFactor": "May 2024 storm at the Moon: multiple of a normal day (real: about 1.3 times)",
+      "skillAskEarth": "Nova's skill: power her call to Earth costs",
+      "skillPanels": "Kai's skill: extra power when he cleans the panels",
+      "skillGreenhouse": "Amara's skill: extra food from her harvest",
+      "roverBattery": "Rover battery for one drive (moves)",
+      "roverBatteryPerPower": "Rover battery used per 1 power",
+      "roverMaxScience": "Most science one rover drive can add"
     },
     "simplifies": "What this game simplifies",
     "back": "Back"
@@ -198,7 +208,8 @@
     "storms": "Each storm is compared only with the quiet level just before it, on the same detector. A small storm is played as 3 times a normal day for a whole sol; its real peak lasted hours.",
     "sites": "Site numbers (sun, dust, heater, ice) and upgrade numbers are game numbers. The real record of each place decides which way they lean.",
     "moon": "On the Moon, the day the Sun hides behind a ridge and the days Earth is hidden are game events. So is the power cut of the 2018 dust storm.",
-    "risk": "In the game, Earth's burst forecast is always right, because we replay history. Real forecasts give a chance and can be wrong."
+    "risk": "In the game, Earth's burst forecast is always right, because we replay history. Real forecasts give a chance and can be wrong.",
+    "rover": "The rover map uses the real colours of a NASA picture, but one square is about 20 km. A real rover drives far less; rocks, rough ground and sample spots are game rules."
   },
   "jobs": {
     "panels": "Clean solar panels",
@@ -242,6 +253,11 @@
       "1": "Nova",
       "2": "Kai",
       "3": "Amara"
+    },
+    "skill": {
+      "a1": "Calls Earth for free",
+      "a2": "Cleans panels: +1 power",
+      "a3": "Greenhouse: +1 food"
     }
   },
   "planHelp": {
@@ -499,7 +515,7 @@
       "name": "The Storm Season",
       "where": "Mars",
       "hook": "Can you keep 3 astronauts safe through a real solar storm?",
-      "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Plan each sol with care.",
+      "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Explore, build and plan with care.",
       "real": "Every storm here is real. A NASA rover measured each one on Mars.",
       "planners": "Real crews hide in a shielded corner during solar storms."
     },
@@ -518,10 +534,18 @@
       "brief": "NASA studied 13 landing spots near the Moon's south pole. Some are sunny. Some are near ice. Choose yours.",
       "real": "NASA chose those spots for sunlight, radio contact with Earth and ice.",
       "planners": "Planners look for long sunlight, a view of Earth and safe ground."
+    },
+    "classic": {
+      "name": "Quick mission",
+      "where": "Mars",
+      "hook": "Three sols. One real solar storm. Can you keep the crew safe?",
+      "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Plan each sol with care.",
+      "real": "Every storm here is real. A NASA rover measured each one on Mars.",
+      "planners": "Real crews hide in a shielded corner during solar storms."
     }
   },
   "beat": {
-    "chose": "You chose: {{choice}}.",
+    "chose": "You chose “{{choice}}”.",
     "siteMars": {
       "title": "Where do we land?",
       "text": "Three real places. A real NASA robot worked in each one.",
@@ -540,7 +564,7 @@
     },
     "wipe": {
       "title": "Dust on the panels",
-      "text": "Go outside and wipe them? Every wipe is time under space rays.",
+      "text": "Outside, space rays hit you. The more you wipe, the more rays.",
       "none": {
         "label": "Leave the dust"
       },
@@ -589,12 +613,12 @@
     },
     "cold": {
       "title": "A very cold night",
-      "text": "Tonight will be bitter cold. The plants may freeze.",
+      "text": "A very cold night is coming. Plants freeze without heat.",
       "heat": {
         "label": "Turn the heater up"
       },
       "huddle": {
-        "label": "Let the greenhouse get cold"
+        "label": "Save power. The plants may freeze."
       }
     },
     "devil": {
@@ -648,7 +672,7 @@
     },
     "skywatch": {
       "title": "Sky watch",
-      "text": "A huge eruption on the Sun! It points away from the Moon. Shelter anyway?",
+      "text": "The Sun blew up a big storm! It is not aimed at us. Hide anyway?",
       "shelter": {
         "label": "Yes: get the shelter ready"
       },
@@ -676,14 +700,27 @@
         "label": "Collect one more rock sample"
       },
       "charge": {
-        "label": "Charge the batteries for the next crew"
+        "label": "Charge the batteries. The next crew starts with power."
+      }
+    },
+    "explore": {
+      "title": "Rover drive",
+      "text": "Drive the rover to the rock samples. Bring it home before the battery is empty.",
+      "near": {
+        "label": "Pip drives to the near rocks"
+      },
+      "far": {
+        "label": "Pip drives to the far rocks"
+      },
+      "stay": {
+        "label": "The rover stays at home"
       }
     }
   },
   "run": {
     "pick": "Pick a mission",
-    "sols_one": "{{count}} sol",
-    "sols_other": "{{count}} sols",
+    "sols_one": "{{count}} Mars day",
+    "sols_other": "{{count}} Mars days",
     "sols_moon_one": "{{count}} day",
     "sols_moon_other": "{{count}} days",
     "minutes": "about {{count}} min",
@@ -713,7 +750,8 @@
       "radio": "Radio Earth",
       "upgrade": "Upgrade",
       "rover": "Rover drive",
-      "skywatch": "Sky watch"
+      "skywatch": "Sky watch",
+      "explore": "Explore"
     },
     "options": "Your choices",
     "cannot": "Not enough power for this.",
@@ -732,7 +770,7 @@
     "dustFactor": "Dusty panels keep {{n}}% of their power",
     "airMachinePower": "Air machine needs {{n}} power a night",
     "foodGain": "One harvest makes {{n}} food",
-    "shelterFactor": "The shelter lets in {{n}}% of the rays",
+    "shelterFactor": "Only {{n}} of every 100 rays get in",
     "earthHidden": "No radio to Earth on days {{days}}",
     "earthAlways": "Earth is always in view"
   },
@@ -751,7 +789,7 @@
     "pipCloud": "Pip: “The storm cloud Earth warned about is passing.”",
     "real": "It's real!",
     "id": "NASA event number: {{id}}",
-    "flare": "The flare was class {{flare}}. X is the strongest class.",
+    "flare": "The Sun flashed a {{flare}} flare. X is the biggest kind.",
     "fact": {
       "may2024": "20 May 2024. A NASA rover measured this storm on Mars. At its worst hour, the rays were more than 50 times stronger than usual.",
       "sep2017": "11 September 2017. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
@@ -759,5 +797,22 @@
       "moon": "20 May 2024. A NASA spacecraft circling the Moon measured this storm. The rays rose only a little. The storm pointed at Mars.",
       "cloud": "Scientists forecast this storm cloud with a computer model of the Sun's wind."
     }
+  },
+  "exploreUi": {
+    "battery": "Battery: {{n}} of {{max}}",
+    "samples": "Samples on board: {{n}}",
+    "home": "The rover is at the base.",
+    "away": "The rover is away. Bring it home to keep the samples!",
+    "empty": "The battery is empty!",
+    "finish": "End the drive",
+    "pip": "Let Pip drive instead",
+    "back": "I want to drive",
+    "up": "Drive up",
+    "down": "Drive down",
+    "left": "Drive left",
+    "right": "Drive right",
+    "map": "Map of the Gale Crater area. Use the arrow keys or the buttons to drive.",
+    "legend": "Light ground costs 1 battery. Dark, rough ground costs 2. Rocks block the way.",
+    "square": "One square is about 20 km of real Mars."
   }
 }

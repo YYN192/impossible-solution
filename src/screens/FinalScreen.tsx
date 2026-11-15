@@ -59,7 +59,7 @@ export function FinalView({
   useEffect(() => {
     if (!demo) record(stars.count);
     // Finishing a campaign (not an early trip home) opens the next one.
-    if (!demo && !endedEarly && setup) finish(setup.campaignId);
+    if (!demo && !endedEarly && setup) finish(setup.campaignId === "classic" ? "storm" : setup.campaignId);
   }, [demo, record, stars.count, endedEarly, setup, finish]);
 
   /** A new run of the same campaign: without a seed in the link, the next run draws a new one. */

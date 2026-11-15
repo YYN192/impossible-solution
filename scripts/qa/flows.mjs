@@ -31,6 +31,8 @@ export async function press(page, loc, mode) {
 const btn = (page, name, mode, opts) => press(page, button(page, name, opts), mode);
 
 export async function openMenu(page, flags = "demo=1", base = page.__base) {
+  // These flows play the quick 3-sol mission (no beats). The long campaigns are covered by scripts/qa/campaigns.mjs.
+  if (!/demo=1|campaign=/.test(flags)) flags += (flags ? "&" : "") + "campaign=classic&seed=3";
   await page.goto(base + (flags ? "?" + flags : ""));
   await button(page, EN.title.start).waitFor({ state: "visible", ...wait });
   await page.waitForFunction((n) => [...document.querySelectorAll("button")].some((b) => b.textContent.includes(n) && !b.disabled), EN.title.start, wait);

@@ -1,4 +1,5 @@
 import { ENGINE } from "../sim/engine";
+import { EXPLORE } from "../sim/explore";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT, type JobId } from "../sim/types";
 import { CAMPAIGN_NUMBERS } from "./campaigns";
 import { DEMO_START } from "./demo";
@@ -34,6 +35,12 @@ type GameNumberName =
   | "meterMax"
   | "smallStormFactor"
   | "moonStormFactor"
+  | "skillAskEarth"
+  | "skillPanels"
+  | "skillGreenhouse"
+  | "roverBattery"
+  | "roverBatteryPerPower"
+  | "roverMaxScience"
   | "demoStartFood"
   | "demoStartPanels";
 
@@ -91,6 +98,12 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("meter-max", "meterMax", DOSE.meterMax),
   value("small-storm-factor", "smallStormFactor", CAMPAIGN_NUMBERS.SMALL_STORM_FACTOR),
   value("moon-storm-factor", "moonStormFactor", CAMPAIGN_NUMBERS.MOON_STORM_FACTOR),
+  value("skill-ask-earth", "skillAskEarth", ENGINE.skill.askEarthCost),
+  value("skill-panels", "skillPanels", ENGINE.skill.panelsPower),
+  value("skill-greenhouse", "skillGreenhouse", ENGINE.skill.greenhouseFood),
+  value("rover-battery", "roverBattery", EXPLORE.battery),
+  value("rover-battery-per-power", "roverBatteryPerPower", EXPLORE.batteryPerPower),
+  value("rover-max-science", "roverMaxScience", EXPLORE.maxScience),
   value("demo-start-food", "demoStartFood", DEMO_START.food),
   value("demo-start-panels", "demoStartPanels", DEMO_START.panelEfficiency),
 ];
