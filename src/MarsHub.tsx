@@ -6,11 +6,12 @@ import { useMission } from "./state/mission";
 import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
 import { useSession } from "./game/session";
+import { usePressedKeys } from "./game/pressedKeys";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
 
-// Area names as HTML over the canvas (world coords), so they stay sharp and readable at any size.
-const LABELS = [["world.supplies", 128, 96], ["world.console", 320, 220], ["world.research", 496, 152], ["world.airlock", 320, 382]] as const;
+// Physical keys → on-screen hint they light up (keydown on, keyup off).
+const HINT_KEYS = { w: "w", arrowup: "w", a: "a", arrowleft: "a", s: "s", arrowdown: "s", d: "d", arrowright: "d", e: "e" } as const;
 
 /** The station header names the place of the campaign being played (the classic keeps Gale Crater). */
 export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; onMenu: () => void }) {
@@ -27,6 +28,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const [activating, setActivating] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const sol = useGame((s) => s.state.sol);
+  const pressed = usePressedKeys(HINT_KEYS);
   const interact = useCallback(() => {
     if (!near || activating || dialogue) return;
     held.current.clear(); goal.current = pending.current = undefined;
@@ -69,8 +71,14 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     raf = requestAnimationFrame(frame);
     return () => { cancelAnimationFrame(raf); useSession.setState({ position: player }); };
   }, [dialogue, activating]);
+  // The key listeners read the latest state through a ref, so they are attached once. Re-attaching
+  // them whenever `interact` changed (every time something came into or out of reach) ran the
+  // cleanup below, which dropped the held keys: the player froze until the OS key-repeat kicked in.
+  const latest = useRef({ interact, dialogue, activating });
+  useEffect(() => { latest.current = { interact, dialogue, activating }; });
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      const { interact, dialogue, activating } = latest.current;
       if (dialogue || activating || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
       const key = e.key.toLowerCase();
       if (["w", "a", "s", "d", "arrowup", "arrowleft", "arrowdown", "arrowright"].includes(key)) {
@@ -87,7 +95,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     window.addEventListener("keydown", down); window.addEventListener("keyup", up); events.forEach((n) => window.addEventListener(n, clear));
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); events.forEach((n) => window.removeEventListener(n, clear)); document.removeEventListener("visibilitychange", clear); };
-  }, [interact, dialogue, activating]);
+  }, []);
   const tap = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (dialogue || activating) return;
     const r = e.currentTarget.getBoundingClientRect();
@@ -108,15 +116,14 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
-      {LABELS.map(([key, x, y]) => <span key={key} className="world-label" style={{ left: `${x / 6.4}%`, top: `${y / 3.84}%` }}>{t(key)}</span>)}
       {activating && <div className="console-boot" role="status">{t("world.connecting")}</div>}
     </div></div>
     <div className="world-controls"><div className="dpad" aria-label={t("world.movement")}>
-      {([['w', '↑', 'up'], ['a', '←', 'left'], ['s', '↓', 'down'], ['d', '→', 'right']] as const).map(([key, symbol, direction]) => <button key={key} className={`move-${direction}`} aria-label={t(`world.${direction}`)}
+      {([['w', '↑', 'up'], ['a', '←', 'left'], ['s', '↓', 'down'], ['d', '→', 'right']] as const).map(([key, symbol, direction]) => <button key={key} className={`move-${direction}`} data-pressed={pressed.has(key) ? "" : undefined} aria-label={t(`world.${direction}`)}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); held.current.add(key); }}
         onPointerUp={() => held.current.delete(key)} onPointerCancel={() => held.current.delete(key)} onLostPointerCapture={() => held.current.delete(key)}>{symbol}</button>)}
     </div><div className="interaction-guide"><p aria-live="polite">{near ? t(`world.near.${near.dialogue ?? "console"}`) : t("world.explore")}</p>
-      <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd>E</kbd></button>
+      <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd data-pressed={pressed.has("e") ? "" : undefined}>E</kbd></button>
       <button className="quiet-button go-console" onClick={onConsole}>{t("world.goConsole")} →</button>
     </div><p className="station-tip">{t("world.tip")}</p></div>
     {dialogue && <dialog ref={dialogueBox} className="npc-dialogue" aria-labelledby="npc-dialogue-title" onCancel={(e) => { e.preventDefault(); closeDialogue(); }}>
