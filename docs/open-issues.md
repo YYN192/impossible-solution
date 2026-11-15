@@ -1,6 +1,6 @@
 # Open issues: sorted by importance, then difficulty
 
-_Generated on Sun 15 Nov 2026, 14:40 (Sofia), updated after #63 and the #67 "Tap" fix from https://github.com/YYN192/impossible-solution/issues. The sub-tasks are the checklists in each issue and in its comments; none of these issues uses GitHub's sub-issue feature. Items fixed and verified today are ticked even where GitHub has not been updated yet._
+_Generated on Sun 15 Nov 2026, 14:40 (Sofia), updated about 15:00 after #63, #68 and the #67 "Tap" fix. Exact next steps for each partly done issue are in its latest GitHub comment from https://github.com/YYN192/impossible-solution/issues. The sub-tasks are the checklists in each issue and in its comments; none of these issues uses GitHub's sub-issue feature. Items fixed and verified today are ticked even where GitHub has not been updated yet._
 
 **Importance:** Critical = needed for tonight's submission · High = judges or kids will hit it · Medium = clearly worth it · Low = nice to have.  
 **Difficulty:** S = under 1 hour · M = 1–3 hours · L = more than 3 hours.
@@ -17,7 +17,6 @@ _Generated on Sun 15 Nov 2026, 14:40 (Sofia), updated after #63 and the #67 "Tap
 | #75 | Readability: dust overlay contrast, text under 16 px, small targets, phone layout hides the main action | High | M | 2/6 | Dust veil, text sizes, contrast and buttons are done. Left: phone layout (Start, End sol and preview below the fold) and a contrast check under the dust. |
 | #64 | Show, don't tell: review every screen and guide the first mission | High | L | 11/11 | Biggest teaching win: goal line, meter safe zones, storm warning before the plan, a result line after each choice. |
 | #59 | Mission 1 needs more hands-on interaction for 8-year-olds | High | L | 9/9 | P0 label, but a design job: new hands-on moments for 8-year-olds, rover screen overload, mini-game clock. |
-| #68 | Rover out of power: play a sound, shake the screen and say "No power" | Medium | S | 6/6 | Rover out of power: sound, short shake, "No power!". Small and self-contained. |
 | #66 | Rover mission: check the rover really drove far and the crew is not overworked | Medium | S | 3/9 | Main fixes done (live cost, no-sample result, tests). Left: a team decision on whether samples should tire the crew. |
 | #76 | South Pole Outpost still says Mars and sol (text, hub art, ambience) | Medium | M | 2/5 | Moon wording done (Artemis Outpost, no Mars/sol, test). Left: Moon hub art (Earth in the window) and a Moon ambience loop. |
 | #65 | End-of-day wrap-up: pop-ups and animation for the important data | Medium | M | 10/10 | Celebrate by result, chain one link at a time, "Next time" tip, count-up pop-ups. |
@@ -34,6 +33,7 @@ _Generated on Sun 15 Nov 2026, 14:40 (Sofia), updated after #63 and the #67 "Tap
 
 ## Closed today (for reference)
 
+- #68 Rover out of power: sound, shake and "No power!".
 - #63 Mini-games can be played with the keyboard (arrows, A/D, Space).
 - #53 Bulgarian keyboard: WASD and E use the physical key.
 - #56 Help bubble no longer covers the footer.
@@ -177,20 +177,6 @@ P0 label, but a design job: new hands-on moments for 8-year-olds, rover screen o
 
 ## Medium
 
-### #68 Rover out of power: play a sound, shake the screen and say "No power"
-
-**Importance:** Medium · **Difficulty:** S · **Labels:** enhancement, ui · https://github.com/YYN192/impossible-solution/issues/68
-
-Rover out of power: sound, short shake, "No power!". Small and self-contained.
-
-**Sub-tasks:**
-
-- [ ] When the rover battery reaches 0, a "power down" sound plays once (respects the sound toggle).
-- [ ] The screen shakes briefly (about 0.3–0.5 s); no shake with `prefers-reduced-motion`.
-- [ ] A big "No power!" / "Няма ток!" message appears over the rover, in EN and BG.
-- [ ] It fires once per power-out, not every frame.
-- [ ] The sound is listed in `public/audio/audio-manifest.json` and `CREDITS.md`.
-- [ ] Tests written first: battery at 0 triggers the event exactly once.
 
 ### #66 Rover mission: check the rover really drove far and the crew is not overworked
 
