@@ -68,7 +68,7 @@ describe("Today's Sun (#8)", () => {
     const sun = { arrival: "2026-11-13T12:00Z", passed: true, url: "https://ccmc.gsfc.nasa.gov/DONKI/", cmeId: "C-1", speed: 726, fetchedAt: now.getTime() };
     const live = render(<SunCard sun={{ ...sun, source: "network" }} />);
     expect(live.container.textContent).toContain("Live NASA data");
-    expect(screen.getByText(t("notice.sunSpeed", { speed: 726 }))).toBeTruthy();
+    expect(live.container.textContent).toContain(t("notice.sunSpeed", { speed: 726 }));
     expect(screen.getByRole("link").getAttribute("href")).toBe(sun.url);
     live.unmount();
     for (const source of ["snapshot", "cache", "stale-cache"] as const) {
