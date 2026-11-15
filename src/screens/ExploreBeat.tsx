@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { mistake, shake } from "../game/feedback";
-import { EXPLORE, drivePower, driveAction, isHome, move, ranOutOfPower, startDrive, type ExploreMap } from "../sim/explore";
+import { EXPLORE, drivePower, driveAction, isHome, move, ranOutOfPower, farSamples, roverChoice, startDrive, type ExploreMap } from "../sim/explore";
+import type { Beat } from "../sim/campaign";
+import { tRun } from "../i18n/dynamic";
 import type { Action } from "../sim/types";
 import { gameKey, usePressedKeys } from "../game/pressedKeys";
 
@@ -19,14 +21,18 @@ const HINT_KEYS = Object.fromEntries(Object.entries(KEYS).map(([k, d]) => [k.toL
  * Rover drive: the kid steers the rover over a map whose colours come from a real NASA picture.
  * Arrow keys, WASD, the four buttons or a tap on a neighbouring square all work. The whole drive
  * is handed to the engine as one action when it ends (see sim/explore.ts).
+ * With `beat` (Dust Season, #98) the drive picks one of that beat's own options instead (`roverChoice`).
  */
-export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action: Action) => void }) {
+export function ExploreBeat({ map, beat, onDone }: { map: ExploreMap; beat?: Beat; onDone: (action: Action) => void }) {
   const { t } = useTranslation();
   const [drive, setDrive] = useState(() => startDrive(map));
   const [facing, setFacing] = useState<Dir>("right");
   const box = useRef<HTMLDivElement>(null);
   const home = isHome(map, drive);
   const pressed = usePressedKeys(HINT_KEYS);
+  const choice = beat && roverChoice(map, drive);
+  const far = beat ? farSamples(map) : [];
+  const option = beat?.options.find((o) => o.id === choice);
 
   function go(dir: Dir) {
     const [dx, dy] = DIRS[dir];
@@ -70,6 +76,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
               className="explore-cell"
               data-terrain={cell.terrain}
               data-sample={sample >= 0 && !drive.collected.includes(sample) ? "" : undefined}
+              data-far={far.includes(sample) && !drive.collected.includes(sample) ? "" : undefined}
               data-near={near && cell.terrain !== "rock" ? "" : undefined}
               style={{ backgroundColor: cell.color }}
               onClick={dir ? () => go(dir) : undefined}
@@ -91,7 +98,11 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
           </span>
         </p>
         <p><Icon name="rock" />{" "}{t("exploreUi.samples", { n: drive.collected.length })}</p>
-        <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+        {beat ? (
+          option && <p className="explore-cost" aria-live="polite">{t("exploreUi.pick", { choice: tRun(`beat.${beat.id}.${option.id}.label`) })}</p>
+        ) : (
+          <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+        )}
         {drive.collected.length >= EXPLORE.maxScience && <p className="note">{t("exploreUi.labLimit", { max: EXPLORE.maxScience })}</p>}
         <p className={home ? "explore-home" : "explore-away"} role="status">
           {drive.battery === 0 && !home ? t("exploreUi.empty") + " " : ""}
@@ -104,8 +115,8 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
             </button>
           ))}
         </div>
-        <button type="button" className="primary" onClick={() => onDone(driveAction(map, drive))}>{t("exploreUi.finish")}</button>
-        <p className="note">{t("exploreUi.legend")} {t("exploreUi.square")}</p>
+        <button type="button" className="primary" onClick={() => onDone(option?.action ?? driveAction(map, drive))}>{t("exploreUi.finish")}</button>
+        <p className="note">{beat && `${t("exploreUi.rocksRule")} `}{t("exploreUi.legend")} {t("exploreUi.square")}</p>
       </div>
     </div>
   );

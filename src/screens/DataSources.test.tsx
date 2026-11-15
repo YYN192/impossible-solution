@@ -90,6 +90,7 @@ describe("DataSources game numbers (#7)", () => {
       "dust-storm-chance",
       "storm-panels-dose",
       "storm-greenhouse-power",
+      "wipe-panels",
     ];
     expect(GAME_NUMBERS.map(({ id }) => id)).toEqual(expected);
   });

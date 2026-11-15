@@ -1,4 +1,5 @@
 import { ENGINE } from "../sim/engine";
+import { WIPE_PANELS } from "../sim/campaign";
 import { EXPLORE } from "../sim/explore";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT, type JobId } from "../sim/types";
 import { CAMPAIGN_NUMBERS } from "./campaigns";
@@ -46,7 +47,8 @@ type GameNumberName =
   | "demoStartPanels"
   | "dustStormChance"
   | "stormPanelsDose"
-  | "stormGreenhousePower";
+  | "stormGreenhousePower"
+  | "wipePanels";
 
 export interface GameNumberDescriptor {
   /** Stable DOM/test identifier; do not derive this from translated copy. */
@@ -113,6 +115,7 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("dust-storm-chance", "dustStormChance", STORM_CHANCE),
   value("storm-panels-dose", "stormPanelsDose", DOSE.outsideExtra),
   value("storm-greenhouse-power", "stormGreenhousePower", 1),
+  value("wipe-panels", "wipePanels", WIPE_PANELS),
 ];
 
 function value(

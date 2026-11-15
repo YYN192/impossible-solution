@@ -95,13 +95,16 @@ export const GALE_MAP: DataRef = {
   fetched: galeMap.fetchedAt,
 };
 
+// The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
+const galeExploreMap = (next: () => number) =>
+  buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next);
+
 /** Drive the rover on the real-colour map of the Gale Crater area. The seed places the samples. */
 const explore = (next: () => number): Beat => ({
   id: "explore",
   type: "explore",
   card: GALE_MAP,
-  // The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
-  map: buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next),
+  map: galeExploreMap(next),
   options: [
     option("explore", "near", "rover", { effect: { power: -1, science: 1 } }),
     option("explore", "far", "map", { effect: { power: -3, science: 2 } }),
@@ -220,13 +223,16 @@ const dust: Campaign = {
             option("siteMars", "meridiani", "wind", { rules: { dustFactor: 0.8, solar: 5 }, source: WIND_CLEANING }, true),
           ],
         },
-        2: wipe,
+        2: { ...wipe, hands: true },
         3: upgrade,
         4: radio(LIGHT_DELAY, "night"),
         5: dilemma(next),
         6: {
           id: "rover",
           type: "rover",
+          card: GALE_MAP,
+          // #98: drive it yourself; the samples brought home pick near / far / stay (roverChoice).
+          map: galeExploreMap(next),
           options: [
             option("rover", "near", "rover", { effect: { power: -1, science: 1, dose: DOSE.outsideExtra } }),
             option("rover", "far", "map", { effect: { power: -3, science: 2, dose: 2 * DOSE.outsideExtra } }),
