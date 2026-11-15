@@ -1049,7 +1049,9 @@
     },
     "commander": {
       "intro": "Welcome to Ares Station, cadet! I'm Commander Nova. I'm so glad you're here.",
+      "intro_moon": "Welcome to Artemis Outpost, cadet! I'm Commander Nova. I'm so glad you're here.",
       "who": "I lead this crew. Every sol, I pick who does which job. A sol is one day on Mars. It is about 40 minutes longer than a day on Earth.",
+      "who_moon": "I lead this crew. Every day, I pick who does which job. One day and night on the Moon lasts about a month! So we count Earth days.",
       "drillIntro": "Let's practise calling Earth! Earth moves across the sky. Turn the dish with A and D, or the arrow keys. When it points at Earth, send!",
       "win": "Message sent! On the mission, the Ask Earth job works like this. Earth's answer comes the next morning.",
       "mission": {
@@ -1061,7 +1063,9 @@
     "engineer": {
       "intro": "Hey, cadet! I'm Kai, the engineer. If it hums, I probably fixed it.",
       "who": "I grew up fixing bikes. Now I fix a whole Mars base! Mars dust is my enemy. It covers our solar panels.",
+      "who_moon": "I grew up fixing bikes. Now I fix a whole Moon base! Moon dust is my enemy. It is sharp and sticky, and it covers our solar panels.",
       "drillIntro": "Let's practise! The wind keeps blowing dust back onto the panels. Get every panel clean at the same time!",
+      "drillIntro_moon": "Let's practise! Moon dust sticks to the panels, and our boots kick up more. Get every panel clean at the same time!",
       "win": "Spotless! On the mission, the Clean solar panels job gives full power the next day.",
       "mission": {
         "storm": "Power is like our pocket money. Sunlight fills it up, and every machine spends it. The air machine needs power every night, or the air runs low.",
@@ -1071,7 +1075,9 @@
     },
     "scientist": {
       "intro": "Hello! I'm Amara. I study Mars rocks, and I grow our food.",
+      "intro_moon": "Hello! I'm Amara. I study Moon rocks, and I grow our food.",
       "who": "Long, long ago, Gale Crater held a lake. Its rocks still have layers from that water. I read them like a book.",
+      "who_moon": "Moon rocks are very, very old. Many formed when space rocks crashed in and dug the craters. I read them like a book.",
       "drillIntro": "Let's practise! Thirsty plants stop growing. Water each plant before it dries out.",
       "win": "What a harvest! On the mission, the greenhouse needs power for its lights. Then it grows food.",
       "mission": {
