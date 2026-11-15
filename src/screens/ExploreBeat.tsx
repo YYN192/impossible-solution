@@ -4,11 +4,11 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
-import { usePressedKeys } from "../game/pressedKeys";
+import { gameKey, usePressedKeys } from "../game/pressedKeys";
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] } as const;
 type Dir = keyof typeof DIRS;
-const KEYS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", s: "down", a: "left", d: "right" };
+const KEYS: Record<string, Dir> = { arrowup: "up", arrowdown: "down", arrowleft: "left", arrowright: "right", w: "up", s: "down", a: "left", d: "right" };
 
 // Same keys, lower-cased, so the pad lights up while a key is held (Caps Lock included).
 const HINT_KEYS = Object.fromEntries(Object.entries(KEYS).map(([k, d]) => [k.toLowerCase(), d]));
@@ -43,7 +43,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
         aria-label={t("exploreUi.map")}
         style={{ gridTemplateColumns: `repeat(${map.cols}, 1fr)` }}
         onKeyDown={(e) => {
-          const dir = KEYS[e.key];
+          const dir = KEYS[gameKey(e)];
           if (!dir) return;
           e.preventDefault();
           go(dir);

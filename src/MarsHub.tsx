@@ -5,6 +5,7 @@ import { audio, musicFor } from "./game/audio";
 import { useMission } from "./state/mission";
 import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
+import { gameKey } from "./game/pressedKeys";
 import { useSession } from "./game/session";
 import { usePressedKeys } from "./game/pressedKeys";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
@@ -104,7 +105,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
-      const key = e.key.toLowerCase();
+      const key = gameKey(e);
       if (["w", "a", "s", "d", "arrowup", "arrowleft", "arrowdown", "arrowright"].includes(key)) {
         // Arrows only stop page scrolling while the game itself has focus.
         if (e.target === canvas.current || e.target === document.body) e.preventDefault();
@@ -112,7 +113,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       }
       if (key === "e" && !e.repeat) live.current.interact();
     };
-    const up = (e: KeyboardEvent) => held.current.delete(e.key.toLowerCase());
+    const up = (e: KeyboardEvent) => held.current.delete(gameKey(e));
     // Leaving the tab or rotating can swallow key-up or pointer-up events: never keep walking afterwards.
     // (Not on "resize": phone address bars resize the page while a finger holds the d-pad.)
     const clear = () => held.current.clear();
