@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { audio } from "../game/audio";
+import { isTeacherCode, useProgress } from "../state/progress";
 import { useTranslation } from "react-i18next";
 import "./DataSources.css";
 import "./TeacherCard.css";
@@ -31,11 +33,41 @@ export function TeacherCard({ onBack }: { onBack?: () => void }) {
       <h3>{t("teacher.realTitle")}</h3>
       <p>{t("teacher.real")}</p>
 
+      <TeacherUnlock />
+
       {onBack ? (
         <button type="button" className="sources__back" onClick={onBack}>
           {t("teacher.back")}
         </button>
       ) : null}
     </section>
+  );
+}
+
+/** A class code opens every mission at once, so a teacher can start the class on any of them. */
+function TeacherUnlock() {
+  const { t } = useTranslation();
+  const teacher = useProgress((p) => p.teacher);
+  const [code, setCode] = useState("");
+  const [wrong, setWrong] = useState(false);
+  if (teacher)
+    return (
+      <div className="teacher__unlock">
+        <p role="status">{t("teacher.unlocked")}</p>
+        <button type="button" onClick={() => { audio.playSfx("menu-back"); useProgress.getState().setTeacher(false); }}>{t("teacher.lock")}</button>
+      </div>
+    );
+  return (
+    <form className="teacher__unlock" onSubmit={(e) => {
+      e.preventDefault();
+      if (isTeacherCode(code)) { audio.playSfx("console-success"); useProgress.getState().setTeacher(true); setCode(""); setWrong(false); }
+      else { audio.playSfx("menu-error"); setWrong(true); }
+    }}>
+      <label htmlFor="teacher-code">{t("teacher.codeLabel")}</label>
+      <input id="teacher-code" value={code} autoComplete="off" spellCheck={false} aria-invalid={wrong} aria-describedby="teacher-code-help"
+        onChange={(e) => { setCode(e.target.value); setWrong(false); }} />
+      <button type="submit" className="primary">{t("teacher.unlock")}</button>
+      <p id="teacher-code-help" aria-live="polite">{wrong ? t("teacher.codeWrong") : t("teacher.codeHelp")}</p>
+    </form>
   );
 }

@@ -348,7 +348,13 @@
     "realTitle": "What is real",
     "real": "The 20 May 2024 solar storm, normal Mars radiation, dust on solar panels, and the Earth–Mars message delay are real NASA science. Job costs are game numbers.",
     "open": "For teachers",
-    "back": "Back"
+    "back": "Back",
+    "codeLabel": "Teacher code",
+    "unlock": "Unlock all missions",
+    "codeHelp": "The code is in the project README, under 'For teachers'.",
+    "codeWrong": "That code is not right. Check the spelling and try again.",
+    "unlocked": "All missions are open on this device.",
+    "lock": "Lock the missions again"
   },
   "notice": {
     "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission.",
