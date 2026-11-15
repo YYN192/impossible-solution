@@ -112,7 +112,12 @@
     "heading": "Night falls on sol {{sol}}",
     "nextMorning": "Go to sleep",
     "seeResults": "See how it went",
-    "heading_moon": "Day {{sol}} is over"
+    "heading_moon": "Day {{sol}} is over",
+    "warn": {
+      "air": "Air is low: {{n}} of 10.",
+      "power": "Power is almost gone: {{n}} of 10.",
+      "dose": "Space rays are too high for the crew."
+    }
   },
   "final": {
     "heading": "Mission over",
@@ -824,7 +829,9 @@
       "oct2021": "29 October 2021. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
       "moon": "20 May 2024. A NASA spacecraft circling the Moon measured this storm. The rays rose only a little. The storm pointed at Mars.",
       "cloud": "Scientists forecast this storm cloud with a computer model of the Sun's wind."
-    }
+    },
+    "gameEvent": "Game event (not from NASA data)",
+    "alarmShadow": "A dark day!"
   },
   "exploreUi": {
     "battery": "Battery: {{n}} of {{max}}",

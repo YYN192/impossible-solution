@@ -262,7 +262,7 @@ const moon: Campaign = {
         dose: { inside: MOON_STORM_FACTOR * DOSE.normalDay, outside: MOON_STORM_FACTOR * (DOSE.normalDay + DOSE.outsideExtra) },
       },
       // A game event: even the best ridges are not sunlit all the time.
-      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", captionKey: "event.shadow.moon", solar: 0.2, source: ARTEMIS_REGIONS },
+      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", game: true, captionKey: "event.shadow.moon", solar: 0.2, source: ARTEMIS_REGIONS },
     ];
     const last: Beat = pick(next, [
       {

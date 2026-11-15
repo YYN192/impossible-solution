@@ -59,7 +59,7 @@ describe("?demo=1 recording path (#6)", () => {
       }
       click(/End sol/);
       // Leaving a crew member idle on purpose asks for a second click.
-      if (screen.queryByRole("alert")) click(new RegExp(t("play.confirmEnd")));
+      if (screen.queryByRole("button", { name: new RegExp(t("play.confirmEnd")) })) click(new RegExp(t("play.confirmEnd")));
       click(sol === 3 ? t("endSol.seeResults") : t("endSol.nextMorning"));
     }
 

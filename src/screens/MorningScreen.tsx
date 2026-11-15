@@ -131,7 +131,7 @@ export function MorningReportView({
               </div>
             )}
             <NasaData refs={[
-              ...(event ? [event.source] : []),
+              ...(event && !event.game ? [event.source] : []),
               ...(earth && earth.stormCloudInSols !== undefined ? [earth.source] : []),
               ...(earth && setup ? [setup.delay.ref] : []),
             ]}>

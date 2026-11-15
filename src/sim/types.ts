@@ -90,6 +90,8 @@ export interface StormEvent {
   captionKey: string;
   /** Data provenance shown in Data Sources and on the chip. */
   source: DataRef;
+  /** A game event, not a real NASA event: never shown as "It's real!" or with an event number. */
+  game?: true;
 }
 
 export interface EarthAnswer {
