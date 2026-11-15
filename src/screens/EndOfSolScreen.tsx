@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { audio } from "../game/audio";
+import { shake } from "../game/feedback";
 import { ENGINE } from "../sim/engine";
 import { DominoCard } from "../components/DominoCard";
 import { ResourceMeters } from "../components/ResourceMeters";
@@ -32,7 +33,7 @@ export function EndOfSolScreen() {
   useEffect(() => {
     const { power, air, dose } = useGame.getState().state.bars;
     const timers = [setTimeout(() => audio.playSfx("sol-end"), 300), setTimeout(() => audio.playSfx(
-      power <= 1 || air <= 2 || dose >= ENGINE.doseLimit ? "resource-critical" : air <= 4 ? "air-warning"
+      power <= 1 || air <= 2 || dose >= ENGINE.doseLimit ? (shake(), "resource-critical") : air <= 4 ? "air-warning"
         : power < ENGINE.lowPowerToday ? "power-decrease" : dose >= ENGINE.doseLimit - 2 ? "radiation-increase" : "resource-stable"), 1800)];
     if (storm) timers.push(setTimeout(() => audio.playSfx(storm.kind === "particleBurst" ? "particle-burst" : "storm-warning"), 900));
     return () => timers.forEach(clearTimeout);

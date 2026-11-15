@@ -51,6 +51,21 @@ describe("CrewTalk typing", () => {
   });
 });
 
+describe("CrewTalk practice", () => {
+  it("'Let's practise!' comes first and opens the real mission mini-game on top; Skip returns to the menu", () => {
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.removeAttribute("open"); };
+    render(<CrewTalk speaker="engineer" onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    const answers = screen.getAllByRole("button").filter((b) => b.closest(".crew-talk__menu"));
+    expect(answers[0].textContent).toBe(en.talk.ask.drill);
+    fireEvent.click(answers[0]);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    screen.getByRole("heading", { name: en.miniGame.panels.title });
+    fireEvent.click(screen.getByRole("button", { name: en.miniGame.skip }));
+    screen.getByRole("button", { name: en.talk.ask.mission });
+  });
+});
+
 describe("CrewTalk on the Moon: Moon lines and Moon lore", () => {
   beforeEach(() => { HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.removeAttribute("open"); }; });
   afterEach(() => { useMission.setState({ setup: undefined }); });
@@ -61,7 +76,7 @@ describe("CrewTalk on the Moon: Moon lines and Moon lore", () => {
   it.each(speakers)("%s greets you with a Moon line, and tells two Moon facts", (speaker) => {
     useMission.setState({ setup: campaignMission("moon", 1) });
     render(<CrewTalk speaker={speaker} onClose={() => {}} />);
-    const talk = en.talk[speaker] as Record<string, string>;
+    const talk = en.talk[speaker] as unknown as Record<string, string>;
     expect(line()).toBe(talk.intro_moon);
     next();
     fireEvent.click(screen.getByRole("button", { name: en.talk.ask.lore }));
@@ -86,5 +101,19 @@ describe("CrewTalk on the Moon: Moon lines and Moon lore", () => {
     useMission.setState({ setup: campaignMission("moon", 1) });
     render(<CrewTalk speaker="airlock" onClose={() => {}} />);
     expect(line()).toBe(en.dialogue.airlock.hello_moon);
+  });
+});
+
+describe("CrewTalk practice on the Moon", () => {
+  afterEach(() => { useMission.setState({ setup: undefined }); });
+  it("says the Moon practice line and opens the Moon's own mini-game", () => {
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.removeAttribute("open"); };
+    useMission.setState({ setup: campaignMission("moon", 1) });
+    render(<CrewTalk speaker="engineer" onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    fireEvent.click(screen.getByRole("button", { name: en.talk.ask.drill }));
+    expect(document.querySelector(".crew-talk__line")!.childNodes[0].textContent).toBe(en.talk.engineer.drillIntro_moon);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    screen.getByRole("heading", { name: en.miniGame.moon.panels.title });
   });
 });

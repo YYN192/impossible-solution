@@ -3,11 +3,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { audio, musicFor } from "./game/audio";
 import { useMission } from "./state/mission";
+import { reducedMotion, useComfort } from "./state/comfort";
 import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
 import { gameKey } from "./game/pressedKeys";
 import { useSession } from "./game/session";
 import { usePressedKeys } from "./game/pressedKeys";
+import { createWalkFx, idleBob, stepWalkFx } from "./game/walkFx";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
 import { useNav } from "./state/screen";
@@ -15,6 +17,9 @@ import { readFlags } from "./data/flags";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
 import { CrewTalk } from "./components/CrewTalk";
+import SiteMap from "./components/SiteMap";
+import SpaceWeatherStrip from "./components/SpaceWeatherStrip";
+import EngineeringBay from "./components/EngineeringBay";
 import type { StormView } from "./game/renderWorld";
 
 // Physical keys → on-screen hint they light up (keydown on, keyup off).
@@ -45,6 +50,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const [alarm, setAlarm] = useState(stormLeft > 0);
   const [task, setTask] = useState<"panels" | "greenhouse">();
   const [notice, setNotice] = useState("");
+  const [panel, setPanel] = useState<"map" | "radar" | "engineering">(); // the airlock's mission map (#54), the radar's space weather (#60)
   const view = useRef<StormView>({ level: 0, broken: false, marks: [] });
   view.current = { level: alarm ? 1 : stormLeft / 2, broken: !greenhouseDone, marks: [...(panelsDone ? [] : ["airlock"]), ...(greenhouseDone ? [] : ["greenhouse"])] };
   const finishTask = (done: boolean) => {
@@ -54,33 +60,38 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     setTask(undefined); canvas.current?.focus({ preventScroll: true });
   };
   const interact = useCallback(() => {
-    if (!near || activating || dialogue || task || alarm) return;
+    if (!near || activating || dialogue || task || alarm || panel) return;
     held.current.clear(); goal.current = pending.current = undefined;
     if (near.interaction === "console" && stormLeft) { audio.playSfx("machine-warning"); setNotice(t("hubStorm.blocked")); return; }
     if (near.id === "airlock" && !panelsDone) { audio.playSfx("door"); setTask("panels"); return; }
     if (near.id === "greenhouse" && !greenhouseDone) { audio.playSfx("npc"); setTask("greenhouse"); return; }
+    if (near.id === "radar") { audio.playSfx("console"); setPanel("radar"); return; }
+    if (near.dialogue === "engineering") { audio.playSfx("console-data"); setPanel("engineering"); return; }
     audio.playSfx(near.interaction === "console" ? "console" : near.interaction === "door" ? "door" : "npc");
     if (near.interaction === "console") {
       setActivating(true);
-      timer.current = setTimeout(onConsole, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
-    } else setDialogue(near);
-  }, [near, activating, dialogue, onConsole, task, alarm, stormLeft, panelsDone, greenhouseDone, t]);
+      timer.current = setTimeout(onConsole, reducedMotion() ? 0 : 350);
+    } else if (near.id === "airlock") setPanel("map"); // outside a storm (the panel job comes first above)
+    else setDialogue(near);
+  }, [near, activating, dialogue, onConsole, task, alarm, panel, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { const track = musicFor("hub"); audio.playMusic(track); return audio.stopMusic; }, []);
-  useEffect(() => { canvas.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => { const track = musicFor("hub", useMission.getState().setup?.place); audio.playMusic(track); return audio.stopMusic; }, []);
+  // Focus the game on arrival and again once a panel has closed (a modal dialog keeps the canvas inert until then).
+  useEffect(() => { if (!panel) canvas.current?.focus({ preventScroll: true }); }, [panel]);
+  const closePanel = () => { audio.playSfx("menu-back"); setPanel(undefined); };
   useEffect(() => {
     const c = canvas.current;
     const ctx = c?.getContext("2d");
     if (!ctx) return;
     let player = { ...useSession.getState().position };
-    let last = performance.now(), raf = 0, lastNear = "", lastStep = 0;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let last = performance.now(), raf = 0, lastNear = "", lastStep = 0, fx = createWalkFx(last);
     const frame = (now: number) => {
-      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm;
+      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm && !panel;
       const dx = Number(keys.has("d") || keys.has("arrowright")) - Number(keys.has("a") || keys.has("arrowleft"));
       const dy = Number(keys.has("s") || keys.has("arrowdown")) - Number(keys.has("w") || keys.has("arrowup"));
       let moving = false;
+      const before = player;
       if (dx || dy) goal.current = pending.current = undefined;
       if (free && (dx || dy)) { player = movePlayer(MARS_BASE, player, dx, dy, seconds); moving = true; }
       else if (free && goal.current) {
@@ -92,16 +103,21 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       last = now;
       const target = nearestInteraction(MARS_BASE, player);
       if ((target?.id ?? "") !== lastNear) { setNear(target); lastNear = target?.id ?? ""; }
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches, view.current);
+      // High contrast drops the dust fog (the "!" marks stay); calm mode stills the canvas like reduced motion,
+      // and turns off the walk dust and the idle bounce. Dust follows real movement (pushing into a wall raises none).
+      const comfort = useComfort.getState(), reduced = reducedMotion();
+      fx = stepWalkFx(fx, { now, moved: player.x !== before.x || player.y !== before.y, walking: moving, x: player.x, y: player.y, facing: player.facing, reduced });
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reduced, comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon", { puffs: fx.puffs, bob: idleBob(fx, now, reduced) });
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => { cancelAnimationFrame(raf); useSession.setState({ position: player }); };
-  }, [dialogue, activating, task, alarm]);
+  }, [dialogue, activating, task, alarm, panel]);
   // The key listeners live for the whole visit. They read the latest state through refs: re-adding them
   // whenever `near` changed used to clear the held keys, so walking past a crew member stopped the player.
   const live = useRef({ interact, busy: false });
-  live.current = { interact, busy: Boolean(dialogue || task || alarm) || activating };
+  // While a panel is open its own listener handles E (busy here, so the closing E cannot reopen it).
+  live.current = { interact, busy: Boolean(dialogue || task || alarm || panel) || activating };
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
@@ -156,7 +172,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     {stormLeft ? <div className="world-objective storm-objective"><p><strong><Icon name="dust-storm" /> {t("hubStorm.todo")}</strong></p><ul>
       <li className={panelsDone ? "done" : ""}><Icon name={panelsDone ? "check" : "sun"} /> {t("hubStorm.panels")}</li>
       <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
-      : <div className="world-objective"><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
+      : <div className="world-objective"><p>{campaign && campaign !== "classic" ? t(`world.objectiveFor.${campaign}` as never) : t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} onPointerMove={drag} onPointerUp={release} onPointerCancel={() => { dragging.current = false; }} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
@@ -174,6 +190,9 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     {dialogue?.dialogue && <CrewTalk speaker={dialogue.dialogue} onClose={closeDialogue} />}
     {stormLeft > 0 && alarm && <div className="dust-cover full" aria-hidden="true" />}
     {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
+    {panel === "map" && <SiteMap current={campaign} onClose={closePanel} />}
+    {panel === "radar" && <SpaceWeatherStrip onClose={closePanel} />}
+    {panel === "engineering" && <EngineeringBay onClose={closePanel} />}
     {task === "panels" && <PanelsTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
     {task === "greenhouse" && <GreenhouseTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
   </main>;

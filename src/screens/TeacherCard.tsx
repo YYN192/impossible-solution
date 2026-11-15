@@ -59,3 +59,4 @@ export function TeacherCard({ onBack }: { onBack?: () => void }) {
     </section>
   );
 }
+

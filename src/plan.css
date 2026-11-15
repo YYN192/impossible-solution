@@ -142,3 +142,11 @@
 .dust-panels .gust-here{border-color:#b8c4d0}
 .mini-tile.cracked{background:#3d2414;border-color:#d86e3b;animation:mini-shake .5s steps(2) infinite}
 .mini-game .dust-panels .mini-tile img.pixel:not(.dust-gust){width:64px;height:64px}
+/* Visual hierarchy: step 01 is the brightest thing until an astronaut is chosen; step 02 is dimmed and solid. */
+.plan-screen .crew-tile.call:not(.selected) { border-color: #83d9f4; animation: plan-call 2.4s ease-in-out infinite; }
+.plan-screen .crew-tile.selected { outline: 4px solid #ffd166; outline-offset: 2px; background: #1d3a4d; box-shadow: 0 0 0 6px #ffd16655; }
+.plan-screen .jobs-locked { margin: 0 0 10px; color: #ffd166; font-size: 1rem; }
+.plan-screen .job-list.locked .job-choice { opacity: 0.4; filter: grayscale(1); border-style: solid; border-color: #3b5367; cursor: not-allowed; }
+.plan-screen .crew-roster.shake { animation: plan-shake 0.4s ease-in-out; }
+@keyframes plan-call { 50% { box-shadow: 0 0 14px 2px #83d9f4aa; } }
+@keyframes plan-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }

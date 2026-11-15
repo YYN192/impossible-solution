@@ -103,11 +103,14 @@ describe("audio engine", () => {
 });
 
 describe("music slots for the team's soundtrack", () => {
-  it("fall back to the ambience loops while no track file exists", async () => {
+  it("uses installed soundtracks while preserving the Moon ambience fallback", async () => {
     const { musicFor, sounds } = await import("./audio");
-    expect(musicFor("lobby")).toBe("space-menu-ambience");
+    expect(musicFor("lobby")).toBe("music-lobby");
     expect(musicFor("hub")).toBe("mars-base-ambience");
-    expect(musicFor("console", "dust")).toBe("mission-console-ambience");
+    expect(musicFor("hub", "moon")).toBe("moon-base-ambience"); // #76: no Mars wind on the Moon
+    expect(sounds.get("moon-base-ambience")).toBe(sounds.get("space-menu-ambience"));
+    expect(musicFor("console", "dust")).toBe("music-console");
+    expect(musicFor("console", "storm")).toBe("music-mission-storm");
     for (const id of [musicFor("lobby"), musicFor("hub"), musicFor("console", "moon")]) expect(sounds.has(id)).toBe(true);
   });
 
@@ -123,4 +126,3 @@ describe("music slots for the team's soundtrack", () => {
     sounds.delete("music-mission-dust");
   });
 });
-

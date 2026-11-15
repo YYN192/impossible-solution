@@ -34,10 +34,14 @@
 .mission-menu .mission-card[aria-pressed="true"] .mission-tags{color:#9fe0d8}
 .mission-menu .mission-card:disabled .mission-meta,.mission-menu .mission-card:disabled small{color:#c9d8e4}
 .launch-button{display:inline-flex;align-items:center;justify-content:center;gap:.6rem}
-.mission-menu{min-height:calc(100svh - 48px);padding-top:clamp(8px,1.6vh,28px);padding-bottom:0}
+.mission-menu{min-height:calc(100svh - 54px);padding-top:clamp(8px,1.6vh,28px);padding-bottom:0}
 .mission-menu .menu-bottom{padding:.35rem 0;font-size:.8rem;margin-top:0}
 @media(max-width:900px){.mission-menu .mission-card>.mission-art{height:auto;aspect-ratio:8/5;min-height:0;align-self:start}}
 .mission-menu .mission-card:disabled{opacity:.88}
 @media(max-height:800px) and (min-width:901px){.mission-menu .menu-bottom{display:none}.menu-head h1{font-size:clamp(2.2rem,1rem + 3.4vw,4rem)}}
 .mission-menu .menu-bottom,.mission-menu .menu-bottom span,.mission-menu .sol-explainer{color:#f4f7fa;text-shadow:0 1px 3px #000,0 0 6px #000}
 .mission-menu .mission-card[aria-pressed="true"]:hover{transform:none;border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}
+/* Hierarchy: Start is the one big action; the secondary links sit back like the top bar. */
+.mission-menu button.launch-button { font-size: 1.3rem !important; min-height: 64px; }
+.mission-menu .menu-quiet button { background: transparent; border-color: transparent; box-shadow: none; color: #d6e2ea; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.mission-menu .menu-quiet button:hover { border-color: #52687b; color: #fff; }

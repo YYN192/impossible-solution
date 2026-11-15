@@ -12,10 +12,11 @@ import { z } from "zod";
 import {
   apodEntry,
   summarizeSpaceWeather,
+  weatherWeek,
 } from "../../scripts/ingest/normalize.mjs";
 import { dataClient } from "./client";
 import { donkiUrls, FAIL_TTL_MS, ymd } from "./donki";
-import { ApodEntry, SpaceWeather } from "./datasets";
+import { ApodEntry, SpaceWeather, WeatherWeek } from "./datasets";
 import { getJson, type Result } from "./http";
 
 
@@ -39,6 +40,24 @@ async function snapshotOf<T>(
   return s ? { data: s.data, fetchedAt: s.fetchedAt } : undefined;
 }
 
+/**
+ * One DONKI list for the last 30 days. Today's Sun and the radar strip ask with the same URL and cache key,
+ * so whichever opens second costs no extra call on the shared DEMO_KEY.
+ */
+function donkiMonth(path: string, now: Date, opts: LiveOpts, extra = "") {
+  const start = ymd(new Date(now.getTime() - 30 * 864e5));
+  return getJson({
+    ...donkiUrls(path, start, ymd(now), extra),
+    failTtlMs: FAIL_TTL_MS,
+    cacheKey: `donki:${path}:${start}`,
+    schema: LenientList,
+    offline: opts.offline,
+    // One try per part: on 429 the saved card is already showing, retries would only burn the shared DEMO_KEY.
+    retries: opts.retries ?? 0,
+    fetchImpl: opts.fetchImpl,
+  });
+}
+
 /** DONKI, last 30 days → same summary as src/data/snapshots/space-weather-recent.json. */
 export async function liveSpaceWeather(
   opts: LiveOpts = {},
@@ -47,17 +66,7 @@ export async function liveSpaceWeather(
   const start = ymd(new Date(now.getTime() - 30 * 864e5));
   const end = ymd(now);
   const snapshot = await snapshotOf(dataClient.getSpaceWeather());
-  const one = (path: string, extra = "") =>
-    getJson({
-      ...donkiUrls(path, start, end, extra),
-      failTtlMs: FAIL_TTL_MS,
-      cacheKey: `donki:${path}:${start}`,
-      schema: LenientList,
-      offline: opts.offline,
-      // One try per part: on 429 the saved card is already showing, retries would only burn the shared DEMO_KEY.
-      retries: opts.retries ?? 0,
-      fetchImpl: opts.fetchImpl,
-    });
+  const one = (path: string, extra = "") => donkiMonth(path, now, opts, extra);
   try {
     if (opts.offline) throw new Error("offline");
     // Each part on its own: one broken endpoint (FLR answered 404 on 14 Nov 2026) must not sink the rest.
@@ -87,6 +96,38 @@ export async function liveSpaceWeather(
       throw new Error("DONKI: some answers were old");
     return {
       data,
+      source: parts.some((p) => p.source === "network") ? "network" : "cache",
+      fetchedAt: Math.min(...parts.map((p) => p.fetchedAt)),
+    };
+  } catch (e) {
+    if (snapshot) return { ...snapshot, source: "snapshot" };
+    throw e;
+  }
+}
+
+/**
+ * The radar's strip (#60): DONKI's last 7 days, one row per event type. Uses the 30-day answers Today's Sun
+ * already asked for (same cache) and keeps the last week. A broken part shows as "no answer";
+ * offline, or with no CMEs from DONKI, it is the saved snapshot.
+ */
+export async function liveWeatherWeek(
+  opts: LiveOpts = {},
+): Promise<Result<WeatherWeek>> {
+  const now = opts.now ?? new Date();
+  const window = { start: ymd(new Date(now.getTime() - 7 * 864e5)), end: ymd(now) };
+  const snapshot = await snapshotOf(dataClient.getWeatherWeek());
+  try {
+    if (opts.offline) throw new Error("offline");
+    const keys = ["flr", "sep", "cme", "gst"] as const;
+    const settled = await Promise.allSettled(keys.map((k) => donkiMonth(k.toUpperCase(), now, opts)));
+    const ok = settled.flatMap((s, i) => (s.status === "fulfilled" ? [{ key: keys[i], r: s.value }] : []));
+    const missing = keys.filter((k) => !ok.some((o) => o.key === k));
+    if (missing.includes("cme") || missing.length > 2) throw new Error(`DONKI: missing ${missing.join(", ")}`);
+    const parts = ok.map((o) => o.r);
+    if (parts.some((p) => p.source === "stale-cache")) throw new Error("DONKI: some answers were old");
+    const raw = Object.fromEntries(ok.map((o) => [o.key, o.r.data]));
+    return {
+      data: WeatherWeek.parse(weatherWeek(raw, window, { missing })),
       source: parts.some((p) => p.source === "network") ? "network" : "cache",
       fetchedAt: Math.min(...parts.map((p) => p.fetchedAt)),
     };

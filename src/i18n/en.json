@@ -352,7 +352,13 @@
     "keyOff": "Missions open one by one as the class finishes them.",
     "keyOn": "Every mission is open on this device. Press again to lock them.",
     "open": "For teachers",
-    "back": "Back"
+    "back": "Back",
+    "codeLabel": "Teacher code",
+    "unlock": "Unlock all missions",
+    "codeHelp": "The code is in the project README, under 'For teachers'.",
+    "codeWrong": "That code is not right. Check the spelling and try again.",
+    "unlocked": "All missions are open on this device.",
+    "lock": "Lock the missions again"
   },
   "notice": {
     "sunQuiet": "The Sun is quiet toward Mars this month, so you get the May 2024 mission.",
@@ -461,6 +467,8 @@
     "crewStep": "01 / Choose an astronaut",
     "pickCrewFirst": "Pick an astronaut first.",
     "jobsStep": "02 / Give them a job",
+    "jobsStepFor": "02 / Give {{name}} a job",
+    "jobsLocked": "First choose an astronaut above ↑",
     "clearCrew": "Clear the job of $t(crew.who.{{n}})",
     "crewNumber": "$t(crew.who.{{n}})",
     "chooseJob": "Choose a job for $t(crew.who.{{n}}).",
@@ -510,12 +518,19 @@
       "scientist": "Scientist Amara",
       "drone": "Pip · Maintenance drone",
       "airlock": "Station airlock",
-      "greenhouse": "Greenhouse"
+      "greenhouse": "Greenhouse",
+      "radar": "Space weather radar",
+      "engineering": "Engineering bay"
     },
     "greenhouse": "GREENHOUSE",
     "name_moon": "Artemis Outpost",
     "canvas_moon": "Moon base. Use WASD or arrow keys. Press E near a console or crew member.",
-    "explore_moon": "Explore your home on the Moon."
+    "explore_moon": "Explore your home on the Moon.",
+    "objectiveFor": {
+      "storm": "Talk to your crew about the solar storm, then plan your sol at the glowing console.",
+      "dust": "Dust season! Ask Kai about saving power, then plan your sol at the glowing console.",
+      "moon": "Moon base! Ask the crew about sun, ice and Earth, then plan at the glowing console."
+    }
   },
   "dialogue": {
     "commander": {
@@ -545,6 +560,10 @@
       "advice": "No power for the lights means no harvest. Then the food runs low.",
       "hello_moon": "This greenhouse grows our food. Its water comes from crater ice.",
       "advice_moon": "No power for the lights means no harvest. A Moon night is long!"
+    },
+    "radar": {
+      "hello": "This radar shows what the Sun did this week.",
+      "advice": "Tap a mark to see when it happened and how big it was."
     }
   },
   "lang": {
@@ -905,6 +924,69 @@
     },
     "fixed": "Greenhouse fixed!"
   },
+  "siteMap": {
+    "title": "Mission map",
+    "lead": "Your base and every mission site. Finish a mission to open the next one.",
+    "close": "Close the map",
+    "place": {
+      "mars": "Mars",
+      "moon": "The Moon"
+    },
+    "state": {
+      "here": "You are here",
+      "done": "Done",
+      "open": "Open: start it from the menu"
+    },
+    "locked": "Locked. Finish “{{name}}” first."
+  },
+  "radar": {
+    "title": "Space weather radar",
+    "lead": "What the Sun did in the last 7 days, seen from near Earth. Most of it never reaches Mars.",
+    "close": "Close the radar",
+    "loading": "Asking NASA…",
+    "failed": "No space weather data right now. Try again later.",
+    "pick": "Tap or point at a day with marks to see what happened.",
+    "noAnswer": "No answer from NASA",
+    "count_one": "{{count}} event",
+    "count_other": "{{count}} events",
+    "day": "{{row}}, {{date}}: {{count}}",
+    "row": {
+      "flr": "Sun flashes",
+      "cme": "Sun clouds",
+      "sep": "Particle showers",
+      "gst": "Storms at Earth"
+    },
+    "what": {
+      "flr": "solar flares",
+      "cme": "coronal mass ejections",
+      "sep": "solar energetic particles",
+      "gst": "geomagnetic storms"
+    },
+    "size": {
+      "flr": {
+        "tiny": "A tiny flash ({{cls}})",
+        "small": "A small flash ({{cls}})",
+        "big": "A big flash ({{cls}})",
+        "huge": "A huge flash ({{cls}})",
+        "unknown": "A flash"
+      },
+      "cme": {
+        "slow": "A slow cloud ({{speed}} km/s)",
+        "fast": "A fast cloud ({{speed}} km/s)",
+        "veryFast": "A very fast cloud ({{speed}} km/s)",
+        "unknown": "A cloud, speed not measured"
+      },
+      "sep": "Fast particles measured near Earth",
+      "gst": {
+        "small": "A small storm (Kp {{kp}})",
+        "strong": "A strong storm (Kp {{kp}})",
+        "huge": "A huge storm (Kp {{kp}})",
+        "unknown": "A storm"
+      }
+    },
+    "mars": "A NASA forecast says it may reach Mars.",
+    "source": "Data: NASA's space weather database"
+  },
   "miniGame": {
     "eyebrow": "Mini game",
     "skip": "Skip",
@@ -1039,110 +1121,124 @@
         "panels": "Arrow keys move. Space or Enter tilts.",
         "greenhouse": "Arrow keys move. Space or Enter patches."
       }
-    }
+    },
+    "start": "The clock starts when you press a button.",
+    "pause": "Pause",
+    "resume": "Go on",
+    "paused": "Paused. Press Go on when you are ready."
   },
   "talk": {
     "next": "Next",
     "choose": "What do you say?",
     "ask": {
-      "who": "Who are you?",
-      "tip": "Any tips for me?",
       "drill": "Let's practise!",
+      "mission": "What is our mission?",
+      "who": "Who are you?",
       "bye": "Bye for now!",
       "lore": "Tell me about the Moon!"
     },
     "commander": {
       "intro": "Welcome to Ares Station, cadet! I'm Commander Nova. I'm so glad you're here.",
       "who": "I lead this crew. Every sol, I pick who does which job. A sol is one day on Mars. It is about 40 minutes longer than a day on Earth.",
-      "tip": "At the mission console, you give each astronaut one job. There are always more jobs than people. No choice is free!",
-      "drillIntro": "Let's practise. We have 3 astronauts and 4 jobs. Pick 3 jobs for today.",
-      "win": "Well done! See? One job had to wait. At the console, think about which job can wait the least.",
       "intro_moon": "Welcome to Artemis Outpost, cadet! I'm Commander Nova. We live near the Moon's south pole now.",
       "who_moon": "I lead this crew. Here we count days, like on Earth. But sunrise to sunrise on the Moon takes about 29 and a half Earth days!",
-      "tip_moon": "At the console, give each astronaut one job. Choose your landing spot with care: sunlight, ice or a view of Earth?",
       "lore_moon": "In 1969, Apollo 11 landed the first people on the Moon. 12 astronauts have walked here.",
-      "lore2_moon": "NASA's Artemis missions plan to bring people back, near the south pole. Just like us!"
+      "lore2_moon": "NASA's Artemis missions plan to bring people back, near the south pole. Just like us!",
+      "drillIntro": "Let's practise calling Earth! Earth moves across the sky. Turn the dish with A and D, or the arrow keys. When it points at Earth, send!",
+      "win": "Message sent! On the mission, the Ask Earth job works like this. Earth's answer comes the next morning.",
+      "drillIntro_moon": "Let's practise calling Earth! Send a message. Watch it fly to Earth and back!",
+      "mission": {
+        "storm": "Our mission lasts 5 sols. Keep all 3 astronauts safe, and collect science for the science star. A real storm from the Sun is coming. Nobody knows which sol!",
+        "dust": "This mission lasts 6 sols. First, you choose where to land. All three places are real. One has freezing nights, one has lots of dust, and one has strong wind.",
+        "moon": "Welcome to the Moon's south pole! We stay 5 days. First, choose a landing spot. Sunny spots, ice spots, a view of Earth: you can't have all three."
+      }
     },
     "engineer": {
       "intro": "Hey, cadet! I'm Kai, the engineer. If it hums, I probably fixed it.",
       "who": "I grew up fixing bikes. Now I fix a whole Mars base! Mars dust is my enemy. It covers our solar panels.",
-      "tip": "Dusty solar panels make less power. Clean panels mean more power for every machine.",
-      "drillIntro": "Quick test! We only have 2 power cells. Choose 2 machines to switch on.",
-      "win": "Great call! The air machine stays on, because we all need to breathe. Something else had to switch off.",
       "intro_moon": "Hey, cadet! I'm Kai. Careful, you weigh much less up here. Don't bounce into my tools!",
       "who_moon": "I keep the outpost running. Dust is my enemy here too. Moon dust is sharp and sticks to everything.",
-      "tip_moon": "The Moon has no wind, so no dust storms. But ridges can hide the Sun from our panels.",
       "lore_moon": "On the Moon, you weigh about six times less than on Earth. You could jump really high!",
-      "lore2_moon": "Apollo astronauts said Moon dust smelled like burnt gunpowder. It got into their spacesuits."
+      "lore2_moon": "Apollo astronauts said Moon dust smelled like burnt gunpowder. It got into their spacesuits.",
+      "drillIntro": "Let's practise! The wind keeps blowing dust back onto the panels. Get every panel clean at the same time!",
+      "win": "Spotless! On the mission, the Clean solar panels job gives full power the next day.",
+      "drillIntro_moon": "Let's practise! At the south pole, the Sun stays low. Turn the panel to face it!",
+      "win_moon": "The panel faces the Sun! On the mission, the Clean solar panels job gives full power the next day.",
+      "mission": {
+        "storm": "Power is like our pocket money. Sunlight fills it up, and every machine spends it. The air machine needs power every night, or the air runs low.",
+        "dust": "Dust is our big enemy here. It falls on the panels every sol, so they make less power. Soon a big dust storm will come. For 2 sols the panels make much less power. Save some power before it hits!",
+        "moon": "Here the Sun stays low in the sky. Crater walls throw long shadows. On a shadow day, our panels make almost no power. Keep some power saved."
+      }
     },
     "scientist": {
       "intro": "Hello! I'm Amara. I study Mars rocks, and I grow our food.",
       "who": "Long, long ago, Gale Crater held a lake. Its rocks still have layers from that water. I read them like a book.",
-      "tip": "Greenhouse lights need power. No light means no harvest. Science trips earn stars, but outside, space rays are stronger.",
-      "drillIntro": "Help me grow a sprout! Look at the bubble. It shows what the plant needs next.",
-      "win": "A harvest! Plants need water and light. On Mars, that light comes from our power.",
       "intro_moon": "Hello! I'm Amara. I study Moon rocks and look for ice in the dark craters.",
       "who_moon": "The Moon is about 4.5 billion years old. Its old craters are like a diary of space.",
-      "tip_moon": "Ice from the craters can become water and air. But trips outside raise your dose.",
       "lore_moon": "Some craters near the south pole never see the Sun. They are among the coldest places we know.",
       "lore2_moon": "Their ice may be billions of years old. Ice means water, air and even rocket fuel!",
-      "win_moon": "A harvest! Plants need water and light. Here, that light comes from our power."
+      "win_moon": "A harvest! Plants need water and light. Here, that light comes from our power.",
+      "drillIntro": "Let's practise! Thirsty plants stop growing. Water each plant before it dries out.",
+      "win": "What a harvest! On the mission, the greenhouse needs power for its lights. Then it grows food.",
+      "drillIntro_moon": "Let's practise! Tap the ice to melt it. The cold freezes it back!",
+      "mission": {
+        "storm": "Science trips outside earn science. But outside, you get more space rays. The greenhouse grows food, if its lights get power.",
+        "dust": "Cold nights need the heater, and the heater needs power. If the heater stops, our plants freeze! On the last sol, the rover can drive out for rock samples. The far crater gives more science, but costs more power.",
+        "moon": "Some craters here never see the Sun. Scientists think they hide ice. Ice can give us water and air. Landing near ice is cold and dark, though."
+      }
     },
     "drone": {
       "intro": "Beep boop! I'm Pip, the station drone. I watch the Sun for you.",
       "who": "I was built to read space weather. Sometimes the Sun throws out tiny, very fast bits. We call them space rays.",
-      "tip": "When I beep a warning, build up the shelter. Water and Mars dirt help block space rays.",
-      "drillIntro": "Drill time! Space rays are coming. Stack the shelter blocks before the timer ends.",
-      "win": "Beep! Safe! Each block lowered your dose. Dose means how much space rays hit your body.",
-      "late": "Bzzt! The rays came before the shelter was done. Your dose went up. Want to try again?",
       "intro_moon": "Beep boop! I'm Pip. I watch the Sun, and I keep an eye on Earth up there.",
       "who_moon": "The Moon has no thick air to stop space rays. So I watch the Sun for storms all day.",
-      "tip_moon": "Messages to Earth take about 1.3 seconds each way. That is almost like a phone call!",
       "lore_moon": "From the Moon, Earth hardly moves across the sky. Near the south pole, it hangs low.",
-      "lore2_moon": "Footprints on the Moon can last for millions of years. There is no wind to blow them away."
+      "lore2_moon": "Footprints on the Moon can last for millions of years. There is no wind to blow them away.",
+      "drillIntro": "Drill time! A block slides along the top. Drop it right on the stack to build the shelter.",
+      "win": "Beep! Strong shelter! On the mission, the Build up the shelter job means fewer space rays for everyone.",
+      "drillIntro_moon": "Drill time! The scoop slides by itself. Pour dirt on every part!",
+      "mission": {
+        "storm": "I watch the Sun for you. When a solar storm hits, astronauts inside the shelter get fewer space rays. A thicker shelter helps even more.",
+        "dust": "Even during dust season, the Sun can send space rays. Near the end of this mission, I may beep a warning. Then the shelter matters!",
+        "moon": "The Moon has no thick air to block space rays. When the Sun sends a storm, get into the shelter fast."
+      }
     }
   },
-  "drills": {
-    "back": "Leave the practice",
-    "jobs": {
-      "title": "Job board",
-      "left_one": "{{count}} astronaut is free",
-      "left_other": "{{count}} astronauts are free",
-      "done": "Every astronaut is busy. This job waits: {{job}}",
-      "go": "Start the day"
-    },
+  "comfort": {
+    "title": "Comfort",
+    "quiet": "Quiet class: all sound off",
+    "calm": "Calm mode: nothing shakes, flashes or blows",
+    "contrast": "High contrast",
+    "textSize": "Text size",
+    "skipMiniGames": "Skip the job mini-games",
+    "slowMiniGames": "Slow mini-games",
+    "saved": "These settings stay on this device.",
+    "soundAsk": "Sound?",
+    "soundOn": "On",
+    "soundOff": "Off",
+    "headphones": "Headphones help."
+  },
+  "engineering": {
+    "title": "Engineering bay",
+    "lead": "Real NASA numbers, drawn as blocks. Longer bar means more.",
+    "close": "Close the engineering bay",
     "power": {
-      "title": "Power switch",
-      "cells_one": "Power cells left: {{count}}",
-      "cells_other": "Power cells left: {{count}}",
-      "noAir": "Uh-oh! Without the air machine, nobody can breathe. Try again.",
-      "go": "Switch on",
-      "air": "Air machine",
-      "lamp": "Greenhouse lights",
-      "radio": "Radio to Earth"
+      "title": "Dust steals power",
+      "clean": "Clean panels",
+      "dusty": "Dusty panels",
+      "caption": "Dust on the panels cut InSight's power by a third."
     },
-    "grow": {
-      "title": "Grow a sprout",
-      "water": "Give water",
-      "light": "Turn on the light",
-      "wrong": "Not that one. Look at the bubble!",
-      "stage": "Growth: {{n}} of {{total}}",
-      "needs": {
-        "water": "it needs water",
-        "light": "it needs light"
-      },
-      "ready": "It is ready to harvest!",
-      "harvest": "Harvest"
+    "cold": {
+      "title": "Freezing nights",
+      "ice": "Ice",
+      "night": "Mars night",
+      "caption": "A night on Mars is far colder than ice."
     },
-    "shelter": {
-      "title": "Shelter stack",
-      "time": "Space rays arrive in {{s}} seconds",
-      "safe": "Shelter ready!",
-      "place": "Place a block",
-      "dose": "Dose",
-      "left_one": "{{count}} block left",
-      "left_other": "{{count}} blocks left",
-      "done": "Go inside"
+    "rays": {
+      "title": "Space rays",
+      "day": "One normal day",
+      "storm": "One big storm",
+      "caption": "One solar storm gave Mars about 39 normal days of rays."
     }
   }
 }

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { audio } from "./game/audio";
 import i18n from "./i18n";
 import PlanScreen from "./PlanScreen";
 import { useSession } from "./game/session";
@@ -8,6 +9,7 @@ import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
+import { useComfort } from "./state/comfort";
 import { iconsOf } from "./test/icons";
 
 const t = i18n.t.bind(i18n);
@@ -58,8 +60,62 @@ describe("PlanScreen (#9)", () => {
   it("tells the player to pick an astronaut when a job is tapped first", () => {
     render(<PlanScreen />);
     fireEvent.click(btn(t("jobs.panels")));
-    expect(screen.getAllByText(t("play.pickCrewFirst")).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(t("play.pickCrewFirst")).length).toBeGreaterThan(
+      0,
+    );
     expect(useSession.getState().draft).toEqual({});
+  });
+
+  it("with no astronaut chosen, jobs look locked and a tap plays the error sound, shakes the roster and focuses a free astronaut", () => {
+    const sfx = vi.spyOn(audio, "playSfx").mockImplementation(() => {});
+    render(<PlanScreen />);
+    expect(screen.getByText(t("play.jobsLocked"))).toBeTruthy();
+    const job = btn(t("jobs.panels"));
+    expect(job.className).toContain("locked");
+    expect(job.getAttribute("aria-disabled")).toBe("true");
+    expect(job.textContent).not.toContain("+");
+    fireEvent.click(job);
+    expect(sfx).toHaveBeenCalledWith("menu-error");
+    expect(document.querySelector(".crew-roster")?.className).toContain(
+      "shake",
+    );
+    expect(document.activeElement).toBe(btn(t("crew.name", { n: 1 })));
+    sfx.mockRestore();
+  });
+
+  it("choosing an astronaut unlocks the jobs and names them in the step heading", () => {
+    render(<PlanScreen />);
+    fireEvent.click(btn(t("crew.name", { n: 2 })));
+    expect(
+      screen.getByRole("heading", {
+        name: t("play.jobsStepFor", { name: t("crew.name", { n: 2 }) }),
+      }),
+    ).toBeTruthy();
+    expect(btn(t("jobs.panels")).className).not.toContain("locked");
+    expect(screen.queryByText(t("play.jobsLocked"))).toBeNull();
+  });
+
+  it("after a job is given, the next astronaut without a job is chosen; none when all are busy", () => {
+    useComfort.setState({ skipMiniGames: true });
+    try {
+      render(<PlanScreen />);
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t("jobs.panels")));
+      expect(btn(t("crew.name", { n: 2 })).getAttribute("aria-pressed")).toBe(
+        "true",
+      );
+      fireEvent.click(btn(t("jobs.shelter")));
+      expect(btn(t("crew.name", { n: 3 })).getAttribute("aria-pressed")).toBe(
+        "true",
+      );
+      fireEvent.click(btn(t("jobs.science")));
+      for (const n of [1, 2, 3])
+        expect(btn(t("crew.name", { n })).getAttribute("aria-pressed")).toBe(
+          "false",
+        );
+    } finally {
+      useComfort.setState({ skipMiniGames: false });
+    }
   });
 
   it("disables a tired astronaut", () => {
@@ -105,10 +161,27 @@ describe("PlanScreen mini games", () => {
     fireEvent.click(btn(t("crew.name", { n: 2 })));
     fireEvent.click(btn(t("jobs.askEarth")));
     expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
-    expect(screen.getByRole("heading", { name: t("miniGame.askEarth.title") })).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: t("miniGame.askEarth.title") }),
+    ).toBeTruthy();
     fireEvent.click(btn(t("miniGame.skip")));
-    expect(screen.queryByRole("heading", { name: t("miniGame.askEarth.title") })).toBeNull();
+    expect(
+      screen.queryByRole("heading", { name: t("miniGame.askEarth.title") }),
+    ).toBeNull();
     expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+  });
+
+  it('#77: with "Skip the job mini-games" on, the job is given and no game opens', () => {
+    useComfort.setState({ skipMiniGames: true });
+    try {
+      render(<PlanScreen />);
+      fireEvent.click(btn(t("crew.name", { n: 2 })));
+      fireEvent.click(btn(t("jobs.askEarth")));
+      expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+      expect(screen.queryByRole("dialog")).toBeNull();
+    } finally {
+      useComfort.setState({ skipMiniGames: false });
+    }
   });
 
   it("has a mini game for every job in the list", () => {
@@ -116,13 +189,17 @@ describe("PlanScreen mini games", () => {
     for (const [i, job] of jobIds.slice(0, 3).entries()) {
       fireEvent.click(btn(t("crew.name", { n: i + 1 })));
       fireEvent.click(btn(t(`jobs.${job}`)));
-      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      expect(
+        screen.getByRole("heading", { name: t(`miniGame.${job}.title`) }),
+      ).toBeTruthy();
       fireEvent.click(btn(t("miniGame.skip")));
     }
     for (const job of jobIds.slice(3)) {
       fireEvent.click(btn(t("crew.name", { n: 1 })));
       fireEvent.click(btn(t(`jobs.${job}`)));
-      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      expect(
+        screen.getByRole("heading", { name: t(`miniGame.${job}.title`) }),
+      ).toBeTruthy();
       fireEvent.click(btn(t("miniGame.skip")));
     }
   });

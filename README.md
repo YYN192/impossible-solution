@@ -67,6 +67,10 @@ Needs Git and Node.js 22 LTS (20.19+ works). Then open http://localhost:5173/imp
 
 `?demo=1&offline=1` is the regression-tested recording URL. It always uses the same May 2024 storm data, starting state and three-sol plan.
 
+## For teachers
+
+Missions normally open one after another. To open **every mission** on a classroom device, go to **For teachers** in the main menu and press **Open all missions** (the teacher's key). Press it again to lock them. `?teacher=1` in the URL does the same for one visit.
+
 ## NASA data
 
 The game uses InSight's dusty solar panels, the 20 May 2024 solar storm that Curiosity measured on Mars, and DONKI space-weather forecasts. Every source is listed in the in-game **Where our numbers come from** screen and in [`CREDITS.md`](CREDITS.md). Saved data is never labelled live.

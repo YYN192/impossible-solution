@@ -3,31 +3,17 @@ import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { gameKey } from "../game/pressedKeys";
-import {
-  BLOCKS,
-  CELLS,
-  CREW,
-  DRILL,
-  GROW_STEPS,
-  JOBS,
-  MACHINES,
-  PORTRAIT,
-  SHELTER_SECONDS,
-  growNeed,
-  lettersShown,
-  powerResult,
-  toggleJob,
-  type Drill,
-  type Speaker,
-} from "../game/talk";
-import { Icon } from "./Icon";
-import { tRun } from "../i18n/dynamic";
+import { DRILL, PORTRAIT, lettersShown, missionTalkKey, type Speaker } from "../game/talk";
 import { useMission } from "../state/mission";
+import { JobMiniGame } from "./JobMiniGame";
+import { MoonMiniGame } from "./MoonMiniGame";
+import { DustMiniGame } from "./DustMiniGame";
+import { hasDustGame } from "../game/dustMiniGames";
+import { tRun } from "../i18n/dynamic";
 import "./CrewTalk.css";
+import { reducedMotion } from "../state/comfort";
 
-const reduced = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const reduced = reducedMotion;
 
 /** Arcade-style typewriter: letters appear one by one with a soft blip. A click or key shows the whole line at once. */
 function useTyped(text: string, blip: string) {
@@ -65,9 +51,9 @@ function useTyped(text: string, blip: string) {
 }
 
 type Step =
-  | { kind: "text"; key: string; then: "menu" | "close" | Drill | string }
+  | { kind: "text"; key: string; then: "menu" | "close" | "drill" | string }
   | { kind: "menu" }
-  | { kind: "drill"; drill: Drill };
+  | { kind: "drill" };
 
 /** A crew member's window: portrait, name plate, typed lines, an answer menu and their practice game. */
 export function CrewTalk({
@@ -79,6 +65,7 @@ export function CrewTalk({
 }) {
   const { t } = useTranslation();
   const drill = DRILL[speaker];
+  const campaign = useMission((m) => m.setup?.campaignId);
   // On the Moon, the crew says the `_moon` lines (where there is one) and has Moon facts to tell.
   const place = useMission((m) => m.setup?.place);
   const moon = place === "moon";
@@ -133,12 +120,7 @@ export function CrewTalk({
               audio.playSfx("dialogue");
               if (step.then === "close") onClose();
               else if (step.then === "menu") setStep({ kind: "menu" });
-              else if (
-                (["jobs", "power", "grow", "shelter"] as string[]).includes(
-                  step.then,
-                )
-              )
-                setStep({ kind: "drill", drill: step.then as Drill });
+              else if (step.then === "drill") setStep({ kind: "drill" });
               // A Moon fact has a second line, then the answers come back.
               else if (step.then.startsWith("talk.")) say(step.then);
               else say(step.then, "close");
@@ -148,47 +130,28 @@ export function CrewTalk({
         {step.kind === "menu" && (
           <AnswerMenu
             options={[
+              // Practice first: playtesters went for it, and it is the same game as in the mission.
+              [t("talk.ask.drill"), () => say(`talk.${speaker}.drillIntro`, "drill")],
+              [t("talk.ask.mission"), () => say(missionTalkKey(speaker, campaign))],
               [t("talk.ask.who"), () => say(`talk.${speaker}.who`)],
-              [t("talk.ask.tip"), () => say(`talk.${speaker}.tip`)],
               ...(moon
                 ? [[t("talk.ask.lore"), () => say(`talk.${speaker}.lore_moon`, `talk.${speaker}.lore2_moon`)] as [string, () => void]]
                 : []),
-              [
-                t("talk.ask.drill"),
-                () => say(`talk.${speaker}.drillIntro`, drill),
-              ],
               [t("talk.ask.bye"), onClose],
             ]}
             prompt={t("talk.choose")}
           />
         )}
-        {step.kind === "drill" && (
-          <div className="crew-drill">
-            {step.drill === "jobs" && (
-              <JobsDrill onWin={() => say(`talk.${speaker}.win`)} />
-            )}
-            {step.drill === "power" && (
-              <PowerDrill onWin={() => say(`talk.${speaker}.win`)} />
-            )}
-            {step.drill === "grow" && (
-              <GrowDrill onWin={() => say(`talk.${speaker}.win`)} />
-            )}
-            {step.drill === "shelter" && (
-              <ShelterDrill
-                onWin={() => say(`talk.${speaker}.win`)}
-                onLate={() => say(`talk.${speaker}.late`)}
-              />
-            )}
-            <button
-              className="quiet-button"
-              onClick={() => {
-                audio.playSfx("menu-back");
-                setStep({ kind: "menu" });
-              }}
-            >
-              {t("drills.back")}
-            </button>
-          </div>
+        {step.kind === "drill" && drill && (
+          // The real mission mini-game for this crew member's job, so practice is exactly what the mission asks.
+          // On the Moon and in Dust Season, practice uses that mission's own mini games, like the plan screen.
+          (() => {
+            const seed = Date.now();
+            const onDone = (won: boolean) => (won ? say(`talk.${speaker}.win`) : setStep({ kind: "menu" }));
+            if (moon) return <MoonMiniGame job={drill} seed={seed} onClose={onDone} />;
+            if (campaign === "dust" && hasDustGame(drill)) return <DustMiniGame job={drill} seed={seed} onClose={onDone} />;
+            return <JobMiniGame job={drill} seed={seed} onClose={onDone} />;
+          })()
         )}
       </div>
     </dialog>
@@ -283,241 +246,5 @@ function AnswerMenu({
         </button>
       ))}
     </div>
-  );
-}
-
-function JobsDrill({ onWin }: { onWin: () => void }) {
-  const { t } = useTranslation();
-  const [picked, setPicked] = useState<string[]>([]);
-  const waiting = JOBS.find((j) => !picked.includes(j));
-  return (
-    <>
-      <h3>{t("drills.jobs.title")}</h3>
-      <div className="crew-drill__grid">
-        {JOBS.map((j) => (
-          <button
-            key={j}
-            aria-pressed={picked.includes(j)}
-            onClick={() => {
-              audio.playSfx(picked.includes(j) ? "job-remove" : "job-assign");
-              setPicked((p) => toggleJob(p, j));
-            }}
-          >
-            <Icon
-              name={
-                {
-                  panels: "wipe",
-                  greenhouse: "sprout",
-                  shelter: "shield",
-                  science: "science",
-                }[j]
-              }
-            />{" "}
-            {t(`jobs.${j}`)}
-            {picked.includes(j) && <Icon name="astronaut" />}
-          </button>
-        ))}
-      </div>
-      <p aria-live="polite">
-        {picked.length < CREW
-          ? t("drills.jobs.left", { count: CREW - picked.length })
-          : t("drills.jobs.done", { job: t(`jobs.${waiting!}`) })}
-      </p>
-      <button
-        className="primary"
-        disabled={picked.length < CREW}
-        onClick={() => {
-          audio.playSfx("job-complete");
-          onWin();
-        }}
-      >
-        {t("drills.jobs.go")}
-      </button>
-    </>
-  );
-}
-
-function PowerDrill({ onWin }: { onWin: () => void }) {
-  const { t } = useTranslation();
-  const [on, setOn] = useState<string[]>([]);
-  const [tried, setTried] = useState(false);
-  const result = powerResult(on);
-  return (
-    <>
-      <h3>{t("drills.power.title")}</h3>
-      <div className="crew-drill__grid">
-        {MACHINES.map((m) => (
-          <button
-            key={m}
-            aria-pressed={on.includes(m)}
-            onClick={() => {
-              setTried(false);
-              if (on.includes(m)) {
-                audio.playSfx("power-decrease");
-                setOn(on.filter((x) => x !== m));
-              } else if (on.length < CELLS) {
-                audio.playSfx("power-increase");
-                setOn([...on, m]);
-              } else audio.playSfx("menu-error");
-            }}
-          >
-            <Icon name={{ air: "air", lamp: "lamp", radio: "radio" }[m]} />{" "}
-            {t(`drills.power.${m}`)}
-            {on.includes(m) && <Icon name="power" />}
-          </button>
-        ))}
-      </div>
-      <p aria-live="polite">
-        {tried && result === "noAir"
-          ? t("drills.power.noAir")
-          : t("drills.power.cells", { count: CELLS - on.length })}
-      </p>
-      <button
-        className="primary"
-        disabled={result === "more"}
-        onClick={() => {
-          if (result === "ok") {
-            audio.playSfx("job-complete");
-            onWin();
-          } else {
-            audio.playSfx("air-warning");
-            setTried(true);
-          }
-        }}
-      >
-        {t("drills.power.go")}
-      </button>
-    </>
-  );
-}
-
-function GrowDrill({ onWin }: { onWin: () => void }) {
-  const { t } = useTranslation();
-  const [stage, setStage] = useState(0);
-  const [wrong, setWrong] = useState(false);
-  const need = growNeed(stage),
-    grown = stage >= GROW_STEPS;
-  const give = (what: "water" | "light") => {
-    if (what === need) {
-      audio.playSfx("select");
-      setStage(stage + 1);
-      setWrong(false);
-    } else {
-      audio.playSfx("menu-error");
-      setWrong(true);
-    }
-  };
-  return (
-    <>
-      <h3>{t("drills.grow.title")}</h3>
-      <div className="crew-drill__plant">
-        <img src={asset(`minigame/plant-${stage}`)} alt="" />
-        {!grown && (
-          <span className="crew-drill__bubble">
-            <Icon name={need === "water" ? "ice" : "lamp"} />
-          </span>
-        )}
-      </div>
-      <p aria-live="polite">
-        {wrong
-          ? t("drills.grow.wrong")
-          : grown
-            ? t("drills.grow.ready")
-            : `${t("drills.grow.stage", { n: stage, total: GROW_STEPS })} · ${t(`drills.grow.needs.${need}`)}`}
-      </p>
-      {grown ? (
-        <button
-          className="primary"
-          autoFocus
-          onClick={() => {
-            audio.playSfx("job-complete");
-            onWin();
-          }}
-        >
-          {t("drills.grow.harvest")}
-        </button>
-      ) : (
-        <div className="crew-drill__grid">
-          <button autoFocus onClick={() => give("water")}>
-            <Icon name="ice" /> {t("drills.grow.water")}
-          </button>
-          <button onClick={() => give("light")}>
-            <Icon name="lamp" /> {t("drills.grow.light")}
-          </button>
-        </div>
-      )}
-    </>
-  );
-}
-
-function ShelterDrill({
-  onWin,
-  onLate,
-}: {
-  onWin: () => void;
-  onLate: () => void;
-}) {
-  const { t } = useTranslation();
-  const [blocks, setBlocks] = useState(0);
-  const [left, setLeft] = useState(SHELTER_SECONDS);
-  useEffect(() => {
-    if (blocks >= BLOCKS) return;
-    if (left <= 0) {
-      audio.playSfx("radiation-increase");
-      onLate();
-      return;
-    }
-    const id = setTimeout(() => {
-      setLeft(left - 1);
-      if (left <= 4) audio.playSfx("machine-beep");
-    }, 1000);
-    return () => clearTimeout(id);
-  }, [left, blocks, onLate]);
-  const safe = blocks >= BLOCKS;
-  return (
-    <>
-      <h3>{t("drills.shelter.title")}</h3>
-      <p className="crew-drill__timer" aria-live="off">
-        {safe
-          ? t("drills.shelter.safe")
-          : t("drills.shelter.time", { s: left })}
-      </p>
-      <div className="crew-drill__wall" aria-hidden="true">
-        {Array.from({ length: BLOCKS }, (_, i) => (
-          <img
-            key={i}
-            src={asset(i < blocks ? "minigame/block" : "minigame/block-slot")}
-            alt=""
-          />
-        ))}
-      </div>
-      <p aria-live="polite">
-        <Icon name="dose" /> {t("drills.shelter.dose")}:{" "}
-        <meter
-          min={0}
-          max={BLOCKS}
-          value={BLOCKS - blocks}
-          aria-label={t("drills.shelter.dose")}
-        />{" "}
-        · {t("drills.shelter.left", { count: BLOCKS - blocks })}
-      </p>
-      {safe ? (
-        <button className="primary" autoFocus onClick={onWin}>
-          {t("drills.shelter.done")}
-        </button>
-      ) : (
-        <button
-          className="primary"
-          autoFocus
-          onClick={() => {
-            const n = blocks + 1;
-            audio.playSfx(n >= BLOCKS ? "job-complete" : "job-assign");
-            setBlocks(n);
-          }}
-        >
-          <Icon name="shield" /> {t("drills.shelter.place")}
-        </button>
-      )}
-    </>
   );
 }

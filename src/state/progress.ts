@@ -48,3 +48,4 @@ export const useProgress = create<Progress>()((set, get) => ({
 
 export const isOpen = (c: Campaign, p: Pick<Progress, "done" | "teacher">): boolean =>
   p.teacher || !c.unlockAfter || p.done.includes(c.unlockAfter);
+

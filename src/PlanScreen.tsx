@@ -8,6 +8,7 @@ import { DustMiniGame } from "./components/DustMiniGame";
 import { hasDustGame } from "./game/dustMiniGames";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { usePhone } from "./components/usePhone";
+import { useComfort } from "./state/comfort";
 import { WhatsThis } from "./components/WhatsThis";
 import {
   INSIGHT_DUST,
@@ -22,12 +23,7 @@ import { DataChip } from "./screens/DataChip";
 import { ScreenFrame } from "./components/ScreenFrame";
 import { knownEvents, rulesOf, step } from "./sim/engine";
 import { tRun } from "./i18n/dynamic";
-import {
-  JOBS,
-  type CrewId,
-  type Domino,
-  type JobId,
-} from "./sim/types";
+import { JOBS, type CrewId, type Domino, type JobId } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
 import { useNav } from "./state/screen";
@@ -61,8 +57,11 @@ export default function PlanScreen() {
   const phone = usePhone();
   const [confirmIdle, setConfirmIdle] = useState(false);
   const [nudge, setNudge] = useState(false);
+  const [shake, setShake] = useState(false);
   // The job's mini game, open right after the job is given (the job is already in the plan).
-  const [miniGame, setMiniGame] = useState<{ job: JobId; seed: number } | null>(null);
+  const [miniGame, setMiniGame] = useState<{ job: JobId; seed: number } | null>(
+    null,
+  );
   const plays = useRef(0);
   const resolved = useRef(false);
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
@@ -111,7 +110,8 @@ export default function PlanScreen() {
     useSession.setState({ before: { ...state.bars }, draft: {} });
     const result = useGame.getState().endSol(plan);
     audio.playSfx("resolve");
-    if (result.over && state.sol < rulesOf(state).sols) useNav.getState().endEarly();
+    if (result.over && state.sol < rulesOf(state).sols)
+      useNav.getState().endEarly();
     else useNav.getState().next();
   }
   const endSol = (
@@ -135,10 +135,13 @@ export default function PlanScreen() {
       <div className="planner-layout plan-screen" ref={root}>
         <div>
           <h2 className="step-label">{t("play.crewStep")}</h2>
-          <div className="crew-roster">
+          <div
+            className={`crew-roster ${shake ? "shake" : ""}`}
+            onAnimationEnd={() => setShake(false)}
+          >
             {crew.map((id, i) => (
               <div
-                className={`crew-tile ${selected === id ? "selected" : ""} ${plan[id] ? "has-job" : ""}`}
+                className={`crew-tile ${selected === id ? "selected" : ""} ${plan[id] ? "has-job" : ""} ${!selected && !plan[id] && !state.tired.includes(id) ? "call" : ""}`}
                 key={id}
               >
                 <button
@@ -151,6 +154,11 @@ export default function PlanScreen() {
                     setNudge(false);
                     setConfirmIdle(false);
                     focusNext.current = "job";
+                    // Already (auto-)selected: no re-render follows, so move focus now.
+                    if (selected === id)
+                      root.current
+                        ?.querySelector<HTMLButtonElement>(".job-choice")
+                        ?.focus();
                     audio.playSfx("select");
                   }}
                 >
@@ -160,7 +168,10 @@ export default function PlanScreen() {
                   />
                   <span>
                     <strong>{t("crew.name", { n: i + 1 })}</strong>
-                    <span className="crew-skill"><img src={asset(`campaign/${skillArt[i]}`)} alt="" />{t(`crew.skill.${id}`)}</span>
+                    <span className="crew-skill">
+                      <img src={asset(`campaign/${skillArt[i]}`)} alt="" />
+                      {t(`crew.skill.${id}`)}
+                    </span>
                     <small>
                       {state.tired.includes(id)
                         ? t("crew.tired")
@@ -174,7 +185,10 @@ export default function PlanScreen() {
                   <button
                     type="button"
                     className="unassign"
-                    onClick={() => { assign(id); audio.playSfx("job-remove"); }}
+                    onClick={() => {
+                      assign(id);
+                      audio.playSfx("job-remove");
+                    }}
                     aria-label={t("play.clearCrew", { n: i + 1 })}
                   >
                     ×
@@ -183,26 +197,61 @@ export default function PlanScreen() {
               </div>
             ))}
           </div>
-          <h2 className="step-label">{t("play.jobsStep")}</h2>
-          <div className="job-list">
+          <h2 className="step-label">
+            {selected
+              ? t("play.jobsStepFor", {
+                  name: t("crew.name", { n: crew.indexOf(selected) + 1 }),
+                })
+              : t("play.jobsStep")}
+          </h2>
+          {!selected && <p className="jobs-locked">{t("play.jobsLocked")}</p>}
+          <div className={`job-list ${selected ? "" : "locked"}`}>
             {jobIds.map((id, i) => {
               const owner = crew.find((c) => plan[c] === id);
               return (
                 <button
                   type="button"
-                  className={`job-choice ${owner ? "assigned" : ""}`}
+                  className={`job-choice ${owner ? "assigned" : ""} ${selected ? "" : "locked"}`}
                   key={id}
                   aria-disabled={!selected}
                   aria-label={t(`jobs.${id}`)}
                   aria-pressed={Boolean(owner)}
                   onClick={() => {
-                    if (!selected) { setNudge(true); audio.playSfx("select"); return; }
+                    if (!selected) {
+                      setNudge(true);
+                      audio.playSfx("menu-error");
+                      setShake(true);
+                      // Show where to tap instead: the first astronaut who can still work.
+                      root.current
+                        ?.querySelector<HTMLButtonElement>(
+                          ".crew-tile:not(.has-job) > button:not(:disabled)",
+                        )
+                        ?.focus();
+                      return;
+                    }
                     setNudge(false);
                     assign(selected, id);
-                    select(null);
+                    // Play flows: the next astronaut without a job is chosen for the player.
+                    select(
+                      crew.find(
+                        (c) =>
+                          c !== selected &&
+                          !plan[c] &&
+                          !state.tired.includes(c),
+                      ) ?? null,
+                    );
                     plays.current += 1;
-                    setMiniGame({ job: id, seed: state.sol * 97 + plays.current });
-                    audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
+                    // #77: "Skip mini-games" in Settings: the job is given, no game opens.
+                    if (useComfort.getState().skipMiniGames)
+                      focusNext.current = "crew";
+                    else
+                      setMiniGame({
+                        job: id,
+                        seed: state.sol * 97 + plays.current,
+                      });
+                    audio.playSfx(
+                      id === "askEarth" ? "earth-message-send" : "assign",
+                    );
                   }}
                 >
                   <span className="job-number">0{i + 1}</span>
@@ -218,7 +267,9 @@ export default function PlanScreen() {
                   <span className="job-owner">
                     {owner
                       ? t("play.crewNumber", { n: crew.indexOf(owner) + 1 })
-                      : "+"}
+                      : selected
+                        ? "+"
+                        : ""}
                   </span>
                 </button>
               );
@@ -227,7 +278,9 @@ export default function PlanScreen() {
           <div className="planner-guidance" aria-live="polite">
             {selected
               ? t("play.chooseJob", { n: crew.indexOf(selected) + 1 })
-              : nudge ? t("play.pickCrewFirst") : t("play.chooseCrew")}
+              : nudge
+                ? t("play.pickCrewFirst")
+                : t("play.chooseCrew")}
           </div>
         </div>
         <aside className="plan-outlook">
@@ -262,7 +315,10 @@ export default function PlanScreen() {
                           <Icons icon={skip.icon} />
                         ) : (
                           <>
-                            <span className="px-stack"><img src={asset(`items/${jobArt[id]}`)} alt="" /><Icon name="x" className="px-badge" /></span>
+                            <span className="px-stack">
+                              <img src={asset(`items/${jobArt[id]}`)} alt="" />
+                              <Icon name="x" className="px-badge" />
+                            </span>
                           </>
                         )}
                       </span>
