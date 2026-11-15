@@ -41,6 +41,7 @@ Built for the NASA Space Apps Challenge 2026 ("Build a Junior Astronaut Mission 
 - 🔎 **Where our numbers come from.** A Data Sources screen separates real measurements from labelled game numbers.
 - 🎬 **Repeatable demo.** `?demo=1` replays the same five-link story every time, from bundled data.
 - 🌍 **English and Bulgarian**, keyboard and touch, no login, works on phones.
+- 🎵 **Fire music composed my a smelly indian(Victor).
 
 ## Quick start
 
