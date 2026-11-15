@@ -217,3 +217,12 @@ html[data-contrast] :is(.mission-card:disabled, button:disabled) { opacity: 1 !i
 /* Top-bar links (settings, sources, teachers, full screen) sit back: no box, lighter text, same tap size. */
 .expedition .mission-status-bar nav button, .expedition .mission-status-bar .fullscreen-toggle { background: transparent; border-color: transparent; box-shadow: none; color: #c3d3de; font-weight: 600; }
 .expedition .mission-status-bar nav button:hover, .expedition .mission-status-bar .fullscreen-toggle:hover { border-color: #52687b; color: #fff; }
+/* Plan screen hierarchy: the job name leads, the description reads normally, the cost is a quiet label. */
+.expedition .job-copy strong { font-size: 1.1rem; }
+.expedition :is(.job-copy small, .job-cost) { font-weight: 400 !important; }
+/* Less console chrome above the work, so the jobs and End sol come into view sooner. */
+.expedition .console-top { padding-top: 8px; padding-bottom: 8px; }
+.expedition .sol-navigation { padding: 6px 14px; }
+.expedition .console-content { padding-top: 16px; }
+.expedition .console-content .screen h1 { margin: 0 0 6px; }
+.expedition .crew-tile > button:first-child { min-height: 0; padding-top: 10px; padding-bottom: 10px; }
