@@ -31,7 +31,7 @@ export function hubStormFor(setup: Pick<MissionSetup, "place" | "seed" | "events
   const dust = setup.events.filter((e) => e.kind === "dustStorm");
   if (dust.length) {
     const first = dust.find((e) => e.sol === sol && !dust.some((d) => d.id === e.id && d.sol === sol - 1));
-    return first ? (first.id.startsWith("Opportunity") ? REAL.opportunity2018 : REAL.insight2022) : undefined;
+    return first ? (first.id?.startsWith("Opportunity") ? REAL.opportunity2018 : REAL.insight2022) : undefined;
   }
   const sols = setup.rules.sols ?? 3;
   if (sols < 2) return undefined;

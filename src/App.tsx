@@ -17,6 +17,8 @@ import { TeacherCard } from "./screens/TeacherCard";
 import { useMission } from "./state/mission";
 import { useNav, type Screen } from "./state/screen";
 import { useSession } from "./game/session";
+import { hubStormFor, repaired } from "./data/hubStorm";
+import { useGame } from "./state/game";
 import MainMenu, { type RunChoice } from "./MainMenu";
 import MarsHub from "./MarsHub";
 import ConsolePage from "./ConsolePage";
@@ -48,6 +50,13 @@ export default function App() {
       setPlace(name);
     }
   }, [setup]);
+  // A dust storm on this sol's morning calls the crew back to the base (once per sol).
+  const stormCalled = useRef(0);
+  useEffect(() => {
+    if (screen !== "morning" || place !== "console" || stormCalled.current === sol) return;
+    const game = useGame.getState().state;
+    if (game.sol === sol && hubStormFor(setup, sol, readFlags().demo) && !repaired(game, "storm-panels")) { stormCalled.current = sol; setPlace("hub"); }
+  }, [screen, sol, place, setup, setPlace]);
   const visiblePlace = screen === "title" ? "menu" : place;
   const play = () => {
     if (screen === "title") { useSession.getState().clearPlan(); useNav.getState().next(); }

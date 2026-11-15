@@ -24,6 +24,8 @@ const BY_DOMINO: Record<string, HelpTopic> = {
   "domino.roverHome1": "power",
   "domino.roverHome2": "power",
   "domino.roverStranded": "dose",
+  "domino.stormPanels": "dust",
+  "domino.stormGreenhouse": "food",
 };
 
 export function helpTopicForDomino(textKey: string): HelpTopic | undefined {
