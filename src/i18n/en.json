@@ -507,7 +507,8 @@
       "drone": "Pip · Maintenance drone",
       "airlock": "Station airlock",
       "greenhouse": "Greenhouse",
-      "radar": "Space weather radar"
+      "radar": "Space weather radar",
+      "engineering": "Engineering bay"
     },
     "greenhouse": "GREENHOUSE",
     "name_moon": "Artemis Outpost",
@@ -1119,5 +1120,28 @@
     "soundOn": "On",
     "soundOff": "Off",
     "headphones": "Headphones help."
+  },
+  "engineering": {
+    "title": "Engineering bay",
+    "lead": "Real NASA numbers, drawn as blocks. Longer bar means more.",
+    "close": "Close the engineering bay",
+    "power": {
+      "title": "Dust steals power",
+      "clean": "Clean panels",
+      "dusty": "Dusty panels",
+      "caption": "Dust on the panels cut InSight's power by a third."
+    },
+    "cold": {
+      "title": "Freezing nights",
+      "ice": "Ice",
+      "night": "Mars night",
+      "caption": "A night on Mars is far colder than ice."
+    },
+    "rays": {
+      "title": "Space rays",
+      "day": "One normal day",
+      "storm": "One big storm",
+      "caption": "One solar storm gave Mars about 39 normal days of rays."
+    }
   }
 }

@@ -19,6 +19,7 @@ import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
 import { CrewTalk } from "./components/CrewTalk";
 import SiteMap from "./components/SiteMap";
 import SpaceWeatherStrip from "./components/SpaceWeatherStrip";
+import EngineeringBay from "./components/EngineeringBay";
 import type { StormView } from "./game/renderWorld";
 
 // Physical keys → on-screen hint they light up (keydown on, keyup off).
@@ -49,7 +50,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const [alarm, setAlarm] = useState(stormLeft > 0);
   const [task, setTask] = useState<"panels" | "greenhouse">();
   const [notice, setNotice] = useState("");
-  const [panel, setPanel] = useState<"map" | "radar">(); // the airlock's mission map (#54), the radar's space weather (#60)
+  const [panel, setPanel] = useState<"map" | "radar" | "engineering">(); // the airlock's mission map (#54), the radar's space weather (#60)
   const view = useRef<StormView>({ level: 0, broken: false, marks: [] });
   view.current = { level: alarm ? 1 : stormLeft / 2, broken: !greenhouseDone, marks: [...(panelsDone ? [] : ["airlock"]), ...(greenhouseDone ? [] : ["greenhouse"])] };
   const finishTask = (done: boolean) => {
@@ -65,6 +66,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     if (near.id === "airlock" && !panelsDone) { audio.playSfx("door"); setTask("panels"); return; }
     if (near.id === "greenhouse" && !greenhouseDone) { audio.playSfx("npc"); setTask("greenhouse"); return; }
     if (near.id === "radar") { audio.playSfx("console"); setPanel("radar"); return; }
+    if (near.dialogue === "engineering") { audio.playSfx("console-data"); setPanel("engineering"); return; }
     audio.playSfx(near.interaction === "console" ? "console" : near.interaction === "door" ? "door" : "npc");
     if (near.interaction === "console") {
       setActivating(true);
@@ -173,6 +175,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
     {panel === "map" && <SiteMap current={campaign} onClose={closePanel} />}
     {panel === "radar" && <SpaceWeatherStrip onClose={closePanel} />}
+    {panel === "engineering" && <EngineeringBay onClose={closePanel} />}
     {task === "panels" && <PanelsTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
     {task === "greenhouse" && <GreenhouseTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
   </main>;

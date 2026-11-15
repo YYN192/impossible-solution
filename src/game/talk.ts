@@ -1,6 +1,6 @@
 /** Crew talks in the hub: who has which answers and which practice game, plus the pure rules of those games. */
 export type Speaker =
-  "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse" | "radar";
+  "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse" | "radar" | "engineering";
 export type Drill = "jobs" | "power" | "grow" | "shelter";
 
 /** Crew members have a menu of answers and one practice game; places (airlock, greenhouse) just talk. */
@@ -18,6 +18,7 @@ export const PORTRAIT: Record<Speaker, string> = {
   drone: "characters/robots/assistant-drone-portrait",
   airlock: "consoles/mission-monitor",
   greenhouse: "characters/npcs/scientist-portrait",
+  engineering: "environment/decorations/mars-shelf", // the shelves open the Engineering bay graphs
   radar: "consoles/radar", // the radar opens its space weather strip (#60); listed so every station object can talk
 };
 
