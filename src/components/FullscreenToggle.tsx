@@ -13,6 +13,6 @@ export function FullscreenToggle() {
   if (!document.fullscreenEnabled) return null;
   const toggle = () => void (on ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
   return <button type="button" className="sound-toggle fullscreen-toggle" aria-pressed={on} onClick={toggle}>
-    <span aria-hidden="true">{on ? "🗗" : "⛶"}</span> {on ? t("fullscreen.exit") : t("fullscreen.enter")}
+    {on ? t("fullscreen.exit") : t("fullscreen.enter")}
   </button>;
 }

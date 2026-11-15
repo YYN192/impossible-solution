@@ -47,7 +47,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
     }}>
       {!settings ? <>
         <header className="menu-head">
-          <p className="eyebrow"><span className="beacon-dot" />{t("menu.eyebrow")}</p>
+          <p className="eyebrow">{t("menu.eyebrow")}</p>
           <h1>{t("app.name")}</h1><p className="menu-tagline">{t("menu.tagline")}</p>
         </header>
         {resume ? <p className="menu-resume">{t("menu.intro")}</p> : <div className="mission-picker" role="group" aria-label={t("run.pick")}>

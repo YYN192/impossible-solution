@@ -15,7 +15,6 @@ export function DataBadge({ source, fetchedAt }: { source: DataSource; fetchedAt
       className={`data-badge ${live ? "data-badge--live" : "data-badge--saved"}`}
       title={live ? t("data.badge.liveTitle") : t(kind === "cached" ? "data.badge.cachedTitle" : "data.badge.savedTitle", { date })}
     >
-      <span aria-hidden="true" className="data-badge__dot" />
       {t(`data.badge.${kind === "cached" ? "cached" : kind}`)}
       {!live && date ? <span className="data-badge__when"> · {date}</span> : null}
     </span>
