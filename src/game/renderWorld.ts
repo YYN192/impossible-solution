@@ -33,22 +33,27 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   }
   for (const x of [32, 592]) sprite("environment/decorations/mars-pipe", x, 144, 16, 64);
   for (const x of [64, 192, 416, 560]) sprite("environment/decorations/mars-vent", x, 336, 32, 16);
-  // Marked console bay and light strips make the goal easy to find.
-  // The bay outline pulses gently to guide the player to Mission Control (steady with reduced motion).
-  ctx.globalAlpha = reduced ? 1 : 0.55 + 0.45 * Math.sin(time / 380);
-  ctx.strokeStyle = "#57829b"; ctx.lineWidth = 1; ctx.strokeRect(272.5, 104.5, 95, 94);
-  ctx.globalAlpha = 1;
+  // Console bay guide: a calm outline with soft "chase lights" running all the way round (classic arcade marquee).
+  // It rests once the player arrives, and while a storm sends them elsewhere first.
+  if (near !== "console" && !storm.marks.length) {
+    ctx.lineWidth = 1; ctx.strokeStyle = "#3d5d73"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.setLineDash([4, 8]); ctx.lineDashOffset = reduced ? 0 : -time / 45;
+    ctx.strokeStyle = "#8fd3e8aa"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.setLineDash([]);
+  }
   ctx.fillStyle = "#29445b"; ctx.fillRect(272, 198, 96, 3);
   const entities = room.entities.map((e) => ({ y: e.y + e.h, draw: () => {
     if (e.id === "greenhouse") { greenhouse(ctx, e.x, e.y, storm.broken); return; }
     let path = e.sprite;
     if (e.id === "console") path = `consoles/mission-console-${near === e.id ? "highlighted" : !reduced && Math.floor(time / 1100) % 4 === 0 ? "inactive" : "active"}`;
-    if (e.interaction === "door" && near === e.id) path = "environment/doors/mars-door-airlock-open";
     const bob = !reduced && e.id === "drone" ? Math.round(Math.sin(time / 450) * 2) : 0;
-    sprite(path, e.x, e.y + bob, e.w, e.h);
-    if (e.interaction === "npc" && !reduced && Math.floor(time / 1700 + e.x) % 5 === 0) {
-      ctx.fillStyle = "#a1e5e5"; ctx.fillRect(e.x + 15, e.y - 5, 2, 2);
+    // Crew turn to face you when you come close (their idle sprites exist for all four directions).
+    if (near === e.id && path.includes("-idle-")) {
+      const dx = player.x - (e.x + e.w / 2), dy = player.y - (e.y + e.h - 4);
+      path = path.replace(/-idle-\w+$/, `-idle-${Math.abs(dx) > Math.abs(dy) ? dx > 0 ? "right" : "left" : dy > 0 ? "front" : "back"}`);
     }
+    if (e.interaction === "door") { door(ctx, getSprite(path), e.x, e.y, e.w, e.h, near === e.id, reduced); return; }
+    sprite(path, e.x, e.y + bob, e.w, e.h);
   }}));
   entities.push({ y: player.y, draw: () => {
     ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 3), 20, 5);
@@ -67,6 +72,15 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
       ctx.fillRect(Math.round(x), Math.round(y), 4 + i % 6, 1);
     }
   }
+  // A speech bubble over everyone you can talk to: small and quiet from afar, bigger with "…" when you are close.
+  for (const e of room.entities) if (e.interaction === "npc") {
+    const close = near === e.id, cx = Math.round(e.x + e.w / 2), y = e.y - (close ? 13 : 7) + (reduced ? 0 : Math.round(Math.sin(time / 300 + e.x) * (close ? 1.5 : 1)));
+    const w = close ? 16 : 8, h = close ? 10 : 6;
+    ctx.fillStyle = "#080b12"; ctx.fillRect(cx - w / 2 - 1, y - 1, w + 2, h + 2); ctx.fillRect(cx - 2, y + h, 4, 3);
+    ctx.fillStyle = close ? "#f2f6fa" : "#a9bccb"; ctx.fillRect(cx - w / 2, y, w, h); ctx.fillRect(cx - 1, y + h, 2, 2);
+    ctx.fillStyle = "#080b12";
+    if (close) for (let i = 0; i < 3; i++) if (reduced || Math.floor(time / 250) % 4 > i) ctx.fillRect(cx - 5 + i * 4, y + 4, 2, 2);
+  }
   for (const id of storm.marks) {
     const e = room.entities.find((n) => n.id === id);
     if (!e) continue;
@@ -78,6 +92,22 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   // Area names are HTML overlays in MarsHub so they stay sharp and readable at any scale.
   ctx.font = "bold 10px monospace"; ctx.textAlign = "center";
   if (near) { ctx.fillStyle = "#0b1829"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 47), 20, 16); ctx.fillStyle = "#b4f6ed"; ctx.fillText("E", Math.round(player.x), Math.round(player.y - 35)); }
+}
+
+/** Sliding airlock (like classic top-down games): the frame stays put and the two panels part, never a sprite swap. */
+let doorOpen = 0;
+function door(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number, open: boolean, reduced: boolean) {
+  if (!img.complete || !img.naturalWidth) return;
+  doorOpen = reduced ? Number(open) : Math.max(0, Math.min(1, doorOpen + (open ? 0.08 : -0.08)));
+  ctx.drawImage(img, x, y, w, h);
+  if (!doorOpen) return;
+  const sw = img.naturalWidth, sh = img.naturalHeight, inset = w * 0.16, shift = Math.round(doorOpen * (w / 2 - inset));
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x + inset, y + h * 0.12, w - inset * 2, h * 0.88); ctx.clip();
+  ctx.fillStyle = "#03060c"; ctx.fillRect(x, y, w, h);
+  ctx.drawImage(img, 0, 0, sw / 2, sh, x - shift, y, w / 2, h);
+  ctx.drawImage(img, sw / 2, 0, sw / 2, sh, x + w / 2 + shift, y, w / 2, h);
+  ctx.restore();
 }
 
 /** A small pixel greenhouse (glass dome over a planter), drawn in code; `broken` after a dust storm. */

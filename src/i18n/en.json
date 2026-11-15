@@ -950,5 +950,87 @@
       "shelter": "Space drops the block.",
       "askEarth": "← → aim the dish. Space sends."
     }
+  },
+  "talk": {
+    "next": "Next",
+    "choose": "What do you say?",
+    "ask": {
+      "who": "Who are you?",
+      "tip": "Any tips for me?",
+      "drill": "Let's practise!",
+      "bye": "Bye for now!"
+    },
+    "commander": {
+      "intro": "Welcome to Ares Station, cadet! I'm Commander Nova. I'm so glad you're here.",
+      "who": "I lead this crew. Every sol, I pick who does which job. A sol is one day on Mars. It is about 40 minutes longer than a day on Earth.",
+      "tip": "At the mission console, you give each astronaut one job. There are always more jobs than people. No choice is free!",
+      "drillIntro": "Let's practise. We have 3 astronauts and 4 jobs. Pick 3 jobs for today.",
+      "win": "Well done! See? One job had to wait. At the console, think about which job can wait the least."
+    },
+    "engineer": {
+      "intro": "Hey, cadet! I'm Kai, the engineer. If it hums, I probably fixed it.",
+      "who": "I grew up fixing bikes. Now I fix a whole Mars base! Mars dust is my enemy. It covers our solar panels.",
+      "tip": "Dusty solar panels make less power. Clean panels mean more power for every machine.",
+      "drillIntro": "Quick test! We only have 2 power cells. Choose 2 machines to switch on.",
+      "win": "Great call! The air machine stays on, because we all need to breathe. Something else had to switch off."
+    },
+    "scientist": {
+      "intro": "Hello! I'm Amara. I study Mars rocks, and I grow our food.",
+      "who": "Long, long ago, Gale Crater held a lake. Its rocks still have layers from that water. I read them like a book.",
+      "tip": "Greenhouse lights need power. No light means no harvest. Science trips earn stars, but outside, space rays are stronger.",
+      "drillIntro": "Help me grow a sprout! Look at the bubble. It shows what the plant needs next.",
+      "win": "A harvest! Plants need water and light. On Mars, that light comes from our power."
+    },
+    "drone": {
+      "intro": "Beep boop! I'm Pip, the station drone. I watch the Sun for you.",
+      "who": "I was built to read space weather. Sometimes the Sun throws out tiny, very fast bits. We call them space rays.",
+      "tip": "When I beep a warning, build up the shelter. Water and Mars dirt help block space rays.",
+      "drillIntro": "Drill time! Space rays are coming. Stack the shelter blocks before the timer ends.",
+      "win": "Beep! Safe! Each block lowered your dose. Dose means how much space rays hit your body.",
+      "late": "Bzzt! The rays came before the shelter was done. Your dose went up. Want to try again?"
+    }
+  },
+  "drills": {
+    "back": "Leave the practice",
+    "jobs": {
+      "title": "Job board",
+      "left_one": "{{count}} astronaut is free",
+      "left_other": "{{count}} astronauts are free",
+      "done": "Every astronaut is busy. This job waits: {{job}}",
+      "go": "Start the day"
+    },
+    "power": {
+      "title": "Power switch",
+      "cells_one": "Power cells left: {{count}}",
+      "cells_other": "Power cells left: {{count}}",
+      "noAir": "Uh-oh! Without the air machine, nobody can breathe. Try again.",
+      "go": "Switch on",
+      "air": "Air machine",
+      "lamp": "Greenhouse lights",
+      "radio": "Radio to Earth"
+    },
+    "grow": {
+      "title": "Grow a sprout",
+      "water": "Give water",
+      "light": "Turn on the light",
+      "wrong": "Not that one. Look at the bubble!",
+      "stage": "Growth: {{n}} of {{total}}",
+      "needs": {
+        "water": "it needs water",
+        "light": "it needs light"
+      },
+      "ready": "It is ready to harvest!",
+      "harvest": "Harvest"
+    },
+    "shelter": {
+      "title": "Shelter stack",
+      "time": "Space rays arrive in {{s}} seconds",
+      "safe": "Shelter ready!",
+      "place": "Place a block",
+      "dose": "Dose",
+      "left_one": "{{count}} block left",
+      "left_other": "{{count}} blocks left",
+      "done": "Go inside"
+    }
   }
 }

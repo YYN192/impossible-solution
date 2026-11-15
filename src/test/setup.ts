@@ -13,6 +13,6 @@ if (dom && typeof globalThis.localStorage === "undefined") {
 afterEach(() => cleanup());
 // DOM tests verify interactions; the real canvas is verified in the browser.
 Object.defineProperty(window, "matchMedia", { writable: true, value: vi.fn((query: string) => ({ matches: query.includes("reduced-motion"), media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() })) });
-HTMLCanvasElement.prototype.getContext = vi.fn(() => ({ fillRect: vi.fn(), strokeRect: vi.fn(), drawImage: vi.fn(), fillText: vi.fn() })) as never;
+HTMLCanvasElement.prototype.getContext = vi.fn(() => ({ fillRect: vi.fn(), strokeRect: vi.fn(), drawImage: vi.fn(), fillText: vi.fn(), setLineDash: vi.fn(), save: vi.fn(), restore: vi.fn(), beginPath: vi.fn(), rect: vi.fn(), clip: vi.fn() })) as never;
 HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
 import "../i18n";
