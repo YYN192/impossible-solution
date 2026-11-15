@@ -121,6 +121,13 @@
     "heading": "Night falls on sol {{sol}}",
     "nextMorning": "Go to sleep",
     "seeResults": "See how it went",
+    "changes": {
+      "title": "What changed today",
+      "showAll": "Show all",
+      "good": "Good",
+      "bad": "Watch out",
+      "sr": "{{name}}: {{from}} to {{to}}. {{verdict}}."
+    },
     "heading_moon": "Day {{sol}} is over",
     "warn": {
       "air": "Air is low: {{n}} of 10.",
