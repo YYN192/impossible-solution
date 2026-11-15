@@ -13,7 +13,6 @@ function preload(room: Room) {
   for (const e of room.entities) {
     if (e.sprite.includes("-idle-")) for (const f of ["front", "back", "left", "right"]) getSprite(e.sprite.replace(/-idle-\w+$/, `-idle-${f}`));
     if (e.id === "console") for (const s of ["active", "inactive", "highlighted"]) getSprite(`consoles/mission-console-${s}`);
-    if (e.interaction === "door") getSprite("environment/doors/mars-door-airlock-open");
   }
 }
 
@@ -66,7 +65,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
       const dx = player.x - (e.x + e.w / 2), dy = player.y - (e.y + e.h - 4);
       path = path.replace(/-idle-\w+$/, `-idle-${Math.abs(dx) > Math.abs(dy) ? dx > 0 ? "right" : "left" : dy > 0 ? "front" : "back"}`);
     }
-    if (e.interaction === "door") { door(ctx, getSprite(path), getSprite("environment/doors/mars-door-airlock-open"), e.x, e.y, e.w, e.h, near === e.id, reduced, time); return; }
+    if (e.interaction === "door") { door(ctx, getSprite(path), e.x, e.y, e.w, e.h, near === e.id, reduced, time); return; }
     // A sprite that has not loaded yet draws nothing, which made crew blink out for a frame the first time they
     // turned. Until the new look is ready, keep drawing the one we already have.
     if (!ready(path)) path = ready(e.sprite) ? e.sprite : path;
@@ -118,8 +117,6 @@ export const DOOR = {
   /** Where the door leaf sits in the 32×32 airlock sprites: inside the side posts, under the orange light, above the
    *  sill (columns 6–25, rows 6–28). Only this part moves; the frame around it is never covered. */
   leaf: { x: 6, y: 6, w: 20, h: 23 },
-  /** Sprite columns of each panel that stay showing when fully open: the door slides into the wall, never vanishes. */
-  lip: 2,
   /** The light strip over the door (sprite rows 3–5, columns 5–26): orange when shut, green while open. */
   light: { x: 5, y: 3, w: 22, h: 3 },
 };
@@ -132,7 +129,7 @@ export function doorStep(progress: number, near: boolean, dt: number, reduced: b
   return Math.max(0, Math.min(1, progress + (near ? step : -step)));
 }
 let doorProgress = 0, doorTime: number | undefined;
-function door(ctx: CanvasRenderingContext2D, closed: HTMLImageElement, open: HTMLImageElement, x: number, y: number, w: number, h: number, near: boolean, reduced: boolean, time: number) {
+function door(ctx: CanvasRenderingContext2D, closed: HTMLImageElement, x: number, y: number, w: number, h: number, near: boolean, reduced: boolean, time: number) {
   doorProgress = doorStep(doorProgress, near, doorTime === undefined ? 0 : time - doorTime, reduced);
   doorTime = time;
   if (!closed.complete || !closed.naturalWidth) return;
@@ -148,15 +145,13 @@ function door(ctx: CanvasRenderingContext2D, closed: HTMLImageElement, open: HTM
   ctx.globalAlpha = 1;
   ctx.save();
   ctx.beginPath(); ctx.rect(lx, ly, lw, lh); ctx.clip();
-  // Behind the panels: the corridor from the open-door art (or plain dark if it has not loaded yet).
-  if (open.complete && open.naturalWidth) ctx.drawImage(open, leaf.x, leaf.y, leaf.w, leaf.h, lx, ly, lw, lh);
-  else { ctx.fillStyle = "#03060c"; ctx.fillRect(lx, ly, lw, lh); }
-  // Whole canvas pixels, so the panels stay crisp but move in small, even steps.
-  const shift = Math.round(eased * (half - DOOR.lip) * sx);
+  // Behind the panels: a dark doorway with Mars light glowing in from outside at the bottom.
+  ctx.fillStyle = "#03060c"; ctx.fillRect(lx, ly, lw, lh);
+  for (const [rows, color] of [[6, "#1a0f0d"], [3, "#3a1a0e"], [1, "#6a3417"]] as const) { ctx.fillStyle = color; ctx.fillRect(lx, ly + lh - rows * sy, lw, rows * sy); }
+  // Whole canvas pixels, so the panels stay crisp but move in small, even steps; fully open they sit inside the posts.
+  const shift = Math.round(eased * half * sx);
   ctx.drawImage(closed, leaf.x, leaf.y, half, leaf.h, lx - shift, ly, half * sx, lh);
   ctx.drawImage(closed, leaf.x + half, leaf.y, half, leaf.h, lx + half * sx + shift, ly, half * sx, lh);
-  // A thin dark seam between the panels while they part reads as a real gap opening.
-  if (shift > 0 && shift < (half - DOOR.lip) * sx) { ctx.fillStyle = "#03060c"; ctx.fillRect(lx + half * sx - shift - 1, ly, 1, lh); ctx.fillRect(lx + half * sx + shift, ly, 1, lh); }
   ctx.restore();
 }
 

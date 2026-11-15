@@ -3,6 +3,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../i18n/en.json";
 import { CrewTalk } from "./CrewTalk";
 
+describe("CrewTalk answer menu", () => {
+  it("W A S D move the cursor like the arrow keys (by key position, so any keyboard layout works)", () => {
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.removeAttribute("open"); };
+    render(<CrewTalk speaker="commander" onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    const answers = screen.getAllByRole("button").filter((b) => b.closest(".crew-talk__menu"));
+    answers[0].focus();
+    const key = (code: string) => fireEvent.keyDown(document.activeElement!, { code, key: "x" });
+    key("KeyS"); expect(document.activeElement).toBe(answers[1]);
+    key("KeyD"); expect(document.activeElement).toBe(answers[2]);
+    key("KeyW"); expect(document.activeElement).toBe(answers[1]);
+    key("KeyA"); expect(document.activeElement).toBe(answers[0]);
+    key("KeyW"); expect(document.activeElement).toBe(answers[3]); // wraps round
+    key("ArrowDown"); expect(document.activeElement).toBe(answers[0]);
+  });
+});
+
 describe("CrewTalk typing", () => {
   const before = window.matchMedia;
   beforeEach(() => {

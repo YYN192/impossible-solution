@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
+import { gameKey } from "../game/pressedKeys";
 import {
   BLOCKS,
   CELLS,
@@ -225,7 +226,7 @@ function TypedLine({
   );
 }
 
-/** Answers like an old RPG menu: arrow keys move the ▶ cursor, Enter, E or a tap picks. */
+/** Answers like an old RPG menu: arrow keys or W A S D move the ▶ cursor, Enter, E or a tap picks. */
 function AnswerMenu({
   options,
   prompt,
@@ -235,7 +236,8 @@ function AnswerMenu({
 }) {
   const list = useRef<HTMLDivElement>(null);
   const move = (e: React.KeyboardEvent) => {
-    const d = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
+    const k = gameKey(e);
+    const d = ["arrowdown", "arrowright", "s", "d"].includes(k) ? 1 : ["arrowup", "arrowleft", "w", "a"].includes(k) ? -1 : 0;
     if (!d) return;
     e.preventDefault();
     const buttons = [...list.current!.querySelectorAll("button")];

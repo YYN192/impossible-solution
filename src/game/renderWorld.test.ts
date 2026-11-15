@@ -36,6 +36,5 @@ describe("sliding airlock", () => {
     const { leaf, light } = DOOR;
     expect(leaf.x + leaf.w).toBeLessThanOrEqual(32 - leaf.x);
     expect(light.y + light.h).toBeLessThanOrEqual(leaf.y);
-    expect(DOOR.lip).toBeGreaterThan(0);
   });
 });
