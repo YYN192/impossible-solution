@@ -80,7 +80,8 @@ export function BeatScreen() {
       <p className="lead">{tRun(`beat.${beat.id}.text`, vars)}</p>
       {beat.type === "radio" && (
         <p className="beat-delay">
-          {place ? t("beatUi.delayMoon") : t("beatUi.delayMars", { minutes: Math.round(setup.delay.seconds / 60) })}
+          {/* "today" only for a live reading; a saved one says so. */}
+          {place ? t("beatUi.delayMoon") : t(setup.delay.ref.mode === "live" ? "beatUi.delayMars" : "beatUi.delayMarsSaved", { minutes: Math.round(setup.delay.seconds / 60) })}
         </p>
       )}
       {beat.card && <DataChip source={beat.card} />}

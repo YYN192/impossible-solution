@@ -79,7 +79,8 @@
     "dustStorm_one": "The dust storm lasts {{count}} more sol.",
     "dustStorm_other": "The dust storm lasts {{count}} more sols.",
     "delay": "Your message took {{minutes}} minutes each way today.",
-    "delayMoon": "Your message took about 1.3 seconds each way."
+    "delayMoon": "Your message took about 1.3 seconds each way.",
+    "delaySaved": "Your message took about {{minutes}} minutes each way. This is a saved reading."
   },
   "chip": {
     "live": "Live NASA data",
@@ -193,7 +194,7 @@
     "dose": "The space-ray meter uses game units. Which storm is huge and which is small comes from real readings.",
     "forecast": "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
     "dates": "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
-    "real": "Real: three dated solar storms measured on Mars, the dust effect on solar panels, today's radio delay, and the landing places.",
+    "real": "Real: three dated solar storms measured on Mars, the dust effect on solar panels, the radio delay, and the landing places.",
     "storms": "Each storm is compared only with the quiet level just before it, on the same detector. A small storm is played as 3 times a normal day for a whole sol; its real peak lasted hours.",
     "sites": "Site numbers (sun, dust, heater, ice) and upgrade numbers are game numbers. The real record of each place decides which way they lean.",
     "moon": "On the Moon, the day the Sun hides behind a ridge and the days Earth is hidden are game events. So is the power cut of the 2018 dust storm.",
@@ -717,7 +718,8 @@
     "delayMars": "Your message takes {{minutes}} minutes each way today.",
     "delayMoon": "Your message takes about 1.3 seconds each way.",
     "answerNight": "Earth will answer by the morning.",
-    "now": "Now"
+    "now": "Now",
+    "delayMarsSaved": "Your message takes about {{minutes}} minutes each way. This is a saved reading."
   },
   "rule": {
     "solar": "Panels make {{n}} power a day",

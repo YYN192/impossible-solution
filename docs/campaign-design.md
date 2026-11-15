@@ -79,7 +79,7 @@ The game has one engine and several **campaigns**. A campaign is data: a place, 
 | S1 | 20 May 2024: Curiosity RAD measured 8.1 mGy from one solar storm, the largest since landing; flare estimated X12 (far side, Solar Orbiter); DONKI CME 2024-05-20T05:36Z | Storm pool | to verify |
 | S2 | 10 Sep 2017: X8.2 flare (AR 12673); Curiosity RAD saw surface radiation more than double any earlier reading; MAVEN saw a global aurora 25× brighter | Storm pool | to verify |
 | S3 | 28 Oct 2021: X1.0 flare; first ground-level event seen on Earth, the Moon and Mars at once (Guo et al. 2023); Mars surface dose far lower than in Mars orbit | Storm pool, Moon pool | to verify |
-| S4 | Peak vs total: 8.1 mGy ÷ 0.21 mGy/day ≈ 39 normal days (total); RadLab hourly peak 304 vs 4.1 µGy/h ≈ ×74 (peak rate) | One kid sentence | to verify |
+| S4 | Peak only: RadLab hourly peak 304 vs about 4 µGy/h ≈ ×74. The older "N normal days" framing is dropped (it mixed a 2024 total with a 2012 baseline) | One kid sentence: "more than 50 times stronger than usual" | verified 15 Nov |
 | S5 | A big, active sunspot group facing a planet raises the chance of a burst; nobody can give the exact hour | Earth's "burst risk" answer | to verify |
 | D1 | InSight Oct 2022 dust storm: 425 → 275 Wh per sol | Dust pool | verified earlier (14 Nov) |
 | D2 | InSight made about 5,000 Wh per sol at landing (2018) and about 500 Wh by mid-2022; mission ended Dec 2022 | Dust Season briefing | to verify |

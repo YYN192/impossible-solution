@@ -25,6 +25,9 @@ import type { Flags } from "./flags";
 import { DEMO_START } from "./demo";
 import { DONKI_ENLIL_MAY23, earthAnswerRef, RAD_STORM } from "./sources";
 
+/** DONKI activity ID of the 20 May 2024 eruption (from our snapshot), shown on the storm card. */
+const MAY2024_ID = "2024-05-20T05:36:00-CME-001";
+
 export type MissionKind = "may2024" | "todaysSun" | "campaign";
 
 export interface MissionSetup {
@@ -108,6 +111,7 @@ export function may2024Mission(): MissionSetup {
       {
         sol: 2,
         kind: "particleBurst",
+        id: MAY2024_ID,
         captionKey: "event.burst.may2024",
         source: RAD_STORM,
       },
@@ -116,6 +120,7 @@ export function may2024Mission(): MissionSetup {
             {
               sol: 3,
               kind: "stormCloud" as const,
+              id: MAY2024_ID,
               captionKey: "event.stormCloud.may2024",
               source: cloudRef,
             },

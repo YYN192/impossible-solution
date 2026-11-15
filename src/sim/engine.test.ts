@@ -153,7 +153,7 @@ describe("power and air", () => {
   });
 });
 
-describe("space rays (real ratio: a burst ≈ 39 normal days, Curiosity RAD)", () => {
+describe("space rays (the huge storm stands for 20 May 2024, Curiosity RAD)", () => {
   it("a normal day inside adds the normal daily dose", () => {
     const g = createGame();
     expect(step(g, { a1: "panels", a2: "greenhouse" }, NONE).state.bars.dose).toBeCloseTo(g.bars.dose + DOSE.normalDay + DOSE.outsideExtra);

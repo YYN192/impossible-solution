@@ -309,7 +309,7 @@ describe("particle burst", () => {
     expect(r.fell.find((d) => d.id === "sol1-dose-high")?.source?.url).toBe("https://example.test/burst");
   });
 
-  it("being outside in a burst gives the big dose (39 × a normal day)", () => {
+  it("being outside in a burst gives the big dose (the huge May 2024 storm)", () => {
     const r = step(initialState(), plan("science"), [burstOn(1)]);
     expect(r.state.bars.dose).toBeCloseTo(DOSE.burstOutside);
     expect(r.fell.find((d) => d.id === "sol1-dose-high")?.causeIds).toContain("sol1-shelter-skipped");

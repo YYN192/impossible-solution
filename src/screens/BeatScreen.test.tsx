@@ -49,9 +49,10 @@ describe("beat screen: one interaction per sol, through the engine", () => {
     expect((screen.getByRole("button", { name: new RegExp(t("beat.upgrade.none.label")) }) as HTMLButtonElement).disabled).toBe(false);
   });
 
-  it("the radio beat shows today's light delay and where it came from", () => {
+  it("the radio beat shows the light delay and where it came from; a saved reading is never called today's", () => {
     open("dust", 4);
-    screen.getByText(t("beatUi.delayMars", { minutes: 11 }));
+    screen.getByText(t("beatUi.delayMarsSaved", { minutes: 11 }));
+    expect(screen.queryByText(/today/)).toBeNull();
     expect(screen.getByText(/Deep Space Network/)).toBeTruthy();
   });
 

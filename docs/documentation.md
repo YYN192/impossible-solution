@@ -62,7 +62,7 @@ Every real number in the game has a NASA source; every other number is labelled 
 | Real data | Real value | Used in the game for |
 | --- | --- | --- |
 | [Curiosity RAD, 20 May 2024 storm (JPL)](https://www.jpl.nasa.gov/news/nasa-watches-mars-light-up-during-epic-solar-storm/) | 8.1 mGy absorbed dose from one storm | How far the space-ray meter jumps in a particle burst |
-| [Curiosity RAD surface baseline (Hassler et al., Science 2014)](https://doi.org/10.1126/science.1244797) | 0.21 mGy/day (0.64 mSv/day) | The normal daily rise; the burst equals about 39 normal days |
+| [Curiosity RAD surface baseline (Hassler et al., Science 2014)](https://doi.org/10.1126/science.1244797) | 0.21 mGy/day (0.64 mSv/day) | The normal daily rise (not compared with the 2024 storm: different years and series) |
 | [InSight dust and solar power (JPL)](https://www.jpl.nasa.gov/news/nasas-insight-waits-out-dust-storm/) | 425 → 275 Wh per sol in a 2022 dust storm (about −35%) | Skipping panel cleaning lowers tomorrow's power by about a third |
 | [DONKI CME 2024-05-20T05:36:00-CME-001](https://ccmc.gsfc.nasa.gov/DONKI/view/CME/31034/-1) | The 20 May 2024 eruption, about 1,900–2,700 km/s | The storm on sol 2 of the main mission |
 | [DONKI WSA-Enlil forecast](https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/31103/-1) | 23 May 2024 CME forecast to brush past Mars on 28 May, ~11:30 UTC | Ask Earth's "a storm cloud is coming" answer |
@@ -132,7 +132,7 @@ NASA data flows down into storm events; the engine turns each sol's plan into a 
 - A `Plan` maps each astronaut (`a1`–`a3`) to a job; unassigned astronauts are idle.
 - A `Domino` has an `id` such as `sol1-panels-skipped`, the `sol`, an `icon`, a `textKey` into `en.json`, and `causeIds` that point to earlier dominoes. The final screen follows `causeIds` back to the first cause.
 - A `StormEvent` (particle burst or storm cloud) comes from the data layer with its `captionKey` and a `DataRef` source.
-- `MISSION_SOLS = 3`. The numbers in `JOBS`, `NIGHT` and `DOSE` are game numbers, except the burst size, which keeps the real ratio of 8.1 mGy to 0.21 mGy per day (about 39 normal days).
+- `MISSION_SOLS = 3`. The numbers in `JOBS`, `NIGHT` and `DOSE` are game numbers, and storm size comes from one real ratio per storm: worst hour ÷ quiet level in the same RadLab series (May 2024 about 74 times, Sep 2017 and Oct 2021 about 3 times).
 
 **Text**: screens call `t("morning.heading")`; keys are typed against `en.json`, so a wrong key fails the build. Keys that arrive at runtime (domino and storm captions) go through `tDynamic`, which shows the key instead of crashing if it is missing.
 

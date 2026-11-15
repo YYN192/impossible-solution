@@ -25,7 +25,7 @@ export function EarthAnswer({ answer }: { answer: Answer }) {
       {setup && (
         <>
           <p className="note">
-            {moon ? t("earth.delayMoon") : t("earth.delay", { minutes: Math.round(setup.delay.seconds / 60) })}
+            {moon ? t("earth.delayMoon") : t(setup.delay.ref.mode === "live" ? "earth.delay" : "earth.delaySaved", { minutes: Math.round(setup.delay.seconds / 60) })}
           </p>
           <DataChip source={setup.delay.ref} />
         </>
