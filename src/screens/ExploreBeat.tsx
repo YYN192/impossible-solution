@@ -1,5 +1,5 @@
 import { Icon } from "../components/Icon";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
@@ -47,6 +47,23 @@ export function ExploreBeat({ map, beat, onDone }: { map: ExploreMap; beat?: Bea
     setDrive(next);
   }
 
+  // WASD and the arrows drive from the first press, with no click on the map first: one listener on the page,
+  // reading the latest go() through a ref. Not while typing in a field or while a dialog is open on top.
+  const latest = useRef(go);
+  useEffect(() => { latest.current = go; });
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      const dir = KEYS[gameKey(e)];
+      if (!dir || e.defaultPrevented) return;
+      if (e.target instanceof HTMLElement && e.target.closest("input, textarea, select, [contenteditable]")) return;
+      if (document.querySelector("dialog[open]")) return;
+      e.preventDefault(); // arrows must not scroll the page while driving
+      latest.current(dir);
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, []);
+
   return (
     <div ref={box} className="explore">
       <div
@@ -55,12 +72,6 @@ export function ExploreBeat({ map, beat, onDone }: { map: ExploreMap; beat?: Bea
         tabIndex={0}
         aria-label={t("exploreUi.map")}
         style={{ gridTemplateColumns: `repeat(${map.cols}, 1fr)` }}
-        onKeyDown={(e) => {
-          const dir = KEYS[gameKey(e)];
-          if (!dir) return;
-          e.preventDefault();
-          go(dir);
-        }}
       >
         {drive.battery === 0 && !home && <p className="explore-nopower" role="alert">{t("exploreUi.noPower")}</p>}
         {map.cells.map((cell, i) => {

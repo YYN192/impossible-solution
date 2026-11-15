@@ -63,13 +63,15 @@ export async function endSol(page, mode = "mouse") {
   await btn(page, EN.plan.endSol, mode, { prefix: true });
   const confirm = button(page, EN.play.confirmEnd, { prefix: true });
   if (await confirm.isVisible().catch(() => false)) await press(page, confirm, mode);
-  await page.getByRole("heading", { name: /^(Night falls|Mission over)/ }).first().waitFor(wait);
+  await page.getByRole("heading", { name: /^(Night falls|Mission complete|Mission ended early)/ }).first().waitFor(wait); // #67: "Mission over" became "Mission complete! N of 3 stars"
 }
 /** From the night screen: next morning, or the final screen. */
 export const nextFromNight = async (page, mode = "mouse") => {
   await press(page, page.getByRole("button", { name: new RegExp(`^(${esc(EN.endSol.nextMorning)}|${esc(EN.endSol.seeResults)})`) }).first(), mode);
 };
-export const atFinal = (page) => heading(page, EN.final.heading).isVisible().catch(() => false);
+/** The final heading starts "Mission complete!"; the star count after it changes (#67), so match the start only. */
+const FINAL_HEADING = EN.final.heading.split("{{")[0].trim();
+export const atFinal = (page) => heading(page, FINAL_HEADING).isVisible().catch(() => false);
 /** A dust storm calls the crew back to the base: close the alarm, wipe the panels (airlock), fix the greenhouse,
  *  go back to the console. The jobs are reached by tapping the world (keyboard runs use the mouse for this part). */
 export async function weatherStorm(page, mode = "mouse") {
@@ -100,7 +102,7 @@ export async function playToFinal(page, mode = "mouse") {
     else if (await button(page, EN.morning.goPlan).isVisible()) { await toPlan(page, mode); await assignAll(page, mode); await endSol(page, mode); }
     else if (await page.getByRole("button", { name: new RegExp(`^(${esc(EN.endSol.nextMorning)}|${esc(EN.endSol.seeResults)})`) }).first().isVisible()) await nextFromNight(page, mode);
   }
-  await heading(page, EN.final.heading).waitFor(wait);
+  await heading(page, FINAL_HEADING).waitFor(wait);
 }
 export const openSources = (page, mode = "mouse") => btn(page, EN.dataSources.open, mode).then(() => heading(page, EN.dataSources.title).waitFor(wait));
 export const openTeacher = (page, mode = "mouse") => btn(page, EN.teacher.open, mode).then(() => heading(page, EN.teacher.title).waitFor(wait));

@@ -61,7 +61,8 @@ button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: inset
 button:disabled { opacity: 1; color: #aab6c2; background: #141d29; border-color: var(--steel); box-shadow: none; }
 button.primary { background: #83d9f4; border-color: #e8f0f7; color: #08202a; font-weight: 700; }
 button.primary:hover:not(:disabled) { background: #b6ecfb; }
-button[aria-pressed="true"]:not(.job-choice):not(.sound-toggle):not(.crew-tile > button) { background: #83d9f4; border-color: #e8f0f7; color: #08202a; }
+/* Not for cards with dark chips inside (the picked spare part, a picked radar day): they style their own pressed look. */
+button[aria-pressed="true"]:not(.job-choice):not(.sound-toggle):not(.crew-tile > button):not(.build-part):not(.radar-day) { background: #83d9f4; border-color: #e8f0f7; color: #08202a; }
 button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 6px #4c9ce5; }
 .quiet-button, .go-console { background: transparent; border-color: var(--steel); box-shadow: none; color: #cfdae4; }
 
@@ -404,3 +405,13 @@ html[data-contrast] .teacher__bar > :not(.primary) { color: #fff; border-color: 
 @keyframes sol-pop { from { transform: scale(0.6); opacity: 0; } }
 @keyframes sol-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 @media (prefers-reduced-motion: reduce) { .sol-change, .sol-change.bad { animation: none; } }
+/* #106: fast travel on the airlock map. A base you can go to is a full-width button row, its marker is
+   tappable too, and the "Travel to ...?" question sits above the planets with one gold Travel button. */
+.site-map-place li > .site-map-go { display: flex; gap: 10px; align-items: center; width: 100%; min-height: var(--tap, 48px); padding: 8px 10px; text-align: left; }
+.site-map-go span { font-weight: 400; }
+.site-map-go[data-asking] { outline: 3px solid #f2c94c; outline-offset: 2px; }
+.site-map-marker[data-go] { cursor: pointer; }
+.site-map-ask { margin: 8px 0 4px; padding: 10px 12px; border: var(--px, 4px) solid #f2c94c; background: #241f0f; }
+.site-map-ask p { margin: 0 0 8px; font-weight: 700; }
+.site-map-ask .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+.site-map-ask button { scroll-margin-top: 10rem; } /* focusing Travel on a phone keeps the question in view under the sticky header */

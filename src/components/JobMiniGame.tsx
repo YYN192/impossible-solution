@@ -31,11 +31,12 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const setGame = (next: MiniGame) => { now.current = next; setGameState(next); };
   const box = useRef<HTMLDialogElement>(null);
   const done = won(game);
+  // The shelter block slides from the start: otherwise the first "Drop the block" only started it and dropped nothing.
   const { started, paused, togglePause, go } = useGameClock(done, () => {
     const g = now.current, n = tick(g);
     if (setbackIn(g, n)) mistake("small", box.current);
     setGame(n);
-  });
+  }, job === "shelter");
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
   useEffect(() => audio.miniGameOpened(), []);
@@ -51,7 +52,6 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const play = (move: Move, sound = "console-button") => {
     go();
     const game = now.current;
-    if (!started && game.job === "shelter") return; // the first press only starts the sliding block
     const nextGame = move(game);
     if (nextGame === game) return;
     const missed = "miss" in nextGame && nextGame.miss;

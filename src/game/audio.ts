@@ -207,6 +207,7 @@ const FADE_OUT = 0.4, FADE_IN = 0.3;
 
 let intent: MusicIntent = { scene: "off", storm: false };
 const openMiniGames = new Set<symbol>();
+const musicHolds = new Set<symbol>();
 let random = Math.random;
 interface Entry {
   id: string;
@@ -283,6 +284,7 @@ function startTrack(id: string, mode: Entry["mode"]) {
 
 /** Make the music match the intent. Idempotent: safe to call on every change. */
 function reconcileMusic() {
+  if (musicHolds.size) return stopPlaying(0);
   if (!ctx) return; // nothing before the first tap
   if (!audible("music")) {
     // Muted / Music 0 / Master 0: the gains are 0 already; stop after the mute blip (no hidden playback).
@@ -339,6 +341,13 @@ if (typeof document !== "undefined") document.addEventListener("visibilitychange
 export const audio = {
   unlock,
   autostart,
+  /** Brief failure beat: silence music only, even if a click tries to unlock audio. */
+  holdMusic: () => {
+    const token = Symbol("music hold");
+    musicHolds.add(token);
+    stopPlaying(0);
+    return () => { musicHolds.delete(token); reconcileMusic(); };
+  },
   playSfx: (id: string, gapMs = id === "volume-change" ? 150 : 70) => {
     if (id === "step")
       id = (stepFlip = !stepFlip)

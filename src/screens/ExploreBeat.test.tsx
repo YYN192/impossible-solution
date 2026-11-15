@@ -8,6 +8,32 @@ import { ExploreBeat } from "./ExploreBeat";
 const t = i18n.t.bind(i18n) as unknown as (k: string, o?: object) => string;
 const map = campaignMission("storm", 3).beats[1].map!;
 
+describe("rover drive: keys work at once, no click on the map first", () => {
+  const openDir = () => {
+    const cost = reachCost(map);
+    return ([["d", 1, 0], ["a", -1, 0], ["s", 0, 1], ["w", 0, -1]] as const)
+      .find(([, dx, dy]) => Number.isFinite(cost[(map.base.y + dy) * map.cols + map.base.x + dx]))!;
+  };
+  it("WASD on the page moves the rover while the map does not have focus", () => {
+    render(<ExploreBeat map={map} onDone={vi.fn()} />);
+    expect(document.activeElement).not.toBe(screen.getByRole("application"));
+    fireEvent.keyDown(window, { key: openDir()[0], code: `Key${openDir()[0].toUpperCase()}` });
+    screen.getByText(t("exploreUi.away"));
+  });
+  it("one key press is one move, also when the map has focus (no double step)", () => {
+    render(<ExploreBeat map={map} onDone={vi.fn()} />);
+    screen.getByRole("application").focus();
+    fireEvent.keyDown(screen.getByRole("application"), { key: openDir()[0], code: `Key${openDir()[0].toUpperCase()}` });
+    expect(document.querySelectorAll(".explore-cell img.explore-rover")).toHaveLength(1);
+    expect(Number(/\d+/.exec(document.querySelector(".explore-battery")!.textContent!)![0])).toBeGreaterThanOrEqual(EXPLORE.battery - 2);
+  });
+  it("keys typed in a field or behind an open dialog do not drive", () => {
+    render(<><input aria-label="note" /><ExploreBeat map={map} onDone={vi.fn()} /></>);
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: openDir()[0] });
+    screen.getByText(t("exploreUi.home"));
+  });
+});
+
 describe("rover drive on the map", () => {
   it("draws the real-colour map with the base, the rover and the samples", () => {
     render(<ExploreBeat map={map} onDone={vi.fn()} />);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { MENU_CAMPAIGNS } from "../data/campaigns";
-import { mapSites, type SiteState } from "./siteMap";
+import { canTravel, mapSites, type SiteState } from "./siteMap";
 
 const states = (done: string[], current?: string, teacher = false) =>
   Object.fromEntries(mapSites(MENU_CAMPAIGNS, { done, teacher }, current).map((s) => [s.id, s.state])) as Record<string, SiteState>;
@@ -45,5 +45,15 @@ describe("mission sites on the airlock map", () => {
       expect(s.at.x).toBeGreaterThanOrEqual(8); expect(s.at.x).toBeLessThanOrEqual(92);
       expect(s.at.y).toBeGreaterThanOrEqual(8); expect(s.at.y).toBeLessThanOrEqual(92);
     }
+  });
+});
+
+describe("fast travel from the airlock map (#106)", () => {
+  const travel = (done: string[], current?: string) =>
+    mapSites(MENU_CAMPAIGNS, { done, teacher: false }, current).filter(canTravel).map((s) => s.id);
+  it("open and done bases can be travelled to; locked ones and the base you are on cannot", () => {
+    expect(travel([])).toEqual(["storm"]); // a new player on the quick mission: only the first base is open
+    expect(travel(["storm"], "storm")).toEqual(["dust"]); // storm is "here", dust just opened, the Moon is locked
+    expect(travel(["storm", "dust"], "dust")).toEqual(["storm", "moon"]); // a done base can be replayed
   });
 });

@@ -54,14 +54,14 @@ describe("complete expedition", () => {
       expect(useGame.getState().state).toEqual(expected);
       click(sol < 3 ? t("endSol.nextMorning") : t("endSol.seeResults"));
     }
-    screen.getByRole("heading", { name: t("final.heading") });
+    screen.getByRole("heading", { name: /^Mission complete! \d of 3 stars$/ });
     expect(document.querySelectorAll(".chain").length).toBeGreaterThan(0);
     expect(document.querySelectorAll(".chain .chip a").length).toBeGreaterThan(0);
     click(t("final.tryAgain"));
     expect(useGame.getState().state).toEqual(start);
     expect(useMission.getState().setup).toBe(setup);
     screen.getByRole("heading", { name: t("morning.heading", { sol: 1 }) });
-  });
+  }, 20_000); // plays a whole run and replays it (about 4 s alone): under a full parallel run it needs more than the 5 s default
   it("keeps a draft and the player's position while leaving the console", async () => {
     await launch(); click(t("morning.goPlan"));
     const start = useGame.getState().state;

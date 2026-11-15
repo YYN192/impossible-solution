@@ -54,11 +54,11 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   }
   for (const x of [32, 592]) sprite("environment/decorations/mars-pipe", x, 144, 16, 64);
   for (const x of [64, 192, 416, 560]) sprite("environment/decorations/mars-vent", x, 336, 32, 16);
-  // Console bay guide (#55): the raised edge glows in hard pixel rings that grow and shrink until the first sol
-  // starts. It rests once the player arrives, and while a storm sends them elsewhere first.
-  if (near !== "console" && !storm.marks.length) {
+  // Console bay guide (#55): keep the pixel glow throughout the mission, steady when nearby.
+  // Hide it while storm repairs need the player's attention elsewhere.
+  if (!storm.marks.length) {
     ctx.lineWidth = 2; ctx.strokeStyle = "#83d9f4"; ctx.strokeRect(272, 108, 96, 91);
-    for (let i = 1; i <= consoleGlow(time, reduced, running); i++) {
+    for (let i = 1; i <= consoleGlow(time, reduced || near === "console", running); i++) {
       ctx.strokeStyle = ["#83d9f4b0", "#83d9f470", "#83d9f438"][i - 1];
       ctx.strokeRect(272 - 3 * i, 108 - 3 * i, 96 + 6 * i, 91 + 6 * i);
     }
@@ -150,10 +150,10 @@ export const DOOR = {
 /** Smooth start and stop: the panels ease out of the frame and settle into the wall. */
 export const easeInOut = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 /** Opening progress 0–1 after `dt` ms, moving toward open (`near`) or shut. Reduced motion jumps straight there. */
-/** How many glow rings light the console edge (#55): 0 1 2 3 2 1 in 300 ms steps (a 1.8 s pulse) until the
- *  mission is running; none with reduced motion, so the plain outline stays still. */
+/** Always-visible pixel rings (#55): a 1.8 s pulse before launch, 2.4 s during the mission.
+ *  Reduced motion keeps two steady rings. */
 export const consoleGlow = (time: number, reduced: boolean, running: boolean) =>
-  running || reduced ? 0 : [0, 1, 2, 3, 2, 1][Math.floor(time / 300) % 6];
+  reduced ? 2 : [1, 2, 3, 3, 2, 1][Math.floor(time / (running ? 400 : 300)) % 6];
 
 export function doorStep(progress: number, near: boolean, dt: number, reduced: boolean) {
   if (reduced) return near ? 1 : 0;

@@ -95,7 +95,7 @@ describe("airlock map: mission sites", () => {
     expect(screen.queryByTestId("site-base")).toBeNull();
   });
 
-  it("is view only: sites are not buttons", () => {
+  it("locked bases and the base you are on are not buttons (#106)", () => {
     render(<SiteMap current="storm" onClose={vi.fn()} />);
     expect(screen.getAllByRole("button")).toHaveLength(1); // just the X
   });
@@ -106,5 +106,48 @@ describe("airlock map: mission sites", () => {
     expect(within(site("storm")).getByText(t("campaign.storm.name"))).toBeTruthy();
     expect(t("campaign.storm.name")).toBe("Сезонът на бурите");
     expect(screen.getByRole("dialog", { name: t("siteMap.title") })).toBeTruthy();
+  });
+});
+
+describe("airlock map: fast travel (#106)", () => {
+  const ask = () => screen.queryByRole("group", { name: t("siteMap.travelAsk", { name: t("campaign.dust.name") }) });
+
+  it("an open base is a button; picking it asks first, and Travel goes there", () => {
+    useProgress.setState({ done: ["storm"] });
+    const onTravel = vi.fn();
+    render(<SiteMap current="storm" onClose={vi.fn()} onTravel={onTravel} />);
+    fireEvent.click(within(site("dust")).getByRole("button"));
+    expect(onTravel).not.toHaveBeenCalled(); // a mistap never ends the mission being played
+    expect(ask()).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: t("siteMap.travel") }));
+    fireEvent.click(screen.getByRole("button", { name: t("siteMap.travel") }));
+    expect(onTravel).toHaveBeenCalledWith("dust");
+  });
+
+  it("Stay here changes nothing", () => {
+    useProgress.setState({ done: ["storm"] });
+    const onTravel = vi.fn();
+    render(<SiteMap current="storm" onClose={vi.fn()} onTravel={onTravel} />);
+    fireEvent.click(within(site("dust")).getByRole("button"));
+    fireEvent.click(screen.getByRole("button", { name: t("siteMap.stay") }));
+    expect(ask()).toBeNull();
+    expect(onTravel).not.toHaveBeenCalled();
+  });
+
+  it("tapping the base's marker on the planet picture asks too (mouse and touch)", () => {
+    useProgress.setState({ done: ["storm"] });
+    render(<SiteMap current="storm" onClose={vi.fn()} onTravel={vi.fn()} />);
+    fireEvent.click(document.querySelector('.site-map-marker[data-site="dust"]')!);
+    expect(ask()).toBeTruthy();
+    fireEvent.click(document.querySelector('.site-map-marker[data-site="moon"]')!); // locked: nothing
+    expect(ask()).toBeTruthy();
+  });
+
+  it("a done base can be replayed, and the open-site text says how to go there", () => {
+    useProgress.setState({ done: ["storm", "dust"] });
+    render(<SiteMap current="dust" onClose={vi.fn()} onTravel={vi.fn()} />);
+    expect(within(site("storm")).getByRole("button")).toBeTruthy();
+    expect(within(site("moon")).getByText(t("siteMap.state.open"))).toBeTruthy();
+    expect(t("siteMap.state.open")).not.toMatch(/menu/i);
   });
 });

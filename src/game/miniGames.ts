@@ -120,7 +120,8 @@ export function tick(game: MiniGame): MiniGame {
     }
     case "shelter": {
       if (ticks % game.every) return { ...game, ticks };
-      return { ...game, ticks, ...bounce(game.pos, game.dir) };
+      // Moving on clears the "oops" from a miss, so the "Now! Drop it!" cue can show again.
+      return { ...game, ticks, miss: false, ...bounce(game.pos, game.dir) };
     }
     case "askEarth": {
       if (ticks % EARTH_EVERY) return { ...game, ticks };

@@ -1,0 +1,18 @@
+/* First-play guide (#64): it only points; every tap goes straight through it. */
+.guide, .guide * { pointer-events: none; }
+.guide { position: fixed; inset: 0; z-index: 40; }
+.guide-ring { position: fixed; border: 3px solid #83d9f4; box-shadow: 0 0 0 3px #080b12, 0 0 14px 2px #83d9f488; animation: guide-pulse 1.4s ease-in-out infinite; }
+.guide-bubble { position: fixed; padding: 10px 14px; background: #f2f6fa; color: #080b12; border: 3px solid #080b12; box-shadow: 4px 4px 0 #080b12; font-size: 1rem; font-weight: 700; line-height: 1.35; }
+.guide-bubble.above { transform: translateY(-100%); }
+.guide-bubble p { margin: 0; }
+/* The tail points at the control: below the bubble when the bubble is above it, and the other way round. */
+.guide-bubble::after { content: ""; position: absolute; left: calc(var(--tail) - 9px); width: 14px; height: 14px; background: #f2f6fa; border: 3px solid #080b12; transform: rotate(45deg); }
+.guide-bubble.below::after { top: -10px; border-right: 0; border-bottom: 0; }
+.guide-bubble.above::after { bottom: -10px; border-left: 0; border-top: 0; }
+.guide-goals { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; font-weight: 400; }
+.guide-goals li { display: flex; align-items: center; gap: 6px; }
+.guide-goals .px-icon { width: 20px; height: 20px; }
+@keyframes guide-pulse { 50% { box-shadow: 0 0 0 3px #080b12, 0 0 22px 6px #83d9f4aa; } }
+@media (prefers-reduced-motion: reduce) { .guide-ring { animation: none; } }
+html[data-calm] .guide-ring { animation: none; }
+.guide-toggle span { display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; border: 2px solid currentColor; border-radius: 50%; font-weight: 700; line-height: 1; }
