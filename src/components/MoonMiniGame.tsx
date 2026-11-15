@@ -19,34 +19,45 @@ const Sprite = ({ name, className = "" }: { name: string; className?: string }) 
  */
 export function MoonMiniGame({ job, seed, onClose }: { job: JobId; seed: number; onClose: (won: boolean) => void }) {
   const { t } = useTranslation();
-  const [game, setGame] = useState<MoonGame>(() => startMoonGame(job, seed));
+  const [game, setGameState] = useState<MoonGame>(() => startMoonGame(job, seed));
+  // The newest game, updated the moment it changes, so quick presses and clock ticks never undo each other.
+  const now = useRef(game);
+  const setGame = (next: MoonGame) => { now.current = next; setGameState(next); };
   const box = useRef<HTMLDialogElement>(null);
   const done = moonWon(game);
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
   useEffect(() => audio.miniGameOpened(), []);
-  const { started, paused, togglePause, go } = useGameClock(done, () => setGame((g) => moonTick(g)));
+  const { started, paused, togglePause, go } = useGameClock(done, () => setGame(moonTick(now.current)));
   useEffect(() => { if (done) audio.playSfx("job-complete"); }, [done]);
-  const play = (next: MoonGame, sound = "console-button") => {
+  const play = (move: (game: MoonGame) => MoonGame, sound = "console-button") => {
     go();
-    if (next === game) return;
+    const next = move(now.current);
+    if (next === now.current) return;
     const oops = ("full" in next && next.full) || ("dark" in next && next.dark);
     audio.playSfx(oops ? "menu-error" : sound);
     setGame(next);
   };
+  // Sun panel keys live on window (like Mars Ask Earth): the ← / → button disables at the edge and focus would drop to <body>.
+  useEffect(() => {
+    if (game.job !== "panels" || done) return;
+    const onWindowKey = (e: KeyboardEvent) => {
+      const k = gameKey(e);
+      const by = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
+      if (by) { e.preventDefault(); play((g) => moonTurn(g, by)); }
+    };
+    window.addEventListener("keydown", onWindowKey);
+    return () => window.removeEventListener("keydown", onWindowKey);
+  });
   const onKey = (e: React.KeyboardEvent<HTMLDialogElement>) => {
     if (done) return;
     const k = gameKey(e.nativeEvent);
     const onButton = e.target instanceof HTMLButtonElement;
-    if (game.job === "panels") {
-      const by = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
-      if (by) { e.preventDefault(); play(moonTurn(game, by)); }
-      return;
-    }
-    if (game.job === "shelter" && (k === " " || k === "enter") && !onButton) { e.preventDefault(); play(moonPour(game), "job-assign"); return; }
+    if (game.job === "panels") return; // on window, below
+    if (game.job === "shelter" && (k === " " || k === "enter") && !onButton) { e.preventDefault(); play(moonPour, "job-assign"); return; }
     if (game.job === "askEarth" && (k === " " || k === "enter") && !onButton) {
       e.preventDefault();
-      play(game.phase === "arrived" ? moonRead(game) : moonSend(game), "earth-message-send");
+      play((g) => g.job === "askEarth" && g.phase === "arrived" ? moonRead(g) : moonSend(g), "earth-message-send");
       return;
     }
     // Grid games: arrows move focus between the tiles.
@@ -103,7 +114,7 @@ function Hint({ game }: { game: MoonGame }) {
   }
 }
 
-function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: string) => void }) {
+function Board({ game, play }: { game: MoonGame; play: (move: (g: MoonGame) => MoonGame, sound?: string) => void }) {
   const { t } = useTranslation();
   const row = (size: number, fill: (i: number) => React.ReactNode, className = "") =>
     <div className={`mini-row ${className}`} aria-hidden="true">{Array.from({ length: size }, (_, i) => <span key={i}>{fill(i)}</span>)}</div>;
@@ -114,8 +125,8 @@ function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: str
         {row(SUN_STEPS, (i) => i === game.sun ? <Sprite name="minigame/moon-sun" className="big moon-sun" /> : <Sprite name="minigame/star" className="star" />, "mini-sky moon-sky")}
         {row(SUN_STEPS, (i) => i === game.aim ? <Sprite name="campaign/panel-clean" className={`big panel-here ${facing ? "aimed" : ""}`} /> : null, "mini-sky dish moon-ground")}
         <div className="mini-dish-controls">
-          <button type="button" autoFocus disabled={game.aim === 0} onClick={() => play(moonTurn(game, -1))}><span aria-hidden="true">←</span> {t("miniGame.moon.panels.left")}</button>
-          <button type="button" disabled={game.aim === SUN_STEPS - 1} onClick={() => play(moonTurn(game, 1))}>{t("miniGame.moon.panels.right")} <span aria-hidden="true">→</span></button>
+          <button type="button" autoFocus disabled={game.aim === 0} onClick={() => play((g) => moonTurn(g, -1))}><span aria-hidden="true">←</span> {t("miniGame.moon.panels.left")}</button>
+          <button type="button" disabled={game.aim === SUN_STEPS - 1} onClick={() => play((g) => moonTurn(g, 1))}>{t("miniGame.moon.panels.right")} <span aria-hidden="true">→</span></button>
         </div>
       </>;
     }
@@ -124,7 +135,7 @@ function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: str
         const state = ice === 0 ? "water" : ice === ICE_SOLID ? "frozen" : "melting";
         return <button key={i} type="button" autoFocus={i === 0} className={`mini-tile ice ${state}`} aria-pressed={ice === 0}
           aria-label={t("miniGame.moon.greenhouse.block", { n: i + 1, state: t(`miniGame.moon.greenhouse.${state}`) })}
-          onClick={() => play(moonTap(game, i))}>
+          onClick={() => play((g) => moonTap(g, i))}>
           <Sprite name={ice === 0 ? "minigame/moon-water" : `minigame/moon-ice-${ice}`} className="big" />
           {ice === 0 && <span className="mini-drops"><Sprite name="minigame/check" /></span>}
         </button>;
@@ -136,7 +147,7 @@ function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: str
           <span key={i} className="moon-pile">{Array.from({ length: PILE_MAX }, (_, j) =>
             <Sprite key={j} name={j < p ? "minigame/moon-dirt" : "minigame/block-slot"} className="wide" />).reverse()}</span>)}</div>
         <div className="mini-dish-controls">
-          <button type="button" className="primary" autoFocus onClick={() => play(moonPour(game), "job-assign")}>{t("miniGame.moon.shelter.pour")}</button>
+          <button type="button" className="primary" autoFocus onClick={() => play(moonPour, "job-assign")}>{t("miniGame.moon.shelter.pour")}</button>
         </div>
       </>;
     case "askEarth": {
@@ -153,8 +164,8 @@ function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: str
           {game.phase === "arrived" && <Sprite name="minigame/moon-reply" className="moon-letter" />}
         </div>
         <div className="mini-dish-controls">
-          <button type="button" autoFocus disabled={game.phase !== "ready"} onClick={() => play(moonSend(game), "earth-message-send")}>{t("miniGame.moon.askEarth.send")}</button>
-          <button type="button" className="primary" disabled={game.phase !== "arrived"} onClick={() => play(moonRead(game), "job-complete")}>{t("miniGame.moon.askEarth.read")}</button>
+          <button type="button" autoFocus disabled={game.phase !== "ready"} onClick={() => play(moonSend, "earth-message-send")}>{t("miniGame.moon.askEarth.send")}</button>
+          <button type="button" className="primary" disabled={game.phase !== "arrived"} onClick={() => play(moonRead, "job-complete")}>{t("miniGame.moon.askEarth.read")}</button>
         </div>
       </>;
     }
@@ -164,7 +175,7 @@ function Board({ game, play }: { game: MoonGame; play: (g: MoonGame, sound?: str
         const state = !lit ? "dark" : ice ? "ice" : "empty";
         return <button key={i} type="button" autoFocus={i === 0} className={`mini-tile hole ${lit ? "lit" : "dark"}`}
           aria-label={t("miniGame.moon.science.hole", { n: i + 1, state: t(`miniGame.moon.science.${state}`) })}
-          onClick={() => play(moonTap(game, i), "science-discovery")}>
+          onClick={() => play((g) => moonTap(g, i), "science-discovery")}>
           {lit && <Sprite name="minigame/moon-lamp" className="moon-beam" />}
           {lit && ice && <Sprite name="minigame/moon-ice" className="rock" />}
           {lit && ice && <Sprite name="minigame/sparkle" className="glint" />}

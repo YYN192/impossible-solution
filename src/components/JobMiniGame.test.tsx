@@ -177,6 +177,24 @@ describe("mini-games with the keyboard (#63)", () => {
     expect(column(".dish-here")).toBe(start);
   });
 
+  it("Ask Earth: quick presses all count, and a press never undoes the clock's move", () => {
+    render(<JobMiniGame job="askEarth" seed={SEED} onClose={vi.fn()} />);
+    const start = column(".dish-here");
+    const code = start > 0 ? "ArrowLeft" : "ArrowRight", by = start > 0 ? -1 : 1;
+    const press = () => window.dispatchEvent(new KeyboardEvent("keydown", { code, key: code, bubbles: true }));
+    // Two presses before React re-renders (a fast double tap or a held key): both must move the dish.
+    act(() => { press(); press(); });
+    expect(column(".dish-here")).toBe(start + 2 * by);
+    // A clock tick lands between React's render and the next press: Earth must not jump back.
+    act(() => { vi.advanceTimersByTime(TICK_MS * 3); });
+    const earth = column(".mini-sky .earth");
+    act(() => { vi.advanceTimersByTime(TICK_MS); press(); });
+    const earthAfter = column(".mini-sky .earth");
+    act(() => { vi.advanceTimersByTime(0); });
+    expect(column(".mini-sky .earth")).toBe(earthAfter);
+    expect(earthAfter === earth || Math.abs(earthAfter - earth) === 1).toBe(true);
+  });
+
   it("Shelter: Space drops the block", () => {
     render(<JobMiniGame job="shelter" seed={SEED} onClose={vi.fn()} />);
     const status = () => document.querySelector(".storm-left")!.textContent;
