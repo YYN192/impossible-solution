@@ -941,6 +941,13 @@
       "plain": "plain rock",
       "empty": "empty",
       "oops": "That was a plain rock. Only shiny ones!"
+    },
+    "keys": {
+      "panels": "Arrow keys move. Space or Enter wipes.",
+      "greenhouse": "Arrow keys move. Space or Enter waters.",
+      "science": "Arrow keys move. Space or Enter grabs.",
+      "shelter": "Space drops the block.",
+      "askEarth": "← → aim the dish. Space sends."
     }
   }
 }

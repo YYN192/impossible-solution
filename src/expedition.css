@@ -66,3 +66,4 @@ html{font-size:clamp(16px,.45vw + 10px,22px)}
 .dust-cover.in-world{position:absolute;inset:0;z-index:1;animation:dust-blow 2.4s linear infinite,dust-in .6s ease-out}
 .dust-cover.full{animation:dust-blow 2.4s linear infinite,dust-in .6s ease-out}
 @keyframes dust-in{from{opacity:0}}
+@media(pointer:coarse){.mini-keys{display:none}}
