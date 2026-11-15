@@ -311,4 +311,25 @@ button.primary:disabled { background: #141d29; border-color: var(--steel); color
   .expedition .plan-screen .step-label { margin-bottom: 8px; }
   .expedition .plan-screen .jobs-locked { margin-bottom: 6px; }
   .expedition .screen > .plan-screen { margin-top: 12px; }
+
+/* ===== Morning / beat / report / final hierarchy (owner's 1-second test) =====
+   Level 2 "you can choose this": beat options get the cyan "interactive" frame; blocked ones stay grey. */
+.beat-option:not(:disabled) { border-color: #83d9f4; }
+.beat-option:not(:disabled):hover { background: #1a3547; border-color: #c8f1ff; }
+/* Meter "?" help sits back inside the meter cards (info, not an action). Tap size unchanged. */
+.resource-meter .whats-this__button { background: transparent !important; border: 1px solid #52687b !important; box-shadow: none !important; color: #c3d3de !important; }
+.resource-meter .whats-this__button:hover { border-color: #83d9f4 !important; color: #fff !important; }
+/* What changed: the +1 / -1 is coloured and readable next to the number, and the change band shows on every screen. */
+.meter-change { font-size: 1rem !important; font-weight: 700; }
+.meter-change.better { color: #7fe0a0; }
+.meter-change.worse { color: #ff9b9b; }
+.meter-change.same { color: #8ba2b6; font-weight: 400; }
+.meter-track { position: relative; }
+.meter-delta { position: absolute; top: 0; bottom: 0; opacity: .85; }
+.meter-delta.better { background: #7fe0a0; }
+.meter-delta.worse { background: repeating-linear-gradient(135deg, #ff7b7b 0, #ff7b7b 4px, #7a2b2b 4px, #7a2b2b 8px); }
+/* Final screen: one gold "try again"; the other two are quiet. On phones the bar is not sticky (it hid the story). */
+.screen:has(.stars) > .actions button:not(.primary) { background: transparent; border-color: #52687b; box-shadow: none; color: #dce6ee; }
+@media (max-width: 720px) {
+  .screen:has(.stars) > .actions { position: static; background: none; }
 }

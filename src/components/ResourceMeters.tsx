@@ -45,7 +45,7 @@ export function ResourceMeters({
               </strong>
               {/* key re-mounts the number so its tick animation replays on every change */}
               {previous && (
-                <span className="meter-change" key={delta}>
+                <span className={`meter-change ${delta === 0 ? "same" : (key === "dose" ? -delta : delta) > 0 ? "better" : "worse"}`} key={delta}>
                   {delta > 0 ? "+" : ""}
                   {Number(delta.toFixed(1))}
                 </span>
