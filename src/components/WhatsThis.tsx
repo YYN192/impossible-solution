@@ -39,9 +39,12 @@ export function WhatsThis({ topic }: { topic: HelpTopic }) {
   // on a phone. Measure once it opens and slide it back in (8 px margin).
   const bubble = useRef<HTMLSpanElement>(null);
   const [shift, setShift] = useState(0);
+  // Near the bottom of the screen (the "sol" help on the start screen) it opens above the "?".
+  const [up, setUp] = useState(false);
   useLayoutEffect(() => {
-    if (!open || !bubble.current) return setShift(0);
+    if (!open || !bubble.current) { setUp(false); return setShift(0); }
     const r = bubble.current.getBoundingClientRect();
+    if (r.bottom > window.innerHeight - 8 && r.top - r.height - 60 > 0) setUp(true);
     const vw = document.documentElement.clientWidth;
     if (r.left < 8) setShift(8 - r.left);
     else if (r.right > vw - 8) setShift(vw - 8 - r.right);
@@ -66,7 +69,7 @@ export function WhatsThis({ topic }: { topic: HelpTopic }) {
           id={id}
           ref={bubble}
           role="note"
-          className="whats-this__bubble"
+          className={up ? "whats-this__bubble whats-this__bubble--up" : "whats-this__bubble"}
           style={shift ? { transform: `translateX(calc(-50% + ${shift}px))` } : undefined}
         >
           <strong>{title}</strong> {t(`help.${topic}.text`)}{" "}

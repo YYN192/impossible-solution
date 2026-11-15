@@ -35,3 +35,7 @@
   font-size: 1rem;
   padding: 0.3rem 1rem;
 }
+.whats-this__bubble--up {
+  top: auto;
+  bottom: calc(100% + 0.4rem);
+}
