@@ -34,7 +34,7 @@ export function StormAlarm({ storm, onClose }: { storm: HubStorm; onClose: () =>
 
 const PANELS = 6;
 /** Outside the airlock: wipe every dusty panel (tap, click or Enter on each). */
-export function PanelsTask({ onDone, onClose }: { onDone: () => void; onClose: () => void }) {
+export function PanelsTask({ onDone, onClose, countdown }: { onDone: () => void; onClose: () => void; countdown?: React.ReactNode }) {
   const { t } = useTranslation();
   const [clean, setClean] = useState<boolean[]>(() => Array(PANELS).fill(false));
   const left = clean.filter((c) => !c).length;
@@ -44,6 +44,7 @@ export function PanelsTask({ onDone, onClose }: { onDone: () => void; onClose: (
     setClean((c) => c.map((v, j) => v || j === i));
   };
   return <Modal label="panels-title" onClose={onClose}>
+    {countdown}
     <div>
       <p className="eyebrow">{t("hubStorm.outside")}</p>
       <h2 id="panels-title">{t("hubStorm.panelsTitle")}</h2>
@@ -62,10 +63,11 @@ export function PanelsTask({ onDone, onClose }: { onDone: () => void; onClose: (
 
 const STEPS = ["cover", "lights", "plants"] as const;
 /** The broken greenhouse: three repair jobs in order. */
-export function GreenhouseTask({ onDone, onClose }: { onDone: () => void; onClose: () => void }) {
+export function GreenhouseTask({ onDone, onClose, countdown }: { onDone: () => void; onClose: () => void; countdown?: React.ReactNode }) {
   const { t } = useTranslation();
   const [done, setDone] = useState(0);
   return <Modal label="greenhouse-title" onClose={onClose}>
+    {countdown}
     <div>
       <p className="eyebrow">{t("world.near.greenhouse")}</p>
       <h2 id="greenhouse-title">{t("hubStorm.greenhouseTitle")}</h2>

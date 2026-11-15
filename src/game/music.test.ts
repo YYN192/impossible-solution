@@ -76,6 +76,18 @@ async function setup(prefs: Record<string, unknown> = { music: 0.5 }, opts?: { s
 }
 
 describe("music coordinator", () => {
+  it("failure stops the storm immediately, blocks unlocks, and restarts one fresh storm source", async () => {
+    const a = await setup();
+    a.audio.setMusic({ scene: "base", storm: true }); a.audio.unlock(); await flush();
+    const first = a.live()[0];
+    const release = a.audio.holdMusic();
+    expect(first.stopped).toBe(true);
+    a.audio.unlock(); await flush();
+    expect(a.live()).toHaveLength(0);
+    release(); await flush();
+    expect(a.live().map(a.name)).toEqual([STORM]);
+    expect(a.live()[0]).not.toBe(first);
+  });
   beforeEach(() => localStorage.clear());
   afterEach(() => {
     vi.unstubAllGlobals();
