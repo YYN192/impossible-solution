@@ -1,6 +1,7 @@
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { tRun } from "../i18n/dynamic";
+import { Icon } from "./Icon";
 import { DataChip } from "../screens/DataChip";
 import type { EarthAnswer as Answer } from "../sim/types";
 import { useMission } from "../state/mission";
@@ -24,7 +25,7 @@ export function EarthAnswer({ answer }: { answer: Answer }) {
   const moon = setup?.place === "moon" ? "moon" : undefined;
   return (
     <div className="earth-answer">
-      <p>{earthSentence(t, answer, moon)}</p>
+      <p><Icon name="radio" /> {earthSentence(t, answer, moon)}</p>
       {answer.burstRisk && <p className={`risk risk-${answer.burstRisk}`}>{t(`earth.risk.${answer.burstRisk}`)}</p>}
       {answer.dustStormSols !== undefined && <p>{t("earth.dustStorm", { count: answer.dustStormSols })}</p>}
       {answer.stormCloudInSols !== undefined && <DataChip source={answer.source} />}

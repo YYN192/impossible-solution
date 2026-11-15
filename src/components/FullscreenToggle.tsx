@@ -1,3 +1,4 @@
+import { Icon } from "./Icon";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,6 +14,6 @@ export function FullscreenToggle() {
   if (!document.fullscreenEnabled) return null;
   const toggle = () => void (on ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
   return <button type="button" className="sound-toggle fullscreen-toggle" aria-pressed={on} onClick={toggle}>
-    {on ? t("fullscreen.exit") : t("fullscreen.enter")}
+    <Icon name={on ? "windowed" : "fullscreen"} /> {on ? t("fullscreen.exit") : t("fullscreen.enter")}
   </button>;
 }

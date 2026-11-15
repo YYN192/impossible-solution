@@ -72,7 +72,7 @@
     }
   },
   "earth": {
-    "answer": "📡 Earth says: {{dust}}, and {{storm}}.",
+    "answer": "Earth says: {{dust}}, and {{storm}}.",
     "dust": {
       "clear": "clear skies tomorrow",
       "dusty": "dusty skies tomorrow"
@@ -130,8 +130,8 @@
     },
     "goalWon": "(got it)",
     "goalMissed": "(missed)",
-    "best_one": "Best: {{count}}★",
-    "best_other": "Best: {{count}}★",
+    "best_one": "Best: {{count}} star",
+    "best_other": "Best: {{count}} stars",
     "tryAgain": "Try a different plan",
     "home": "Back to start",
     "sol_moon": "Day {{sol}}",

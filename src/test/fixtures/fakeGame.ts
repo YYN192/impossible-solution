@@ -40,13 +40,13 @@ const d = (
 });
 
 export const FAKE_DOMINOES: Domino[] = [
-  d("sol1-panels-skipped", 1, "🧽✗", "panelsSkipped"),
-  d("sol2-power-low", 2, "⚡↓", "powerLow", ["sol1-panels-skipped"]),
-  d("sol2-greenhouse-skipped", 2, "🥬✗", "greenhouseSkipped", [
+  d("sol1-panels-skipped", 1, "wipe x", "panelsSkipped"),
+  d("sol2-power-low", 2, "power down", "powerLow", ["sol1-panels-skipped"]),
+  d("sol2-greenhouse-skipped", 2, "food x", "greenhouseSkipped", [
     "sol2-power-low",
   ]),
-  d("sol2-food-empty", 2, "🥬0", "foodEmpty", ["sol2-greenhouse-skipped"]),
-  d("sol3-crew-tired", 3, "😴", "crewTired", ["sol2-food-empty"]),
+  d("sol2-food-empty", 2, "food zero", "foodEmpty", ["sol2-greenhouse-skipped"]),
+  d("sol3-crew-tired", 3, "tired", "crewTired", ["sol2-food-empty"]),
 ];
 
 /** Which dominoes have fallen by the morning of each sol (what StepResult.fell would hold). */

@@ -1,3 +1,4 @@
+import { Icon, Icons } from "./components/Icon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
@@ -218,7 +219,7 @@ export default function PlanScreen() {
             {jobIds
               .filter((id) => !Object.values(plan).includes(id))
               .map((id) => {
-                // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art + ✗.
+                // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art with an x badge.
                 const skip = preview.fell.find(
                   (d) => d.id === `sol${state.sol}-${id}-skipped`,
                 );
@@ -228,10 +229,10 @@ export default function PlanScreen() {
                     <span className="mini-chain" aria-hidden="true">
                       <span className="mini-link">
                         {skip ? (
-                          skip.icon
+                          <Icons icon={skip.icon} />
                         ) : (
                           <>
-                            <img src={asset(`items/${jobArt[id]}`)} alt="" />✗
+                            <span className="px-stack"><img src={asset(`items/${jobArt[id]}`)} alt="" /><Icon name="x" className="px-badge" /></span>
                           </>
                         )}
                       </span>
@@ -239,7 +240,7 @@ export default function PlanScreen() {
                         <span className="mini-effect" key={d.id}>
                           <span className="mini-arrow">→</span>
                           <span className="mini-link">
-                            {d.icon}
+                            <Icons icon={d.icon} />
                             {d.sol > state.sol && (
                               <small>{t("play.tomorrow")}</small>
                             )}

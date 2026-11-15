@@ -1,3 +1,4 @@
+import { Icon } from "./components/Icon";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
@@ -57,7 +58,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
             return <button type="button" className="mission-card" key={c.id} disabled={!open}
               aria-pressed={!special && campaignId === c.id} onClick={() => pick({ campaign: c.id })}>
               <img className="mission-art" src={asset(`campaign/card-${c.id}`)} alt="" />
-              <strong>{open ? "" : "🔒 "}{tRun(`campaign.${c.id}.name`)}</strong>
+              <strong>{open ? null : <><Icon name="lock" />{" "}</>}{tRun(`campaign.${c.id}.name`)}</strong>
               <span className="mission-meta">{tRun(`campaign.${c.id}.where`)} · {tRun("run.sols", { count: c.rules.sols ?? 3 }, moon)} · {t("run.minutes", { count: c.minutes })} · {t(`run.level.${c.difficulty}`)}</span>
               <small>{open ? tRun(`campaign.${c.id}.hook`) : t("run.locked", { name: tRun(`campaign.${c.unlockAfter}.name`) })}</small>
               <span className="mission-tags">{t("run.realData", { list: c.datasets.join(", ") })}</span>

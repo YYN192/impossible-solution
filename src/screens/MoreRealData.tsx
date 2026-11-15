@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { dataClient, publicUrl, type Loaded } from "../data/client";
@@ -229,7 +230,7 @@ export function MoreRealData({ live = false }: { live?: boolean }) {
                 />
               ))}
               <span className="more__pin" aria-hidden="true">
-                📍
+                <Icon name="pin" />
               </span>
             </div>
             <figcaption>
