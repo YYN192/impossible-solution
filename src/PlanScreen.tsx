@@ -1,7 +1,11 @@
+import { Icon, Icons } from "./components/Icon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
+import { JobMiniGame } from "./components/JobMiniGame";
 import { ResourceMeters } from "./components/ResourceMeters";
+import { usePhone } from "./components/usePhone";
+import { useComfort } from "./state/comfort";
 import { WhatsThis } from "./components/WhatsThis";
 import {
   INSIGHT_DUST,
@@ -51,8 +55,13 @@ export default function PlanScreen() {
   const assign = useSession((s) => s.assign);
   const moon = setup?.place === "moon" ? "moon" : undefined;
   const [selected, select] = useState<CrewId | null>(null);
+  // Phones: End sol and a one-line preview stay pinned to the bottom of the screen (#75).
+  const phone = usePhone();
   const [confirmIdle, setConfirmIdle] = useState(false);
   const [nudge, setNudge] = useState(false);
+  // The job's mini game, open right after the job is given (the job is already in the plan).
+  const [miniGame, setMiniGame] = useState<{ job: JobId; seed: number } | null>(null);
+  const plays = useRef(0);
   const resolved = useRef(false);
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
@@ -99,6 +108,21 @@ export default function PlanScreen() {
     if (result.over && state.sol < rulesOf(state).sols) useNav.getState().endEarly();
     else useNav.getState().next();
   }
+  const endSol = (
+    <>
+      {confirmIdle && (
+        <p role="alert">{t("play.idleConfirm", { count: idle })}</p>
+      )}
+      <button
+        type="button"
+        className="primary end-sol"
+        disabled={!setup}
+        onClick={finish}
+      >
+        {confirmIdle ? t("play.confirmEnd") : tRun("plan.endSol", {}, moon)} →
+      </button>
+    </>
+  );
   return (
     <ScreenFrame title={tRun("plan.heading", { sol: state.sol }, moon)}>
       <p className="lead">{t("planHelp.howTo")}</p>
@@ -170,7 +194,10 @@ export default function PlanScreen() {
                     setNudge(false);
                     assign(selected, id);
                     select(null);
-                    focusNext.current = "crew";
+                    plays.current += 1;
+                    // #77: "Skip mini-games" in Settings: the job is given, no game opens.
+                    if (useComfort.getState().skipMiniGames) focusNext.current = "crew";
+                    else setMiniGame({ job: id, seed: state.sol * 97 + plays.current });
                     audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
                   }}
                 >
@@ -218,7 +245,7 @@ export default function PlanScreen() {
             {jobIds
               .filter((id) => !Object.values(plan).includes(id))
               .map((id) => {
-                // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art + ✗.
+                // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art with an x badge.
                 const skip = preview.fell.find(
                   (d) => d.id === `sol${state.sol}-${id}-skipped`,
                 );
@@ -228,10 +255,10 @@ export default function PlanScreen() {
                     <span className="mini-chain" aria-hidden="true">
                       <span className="mini-link">
                         {skip ? (
-                          skip.icon
+                          <Icons icon={skip.icon} />
                         ) : (
                           <>
-                            <img src={asset(`items/${jobArt[id]}`)} alt="" />✗
+                            <span className="px-stack"><img src={asset(`items/${jobArt[id]}`)} alt="" /><Icon name="x" className="px-badge" /></span>
                           </>
                         )}
                       </span>
@@ -239,7 +266,7 @@ export default function PlanScreen() {
                         <span className="mini-effect" key={d.id}>
                           <span className="mini-arrow">→</span>
                           <span className="mini-link">
-                            {d.icon}
+                            <Icons icon={d.icon} />
                             {d.sol > state.sol && (
                               <small>{t("play.tomorrow")}</small>
                             )}
@@ -254,20 +281,36 @@ export default function PlanScreen() {
                 );
               })}
           </ul>
-          {confirmIdle && (
-            <p role="alert">{t("play.idleConfirm", { count: idle })}</p>
-          )}
-          <button
-            type="button"
-            className="primary end-sol"
-            disabled={!setup}
-            onClick={finish}
-          >
-            {confirmIdle ? t("play.confirmEnd") : tRun("plan.endSol", {}, moon)} →
-          </button>
+          {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
         </aside>
+        {phone && (
+          <div className="plan-bar phone-dock">
+            <p className="plan-bar__preview">
+              <span>{tRun("play.preview", {}, moon)}:</span>
+              {(["power", "air", "dose"] as const).map((key) => (
+                <span className="plan-bar__value" key={key}>
+                  <Icon name={key} />
+                  <span className="visually-hidden">{t(`bars.${key}`)}</span>
+                  {Number(preview.state.bars[key].toFixed(1))}
+                </span>
+              ))}
+            </p>
+            {endSol}
+          </div>
+        )}
       </div>
+      {miniGame && (
+        <JobMiniGame
+          key={miniGame.seed}
+          job={miniGame.job}
+          seed={miniGame.seed}
+          onClose={() => {
+            setMiniGame(null);
+            focusNext.current = "crew";
+          }}
+        />
+      )}
       <details className="science-details">
         <summary>{t("play.scienceBehind")}</summary>
         <p>

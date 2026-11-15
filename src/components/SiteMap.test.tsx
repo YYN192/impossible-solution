@@ -55,6 +55,13 @@ describe("airlock map: opening and closing", () => {
     }
   });
 
+  it("E closes it on a Bulgarian keyboard layout too (the physical key, #53)", () => {
+    const onClose = vi.fn();
+    render(<SiteMap current="storm" onClose={onClose} />);
+    fireEvent.keyDown(window, { key: "е", code: "KeyE" }); // Cyrillic е on the E key
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("starts with keyboard focus on the X button", () => {
     render(<SiteMap current="storm" onClose={vi.fn()} />);
     expect(document.activeElement).toBe(screen.getByRole("button", { name: t("siteMap.close") }));

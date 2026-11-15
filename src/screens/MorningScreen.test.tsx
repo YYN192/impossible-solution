@@ -10,6 +10,7 @@ import {
 import { MorningScreen } from "./MorningScreen";
 import { helpTopicForDomino } from "../components/helpTopics";
 import en from "../i18n/en.json";
+import { dominoView } from "../test/icons";
 
 const showMorning = (sol: number) => {
   loadFakeGame(sol);
@@ -32,12 +33,10 @@ describe("Morning report", () => {
     showMorning(2);
     expect(document.querySelectorAll(".domino")).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: /Why\?/ }));
-    const dominoes = [...document.querySelectorAll(".domino")].map(
-      (d) => d.textContent,
-    );
+    const dominoes = [...document.querySelectorAll(".domino")].map(dominoView);
     expect(dominoes).toEqual([
-      "⚡↓Power is low today.",
-      "🧽✗Nobody cleaned the solar panels.",
+      "power down|Power is low today.",
+      "wipe x|Nobody cleaned the solar panels.",
     ]);
     screen.getByText("because");
     // The kid sees the burst only in the end-of-sol report.
@@ -54,7 +53,7 @@ describe("Morning report", () => {
     screen.getByText("The food ran out.");
     fireEvent.click(screen.getByRole("button", { name: /Message from Earth/ }));
     screen.getByText(
-      "📡 Earth says: dusty skies tomorrow, and a storm cloud arrives in 1 sol.",
+      "Earth says: dusty skies tomorrow, and a storm cloud arrives in 1 sol.",
     );
   });
 

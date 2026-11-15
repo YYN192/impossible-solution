@@ -1,0 +1,183 @@
+/* Crew talk window: portrait + name plate on the left, typed text and answers on the right (retro RPG text box). */
+.crew-talk[open] {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+/* Practice games need room: the window grows wider (smoothly) so their buttons are never a tall column of
+   one or two words. It shrinks back for the talk. */
+.crew-talk.npc-dialogue {
+  transition: max-width 0.25s ease-out;
+}
+.crew-talk.crew-talk--wide {
+  max-width: 900px;
+}
+.crew-talk__who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.crew-talk__who img {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  background: #0a1624;
+  border: 2px solid #48647b;
+  padding: 6px;
+}
+.crew-talk__who h2 {
+  margin: 0;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  background: #0b1829;
+  border: 2px solid #48647b;
+  color: #b4f6ed;
+  text-align: center;
+  max-width: 120px;
+}
+.crew-talk__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.crew-talk__line {
+  min-height: 4.5em;
+  margin: 0;
+  cursor: pointer;
+  line-height: 1.55;
+}
+.crew-talk__ghost {
+  visibility: hidden;
+} /* keeps the box from growing while letters appear */
+.crew-talk__next {
+  align-self: flex-end;
+  min-height: 48px;
+}
+.crew-talk__caret {
+  display: inline-block;
+  animation: crew-caret 0.8s steps(2, jump-none) infinite;
+}
+@keyframes crew-caret {
+  to {
+    transform: translateY(3px);
+  }
+}
+.crew-talk__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.crew-talk__menu .eyebrow {
+  margin: 0 0 4px;
+}
+.crew-talk__menu button {
+  text-align: left;
+  min-height: 48px;
+  padding-left: 30px;
+  position: relative;
+}
+.crew-talk__menu button:is(:focus-visible, :hover)::before {
+  content: "▶";
+  position: absolute;
+  left: 10px;
+  color: #f5c542;
+}
+.crew-drill {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.crew-drill h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #f5c542;
+}
+.crew-drill p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.crew-drill__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 8px;
+}
+/* Four choices sit as 2 × 2, never 3 + 1. */
+.crew-drill__grid:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.crew-drill__grid button {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  /* Whole words: break inside a word only if that one word cannot fit on its own line. */
+  overflow-wrap: break-word;
+  hyphens: manual;
+  text-wrap: pretty;
+}
+.crew-drill__grid button[aria-pressed="true"] {
+  border-color: #a0efea;
+  background: #1d3d4f;
+}
+.crew-drill__grid button .px-icon:last-child:not(:first-child) {
+  margin-left: auto;
+}
+.crew-drill__plant {
+  position: relative;
+  align-self: center;
+}
+.crew-drill__plant > img {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+}
+.crew-drill__bubble {
+  position: absolute;
+  top: -6px;
+  right: -34px;
+  background: #f2f6fa;
+  border: 2px solid #080b12;
+  padding: 3px;
+  line-height: 0;
+}
+.crew-drill__timer {
+  font-size: 1rem !important;
+  color: #ff9a6b;
+}
+.crew-drill__wall {
+  display: flex;
+  gap: 4px;
+}
+.crew-drill__wall img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+.crew-drill .quiet-button {
+  align-self: flex-start;
+  min-height: 44px;
+}
+@media (max-width: 720px) {
+  .crew-talk[open] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .crew-talk__who {
+    flex-direction: row;
+  }
+  .crew-talk__who img {
+    width: 56px;
+    height: 56px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crew-talk__caret {
+    animation: none;
+  }
+}

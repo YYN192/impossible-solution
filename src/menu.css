@@ -14,7 +14,7 @@
 .mission-menu .mission-card .mission-meta{color:#c9d8e4}
 .mission-menu .mission-card .mission-tags{font-size:.875rem;opacity:.9}
 .mission-menu .mission-card[aria-pressed="true"]{border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}
-.mission-menu .mission-card[aria-pressed="true"]::after{content:"✓";position:absolute;top:8px;right:8px;width:2rem;height:2rem;display:grid;place-items:center;background:#5eead4;color:#04121a;font-weight:700;font-size:1.2rem;border:2px solid var(--ink,#080b12)}
+.mission-menu .mission-card[aria-pressed="true"]::after{content:"";position:absolute;top:8px;right:8px;width:2rem;height:2rem;display:grid;place-items:center;background:#5eead4 url("./assets/pixel/icons/check.png") center/100% no-repeat;image-rendering:pixelated;color:#04121a;font-weight:700;font-size:1.2rem;border:2px solid var(--ink,#080b12)}
 .mission-menu .mission-card:focus-visible,.menu-stage button:focus-visible{outline:3px solid #5eead4;outline-offset:3px}
 .menu-actions{display:flex;flex-direction:column;align-items:center;gap:.6rem}
 .menu-actions .launch-button{min-height:64px;min-width:min(22rem,90vw);font-size:clamp(1.3rem,1rem + 1vw,2rem);padding:.4rem 2.2rem;margin:0}
@@ -25,7 +25,7 @@
 .menu-stage .sol-explainer{margin:0;font-size:.95rem}
 .menu-settings{width:min(32rem,100%);text-align:left;display:grid;gap:.8rem}
 .mission-menu .menu-bottom{position:relative;z-index:1;margin-top:auto;padding:.5rem 0}
-@media(hover:hover) and (prefers-reduced-motion:no-preference){.mission-menu .mission-card:not(:disabled):hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,.55)}}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){.mission-menu .mission-card:not(:disabled):not([aria-pressed="true"]):hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,.55)}}
 @media(max-width:900px){.mission-menu .mission-picker{grid-template-columns:1fr}.mission-menu .mission-card{display:grid;grid-template-columns:7.5rem 1fr;gap:.2rem .7rem;padding:.5rem}.mission-menu .mission-card>.mission-art{grid-row:1/span 4;height:100%;min-height:5rem;border:2px solid var(--ink,#080b12)}.mission-menu .mission-card>:not(.mission-art){grid-column:2;margin:0}.mission-menu{justify-content:flex-start}}
 @media(max-width:480px){.mission-menu .mission-card{grid-template-columns:5.5rem 1fr}}
 :root:not(:lang(bg)) .mission-menu .menu-head h1{font-family:"Pixelify Sans",var(--font-body);font-weight:400;letter-spacing:0;text-shadow:3px 3px 0 var(--ink,#080b12)}
@@ -40,3 +40,4 @@
 .mission-menu .mission-card:disabled{opacity:.88}
 @media(max-height:800px) and (min-width:901px){.mission-menu .menu-bottom{display:none}.menu-head h1{font-size:clamp(2.2rem,1rem + 3.4vw,4rem)}}
 .mission-menu .menu-bottom,.mission-menu .menu-bottom span,.mission-menu .sol-explainer{color:#f4f7fa;text-shadow:0 1px 3px #000,0 0 6px #000}
+.mission-menu .mission-card[aria-pressed="true"]:hover{transform:none;border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}

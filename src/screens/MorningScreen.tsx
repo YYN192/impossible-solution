@@ -1,3 +1,5 @@
+import { reducedMotion as calmOrReduced } from "../state/comfort";
+import { Icon } from "../components/Icon";
 import { useEffect, useRef, useState } from "react";
 import "../morning.css";
 import { useTranslation } from "react-i18next";
@@ -44,7 +46,7 @@ export function MorningScreen() {
 const reducedMotion = () =>
   typeof window === "undefined" || !window.matchMedia
     ? true // no matchMedia (tests): skip the animation
-    : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    : calmOrReduced();
 
 /** Reveals `text` one letter at a time once `on`; instantly under reduced motion. */
 function useTypewriter(text: string, on: boolean) {
@@ -95,7 +97,7 @@ export function MorningReportView({
         <ol className="sol-track" aria-label={tRun("common.solOf", { sol, total }, moon)}>
           {Array.from({ length: total }, (_, i) => i + 1).map((d) => (
             <li key={d} className={d < sol ? "done" : d === sol ? "now" : ""} aria-current={d === sol ? "step" : undefined}>
-              <span className="rover" aria-hidden="true">{d === sol ? "🚙" : ""}</span>
+              <span className="rover" aria-hidden="true">{d === sol ? <Icon name="rover" /> : null}</span>
               <i aria-hidden="true">{d}</i>
             </li>
           ))}
@@ -108,7 +110,7 @@ export function MorningReportView({
           <section className="m-card m-overnight" aria-labelledby="m-over">
             <h2 id="m-over">{t("morning.overnight")}</h2>
             {headline ? <Chain headline={headline} cause={cause} /> : (
-              <p className="m-calm"><span aria-hidden="true">😴</span> {sol === 1 ? t("morning.firstDay") : t("morning.nothingFell")}</p>
+              <p className="m-calm"><span aria-hidden="true"><Icon name="tired" /></span> {sol === 1 ? tRun("morning.firstDay", {}, useMission.getState().setup?.place) : t("morning.nothingFell")}</p>
             )}
             {/* Sol 1: Pip's briefing for this campaign and the real thing behind it. */}
             {sol === 1 && setup && (
@@ -125,12 +127,12 @@ export function MorningReportView({
             {earth && <RadioMessage answer={earth} moon={moon} />}
             {event && (
               <div className={`m-alert m-alert-${event.kind}`}>
-                <span className="m-alert-icon" aria-hidden="true">{event.kind === "particleBurst" ? "☢️" : "🌪️"}</span>
+                <span className="m-alert-icon" aria-hidden="true"><Icon name={event.kind === "particleBurst" ? "dose" : "dust-storm"} /></span>
                 <span>{tDynamic(event.captionKey)} <WhatsThis topic={helpTopicForEvent(event.kind)} /></span>
               </div>
             )}
             <NasaData refs={[
-              ...(event ? [event.source] : []),
+              ...(event && !event.game ? [event.source] : []),
               ...(earth && earth.stormCloudInSols !== undefined ? [earth.source] : []),
               ...(earth && setup ? [setup.delay.ref] : []),
             ]}>
@@ -140,7 +142,7 @@ export function MorningReportView({
         )}
       </div>
 
-      <div className="actions">
+      <div className="actions phone-dock">
         <button type="button" className="primary morning-go" onClick={next}>
           {t("morning.goPlan")} <span aria-hidden="true">→</span>
         </button>
@@ -163,7 +165,7 @@ function Chain({ headline, cause }: { headline: NonNullable<MorningReport["headl
       {cause && (
         <>
           <button type="button" className="why" aria-expanded={open} aria-controls="m-cause" onClick={() => setOpen(!open)}>
-            <span aria-hidden="true">{open ? "▲" : "🔍"}</span> {open ? t("morning.hideWhy") : t("morning.why")}
+            <span aria-hidden="true">{open ? "▲" : <Icon name="why" />}</span> {open ? t("morning.hideWhy") : t("morning.why")}
           </button>
           <div id="m-cause" className="cause" hidden={!open}>
             {open && (
@@ -188,7 +190,7 @@ function RadioMessage({ answer, moon }: { answer: EarthAnswer; moon?: "moon" }) 
   return (
     <div className="radio">
       <button type="button" className="radio-btn" aria-expanded={on} aria-controls="m-msg" onClick={() => { setOn(true); audio.playSfx("earth-message-receive"); }} disabled={on}>
-        <span className="radio-icon" aria-hidden="true">📡</span>
+        <span className="radio-icon" aria-hidden="true"><Icon name="radio" /></span>
         <span>{t("morning.radio")}<small>{on ? t("morning.decoded") : t("morning.radioTap")}</small></span>
       </button>
       <div id="m-msg" className="radio-msg" hidden={!on}>
@@ -199,11 +201,11 @@ function RadioMessage({ answer, moon }: { answer: EarthAnswer; moon?: "moon" }) 
           <>
             {answer.burstRisk && (
               <p className={`m-alert m-alert-risk-${answer.burstRisk}`}>
-                <span className="m-alert-icon" aria-hidden="true">{answer.burstRisk === "high" ? "⚠️" : "✅"}</span>
+                <span className="m-alert-icon" aria-hidden="true"><Icon name={answer.burstRisk === "high" ? "warning" : "check"} /></span>
                 <span>{t(`earth.risk.${answer.burstRisk}`)}</span>
               </p>
             )}
-            {answer.dustStormSols !== undefined && <p className="m-note">🌫️ {t("earth.dustStorm", { count: answer.dustStormSols })}</p>}
+            {answer.dustStormSols !== undefined && <p className="m-note"><Icon name="dusty-sky" /> {tRun("earth.dustStorm", { count: answer.dustStormSols }, useMission.getState().setup?.place)}</p>}
           </>
         )}
       </div>
@@ -219,7 +221,7 @@ function Delay() {
   const moon = setup.place === "moon";
   return (
     <div className="delay">
-      <div className="signal" aria-hidden="true"><span>{moon ? "🌙" : "🔴"}</span><i /><span>🌍</span></div>
+      <div className="signal" aria-hidden="true"><span><Icon name={moon ? "moon" : "mars"} /></span><i /><span><Icon name="earth" /></span></div>
       <p className="note">
         {moon ? t("earth.delayMoon") : t(setup.delay.ref.mode === "live" ? "earth.delay" : "earth.delaySaved", { minutes: Math.round(setup.delay.seconds / 60) })}
       </p>
@@ -233,7 +235,7 @@ function NasaData({ refs, children }: { refs: DataRef[]; children?: React.ReactN
   if (refs.length === 0) return null;
   return (
     <details className="nasa">
-      <summary><span aria-hidden="true">🛰️</span> {t("morning.nasa")}</summary>
+      <summary><Icon name="satellite" /> {t("morning.nasa")}</summary>
       {children}
       {refs.map((r, i) => <DataChip key={i} source={r} />)}
     </details>

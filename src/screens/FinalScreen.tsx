@@ -1,3 +1,5 @@
+import { reducedMotion } from "../state/comfort";
+import { Icon } from "../components/Icon";
 import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { DominoCard } from "../components/DominoCard";
@@ -76,7 +78,7 @@ export function FinalView({
   const won = !endedEarly && stars.count >= 2;
   useEffect(() => {
     // Chains fall side by side, so one tick per step; none when the animation is off.
-    const falls = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? 0 : longest;
+    const falls = reducedMotion() ? 0 : longest;
     const timers = Array.from({ length: falls }, (_, i) => setTimeout(() => audio.playSfx("domino-fall"), i * FALL_STEP_MS + 300));
     timers.push(setTimeout(() => audio.playSfx(won ? "mission-success" : "mission-failure"), falls * FALL_STEP_MS + 600));
     return () => timers.forEach(clearTimeout);
@@ -142,16 +144,15 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
   return (
     <div className="stars">
       <p className="stars-count">
-        <span aria-hidden="true">
-          {"★".repeat(stars.count)}
-          <span className="star-empty">{"☆".repeat(3 - stars.count)}</span>
+        <span className="star-icons" aria-hidden="true">
+          {[0, 1, 2].map((i) => <Icon key={i} name={i < stars.count ? "star" : "star-empty"} />)}
         </span>{" "}
         {t("final.stars", { count: stars.count })}
       </p>
       <ul className="star-goals">
         {goals.map(({ key, won }) => (
           <li key={key} className={won ? "won" : "missed"}>
-            <span aria-hidden="true">{won ? "★ " : "☆ "}</span>
+            <Icon name={won ? "star" : "star-empty"} />{" "}
             {t(`final.goal.${key}`)}{" "}
             <span className="visually-hidden">
               {won ? t("final.goalWon") : t("final.goalMissed")}
@@ -160,7 +161,7 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
         ))}
       </ul>
       {best !== undefined && (
-        <p className="note">{t("final.best", { count: best })}</p>
+        <p className="note"><Icon name="star" /> {t("final.best", { count: best })}</p>
       )}
     </div>
   );
@@ -181,7 +182,7 @@ function RowView({ row, label }: { row: Row; label: number }) {
               </span>
             )}
             <div className="domino-tile">
-              <p className="chain-sol">{tRun("final.sol", { sol: [...new Set(sols)].join(", ") })}</p>
+              <p className="chain-sol">{tRun("final.sol", { sol: [...new Set(sols)].join(", ") }, useMission.getState().setup?.place)}</p>
               <DominoCard domino={domino} fall />
             </div>
           </li>

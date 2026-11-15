@@ -3,7 +3,7 @@
   "source": "https://api.nasa.gov/DONKI/WSAEnlilSimulations?startDate=2026-10-15&endDate=2026-11-14",
   "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
   "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
-  "about": "Fallback for \"Today's Sun\": the latest WSA-Enlil runs that forecast a CME reaching Mars (last 30 days before the snapshot date).",
+  "about": "Fallback for \"Today's Sun\": the latest WSA-Enlil runs that forecast a CME reaching Mars (last 30 days before the snapshot date). cmeId and speed (first CME input) were added on 15 Nov 2026 from the same model runs (unchanged history).",
   "data": [
     {
       "simulationID": "WSA-ENLIL/49216/1",
@@ -12,6 +12,8 @@
       "cmeIDs": [
         "2026-10-23T04:18Z"
       ],
+      "cmeId": "2026-10-23T04:18:00-CME-001",
+      "speed": 597,
       "impactList": [
         {
           "location": "Mars",
@@ -42,6 +44,8 @@
       "cmeIDs": [
         "2026-10-25T19:24Z"
       ],
+      "cmeId": "2026-10-25T19:24:00-CME-001",
+      "speed": 275,
       "impactList": [
         {
           "location": "Mars",
@@ -72,6 +76,8 @@
       "cmeIDs": [
         "2026-10-26T09:48Z"
       ],
+      "cmeId": "2026-10-26T09:48:00-CME-001",
+      "speed": 681,
       "impactList": [
         {
           "location": "Juice",
@@ -107,6 +113,8 @@
       "cmeIDs": [
         "2026-10-26T09:48Z"
       ],
+      "cmeId": "2026-10-26T09:48:00-CME-001",
+      "speed": 681,
       "impactList": [
         {
           "location": "Juice",
@@ -142,6 +150,8 @@
       "cmeIDs": [
         "2026-10-26T09:00Z"
       ],
+      "cmeId": "2026-10-26T09:00:00-CME-001",
+      "speed": 873,
       "impactList": [
         {
           "location": "Mars",
@@ -173,6 +183,8 @@
         "2026-10-26T09:00Z",
         "2026-10-26T09:48Z"
       ],
+      "cmeId": "2026-10-26T09:00:00-CME-001",
+      "speed": 873,
       "impactList": [
         {
           "location": "Juice",
@@ -209,6 +221,8 @@
         "2026-10-26T01:26Z",
         "2026-10-26T02:12Z"
       ],
+      "cmeId": "2026-10-26T01:26:00-CME-001",
+      "speed": 285,
       "impactList": [
         {
           "location": "Mars",
@@ -239,6 +253,8 @@
       "cmeIDs": [
         "2026-10-26T18:48Z"
       ],
+      "cmeId": "2026-10-26T18:48:00-CME-001",
+      "speed": 616,
       "impactList": [
         {
           "location": "Mars",
@@ -269,6 +285,8 @@
       "cmeIDs": [
         "2026-10-26T18:48Z"
       ],
+      "cmeId": "2026-10-26T18:48:00-CME-001",
+      "speed": 616,
       "impactList": [
         {
           "location": "Juno",
@@ -304,6 +322,8 @@
       "cmeIDs": [
         "2026-10-29T10:36Z"
       ],
+      "cmeId": "2026-10-29T10:36:00-CME-001",
+      "speed": 287,
       "impactList": [
         {
           "location": "Mars",
@@ -334,6 +354,8 @@
       "cmeIDs": [
         "2026-11-01T19:00Z"
       ],
+      "cmeId": "2026-11-01T19:00:00-CME-001",
+      "speed": 357,
       "impactList": [
         {
           "location": "BepiColombo",
@@ -379,6 +401,8 @@
       "cmeIDs": [
         "2026-11-09T18:15Z"
       ],
+      "cmeId": "2026-11-09T18:15:00-CME-001",
+      "speed": 726,
       "impactList": [
         {
           "location": "Mars",
@@ -404,6 +428,8 @@
       "cmeIDs": [
         "2026-11-09T18:15Z"
       ],
+      "cmeId": "2026-11-09T18:15:00-CME-001",
+      "speed": 726,
       "impactList": [
         {
           "location": "Mars",

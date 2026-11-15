@@ -107,6 +107,8 @@ describe("music slots for the team's soundtrack", () => {
     const { musicFor, sounds } = await import("./audio");
     expect(musicFor("lobby")).toBe("space-menu-ambience");
     expect(musicFor("hub")).toBe("mars-base-ambience");
+    expect(musicFor("hub", "moon")).toBe("moon-base-ambience"); // #76: no Mars wind on the Moon
+    expect(sounds.get("moon-base-ambience")).toBe(sounds.get("space-menu-ambience"));
     expect(musicFor("console", "dust")).toBe("mission-console-ambience");
     for (const id of [musicFor("lobby"), musicFor("hub"), musicFor("console", "moon")]) expect(sounds.has(id)).toBe(true);
   });

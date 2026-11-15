@@ -48,7 +48,13 @@ export async function assignAll(page, mode = "mouse") {
     await press(page, crew, mode);
     for (const id of Object.keys(EN.jobs)) {
       const job = button(page, EN.jobs[id]);
-      if ((await job.isEnabled()) && (await job.getAttribute("aria-pressed")) !== "true") { await press(page, job, mode); break; }
+      if ((await job.isEnabled()) && (await job.getAttribute("aria-pressed")) !== "true") {
+        await press(page, job, mode);
+        // Each job opens an optional mini-game: skip it (it never changes the result).
+        const mini = page.locator("dialog.mini-game[open]");
+        if (await mini.isVisible().catch(() => false)) await press(page, mini.getByRole("button", { name: new RegExp("^" + EN.miniGame.skip) }), mode);
+        break;
+      }
     }
   }
 }
@@ -64,11 +70,34 @@ export const nextFromNight = async (page, mode = "mouse") => {
   await press(page, page.getByRole("button", { name: new RegExp(`^(${esc(EN.endSol.nextMorning)}|${esc(EN.endSol.seeResults)})`) }).first(), mode);
 };
 export const atFinal = (page) => heading(page, EN.final.heading).isVisible().catch(() => false);
+/** A dust storm calls the crew back to the base: close the alarm, wipe the panels (airlock), fix the greenhouse,
+ *  go back to the console. The jobs are reached by tapping the world (keyboard runs use the mouse for this part). */
+export async function weatherStorm(page, mode = "mouse") {
+  const tapMode = mode === "touch" ? "touch" : "mouse";
+  await press(page, page.locator(".dust-alarm .primary"), tapMode);
+  const box = await page.locator("canvas").boundingBox();
+  const tapAt = (x, y) => tapMode === "touch" ? page.touchscreen.tap(box.x + box.width * x / 640, box.y + box.height * y / 384) : page.mouse.click(box.x + box.width * x / 640, box.y + box.height * y / 384);
+  const opened = (sel) => page.locator(sel).waitFor({ timeout: 5000 }).then(() => true, () => false);
+  await page.waitForTimeout(400);
+  await tapAt(320, 350); // airlock: clean the solar panels
+  if (!(await opened(".storm-panels"))) await press(page, page.locator(".interaction-guide .primary"), tapMode);
+  await page.locator(".storm-panels").waitFor(wait);
+  for (const b of await page.locator(".storm-panels button").all()) await press(page, b, tapMode);
+  await press(page, page.locator(".storm-dialog .primary"), tapMode);
+  await page.waitForTimeout(400); // the closing dialog keeps the canvas inert for a moment
+  await tapAt(208, 300); // greenhouse
+  if (!(await opened(".storm-steps"))) await press(page, page.locator(".interaction-guide .primary"), tapMode);
+  await page.locator(".storm-steps").waitFor(wait);
+  for (let s = 0; s < 3; s++) await press(page, page.locator(".storm-steps button:not(:disabled)").first(), tapMode);
+  await press(page, page.locator(".storm-dialog .primary"), tapMode);
+  await btn(page, EN.world.goConsole, mode, { prefix: true });
+}
 /** From the console morning screen to the final screen. */
 export async function playToFinal(page, mode = "mouse") {
   for (let i = 0; i < 12 && !(await atFinal(page)); i++) {
     await page.waitForTimeout(150);
-    if (await button(page, EN.morning.goPlan).isVisible()) { await toPlan(page, mode); await assignAll(page, mode); await endSol(page, mode); }
+    if (await page.locator(".dust-alarm").count()) await weatherStorm(page, mode);
+    else if (await button(page, EN.morning.goPlan).isVisible()) { await toPlan(page, mode); await assignAll(page, mode); await endSol(page, mode); }
     else if (await page.getByRole("button", { name: new RegExp(`^(${esc(EN.endSol.nextMorning)}|${esc(EN.endSol.seeResults)})`) }).first().isVisible()) await nextFromNight(page, mode);
   }
   await heading(page, EN.final.heading).waitFor(wait);
@@ -96,9 +125,21 @@ export async function openDialogue(page, mode = "mouse") {
   }
   await page.locator("dialog[open]").waitFor(wait);
 }
+/** Leave a crew talk (CrewTalk): "Next" through the typed lines, then "Bye for now!" in the answer menu.
+ *  Places (airlock) just have lines; an older dialogue has a Close button. */
 export const closeDialogue = async (page, mode = "mouse") => {
-  await btn(page, EN.help.close, mode);
-  await page.locator("dialog[open]").waitFor({ state: "detached", ...wait });
+  const dialog = page.locator("dialog[open]");
+  for (let i = 0; i < 8 && (await dialog.count()); i++) {
+    const bye = dialog.getByRole("button", { name: EN.talk.ask.bye, exact: true });
+    const close = dialog.getByRole("button", { name: EN.help.close, exact: true });
+    const next = dialog.locator(".crew-talk__next");
+    const visible = (l) => l.isVisible().catch(() => false);
+    if (await visible(bye)) await press(page, bye, mode);
+    else if (await visible(close)) await press(page, close, mode);
+    else if (await visible(next)) await press(page, next, mode);
+    await page.waitForTimeout(150);
+  }
+  await dialog.waitFor({ state: "detached", ...wait });
 };
 
 /** Named screens for the layout / a11y checks. Each starts from a fresh page. */

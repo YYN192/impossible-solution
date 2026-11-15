@@ -64,3 +64,47 @@
 @keyframes plan-pop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
 @keyframes plan-tick{0%{transform:translateY(-4px);opacity:.3}100%{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.plan-screen *{animation:none!important;transition:none!important}}
+/* Job mini games (src/components/JobMiniGame.tsx): pixel art like the rest of the game. Sprites come from
+   scripts/generate-minigame-assets.mjs and scale by whole pixels; borders are hard and shadows stepped. */
+.mini-game{position:fixed;inset:0;margin:auto;max-width:620px;max-height:calc(100dvh - 24px);overflow:auto;border:var(--px,4px) solid #83d9f4;box-shadow:6px 6px 0 #020811,inset 0 0 0 var(--px,4px) #101a2b;background:#122131}
+.mini-game[open]{display:block}
+.mini-game h2{font-size:clamp(1.3rem,3.5vw,2rem);margin:.2rem 0 .5rem;text-shadow:3px 3px 0 #080b12}
+.mini-game .eyebrow{color:#83d9f4;text-transform:uppercase;letter-spacing:.08em}
+.mini-game .actions{display:flex;flex-wrap:wrap;gap:10px}.mini-game .actions button{min-height:52px;font-size:1rem}
+.mini-game img.pixel{image-rendering:pixelated;image-rendering:crisp-edges;display:block;width:32px;height:32px}
+.mini-game img.pixel.big{width:96px;height:96px}
+.mini-game img.pixel.wide{width:64px;height:32px}
+.mini-board{background:#101a2b;border:var(--px,4px) solid #252c38;box-shadow:inset 4px 4px 0 #080b12;padding:10px;margin:10px 0}
+.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mini-tile{min-height:128px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#1a2a3c;border:var(--px,4px) solid #687586;border-radius:0;padding:6px}
+.mini-tile.dusty{background:#3d2414;border-color:#d86e3b}
+.mini-tile.clean,.mini-tile.grown{background:#173b2c;border-color:#65bf83}
+.mini-tile.thirsty{background:#3d2414;border-color:#d86e3b;animation:mini-shake .5s steps(2) infinite}
+.mini-tile.thirsty img.big{filter:saturate(.35)}
+.mini-drops{display:flex;gap:2px;min-height:32px}
+.mini-drops img.pixel{width:32px;height:32px}
+.mini-row{display:grid;grid-template-columns:repeat(5,1fr);min-height:100px;align-items:end}
+.mini-row>span{display:flex;justify-content:center;align-items:end;min-height:36px}
+.mini-row.slider{min-height:36px;align-items:center}
+.mini-row.rail{min-height:8px;border-top:var(--px,4px) solid #687586}
+.mini-target{display:block;width:64px;height:8px;background:#65bf83}
+.mini-stack{display:flex;flex-direction:column;align-items:center;gap:0;margin:8px 0 0}
+.mini-sky img.star{width:32px;height:32px;opacity:.7;animation:mini-twinkle 1.2s steps(2) infinite}
+.mini-sky .earth{animation:mini-bob 1s steps(2) infinite}
+.mini-sky.dish .aimed{filter:drop-shadow(0 0 0 #65bf83) drop-shadow(4px 0 0 #65bf83) drop-shadow(-4px 0 0 #65bf83)}
+.mini-tile.hole{position:relative;justify-content:flex-end;background:#2a1a10;border-color:#a84730}
+.mini-game img.pixel.ground{width:96px;height:48px}.mini-tile.hole .rock{width:48px;height:48px;margin-bottom:-14px;position:relative;z-index:1;animation:mini-pop .15s steps(2)}
+.mini-tile.hole .glint{position:absolute;top:6px;right:10px;animation:mini-twinkle .6s steps(2) infinite}
+.mini-dish-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0 4px}
+.mini-dish-controls button{min-height:52px;min-width:120px}
+.mini-dish-controls button:disabled{opacity:.45;cursor:not-allowed}
+.mini-meter{display:flex;gap:4px;margin:8px 0}.mini-meter span{flex:1;height:12px;background:#252c38;border:2px solid #080b12}.mini-meter span.on{background:#65bf83}
+.mini-won{display:inline-flex;align-items:center;gap:8px;color:#e6bd5d}
+.mini-now{color:#65bf83;font-weight:700}
+.mini-count{color:var(--muted)}
+@keyframes mini-twinkle{50%{opacity:.25}}
+@keyframes mini-bob{50%{transform:translateY(-4px)}}
+@keyframes mini-pop{from{transform:translateY(12px)}}
+@keyframes mini-shake{50%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.mini-game *{animation:none!important;transition:none!important}}
+@media (max-width:480px){.mini-game img.pixel.big{width:64px;height:64px}.mini-game img.pixel.ground{width:64px;height:32px}.mini-row{min-height:68px}}

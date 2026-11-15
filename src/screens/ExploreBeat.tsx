@@ -1,14 +1,16 @@
+import { reducedMotion } from "../state/comfort";
+import { Icon } from "../components/Icon";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
-import { driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
+import { EXPLORE, drivePower, driveAction, isHome, move, ranOutOfPower, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
-import { usePressedKeys } from "../game/pressedKeys";
+import { gameKey, usePressedKeys } from "../game/pressedKeys";
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] } as const;
 type Dir = keyof typeof DIRS;
-const KEYS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", s: "down", a: "left", d: "right" };
+const KEYS: Record<string, Dir> = { arrowup: "up", arrowdown: "down", arrowleft: "left", arrowright: "right", w: "up", s: "down", a: "left", d: "right" };
 
 // Same keys, lower-cased, so the pad lights up while a key is held (Caps Lock included).
 const HINT_KEYS = Object.fromEntries(Object.entries(KEYS).map(([k, d]) => [k.toLowerCase(), d]));
@@ -22,6 +24,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
   const { t } = useTranslation();
   const [drive, setDrive] = useState(() => startDrive(map));
   const [facing, setFacing] = useState<Dir>("right");
+  const [shake, setShake] = useState(false);
   const home = isHome(map, drive);
   const pressed = usePressedKeys(HINT_KEYS);
 
@@ -31,11 +34,15 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
     const next = move(map, drive, dx, dy);
     if (next === drive) return audio.playSfx("job-remove");
     audio.playSfx(next.collected.length > drive.collected.length ? "assign" : "select");
+    if (ranOutOfPower(map, drive, next)) {
+      audio.playSfx("rover-power-down");
+      if (!reducedMotion()) { setShake(true); setTimeout(() => setShake(false), 400); }
+    }
     setDrive(next);
   }
 
   return (
-    <div className="explore">
+    <div className={shake ? "explore shake" : "explore"}>
       <div
         className="explore-map"
         role="application"
@@ -43,12 +50,13 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
         aria-label={t("exploreUi.map")}
         style={{ gridTemplateColumns: `repeat(${map.cols}, 1fr)` }}
         onKeyDown={(e) => {
-          const dir = KEYS[e.key];
+          const dir = KEYS[gameKey(e)];
           if (!dir) return;
           e.preventDefault();
           go(dir);
         }}
       >
+        {drive.battery === 0 && !home && <p className="explore-nopower" role="alert">{t("exploreUi.noPower")}</p>}
         {map.cells.map((cell, i) => {
           const x = i % map.cols, y = Math.floor(i / map.cols);
           const sample = map.samples.findIndex((s) => s.x === x && s.y === y);
@@ -76,13 +84,15 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
       </div>
       <div className="explore-side">
         <p className="explore-battery" role="status">
-          <span aria-hidden="true">🔋 </span>
+          <Icon name="battery" />{" "}
           {t("exploreUi.battery", { n: drive.battery, max: map.battery })}
           <span className="explore-pips" aria-hidden="true">
             {Array.from({ length: map.battery }, (_, i) => <i key={i} data-on={i < drive.battery ? "" : undefined} />)}
           </span>
         </p>
-        <p><span aria-hidden="true">🪨 </span>{t("exploreUi.samples", { n: drive.collected.length })}</p>
+        <p><Icon name="rock" />{" "}{t("exploreUi.samples", { n: drive.collected.length })}</p>
+        <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+        {drive.collected.length >= EXPLORE.maxScience && <p className="note">{t("exploreUi.labLimit", { max: EXPLORE.maxScience })}</p>}
         <p className={home ? "explore-home" : "explore-away"} role="status">
           {drive.battery === 0 && !home ? t("exploreUi.empty") + " " : ""}
           {home ? t("exploreUi.home") : t("exploreUi.away")}

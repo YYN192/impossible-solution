@@ -59,7 +59,7 @@ describe("?demo=1 recording path (#6)", () => {
       }
       click(/End sol/);
       // Leaving a crew member idle on purpose asks for a second click.
-      if (screen.queryByRole("alert")) click(new RegExp(t("play.confirmEnd")));
+      if (screen.queryByRole("button", { name: new RegExp(t("play.confirmEnd")) })) click(new RegExp(t("play.confirmEnd")));
       click(sol === 3 ? t("endSol.seeResults") : t("endSol.nextMorning"));
     }
 
@@ -90,5 +90,5 @@ describe("?demo=1 recording path (#6)", () => {
       chains.flat().filter((d) => d.id === "sol1-panels-skipped"),
     ).toHaveLength(1);
     expect(chains.flat().some((d) => d.source)).toBe(true);
-  });
+  }, 20_000); // plays the whole demo twice: slower CI machines need more than the 5 s default
 });

@@ -1,8 +1,10 @@
+import { Icon } from "./Icon";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import type { HubStorm } from "../data/hubStorm";
+import { localText } from "../i18n/sourceText";
 
 /** A modal <dialog> that opens on mount; Esc (cancel) calls onClose. */
 function Modal({ label, onClose, className = "", children }: { label: string; onClose: () => void; className?: string; children: React.ReactNode }) {
@@ -13,17 +15,17 @@ function Modal({ label, onClose, className = "", children }: { label: string; on
 
 /** The storm arrives: the whole screen fills with dust and the alarm names the real storm it is like. */
 export function StormAlarm({ storm, onClose }: { storm: HubStorm; onClose: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   useEffect(() => { audio.playSfx("storm-warning"); }, []);
   return <Modal label="storm-title" onClose={onClose} className="dust-alarm">
     <div>
-      <p className="eyebrow">⚠ {t("hubStorm.eyebrow")}</p>
-      <h2 id="storm-title">🌪️ {t("hubStorm.title")}</h2>
+      <p className="eyebrow"><Icon name="warning" /> {t("hubStorm.eyebrow")}</p>
+      <h2 id="storm-title"><Icon name="dust-storm" /> {t("hubStorm.title")}</h2>
       <p className="lead">{t("hubStorm.lead")}</p>
-      <ul className="storm-todo"><li>☀️ {t("hubStorm.panels")}</li><li>🌱 {t("hubStorm.greenhouse")}</li></ul>
+      <ul className="storm-todo"><li><Icon name="sun" /> {t("hubStorm.panels")}</li><li><Icon name="sprout" /> {t("hubStorm.greenhouse")}</li></ul>
       <aside className="storm-real"><strong>{t("hubStorm.realTitle")}</strong>
         <p>{t(`hubStorm.real.${storm.real}`)}</p>
-        {storm.source && <a href={storm.source.url} target="_blank" rel="noreferrer">{t("hubStorm.source")}: {storm.source.label}</a>}
+        {storm.source && <a href={storm.source.url} target="_blank" rel="noreferrer">{t("hubStorm.source")}: {localText(storm.source.label, i18n.language)}</a>}
       </aside>
       <div className="actions"><button className="primary" autoFocus onClick={onClose}>{t("hubStorm.go")}</button></div>
     </div>
@@ -70,7 +72,7 @@ export function GreenhouseTask({ onDone, onClose }: { onDone: () => void; onClos
       <p className="lead">{t("hubStorm.greenhouseLead")}</p>
       <ol className="storm-steps">{STEPS.map((s, i) => <li key={s}>
         <button type="button" disabled={i !== done} aria-pressed={i < done} onClick={() => { audio.playSfx("select"); setDone(i + 1); }}>
-          <span aria-hidden="true">{i < done ? "✅" : ["🩹", "💡", "🌱"][i]}</span> {t(`hubStorm.step.${s}`)}
+          <span aria-hidden="true"><Icon name={i < done ? "check" : (["patch", "lamp", "sprout"] as const)[i]} /></span> {t(`hubStorm.step.${s}`)}
         </button></li>)}</ol>
       <div className="actions"><button className="primary" disabled={done < STEPS.length} onClick={onDone}>{t("hubStorm.fixed")}</button><button onClick={onClose}>{t("hubStorm.later")}</button></div>
     </div>

@@ -3,6 +3,7 @@
  * `buildRun(campaign, seed)` turns a campaign into one run. Same seed → same run.
  * Real data is never changed by the seed; only which real event and which beat a run gets.
  */
+import type { Icon } from "./icons";
 import type { ExploreMap } from "./explore";
 import { rng } from "./rng";
 import { CLASSIC_RULES, type Action, type DataRef, type Rules, type StormEvent } from "./types";
@@ -82,7 +83,7 @@ export function buildRun(campaign: Campaign, seed: number): Run {
 export const option = (
   beatId: string,
   id: string,
-  icon: string,
+  icon: Icon,
   rest: Omit<Action, "id" | "icon" | "textKey"> = {},
   real = false,
 ): BeatOption => ({

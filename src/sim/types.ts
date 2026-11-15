@@ -90,6 +90,8 @@ export interface StormEvent {
   captionKey: string;
   /** Data provenance shown in Data Sources and on the chip. */
   source: DataRef;
+  /** A game event, not a real NASA event: never shown as "It's real!" or with an event number. */
+  game?: true;
 }
 
 export interface EarthAnswer {
@@ -116,7 +118,7 @@ export interface DataRef {
 export interface Domino {
   id: string; // e.g. 'sol1-panels-skipped'
   sol: number;
-  icon: string; // e.g. '🧽✗', '⚡↓'
+  icon: string; // icon names from src/sim/icons.ts, e.g. 'wipe x', 'power down' (#50)
   textKey: string; // i18n key
   causeIds: string[];
   source?: DataRef;
@@ -171,7 +173,7 @@ export const MISSION_SOLS = 3;
 /**
  * Causal table — THE game. Cost today / if done / if skipped.
  * Game numbers; tune them only with the brute-force tests green
- * (3-link chain exists, several 2–3★ plans exist, no plan is free).
+ * (3-link chain exists, several 2–3 star plans exist, no plan is free).
  */
 export const JOBS: Record<
   JobId,

@@ -102,6 +102,9 @@ try {
           for (let c = 0; c < n; c++) {
             await click(page.locator(".crew-tile > button:not(:disabled):not(.unassign)").nth(c));
             await click(page.locator(".job-choice").nth((c + i) % 5));
+            // Each job opens an optional mini-game: skip it (it never changes the result).
+            const mini = page.locator("dialog.mini-game[open]");
+            if (await mini.count()) await click(mini.getByRole("button", { name: new RegExp("^" + EN.miniGame.skip) }));
           }
           if (!reloaded && i > 6) {
             reloaded = true;

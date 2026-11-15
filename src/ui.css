@@ -17,21 +17,20 @@
 @media (pointer: coarse) { :root { --tap: 48px; } }
 html { -webkit-text-size-adjust: 100%; }
 body { font-size: 1rem; }
-img, canvas, .world-viewport, .menu-landscape img { image-rendering: pixelated; }
+img, canvas, .world-viewport{ image-rendering: pixelated; }
 
 /* Paragraphs and list text: readable Nunito, never below 1rem. (!important beats the many one-off minified sizes.) */
 p, li, dd, summary + * { font-family: var(--font-body); }
 p, li { font-size: max(1rem, 1em) !important; line-height: 1.5; overflow-wrap: anywhere; }
-.eyebrow, .note, .chip, .sol-tag, .chain-sol, .console-footer, .menu-bottom, .meter-label, .step-label, .menu-landscape span,
-.mission-facts > span, .sol-navigation > span, .planner-guidance, .meter-change, .meter-value small, .resource-meter > small,
+.eyebrow, .note, .chip, .sol-tag, .chain-sol, .console-footer, .menu-bottom, .meter-label, .step-label, .sol-navigation > span, .planner-guidance, .meter-change, .meter-value small, .resource-meter > small,
 .job-number, .world-objective > span:last-child, .station-tip, .data-badge { font-size: 0.875rem !important; }
 .note, .chip, .chain-sol, .station-tip, .planner-guidance { line-height: 1.4; }
 
 /* Headings and labels: pixel font. */
-h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .mission-facts, .data-badge {
+h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge {
   font-family: var(--font-pixel); letter-spacing: 0; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto;
 }
-.menu-story h1 { letter-spacing: 0; text-shadow: 3px 3px 0 var(--ink); }
+
 .eyebrow { letter-spacing: 0.06em; }
 
 /* ONE button system: every button, button-like control and summary. */
@@ -129,8 +128,85 @@ kbd[data-pressed] { background: #08202a; color: #83d9f4; border-color: #08202a; 
    keeps the pixel font. To bring it back everywhere, delete the next three rules. */
 :root { --font-pixel: var(--font-body); }
 :is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge, .job-copy strong, .crew-tile strong, .mission-card strong, .beat-option strong) { font-weight: 700; }
-:root:not(:lang(bg)) .menu-story h1 { font-family: "Pixelify Sans", var(--font-body); font-weight: 400; }
+
 /* A 44 px link inside a chip must grow the chip, not spill onto the next card. */
 p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35rem; }
 /* A job card with no astronaut picked yet looks "not ready" but still answers when tapped. */
 .job-choice[aria-disabled="true"] { border-style: dashed; color: #cfdae4; }
+
+/* #75 readability minimums (kid-design audit, 15 Nov). Sentences are at least 16 px; labels may stay at 14 px. */
+.expedition :is(.mini-text, .mini-link small, .sol-explainer, .job-cost, .job-copy small, .small-counters, .crew-tile small, .beat-option small, .beat-effects, .night-results, .storm-left) { font-size: max(1rem, 16px) !important; line-height: 1.45; }
+.expedition .lead { max-width: 62ch; }
+/* Low-contrast greys on the dark job cards lifted to WCAG AA (≥ 4.5:1 on #142536). */
+.expedition :is(.job-number, .job-cost, .job-copy small, .mini-link small) { color: #c3d3de !important; }
+/* Help buttons and the main "next" buttons: bigger for ages 7–9. */
+.expedition .whats-this__button { min-width: var(--tap) !important; min-height: var(--tap) !important; } /* 44 px, 48 px on touch */
+.expedition :is(.end-sol, .beat-result .primary, .morning-go, .screen .actions .primary, .launch-button) { min-height: 56px; }
+
+/* #75 phones: the main action of each screen stays on screen. Start (menu), Plan the day (morning) and
+   End sol (plan) are pinned to the bottom edge until their own place scrolls into view (position: sticky,
+   so nothing is ever covered for good and the page still scrolls normally). */
+.mission-menu { overflow: clip; } /* clip, not hidden: hidden would make the menu a scroll box and break sticky */
+@media (max-width: 720px) {
+  .phone-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-inline: -14px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: #0b1825f2;
+    border-top: 2px solid #31495e;
+    box-shadow: 0 -8px 18px #020811b3;
+  }
+  .screen .actions.phone-dock { margin-top: 1rem; margin-bottom: 0; }
+  /* Menu: the cards scroll under a pinned Start button. */
+  .mission-menu .menu-actions { display: contents; }
+  .mission-menu .menu-actions .launch-button {
+    position: sticky;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 5;
+    box-shadow: 0 0 0 4px #080f1a, 0 8px 24px #000c;
+  }
+  /* Plan: one line of "after this sol" numbers above End sol. */
+  .plan-bar { display: grid; gap: 8px; }
+  .plan-bar .end-sol { width: 100%; margin: 0; }
+  .plan-bar [role="alert"] { margin: 0; }
+  .plan-bar__preview { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; font-size: 1rem; }
+  .plan-bar__value { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+  /* Beat screens: the three meters as one compact strip (icon, ?, number) above the choices. */
+  .beat-meters .resource-meters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 12px 0 6px; }
+  .beat-meters .resource-meter { padding: 6px 8px; }
+  .beat-meters .meter-label { flex-wrap: nowrap; gap: 6px; }
+  .beat-meters .meter-label > span:not(.whats-this),
+  .beat-meters .meter-track,
+  .beat-meters .resource-meter > small {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .beat-meters .meter-label .whats-this { margin-left: auto; }
+  .beat-meters .meter-value { margin: 2px 0 0; }
+  .beat-meters .meter-value strong { font-size: 1.25rem; }
+  .beat-meters .small-counters { padding: 6px 0; }
+}
+/* #75 phones: the hub picture sits in the middle of the free space, not stuck to its top. */
+@media (max-width: 720px) { .world-viewport { place-items: center; } }
+
+/* #77 Calm mode: everything stays still, exactly like the system's "reduce motion" (no shake, blowing dust, pulsing,
+   falling dominoes); alarms also play softer (audio.ts alarmFactor). */
+html[data-calm] *, html[data-calm] *::before, html[data-calm] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+/* #77 High contrast: muted text becomes near-white, borders get stronger, and the dust veil is gone. */
+html[data-contrast] { --muted: #e6edf3; }
+html[data-contrast] .dust-cover { display: none !important; }
+html[data-contrast] :is(.note, small, .eyebrow, .job-cost, .job-number, .mini-link small, .meter-label, .data-badge, .data-badge__when, .station-tip, .mission-tags, .mission-meta, .sol-navigation > span) { color: #f2f6fa !important; opacity: 1 !important; }
+html[data-contrast] :is(button, .menu-panel, .information-panel, .mission-console, .npc-dialogue, .crew-tile, .job-choice, .resource-meter, .domino, .earth-inbox) { border-color: #e6edf3 !important; }
+html[data-contrast] :is(.mission-card:disabled, button:disabled) { opacity: 1 !important; }
+/* #77 Settings: on/off rows with a square check, a text-size row, and the first-start sound question. */
+.comfort-toggle { display: flex; align-items: center; gap: 0.7rem; text-align: left; min-height: 48px; }
+.comfort-toggle::before { content: ""; flex: none; width: 1.1em; height: 1.1em; border: 2px solid currentColor; }
+.comfort-toggle[aria-pressed="true"]::before { background: var(--cyan); box-shadow: inset 0 0 0 2px #0b1020; }
+.comfort-heading { margin: 0.6rem 0 0; font-size: 1.1rem; }
+.comfort-sizes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.comfort-sizes > span { margin-right: auto; }
+.comfort-sizes button, .sound-ask button { min-height: 48px; min-width: 64px; padding: 0.3rem 0.9rem; }
+.comfort-sizes button[aria-pressed="true"], .sound-ask button[aria-pressed="true"] { background: var(--cyan); border-color: var(--cyan); color: #0b242e; }
+.sound-ask { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; margin: 0.6rem 0 0; }
+.information-panel .menu-settings { margin-inline: auto; }

@@ -74,16 +74,16 @@ const EARTH_REF: DataRef = {
 
 /** Jobs whose skipping drops a domino of its own (the screens have text for these). */
 const SKIP_DOMINO: Partial<Record<JobId, { icon: string; key: string }>> = {
-  panels: { icon: "🧽✗", key: "panelsSkipped" },
-  greenhouse: { icon: "🥬✗", key: "greenhouseSkipped" },
-  shelter: { icon: "🛡️✗", key: "shelterSkipped" },
+  panels: { icon: "wipe x", key: "panelsSkipped" },
+  greenhouse: { icon: "food x", key: "greenhouseSkipped" },
+  shelter: { icon: "shield x", key: "shelterSkipped" },
 };
 
 /** Assigned but not enough power: says so, instead of "nobody did it". */
 const NO_POWER_DOMINO: Partial<Record<JobId, { icon: string; key: string }>> = {
-  greenhouse: { icon: "🥬⚡✗", key: "noPowerGreenhouse" },
-  shelter: { icon: "🛡️⚡✗", key: "noPowerShelter" },
-  askEarth: { icon: "📡⚡✗", key: "noPowerAskEarth" },
+  greenhouse: { icon: "food power x", key: "noPowerGreenhouse" },
+  shelter: { icon: "shield power x", key: "noPowerShelter" },
+  askEarth: { icon: "radio power x", key: "noPowerAskEarth" },
 };
 
 const clamp = (v: number, max = 10) => Math.min(max, Math.max(0, v));
@@ -202,7 +202,7 @@ export function step(
     add({
       id: p(sol, "power-low"),
       sol,
-      icon: "⚡↓",
+      icon: "power down",
       textKey: "domino.powerLow",
       causeIds: blamed("power"),
     });
@@ -216,7 +216,7 @@ export function step(
   for (const job of JOB_IDS) {
     const assignedJob = assigned.has(job);
     if (job === "askEarth" && assignedJob && earthHidden) {
-      add({ id: p(sol, "no-signal"), sol, icon: "📡🌘", textKey: "domino.noSignal", causeIds: [] });
+      add({ id: p(sol, "no-signal"), sol, icon: "radio no-signal", textKey: "domino.noSignal", causeIds: [] });
       continue;
     }
     const affordable = costOf(job) <= power + EPS;
@@ -245,7 +245,7 @@ export function step(
     add({
       id: p(sol, "air-low"),
       sol,
-      icon: "🫧↓",
+      icon: "air down",
       textKey: "domino.airLow",
       causeIds: [...powerLowToday, ...blamed("air")],
     });
@@ -264,7 +264,7 @@ export function step(
       add({
         id: p(sol, "cold-night"),
         sol,
-        icon: "🥶",
+        icon: "cold",
         textKey: "domino.coldNight",
         causeIds: powerLowToday,
       });
@@ -297,7 +297,7 @@ export function step(
       add({
         id: p(sol, "outside-storm"),
         sol,
-        icon: "🧑‍🚀☢️",
+        icon: "astronaut dose",
         textKey: "domino.outsideStorm",
         causeIds: [],
       });
@@ -311,7 +311,7 @@ export function step(
     add({
       id: p(sol, "dose-high"),
       sol,
-      icon: "☢️↑",
+      icon: "dose up",
       textKey: "domino.doseHigh",
       causeIds,
       source: storm.source,
@@ -321,7 +321,7 @@ export function step(
     add({
       id: p(sol, "dose-full"),
       sol,
-      icon: "🚀🏠",
+      icon: "rocket home",
       textKey: "domino.doseFull",
       causeIds: storm ? [p(sol, "dose-high")] : blamed("dose"),
     });
@@ -334,7 +334,7 @@ export function step(
       add({
         id: p(sol, "food-empty"),
         sol,
-        icon: "🥬0",
+        icon: "food zero",
         textKey: "domino.foodEmpty",
         causeIds: [
           p(sol, "greenhouse-skipped"),
@@ -351,7 +351,7 @@ export function step(
     add({
       id: p(sol, "dust-storm"),
       sol,
-      icon: "🌪️",
+      icon: "dust-storm",
       textKey: dustStorm.captionKey,
       causeIds: [],
       source: dustStorm.source,
@@ -386,7 +386,7 @@ export function step(
         add({
           id: p(next, "power-low"),
           sol: next,
-          icon: "⚡↓",
+          icon: "power down",
           textKey: "domino.powerLow",
           causeIds,
         });
@@ -395,7 +395,7 @@ export function step(
       add({
         id: p(next, "crew-tired"),
         sol: next,
-        icon: "😴",
+        icon: "tired",
         textKey: "domino.crewTired",
         causeIds: [p(sol, "food-empty")],
       });
@@ -444,7 +444,7 @@ export function act(
   const sol = state.sol;
   const R = rulesOf(state);
   if (action.ask && R.earthHidden.includes(sol)) {
-    const d: Domino = { id: `sol${sol}-no-signal`, sol, icon: "📡🌘", textKey: "domino.noSignal", causeIds: [] };
+    const d: Domino = { id: `sol${sol}-no-signal`, sol, icon: "radio no-signal", textKey: "domino.noSignal", causeIds: [] };
     return { state: { ...state, dominoes: [...state.dominoes, d] }, fell: [d] };
   }
   const e = action.effect ?? {};

@@ -72,8 +72,8 @@ function crewBeat(next: () => number): Beat {
     type: "dilemma",
     vars: { crew: CREW_NAMES[who] },
     options: [
-      option("crew", "meal", "🍲", { effect: { food: -1 } }),
-      option("crew", "rest", "🛌", { effect: { tired: [who] } }),
+      option("crew", "meal", "meal", { effect: { food: -1 } }),
+      option("crew", "rest", "rest", { effect: { tired: [who] } }),
     ],
   };
 }
@@ -83,8 +83,8 @@ const radio = (card: DataRef, ask: "night" | "now"): Beat => ({
   type: "radio",
   card,
   options: [
-    option(ask === "now" ? "radioMoon" : "radio", "call", "📡", { effect: { power: -1 }, ask }),
-    option(ask === "now" ? "radioMoon" : "radio", "skip", "🔋"),
+    option(ask === "now" ? "radioMoon" : "radio", "call", "radio", { effect: { power: -1 }, ask }),
+    option(ask === "now" ? "radioMoon" : "radio", "skip", "battery"),
   ],
 });
 
@@ -103,9 +103,9 @@ const explore = (next: () => number): Beat => ({
   // The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
   map: buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next),
   options: [
-    option("explore", "near", "🚙", { effect: { power: -1, science: 1 } }),
-    option("explore", "far", "🗺️", { effect: { power: -3, science: 2 } }),
-    option("explore", "stay", "🏠"),
+    option("explore", "near", "rover", { effect: { power: -1, science: 1 } }),
+    option("explore", "far", "map", { effect: { power: -3, science: 2 } }),
+    option("explore", "stay", "home"),
   ],
 });
 
@@ -116,13 +116,13 @@ const dilemma = (next: () => number): Beat =>
       id: "cold",
       type: "dilemma" as const,
       card: REMS_NIGHT,
-      options: [option("cold", "heat", "🔥", { effect: { power: -2 } }), option("cold", "huddle", "🥶", { effect: { food: -1 } })],
+      options: [option("cold", "heat", "heater", { effect: { power: -2 } }), option("cold", "huddle", "cold", { effect: { food: -1 } })],
     },
     {
       id: "devil",
       type: "dilemma" as const,
       card: WIND_CLEANING,
-      options: [option("devil", "tilt", "🌬️", { effect: { power: -1, panelEfficiency: 1 } }), option("devil", "shut", "🚪")],
+      options: [option("devil", "tilt", "wind", { effect: { power: -1, panelEfficiency: 1 } }), option("devil", "shut", "door")],
     },
     crewBeat(next),
   ]);
@@ -132,9 +132,9 @@ const wipe: Beat = {
   type: "wipe",
   card: INSIGHT_SAND,
   options: [
-    option("wipe", "none", "🧽✗"),
-    option("wipe", "half", "🧽", { effect: { panelEfficiency: 0.8, dose: DOSE.outsideExtra } }),
-    option("wipe", "all", "✨", { effect: { panelEfficiency: 1, dose: 2 * DOSE.outsideExtra } }),
+    option("wipe", "none", "wipe x"),
+    option("wipe", "half", "wipe", { effect: { panelEfficiency: 0.8, dose: DOSE.outsideExtra } }),
+    option("wipe", "all", "sparkle", { effect: { panelEfficiency: 1, dose: 2 * DOSE.outsideExtra } }),
   ],
 };
 
@@ -142,10 +142,10 @@ const upgrade: Beat = {
   id: "upgrade",
   type: "upgrade",
   options: [
-    option("upgrade", "brush", "🧹", { effect: { power: -2 }, rules: { dustFactor: 0.9 } }),
-    option("upgrade", "shelf", "🥬", { effect: { power: -2 }, rules: { foodGain: 2 } }),
-    option("upgrade", "walls", "🛡️", { effect: { power: -2 }, rules: { shelterFactor: 0.25 } }),
-    option("upgrade", "none", "🔋"),
+    option("upgrade", "brush", "brush", { effect: { power: -2 }, rules: { dustFactor: 0.9 } }),
+    option("upgrade", "shelf", "food", { effect: { power: -2 }, rules: { foodGain: 2 } }),
+    option("upgrade", "walls", "shield", { effect: { power: -2 }, rules: { shelterFactor: 0.25 } }),
+    option("upgrade", "none", "battery"),
   ],
 };
 
@@ -215,9 +215,9 @@ const dust: Campaign = {
           id: "siteMars",
           type: "site",
           options: [
-            option("siteMars", "gale", "🏔️", { rules: { heater: 2 }, source: REMS_NIGHT }, true),
-            option("siteMars", "elysium", "🏜️", { rules: { dustFactor: 0.5 }, source: INSIGHT_POWER }, true),
-            option("siteMars", "meridiani", "🌬️", { rules: { dustFactor: 0.8, solar: 5 }, source: WIND_CLEANING }, true),
+            option("siteMars", "gale", "mountain", { rules: { heater: 2 }, source: REMS_NIGHT }, true),
+            option("siteMars", "elysium", "plain", { rules: { dustFactor: 0.5 }, source: INSIGHT_POWER }, true),
+            option("siteMars", "meridiani", "wind", { rules: { dustFactor: 0.8, solar: 5 }, source: WIND_CLEANING }, true),
           ],
         },
         2: wipe,
@@ -228,9 +228,9 @@ const dust: Campaign = {
           id: "rover",
           type: "rover",
           options: [
-            option("rover", "near", "🚙", { effect: { power: -1, science: 1, dose: DOSE.outsideExtra } }),
-            option("rover", "far", "🗺️", { effect: { power: -3, science: 2, dose: 2 * DOSE.outsideExtra } }),
-            option("rover", "stay", "🏠"),
+            option("rover", "near", "rover", { effect: { power: -1, science: 1, dose: DOSE.outsideExtra } }),
+            option("rover", "far", "map", { effect: { power: -3, science: 2, dose: 2 * DOSE.outsideExtra } }),
+            option("rover", "stay", "home"),
           ],
         },
       },
@@ -262,15 +262,15 @@ const moon: Campaign = {
         dose: { inside: MOON_STORM_FACTOR * DOSE.normalDay, outside: MOON_STORM_FACTOR * (DOSE.normalDay + DOSE.outsideExtra) },
       },
       // A game event: even the best ridges are not sunlit all the time.
-      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", captionKey: "event.shadow.moon", solar: 0.2, source: ARTEMIS_REGIONS },
+      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", game: true, captionKey: "event.shadow.moon", solar: 0.2, source: ARTEMIS_REGIONS },
     ];
     const last: Beat = pick(next, [
       {
         id: "lastDay",
         type: "dilemma" as const,
         options: [
-          option("lastDay", "sample", "🪨", { effect: { science: 1, dose: DOSE.outsideExtra } }),
-          option("lastDay", "charge", "🔋", { effect: { power: 2 } }),
+          option("lastDay", "sample", "rock", { effect: { science: 1, dose: DOSE.outsideExtra } }),
+          option("lastDay", "charge", "battery", { effect: { power: 2 } }),
         ],
       },
       crewBeat(next),
@@ -283,9 +283,9 @@ const moon: Campaign = {
           type: "site",
           card: ARTEMIS_REGIONS,
           options: [
-            option("siteMoon", "malapert", "⛰️", { rules: { solar: 6 }, source: ARTEMIS_REGIONS }, true),
-            option("siteMoon", "shackleton", "☀️", { rules: { solar: 7, earthHidden: hidden }, source: ARTEMIS_REGIONS }, true),
-            option("siteMoon", "haworth", "🧊", { rules: { solar: 4, airMachinePower: 1, foodGain: 2, earthHidden: hidden }, source: ARTEMIS_REGIONS }, true),
+            option("siteMoon", "malapert", "mountain", { rules: { solar: 6 }, source: ARTEMIS_REGIONS }, true),
+            option("siteMoon", "shackleton", "sun", { rules: { solar: 7, earthHidden: hidden }, source: ARTEMIS_REGIONS }, true),
+            option("siteMoon", "haworth", "ice", { rules: { solar: 4, airMachinePower: 1, foodGain: 2, earthHidden: hidden }, source: ARTEMIS_REGIONS }, true),
           ],
         },
         2: radio(MOON_DELAY, "now"),
@@ -294,17 +294,17 @@ const moon: Campaign = {
           type: "skywatch",
           card: CRATER_MAY2024,
           options: [
-            option("skywatch", "shelter", "🛡️", { effect: { power: -1, shelterSols: 2 } }),
-            option("skywatch", "work", "👷"),
+            option("skywatch", "shelter", "shield", { effect: { power: -1, shelterSols: 2 } }),
+            option("skywatch", "work", "worker"),
           ],
         },
         4: {
           id: "ice",
           type: "rover",
           options: [
-            option("ice", "rim", "🚙", { effect: { power: -1, air: 1 } }),
-            option("ice", "deep", "🧊", { effect: { power: -3, air: 2, food: 1, science: 1, dose: DOSE.outsideExtra } }),
-            option("ice", "stay", "🏠"),
+            option("ice", "rim", "rover", { effect: { power: -1, air: 1 } }),
+            option("ice", "deep", "ice", { effect: { power: -3, air: 2, food: 1, science: 1, dose: DOSE.outsideExtra } }),
+            option("ice", "stay", "home"),
           ],
         },
         5: last,

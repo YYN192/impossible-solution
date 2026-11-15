@@ -8,6 +8,8 @@ import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
+import { useComfort } from "./state/comfort";
+import { iconsOf } from "./test/icons";
 
 const t = i18n.t.bind(i18n);
 const jobIds = Object.keys(JOBS) as JobId[];
@@ -85,6 +87,8 @@ describe("PlanScreen (#9)", () => {
       expect(document.activeElement).toBe(btn(t(`jobs.${jobIds[0]}`)));
       btn(t(`jobs.${job}`)).focus();
       fireEvent.click(btn(t(`jobs.${job}`)));
+      // The job's mini game opens; skipping it sends focus on to the next astronaut.
+      fireEvent.click(btn(t("miniGame.skip")));
     }
     expect(useSession.getState().draft).toEqual({
       a1: "greenhouse",
@@ -92,6 +96,49 @@ describe("PlanScreen (#9)", () => {
       a3: "shelter",
     });
     expect(document.activeElement).toBe(btn(`${t("plan.endSol")} →`));
+  });
+});
+
+describe("PlanScreen mini games", () => {
+  it("assigning a job opens that job's mini game; closing it keeps the job", () => {
+    render(<PlanScreen />);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(btn(t("crew.name", { n: 2 })));
+    fireEvent.click(btn(t("jobs.askEarth")));
+    expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+    expect(screen.getByRole("heading", { name: t("miniGame.askEarth.title") })).toBeTruthy();
+    fireEvent.click(btn(t("miniGame.skip")));
+    expect(screen.queryByRole("heading", { name: t("miniGame.askEarth.title") })).toBeNull();
+    expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+  });
+
+  it("#77: with \"Skip the job mini-games\" on, the job is given and no game opens", () => {
+    useComfort.setState({ skipMiniGames: true });
+    try {
+      render(<PlanScreen />);
+      fireEvent.click(btn(t("crew.name", { n: 2 })));
+      fireEvent.click(btn(t("jobs.askEarth")));
+      expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+      expect(screen.queryByRole("dialog")).toBeNull();
+    } finally {
+      useComfort.setState({ skipMiniGames: false });
+    }
+  });
+
+  it("has a mini game for every job in the list", () => {
+    render(<PlanScreen />);
+    for (const [i, job] of jobIds.slice(0, 3).entries()) {
+      fireEvent.click(btn(t("crew.name", { n: i + 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
+    for (const job of jobIds.slice(3)) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
   });
 });
 
@@ -115,26 +162,25 @@ describe("PlanScreen preview (#10)", () => {
     for (const [i, id] of jobIds.entries()) {
       expect(items[i].textContent).toContain(t(`jobInfo.${id}.skipped`));
       const skip = fell.find((d) => d.id === `sol1-${id}-skipped`);
-      if (skip) expect(items[i].textContent).toContain(skip.icon);
+      if (skip) expect(iconsOf(items[i])).toContain(skip.icon);
       for (const effect of fell.filter(
         (d) => skip && d.causeIds.includes(skip.id),
       )) {
-        expect(items[i].textContent).toContain(effect.icon);
+        expect(iconsOf(items[i])).toContain(effect.icon);
         if (effect.sol > 1)
           expect(items[i].textContent).toContain(t("play.tomorrow"));
       }
     }
     // With the greenhouse using power, skipping panels → less power tomorrow (engine decides).
-    expect(items[0].textContent).not.toContain("⚡↓");
+    expect(iconsOf(items[0])).not.toContain("power down");
     fireEvent.click(btn(t("crew.name", { n: 1 })));
     fireEvent.click(btn(t("jobs.greenhouse")));
     expect(preview({ a1: "greenhouse" }).fell.map((d) => d.id)).toContain(
       "sol2-power-low",
     );
     const panelsRow = within(skipList()).getAllByRole("listitem")[0];
-    expect(panelsRow.textContent).toMatch(
-      new RegExp(`🧽✗.*⚡↓${t("play.tomorrow")}`),
-    );
+    expect(iconsOf(panelsRow)).toMatch(/wipe x.*power down/);
+    expect(panelsRow.textContent).toContain(t("play.tomorrow"));
 
     fireEvent.click(btn(t("crew.name", { n: 2 })));
     fireEvent.click(btn(t("jobs.panels")));

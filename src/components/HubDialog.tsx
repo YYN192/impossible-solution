@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { gameKey } from "../game/pressedKeys";
 
 /**
  * A panel opened from a station object (airlock map, radar): a modal <dialog> with a × button.
@@ -16,7 +17,8 @@ export default function HubDialog({ id, eyebrow, title, closeLabel, className = 
   const close = useRef(onClose);
   useEffect(() => { close.current = onClose; });
   useEffect(() => {
-    const key = (e: KeyboardEvent) => { if (e.key.toLowerCase() === "e" && !e.repeat) { e.preventDefault(); close.current(); } };
+    // gameKey: the physical key, so E works on Bulgarian layouts, with Caps Lock and with Shift (#53).
+    const key = (e: KeyboardEvent) => { if (gameKey(e) === "e" && !e.repeat) { e.preventDefault(); close.current(); } };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, []);
