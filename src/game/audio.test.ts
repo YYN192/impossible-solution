@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const contexts: { resume: () => Promise<void>; suspend: () => Promise<void> }[] = [];
 /** Minimal Web Audio stand-in: jsdom has no AudioContext. Records every gain node it hands out. */
 function fakeAudio() {
   const gains: {
@@ -37,11 +38,13 @@ function fakeAudio() {
     decodeAudioData() {
       return Promise.resolve({});
     }
-    resume() {
-      return Promise.resolve();
-    }
+    resume = vi.fn(() => Promise.resolve());
+    suspend = vi.fn(() => Promise.resolve());
   }
-  vi.stubGlobal("AudioContext", FakeContext);
+  contexts.length = 0;
+  vi.stubGlobal("AudioContext", class extends FakeContext {
+    constructor() { super(); contexts.push(this); }
+  });
   const fetch = vi.fn(() =>
     Promise.resolve({
       ok: true,
@@ -87,6 +90,25 @@ describe("audio engine", () => {
     fetch.mockClear();
     audio.playSfx("door");
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("#62: goes quiet while the tab is hidden and resumes when it is shown again", async () => {
+    fakeAudio();
+    const { audio } = await import("./audio");
+    audio.unlock();
+    const [c] = contexts;
+    let hidden = true;
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => hidden });
+    try {
+      document.dispatchEvent(new Event("visibilitychange"));
+      expect(c.suspend).toHaveBeenCalledTimes(1);
+      hidden = false;
+      vi.mocked(c.resume).mockClear();
+      document.dispatchEvent(new Event("visibilitychange"));
+      expect(c.resume).toHaveBeenCalled();
+    } finally {
+      delete (document as { hidden?: boolean }).hidden;
+    }
   });
 
   it("never fetches music while the Music volume is 0 (the default)", async () => {

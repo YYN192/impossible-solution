@@ -196,6 +196,9 @@ function unlock() {
 if (typeof window !== "undefined")
   for (const type of ["pointerdown", "keydown", "touchend", "click"])
     window.addEventListener(type, unlock, { capture: true, passive: true });
+// #62: a hidden tab goes quiet (the music loop kept playing in the background) and picks up where it was on return.
+if (typeof document !== "undefined")
+  document.addEventListener("visibilitychange", () => void (document.hidden ? ctx?.suspend() : ctx?.resume())?.catch(() => {}));
 
 /** Original 8-bit sounds from public/audio (see docs/audio.md). Never autoplays: nothing sounds before the first tap. */
 export const audio = {
