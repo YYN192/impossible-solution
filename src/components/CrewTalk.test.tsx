@@ -48,3 +48,18 @@ describe("CrewTalk typing", () => {
     screen.getByRole("button", { name: en.talk.ask.bye });
   });
 });
+
+describe("CrewTalk practice", () => {
+  it("'Let's practise!' comes first and opens the real mission mini-game on top; Skip returns to the menu", () => {
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) { this.removeAttribute("open"); };
+    render(<CrewTalk speaker="engineer" onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    const answers = screen.getAllByRole("button").filter((b) => b.closest(".crew-talk__menu"));
+    expect(answers[0].textContent).toBe(en.talk.ask.drill);
+    fireEvent.click(answers[0]);
+    fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+    screen.getByRole("heading", { name: en.miniGame.panels.title });
+    fireEvent.click(screen.getByRole("button", { name: en.miniGame.skip }));
+    screen.getByRole("button", { name: en.talk.ask.mission });
+  });
+});
