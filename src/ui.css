@@ -61,7 +61,8 @@ button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: inset
 button:disabled { opacity: 1; color: #aab6c2; background: #141d29; border-color: var(--steel); box-shadow: none; }
 button.primary { background: #83d9f4; border-color: #e8f0f7; color: #08202a; font-weight: 700; }
 button.primary:hover:not(:disabled) { background: #b6ecfb; }
-button[aria-pressed="true"]:not(.job-choice):not(.sound-toggle):not(.crew-tile > button) { background: #83d9f4; border-color: #e8f0f7; color: #08202a; }
+/* Not for cards with dark chips inside (the picked spare part, a picked radar day): they style their own pressed look. */
+button[aria-pressed="true"]:not(.job-choice):not(.sound-toggle):not(.crew-tile > button):not(.build-part):not(.radar-day) { background: #83d9f4; border-color: #e8f0f7; color: #08202a; }
 button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 6px #4c9ce5; }
 .quiet-button, .go-console { background: transparent; border-color: var(--steel); box-shadow: none; color: #cfdae4; }
 

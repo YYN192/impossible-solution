@@ -28,7 +28,8 @@
 .build-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
 .build-part { min-height: 56px; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; text-align: left; padding: 10px; background: #152333; border: 2px solid #687586; color: #e8f0f7; font: inherit; touch-action: none; cursor: grab; }
 .build-part .beat-effects, .build-part .beat-cannot { grid-column: 2; }
-.build-part.held { border-color: #e6bd5d; background: #2a2410; }
+/* The part you are holding: a cyan frame on the same dark card, so its text and cost chips stay readable. */
+.build-part.held { border-color: #83d9f4; background: #123447; color: #e8f0f7; box-shadow: 0 0 0 3px #83d9f455; }
 .build-part-icon .px-icon { width: 32px; height: 32px; }
 .build-ghost { position: fixed; z-index: 50; transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(2px 2px 0 #080b12); }
 .build-ghost .px-icon { width: 40px; height: 40px; }
