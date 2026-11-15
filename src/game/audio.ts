@@ -329,7 +329,7 @@ function unlock() {
 if (typeof window !== "undefined")
   for (const type of ["pointerdown", "keydown", "touchend", "click"])
     window.addEventListener(type, unlock, { capture: true, passive: true });
-// A hidden tab pauses all sound (the song keeps its place) and carries on when the player comes back.
+// #62: a hidden tab goes quiet (the song keeps its place, nothing plays in the background) and carries on when the player comes back.
 function onVisibility() {
   if (!ctx) return;
   if (document.hidden) void ctx.suspend?.().catch(() => {});

@@ -4,8 +4,12 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { gameKey } from "../game/pressedKeys";
 import { DRILL, PORTRAIT, lettersShown, missionTalkKey, type Speaker } from "../game/talk";
+import { tRun } from "../i18n/dynamic";
 import { useMission } from "../state/mission";
 import { JobMiniGame } from "./JobMiniGame";
+import { MoonMiniGame } from "./MoonMiniGame";
+import { DustMiniGame } from "./DustMiniGame";
+import { hasDustGame } from "../game/dustMiniGames";
 import "./CrewTalk.css";
 import { reducedMotion } from "../state/comfort";
 
@@ -62,6 +66,9 @@ export function CrewTalk({
   const { t } = useTranslation();
   const drill = DRILL[speaker];
   const campaign = useMission((m) => m.setup?.campaignId);
+  // On the Moon, the crew says the `_moon` lines (#83) and has Moon facts to tell.
+  const place = useMission((m) => m.setup?.place);
+  const moon = place === "moon";
   const box = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState<Step>(
     drill
@@ -107,13 +114,15 @@ export function CrewTalk({
         {step.kind === "text" && (
           <TypedLine
             key={step.key}
-            text={t(step.key as never)}
+            text={tRun(step.key, {}, place)}
             blip={blip}
             onNext={() => {
               audio.playSfx("dialogue");
               if (step.then === "close") onClose();
               else if (step.then === "menu") setStep({ kind: "menu" });
               else if (step.then === "drill") setStep({ kind: "drill" });
+              // A Moon fact has a second line, then the answers come back.
+              else if (step.then.startsWith("talk.")) say(step.then);
               else say(step.then, "close");
             }}
           />
@@ -125,6 +134,9 @@ export function CrewTalk({
               [t("talk.ask.drill"), () => say(`talk.${speaker}.drillIntro`, "drill")],
               [t("talk.ask.mission"), () => say(missionTalkKey(speaker, campaign))],
               [t("talk.ask.who"), () => say(`talk.${speaker}.who`)],
+              ...(moon
+                ? [[t("talk.ask.lore"), () => say(`talk.${speaker}.lore_moon`, `talk.${speaker}.lore2_moon`)] as [string, () => void]]
+                : []),
               [t("talk.ask.bye"), onClose],
             ]}
             prompt={t("talk.choose")}
@@ -132,11 +144,14 @@ export function CrewTalk({
         )}
         {step.kind === "drill" && drill && (
           // The real mission mini-game for this crew member's job, so practice is exactly what the mission asks.
-          <JobMiniGame
-            job={drill}
-            seed={Date.now()}
-            onClose={(won) => (won ? say(`talk.${speaker}.win`) : setStep({ kind: "menu" }))}
-          />
+          // On the Moon and in Dust Season, practice uses that mission's own mini games, like the plan screen.
+          (() => {
+            const seed = Date.now();
+            const onDone = (won: boolean) => (won ? say(`talk.${speaker}.win`) : setStep({ kind: "menu" }));
+            if (moon) return <MoonMiniGame job={drill} seed={seed} onClose={onDone} />;
+            if (campaign === "dust" && hasDustGame(drill)) return <DustMiniGame job={drill} seed={seed} onClose={onDone} />;
+            return <JobMiniGame job={drill} seed={seed} onClose={onDone} />;
+          })()
         )}
       </div>
     </dialog>

@@ -108,6 +108,40 @@
 @keyframes mini-shake{50%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.mini-game *{animation:none!important;transition:none!important}}
 @media (max-width:480px){.mini-game img.pixel.big{width:64px;height:64px}.mini-game img.pixel.ground{width:64px;height:32px}.mini-row{min-height:68px}}
+/* The Moon's own mini games: grey ground, a dark crater, a low Sun. */
+.mini-moon{border-color:#b8c4d0}
+.mini-moon .eyebrow{color:#e6bd5d}
+.mini-moon .mini-board{background:#080b12}
+.mini-fact{display:flex;align-items:center;gap:8px;color:#b8c4d0}
+.mini-game .mini-fact img.pixel{width:24px;height:24px;flex:none}
+.moon-sky .moon-sun{animation:mini-bob 1.4s steps(2) infinite}
+.moon-ground{border-bottom:var(--px,4px) solid #687586}
+.mini-tile.ice{background:#10263a;border-color:#83d9f4}
+.mini-tile.ice.frozen{animation:mini-shake .6s steps(2) infinite}
+.mini-tile.ice.water{background:#173b2c;border-color:#65bf83}
+.moon-piles{min-height:72px}
+.moon-pile{display:flex;flex-direction:column;align-items:center}
+.mini-game .moon-pile img.pixel.wide{width:56px;height:28px}
+.moon-echo{display:grid;grid-template-columns:1fr;justify-items:center;gap:6px;position:relative}
+.moon-path{display:flex;flex-direction:column;align-items:center;gap:2px}
+.moon-path img.star{opacity:.35}
+.moon-path .coming{animation:mini-bob .3s steps(2) infinite}
+.mini-game .moon-letter{position:absolute;right:20%;bottom:10px;width:48px;height:48px;animation:mini-bob .6s steps(2) infinite}
+.moon-crater .mini-tile.hole{background:#080b12;border-color:#252c38}
+.moon-crater .mini-tile.hole.lit{background:#252c38;border-color:#e6bd5d}
+.moon-crater .mini-tile.hole.dark img.ground{opacity:.5}
+.mini-game .moon-beam{position:absolute;top:4px;left:50%;margin-left:-16px;width:32px;height:32px}
+@media (max-width:480px){.mini-game .moon-pile img.pixel.wide{width:40px;height:20px}.moon-piles{min-height:48px}}
+/* Dust Season's own mini games. */
+.mini-dust{border-color:#d86e3b}
+.mini-dust .eyebrow{color:#d86e3b}
+.dust-panels{gap:6px}
+.dust-panels .mini-tile{min-height:110px;justify-content:flex-end}
+.dust-gust-slot{min-height:48px;display:flex;align-items:center}
+.mini-game img.pixel.dust-gust{width:48px;height:48px;animation:mini-shake .3s steps(2) infinite}
+.dust-panels .gust-here{border-color:#b8c4d0}
+.mini-tile.cracked{background:#3d2414;border-color:#d86e3b;animation:mini-shake .5s steps(2) infinite}
+.mini-game .dust-panels .mini-tile img.pixel:not(.dust-gust){width:64px;height:64px}
 /* Visual hierarchy: step 01 is the brightest thing until an astronaut is chosen; step 02 is dimmed and solid. */
 .plan-screen .crew-tile.call:not(.selected) { border-color: #83d9f4; animation: plan-call 2.4s ease-in-out infinite; }
 .plan-screen .crew-tile.selected { outline: 4px solid #ffd166; outline-offset: 2px; background: #1d3a4d; box-shadow: 0 0 0 6px #ffd16655; }

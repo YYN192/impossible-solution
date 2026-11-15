@@ -16,6 +16,7 @@ import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
 import { ExploreBeat } from "./ExploreBeat";
+import { WipeBeat } from "./WipeBeat";
 
 const num = (n: number) => `${n > 0 ? "+" : "−"}${Math.abs(Number(n.toFixed(1)))}`;
 
@@ -107,11 +108,12 @@ export function BeatScreen() {
       </div>
       {onMap && beat.map && (
         <>
-          <ExploreBeat map={beat.map} onDone={act} />
+          <ExploreBeat map={beat.map} beat={beat.type === "rover" ? beat : undefined} onDone={act} />
           <button type="button" className="explore-switch" onClick={() => setPipDrives(true)}>{t("exploreUi.pip")}</button>
         </>
       )}
-      {onMap ? null : !done ? (
+      {beat.hands && !done && <WipeBeat beat={beat} onDone={act} />}
+      {onMap || (beat.hands && !done) ? null : !done ? (
         <div className="beat-options" role="group" aria-label={t("beatUi.options")} data-type={beat.type}>
           {beat.options.map((o) => {
             const can = canAct(state, o.action);

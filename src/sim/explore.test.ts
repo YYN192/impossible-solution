@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { act, createGame } from "./engine";
-import { buildMap, drivePower, driveAction, move, ranOutOfPower, reachCost, startDrive, type ExploreMap } from "./explore";
+import { EXPLORE, buildMap, drivePower, driveAction, farSamples, move, ranOutOfPower, reachCost, roverChoice, startDrive, type ExploreMap } from "./explore";
 import { rng } from "./rng";
 import snap from "../data/snapshots/rover-map-gale.json";
 
@@ -175,5 +175,29 @@ describe("rover runs out of power (#68)", () => {
     const m = map(3);
     const away = { ...startDrive(m), x: m.base.x + 1, battery: 0 };
     expect(ranOutOfPower(m, { ...away, battery: 1 }, away)).toBe(true);
+  });
+});
+
+describe("#98 rover drive picks the beat's own option", () => {
+  // A map whose samples are not all the same distance from the base.
+  const m = [1, 2, 3, 4, 5, 6, 7, 8].map(map).find((x) => farSamples(x).length > 0)!;
+  const cost = reachCost(m);
+  const sampleCost = m.samples.map((p) => cost[p.y * m.cols + p.x]);
+  const nearest = sampleCost.indexOf(Math.min(...sampleCost));
+  const far = farSamples(m)[0];
+  const at = (x: number, y: number, collected: number[]) => ({ x, y, battery: 8, collected });
+  it("the far samples are the ones farther than the nearest", () => {
+    expect(farSamples(m)).not.toContain(nearest);
+    expect(sampleCost[far]).toBeGreaterThan(sampleCost[nearest]);
+  });
+  it("home with no sample = stay, the nearest sample = near, any farther one = far, stranded = no option", () => {
+    expect(roverChoice(m, at(m.base.x, m.base.y, []))).toBe("stay");
+    expect(roverChoice(m, at(m.base.x, m.base.y, [nearest]))).toBe("near");
+    expect(roverChoice(m, at(m.base.x, m.base.y, [far]))).toBe("far");
+    expect(roverChoice(m, at(m.base.x, m.base.y, [nearest, far]))).toBe("far");
+    expect(roverChoice(m, at(m.base.x + 1, m.base.y, [nearest]))).toBeNull();
+  });
+  it("every sample can be fetched and brought home on one battery, so both near and far are playable", () => {
+    for (const c of sampleCost) expect(2 * c).toBeLessThanOrEqual(EXPLORE.battery);
   });
 });

@@ -73,3 +73,14 @@ describe("rover out of power (#68)", () => {
     play.mockRestore();
   });
 });
+
+describe("#98 Dust Season rover: the drive picks the beat's option", () => {
+  const beat = campaignMission("dust", 7).beats[6];
+  it("ending at home with no samples picks 'keep the rover at home' and says what the drive counts as", () => {
+    const onDone = vi.fn();
+    render(<ExploreBeat map={beat.map!} beat={beat} onDone={onDone} />);
+    screen.getByText(t("exploreUi.pick", { choice: t("beat.rover.stay.label") }));
+    fireEvent.click(screen.getByRole("button", { name: t("exploreUi.finish") }));
+    expect(onDone).toHaveBeenCalledWith(beat.options.find((o) => o.id === "stay")!.action);
+  });
+});

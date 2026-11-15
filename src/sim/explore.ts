@@ -150,3 +150,18 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
     effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
   };
 }
+
+/** Dust Season (#98): the samples farther from the base than the nearest one are "the far crater". */
+export function farSamples(map: ExploreMap): number[] {
+  const cost = reachCost(map);
+  const c = map.samples.map((p) => cost[p.y * map.cols + p.x]);
+  return c.flatMap((v, i) => (v > Math.min(...c) ? [i] : []));
+}
+
+/** Dust Season (#98): which of the rover beat's options the drive counts as. null = stranded away from the base. */
+export function roverChoice(map: ExploreMap, d: Drive): "stay" | "near" | "far" | null {
+  if (!isHome(map, d)) return null;
+  if (!d.collected.length) return "stay";
+  const far = farSamples(map);
+  return d.collected.some((i) => far.includes(i)) ? "far" : "near";
+}

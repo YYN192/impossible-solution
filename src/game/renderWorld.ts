@@ -19,7 +19,7 @@ function preload(room: Room) {
   }
 }
 
-export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }, moon = false, fx: PlayerFx = { puffs: [], bob: 0 }) {
+export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }, moon = false, fx: PlayerFx = { puffs: [], bob: 0 }, running = false) {
   if (!preloaded.has(room)) preload(room);
   ctx.imageSmoothingEnabled = false;
   const sprite = (path: string, x: number, y: number, w: number, h: number) => {
@@ -54,13 +54,14 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   }
   for (const x of [32, 592]) sprite("environment/decorations/mars-pipe", x, 144, 16, 64);
   for (const x of [64, 192, 416, 560]) sprite("environment/decorations/mars-vent", x, 336, 32, 16);
-  // Console bay guide: a calm outline with soft "chase lights" running all the way round (classic arcade marquee).
-  // It rests once the player arrives, and while a storm sends them elsewhere first.
+  // Console bay guide (#55): the raised edge glows in hard pixel rings that grow and shrink until the first sol
+  // starts. It rests once the player arrives, and while a storm sends them elsewhere first.
   if (near !== "console" && !storm.marks.length) {
     ctx.lineWidth = 2; ctx.strokeStyle = "#83d9f4"; ctx.strokeRect(272, 108, 96, 91);
-    ctx.setLineDash([4, 8]); ctx.lineDashOffset = reduced ? 0 : -time / 45;
-    ctx.strokeStyle = "#f2f6fa"; ctx.strokeRect(272, 108, 96, 91);
-    ctx.setLineDash([]);
+    for (let i = 1; i <= consoleGlow(time, reduced, running); i++) {
+      ctx.strokeStyle = ["#83d9f4b0", "#83d9f470", "#83d9f438"][i - 1];
+      ctx.strokeRect(272 - 3 * i, 108 - 3 * i, 96 + 6 * i, 91 + 6 * i);
+    }
   }
   ctx.fillStyle = "#29445b"; ctx.fillRect(272, 198, 96, 3);
   const entities = room.entities.map((e) => ({ y: e.y + e.h, draw: () => {
@@ -149,6 +150,11 @@ export const DOOR = {
 /** Smooth start and stop: the panels ease out of the frame and settle into the wall. */
 export const easeInOut = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 /** Opening progress 0–1 after `dt` ms, moving toward open (`near`) or shut. Reduced motion jumps straight there. */
+/** How many glow rings light the console edge (#55): 0 1 2 3 2 1 in 300 ms steps (a 1.8 s pulse) until the
+ *  mission is running; none with reduced motion, so the plain outline stays still. */
+export const consoleGlow = (time: number, reduced: boolean, running: boolean) =>
+  running || reduced ? 0 : [0, 1, 2, 3, 2, 1][Math.floor(time / 300) % 6];
+
 export function doorStep(progress: number, near: boolean, dt: number, reduced: boolean) {
   if (reduced) return near ? 1 : 0;
   const step = Math.min(dt, 100) / (near ? DOOR.openMs : DOOR.closeMs); // a long pause (tab hidden) never jumps

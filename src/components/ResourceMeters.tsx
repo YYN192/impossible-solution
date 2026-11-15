@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { DOSE, type Bars } from "../sim/types";
+import { ENGINE } from "../sim/engine";
 import { asset } from "../game/assets";
 import { WhatsThis } from "./WhatsThis";
 const meters = [
@@ -8,6 +9,10 @@ const meters = [
   { key: "air", icon: "oxygen-tank", max: 10 },
   { key: "dose", icon: "measuring-device", max: DOSE.meterMax },
 ] as const;
+/** #64: the game's own lines (the star rules): power and air at or above, the space-ray meter below. */
+const SAFE = { power: ENGINE.lowPowerToday, air: ENGINE.airReady, dose: ENGINE.doseLimit } as const;
+// Air starts below its star line (5 < 6), so air shows a goal, not a warning.
+const isSafe = (key: keyof typeof SAFE, v: number) => (key === "dose" ? v < SAFE.dose : key === "air" || v >= SAFE[key]);
 export function ResourceMeters({
   bars,
   previous,
@@ -32,7 +37,7 @@ export function ResourceMeters({
       {meters.map(({ key, icon, max }) => {
         const delta = previous ? bars[key] - previous[key] : 0;
         return (
-          <section className={`resource-meter meter-${key}`} key={key}>
+          <section className={`resource-meter meter-${key}${isSafe(key, bars[key]) ? "" : " unsafe"}`} key={key}>
             <div className="meter-label">
               <img src={asset(`items/${icon}`)} alt="" />
               <span>{t(`bars.${key}`)}</span>
@@ -45,7 +50,7 @@ export function ResourceMeters({
               </strong>
               {/* key re-mounts the number so its tick animation replays on every change */}
               {previous && (
-                <span className="meter-change" key={delta}>
+                <span className={`meter-change ${delta === 0 ? "same" : (key === "dose" ? -delta : delta) > 0 ? "better" : "worse"}`} key={delta}>
                   {delta > 0 ? "+" : ""}
                   {Number(delta.toFixed(1))}
                 </span>
@@ -60,6 +65,7 @@ export function ResourceMeters({
               aria-valuemax={max}
             >
               <span style={{ width: `${(display[key] * 100) / max}%` }} />
+              <b className="meter-safe" aria-hidden="true" style={{ left: `${(SAFE[key] * 100) / max}%` }} />
               {/* Band between the old and new value: shows the change itself (green = better, red = worse). */}
               {previous && (
                 <i
@@ -73,7 +79,7 @@ export function ResourceMeters({
               )}
             </div>
             <small>
-              {key === "dose" ? t("play.lowerBetter") : t("play.higherBetter")}
+              {t(key === "dose" ? "play.safeBelow" : key === "air" ? "play.goalAbove" : "play.safeAbove", { n: SAFE[key] })}
             </small>
           </section>
         );

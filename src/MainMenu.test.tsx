@@ -37,6 +37,18 @@ describe("Main menu: mission picker", () => {
     expect(onChoose).toHaveBeenCalledWith({ campaign: "dust" });
   });
 
+  it("the teacher's key opens every locked campaign; tapping the last one chooses it", () => {
+    useProgress.getState().setTeacher(true);
+    menu();
+    for (const id of ["dust", "moon"] as const) {
+      const c = screen.getByRole("button", { name: card(id) }) as HTMLButtonElement;
+      expect(c.disabled, id).toBe(false);
+      expect(c.textContent).toContain(t(`campaign.${id}.hook`));
+    }
+    fireEvent.click(screen.getByRole("button", { name: card("moon") }));
+    expect(onChoose).toHaveBeenCalledWith({ campaign: "moon" });
+  });
+
   it("offers today's real Sun", () => {
     menu();
     fireEvent.click(screen.getByRole("button", { name: t("menu.sunToday") }));

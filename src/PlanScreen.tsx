@@ -3,6 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
 import { JobMiniGame } from "./components/JobMiniGame";
+import { MoonMiniGame } from "./components/MoonMiniGame";
+import { DustMiniGame } from "./components/DustMiniGame";
+import { hasDustGame } from "./game/dustMiniGames";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { usePhone } from "./components/usePhone";
 import { useComfort } from "./state/comfort";
@@ -64,6 +67,10 @@ export default function PlanScreen() {
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
   const focusNext = useRef<"job" | "crew" | null>(null);
+  const closeMiniGame = () => {
+    setMiniGame(null);
+    focusNext.current = "crew";
+  };
   useEffect(() => {
     const want = focusNext.current;
     focusNext.current = null;
@@ -197,7 +204,9 @@ export default function PlanScreen() {
                 })
               : t("play.jobsStep")}
           </h2>
-          {!selected && <p className="jobs-locked">{t("play.jobsLocked")}</p>}
+          {!selected && crew.some((c) => !plan[c] && !state.tired.includes(c)) && (
+            <p className="jobs-locked">{t("play.jobsLocked")}</p>
+          )}
           <div className={`job-list ${selected ? "" : "locked"}`}>
             {jobIds.map((id, i) => {
               const owner = crew.find((c) => plan[c] === id);
@@ -252,10 +261,15 @@ export default function PlanScreen() {
                   <span className="job-copy">
                     <strong>{t(`jobs.${id}`)}</strong>
                     <small>{t(`jobInfo.${id}.done`)}</small>
+                    {/* Two pieces, so each wraps as a whole beside the job name (#95). */}
                     <span className="job-cost">
                       {t("jobInfo.cost", { count: JOBS[id].powerCost })}
-                      {JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}
                     </span>
+                    {JOBS[id].outside && (
+                      <span className="job-cost job-outside">
+                        {t("jobInfo.outside")}
+                      </span>
+                    )}
                   </span>
                   <span className="job-owner">
                     {owner
@@ -336,6 +350,17 @@ export default function PlanScreen() {
           </ul>
           {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
+          {/* #95: inside the outlook (it scrolls on its own), so it adds no page height on a laptop. */}
+          <details className="science-details">
+            <summary>{t("play.scienceBehind")}</summary>
+            <p>
+              {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
+            </p>
+            <DataChip source={LIGHT_DELAY} />
+            <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
+            <DataChip source={INSIGHT_DUST} />
+            <DataChip source={RAD_BASELINE} />
+          </details>
         </aside>
         {phone && (
           <div className="plan-bar phone-dock">
@@ -353,27 +378,12 @@ export default function PlanScreen() {
           </div>
         )}
       </div>
-      {miniGame && (
-        <JobMiniGame
-          key={miniGame.seed}
-          job={miniGame.job}
-          seed={miniGame.seed}
-          onClose={() => {
-            setMiniGame(null);
-            focusNext.current = "crew";
-          }}
-        />
-      )}
-      <details className="science-details">
-        <summary>{t("play.scienceBehind")}</summary>
-        <p>
-          {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
-        </p>
-        <DataChip source={LIGHT_DELAY} />
-        <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
-        <DataChip source={INSIGHT_DUST} />
-        <DataChip source={RAD_BASELINE} />
-      </details>
+      {/* The Moon has its own mini games (no wind, crater ice, a low Sun); Dust Season has its own for the panels and the greenhouse. */}
+      {miniGame && (moon
+        ? <MoonMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+        : setup?.campaignId === "dust" && hasDustGame(miniGame.job)
+          ? <DustMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+          : <JobMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />)}
     </ScreenFrame>
   );
 }

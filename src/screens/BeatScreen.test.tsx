@@ -64,3 +64,19 @@ describe("beat screen: one interaction per sol, through the engine", () => {
     screen.getByText(new RegExp(t("earth.risk.low")));
   });
 });
+
+describe("#98 Dust Season hands-on sols", () => {
+  beforeEach(() => sessionStorage.clear());
+  it("sol 2: wiping every panel by hand plays the 'all' option through the engine", () => {
+    open("dust", 2);
+    for (let b = screen.queryAllByRole("button", { pressed: false }); b.length; b = screen.queryAllByRole("button", { pressed: false })) fireEvent.click(b[0]);
+    fireEvent.click(screen.getByRole("button", { name: t("hubStorm.backInside") }));
+    expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol2-wipe-all"]);
+  });
+  it("sol 6: the rover drive opens on the map; ending at home plays 'stay'", () => {
+    open("dust", 6);
+    screen.getByRole("application");
+    fireEvent.click(screen.getByRole("button", { name: t("exploreUi.finish") }));
+    expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol6-rover-stay"]);
+  });
+});
