@@ -2,6 +2,7 @@ import { Icon, Icons } from "./components/Icon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
+import { JobMiniGame } from "./components/JobMiniGame";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { WhatsThis } from "./components/WhatsThis";
 import {
@@ -54,6 +55,9 @@ export default function PlanScreen() {
   const [selected, select] = useState<CrewId | null>(null);
   const [confirmIdle, setConfirmIdle] = useState(false);
   const [nudge, setNudge] = useState(false);
+  // The job's mini game, open right after the job is given (the job is already in the plan).
+  const [miniGame, setMiniGame] = useState<{ job: JobId; seed: number } | null>(null);
+  const plays = useRef(0);
   const resolved = useRef(false);
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
@@ -171,7 +175,8 @@ export default function PlanScreen() {
                     setNudge(false);
                     assign(selected, id);
                     select(null);
-                    focusNext.current = "crew";
+                    plays.current += 1;
+                    setMiniGame({ job: id, seed: state.sol * 97 + plays.current });
                     audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
                   }}
                 >
@@ -269,6 +274,17 @@ export default function PlanScreen() {
           <p className="note">{t("play.gameUnits")}</p>
         </aside>
       </div>
+      {miniGame && (
+        <JobMiniGame
+          key={miniGame.seed}
+          job={miniGame.job}
+          seed={miniGame.seed}
+          onClose={() => {
+            setMiniGame(null);
+            focusNext.current = "crew";
+          }}
+        />
+      )}
       <details className="science-details">
         <summary>{t("play.scienceBehind")}</summary>
         <p>

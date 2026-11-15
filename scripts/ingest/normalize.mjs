@@ -22,6 +22,8 @@ export const pickSim = (s) => ({
   modelCompletionTime: s.modelCompletionTime,
   link: s.link,
   cmeIDs: list(s.cmeInputs).map((c) => c.cmeStartTime),
+  cmeId: list(s.cmeInputs)[0]?.CMEID ?? null,
+  speed: list(s.cmeInputs)[0]?.speed ?? null,
   impactList: list(s.impactList).map((i) => ({
     location: i.location,
     arrivalTime: i.arrivalTime,

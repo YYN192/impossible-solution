@@ -4,6 +4,7 @@ import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { isOpen, useProgress } from "./state/progress";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
+import { SunCard } from "./components/SunCard";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { SoundToggle } from "./components/SoundToggle";
 import { FullscreenToggle } from "./components/FullscreenToggle";
@@ -83,7 +84,8 @@ export default function App() {
       <LanguageToggle /><SoundToggle /><FullscreenToggle />
       {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
     </div>
-    {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}
+    {setup?.sun ? <SunCard sun={setup.sun} notice={setup.noticeKey && t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")} />
+      : setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}
     {overlay ? <main className="information-panel">{overlay === "teacher" ? <TeacherCard onBack={closeOverlay} /> : <DataSources onBack={closeOverlay} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
       : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} campaignId={setup?.campaignId} onPlay={play} onSources={() => openOverlay("sources")} onTeacher={() => openOverlay("teacher")} onChoose={chooseRun} onNew={() => useNav.getState().home()} />
       : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />

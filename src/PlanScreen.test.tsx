@@ -86,6 +86,8 @@ describe("PlanScreen (#9)", () => {
       expect(document.activeElement).toBe(btn(t(`jobs.${jobIds[0]}`)));
       btn(t(`jobs.${job}`)).focus();
       fireEvent.click(btn(t(`jobs.${job}`)));
+      // The job's mini game opens; skipping it sends focus on to the next astronaut.
+      fireEvent.click(btn(t("miniGame.skip")));
     }
     expect(useSession.getState().draft).toEqual({
       a1: "greenhouse",
@@ -93,6 +95,36 @@ describe("PlanScreen (#9)", () => {
       a3: "shelter",
     });
     expect(document.activeElement).toBe(btn(`${t("plan.endSol")} →`));
+  });
+});
+
+describe("PlanScreen mini games", () => {
+  it("assigning a job opens that job's mini game; closing it keeps the job", () => {
+    render(<PlanScreen />);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(btn(t("crew.name", { n: 2 })));
+    fireEvent.click(btn(t("jobs.askEarth")));
+    expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+    expect(screen.getByRole("heading", { name: t("miniGame.askEarth.title") })).toBeTruthy();
+    fireEvent.click(btn(t("miniGame.skip")));
+    expect(screen.queryByRole("heading", { name: t("miniGame.askEarth.title") })).toBeNull();
+    expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+  });
+
+  it("has a mini game for every job in the list", () => {
+    render(<PlanScreen />);
+    for (const [i, job] of jobIds.slice(0, 3).entries()) {
+      fireEvent.click(btn(t("crew.name", { n: i + 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
+    for (const job of jobIds.slice(3)) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
   });
 });
 

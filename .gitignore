@@ -36,3 +36,6 @@ dist-ssr
 graphify-out/
 .vercel
 .env*
+
+# Launch video build output (/brag); the final video lives in docs/media/
+brag-output/

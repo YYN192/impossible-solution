@@ -41,7 +41,13 @@ const RawSim = z
     link: z.string().optional(),
     cmeInputs: z
       .array(
-        z.object({ cmeStartTime: z.string().nullable().optional() }).loose(),
+        z
+          .object({
+            cmeStartTime: z.string().nullable().optional(),
+            CMEID: z.string().nullable().optional(),
+            speed: z.number().nullable().optional(),
+          })
+          .loose(),
       )
       .nullable()
       .optional(),
@@ -54,6 +60,9 @@ export const Sim = z.object({
   modelCompletionTime: z.string().nullable().optional(),
   link: z.string().optional(),
   cmeIDs: z.array(z.string().nullable()),
+  /** DONKI activity ID and launch speed (km/s) of the run's first CME input. */
+  cmeId: z.string().nullable().optional(),
+  speed: z.number().nullable().optional(),
   impactList: z.array(Impact),
 });
 export type Sim = z.infer<typeof Sim>;
@@ -63,6 +72,9 @@ const trim = (s: z.infer<typeof RawSim>): Sim => ({
   modelCompletionTime: s.modelCompletionTime,
   link: s.link,
   cmeIDs: (s.cmeInputs ?? []).map((c) => c.cmeStartTime ?? null),
+  // shortcut: a run with several CMEs shows only the first one's ID and speed; list all if kids ask.
+  cmeId: s.cmeInputs?.[0]?.CMEID ?? null,
+  speed: s.cmeInputs?.[0]?.speed ?? null,
   impactList: (s.impactList ?? []).map((i) => ({
     location: i.location,
     arrivalTime: i.arrivalTime,
@@ -79,6 +91,10 @@ export interface MarsHit {
   /** ISO time the storm cloud is forecast to reach Mars */
   arrival: string;
   link?: string;
+  /** DONKI activity ID of the CME, e.g. 2026-11-09T18:15:00-CME-001 */
+  cmeId?: string;
+  /** CME speed leaving the Sun, km/s (WSA-Enlil input) — not a speed at Mars, not a dose. */
+  speed?: number;
 }
 
 /** Only forecasts that name Mars, newest arrival first, one per arrival time. */
@@ -94,6 +110,8 @@ export function marsHits(sims: Sim[]): MarsHit[] {
         simulationID: s.simulationID,
         arrival: i.arrivalTime,
         link: s.link,
+        ...(s.cmeId ? { cmeId: s.cmeId } : {}),
+        ...(s.speed ? { speed: s.speed } : {}),
       });
     }
   }
