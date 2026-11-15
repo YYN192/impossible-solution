@@ -27,3 +27,16 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 @media(pointer:coarse){.dpad{grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px)}.dpad button{font-size:1.6rem}}
 /* Short landscape phones: d-pad and action button sit beside the canvas, not below it. */
 @media(orientation:landscape) and (max-height:560px){.station{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr);column-gap:12px;padding-top:6px;padding-bottom:6px}.station-header{grid-column:1/-1;flex-wrap:nowrap;margin-bottom:6px}.station-header>div{order:0;width:auto;text-align:center}.station-header .eyebrow{display:none}.station-header h1{font-size:1rem}.station-header button,.sol-tag{padding:.4rem .8rem}.world-objective{display:none}.world-viewport{min-height:0;padding:6px}.world-controls{flex-direction:column;justify-content:center;margin:0;gap:10px;width:min(200px,32vw)}.interaction-guide button{min-width:0;width:100%}.station-tip{display:none}.mission-status-bar{min-height:40px}}
+/* Big screens (laptops, classroom boards): text grows with the screen and the game uses all of it. */
+html{font-size:clamp(16px,.45vw + 10px,22px)}
+.mission-console{max-width:min(1640px,calc(100% - 24px));margin:12px auto}
+/* Wide screens: the base fills the screen; goal, d-pad and buttons sit in a column beside it. */
+@media(min-width:900px) and (min-height:561px){
+.station{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) clamp(220px,18vw,320px);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"head head" "world goal" "world ctrl";column-gap:clamp(12px,1.5vw,24px);padding:clamp(6px,1.2vmin,16px) clamp(10px,1.5vw,24px)}
+.station-header{grid-area:head;margin-bottom:clamp(6px,1vmin,12px)}.station-header h1{font-size:1.4rem}
+.world-objective{grid-area:goal;flex-wrap:wrap;border:1px solid #354a5e;margin:8px 0 12px;padding:14px}.world-objective p{font-size:1rem;flex:1 1 0}.world-objective>span:last-child{display:block;margin:0;flex-basis:100%}
+.world-viewport{grid-area:world;min-height:0;padding:clamp(4px,.8vmin,10px);place-items:start center}
+.world-controls{grid-area:ctrl;flex-direction:column-reverse;justify-content:flex-end;align-items:stretch;margin:0;gap:18px}
+.interaction-guide p{font-size:1rem}.interaction-guide button{width:100%;min-height:56px}
+.dpad{align-self:center;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:6px}
+.station-tip{display:block!important;max-width:none}}

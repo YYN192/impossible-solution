@@ -507,6 +507,10 @@
     "en": "English",
     "bg": "Български"
   },
+  "fullscreen": {
+    "enter": "Full screen",
+    "exit": "Exit full screen"
+  },
   "sound": {
     "toggle": "Sound on/off"
   },

@@ -69,25 +69,30 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     raf = requestAnimationFrame(frame);
     return () => { cancelAnimationFrame(raf); useSession.setState({ position: player }); };
   }, [dialogue, activating]);
+  // The key listeners live for the whole visit. They read the latest state through refs: re-adding them
+  // whenever `near` changed used to clear the held keys, so walking past a crew member stopped the player.
+  const live = useRef({ interact, busy: false });
+  live.current = { interact, busy: Boolean(dialogue) || activating };
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (dialogue || activating || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
+      if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
       const key = e.key.toLowerCase();
       if (["w", "a", "s", "d", "arrowup", "arrowleft", "arrowdown", "arrowright"].includes(key)) {
         // Arrows only stop page scrolling while the game itself has focus.
         if (e.target === canvas.current || e.target === document.body) e.preventDefault();
         held.current.add(key);
       }
-      if (key === "e" && !e.repeat) interact();
+      if (key === "e" && !e.repeat) live.current.interact();
     };
     const up = (e: KeyboardEvent) => held.current.delete(e.key.toLowerCase());
-    // Resizing/rotating can swallow key-up or pointer-up events: never keep walking afterwards.
+    // Leaving the tab or rotating can swallow key-up or pointer-up events: never keep walking afterwards.
+    // (Not on "resize": phone address bars resize the page while a finger holds the d-pad.)
     const clear = () => held.current.clear();
-    const events = ["blur", "resize", "orientationchange"] as const;
+    const events = ["blur", "orientationchange"] as const;
     window.addEventListener("keydown", down); window.addEventListener("keyup", up); events.forEach((n) => window.addEventListener(n, clear));
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); events.forEach((n) => window.removeEventListener(n, clear)); document.removeEventListener("visibilitychange", clear); };
-  }, [interact, dialogue, activating]);
+  }, []);
   const tap = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (dialogue || activating) return;
     const r = e.currentTarget.getBoundingClientRect();
