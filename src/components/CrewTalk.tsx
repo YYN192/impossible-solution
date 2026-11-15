@@ -4,12 +4,12 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { gameKey } from "../game/pressedKeys";
 import { DRILL, PORTRAIT, lettersShown, missionTalkKey, type Speaker } from "../game/talk";
+import { tRun } from "../i18n/dynamic";
 import { useMission } from "../state/mission";
 import { JobMiniGame } from "./JobMiniGame";
 import { MoonMiniGame } from "./MoonMiniGame";
 import { DustMiniGame } from "./DustMiniGame";
 import { hasDustGame } from "../game/dustMiniGames";
-import { tRun } from "../i18n/dynamic";
 import "./CrewTalk.css";
 import { reducedMotion } from "../state/comfort";
 
@@ -66,7 +66,7 @@ export function CrewTalk({
   const { t } = useTranslation();
   const drill = DRILL[speaker];
   const campaign = useMission((m) => m.setup?.campaignId);
-  // On the Moon, the crew says the `_moon` lines (where there is one) and has Moon facts to tell.
+  // On the Moon, the crew says the `_moon` lines (#83) and has Moon facts to tell.
   const place = useMission((m) => m.setup?.place);
   const moon = place === "moon";
   const box = useRef<HTMLDialogElement>(null);

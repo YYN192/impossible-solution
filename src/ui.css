@@ -273,3 +273,42 @@ button.primary:disabled { background: #141d29; border-color: var(--steel); color
 .morning button.why:hover { background: #12293a; }
 /* Level 3: "Return to station" and similar back buttons sit back. */
 .console-top > button { background: transparent; border-color: var(--steel); box-shadow: none; color: #cfdae4; }
+/* ===== #95: the Plan screen fits a laptop (1366x768, 1440x900) with no page scrolling =====
+   Short job cards everywhere: no 01-05 number, and the cost sits beside the job name when there is room. */
+.expedition .plan-screen .job-number { display: none; }
+.expedition .plan-screen .job-choice { min-height: 0; padding: 8px 12px; gap: 12px; }
+.expedition .plan-screen .job-copy { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+.expedition .plan-screen .job-copy small { order: 1; flex-basis: 100%; }
+@media (min-width: 1001px) {
+  /* "Plan sol 1" and its one-line help share a row. */
+  .expedition .screen:has(> .plan-screen) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 20px; }
+  .expedition .screen:has(> .plan-screen) > .lead { margin: 0; }
+  .expedition .screen > .plan-screen { flex-basis: 100%; margin-top: 10px; grid-template-columns: minmax(0, 2.2fr) minmax(300px, 1fr); }
+  .expedition .plan-screen .step-label { margin-bottom: 8px; }
+  .expedition .plan-screen .planner-guidance { margin-top: 4px; }
+  .expedition .plan-screen .job-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .expedition .plan-screen .job-choice:last-child:nth-child(odd) { grid-column: 1 / -1; } /* an odd last job uses the full row */
+  .expedition .plan-screen .crew-roster { margin-bottom: 14px; }
+  .expedition .plan-screen .crew-tile > button:first-child { flex-direction: row; text-align: left; padding: 8px 10px; gap: 10px; }
+  .expedition .plan-screen .crew-tile.has-job > button:first-child { padding-right: 46px; }
+  .expedition .plan-screen .crew-tile > button:first-child > span { flex: 1; min-width: 0; }
+  .expedition .plan-screen .crew-skill { justify-content: flex-start; text-align: left; }
+  .expedition .plan-screen .crew-tile small { margin-top: 2px; }
+  /* The outlook is exactly as tall as the jobs column (contain: size adds nothing to the row height) and scrolls
+     inside, with End sol pinned to its bottom edge so it is always in view. */
+  .expedition .plan-screen .plan-outlook { contain: size; align-self: stretch; overflow-y: auto; position: static; }
+  /* -20px = the outlook's padding: sticky stops at the padding edge, which let meters peek out below the button. */
+  .expedition .plan-screen .plan-outlook .end-sol { position: sticky; bottom: -20px; z-index: 1; }
+}
+/* One astronaut per row (run.css): name and job share the first line, the skill is the second, so a phone shows
+   all 3 astronauts and the first job above the End sol dock. */
+@media (max-width: 900px) {
+  .expedition .plan-screen .crew-tile > button:first-child { padding-top: 4px; padding-bottom: 4px; } /* still 56 px tall: the 48 px portrait */
+  .expedition .plan-screen .crew-tile > button:first-child > span { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; }
+  .expedition .plan-screen .crew-tile small { grid-area: 1 / 2; margin: 0; }
+  .expedition .plan-screen .crew-skill { grid-column: 1 / -1; }
+  .expedition .plan-screen .crew-roster { margin-bottom: 14px; }
+  .expedition .plan-screen .step-label { margin-bottom: 8px; }
+  .expedition .plan-screen .jobs-locked { margin-bottom: 6px; }
+  .expedition .screen > .plan-screen { margin-top: 12px; }
+}
