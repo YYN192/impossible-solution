@@ -210,3 +210,10 @@ html[data-contrast] :is(.mission-card:disabled, button:disabled) { opacity: 1 !i
 .comfort-sizes button[aria-pressed="true"], .sound-ask button[aria-pressed="true"] { background: var(--cyan); border-color: var(--cyan); color: #0b242e; }
 .sound-ask { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; margin: 0.6rem 0 0; }
 .information-panel .menu-settings { margin-inline: auto; }
+
+/* Visual hierarchy (owner, 15 Nov): the game is level 1, its actions level 2, page chrome level 3. */
+/* Interact looks inactive when there is nothing near, so it only shouts when it can be used. */
+.expedition .interaction-guide .primary:disabled { background: #16283a; border-color: #3b5367; color: #9fb3c3; opacity: 1; box-shadow: none; }
+/* Top-bar links (settings, sources, teachers, full screen) sit back: no box, lighter text, same tap size. */
+.expedition .mission-status-bar nav button, .expedition .mission-status-bar .fullscreen-toggle { background: transparent; border-color: transparent; box-shadow: none; color: #c3d3de; font-weight: 600; }
+.expedition .mission-status-bar nav button:hover, .expedition .mission-status-bar .fullscreen-toggle:hover { border-color: #52687b; color: #fff; }

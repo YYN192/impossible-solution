@@ -47,6 +47,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   for (const x of [64, 144, 400, 480]) {
     if (moon) moonWindow(ctx, x, 40, x === 144 || x === 480 ? getSprite("icons/earth") : undefined);
     else sprite("environment/windows/mars-window-mountains", x, 40, 64, 40);
+    ctx.fillStyle = "#070e198c"; ctx.fillRect(x, 40, 64, 40); // decoration stays in the background (visual hierarchy level 3)
   }
   for (const x of [40, 240, 376, 584]) for (const y of [96, 208, 320]) {
     sprite("environment/decorations/mars-floor-light", x, y, 16, 16);
@@ -56,9 +57,9 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   // Console bay guide: a calm outline with soft "chase lights" running all the way round (classic arcade marquee).
   // It rests once the player arrives, and while a storm sends them elsewhere first.
   if (near !== "console" && !storm.marks.length) {
-    ctx.lineWidth = 1; ctx.strokeStyle = "#3d5d73"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.lineWidth = 2; ctx.strokeStyle = "#83d9f4"; ctx.strokeRect(272, 108, 96, 91);
     ctx.setLineDash([4, 8]); ctx.lineDashOffset = reduced ? 0 : -time / 45;
-    ctx.strokeStyle = "#8fd3e8aa"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.strokeStyle = "#f2f6fa"; ctx.strokeRect(272, 108, 96, 91);
     ctx.setLineDash([]);
   }
   ctx.fillStyle = "#29445b"; ctx.fillRect(272, 198, 96, 3);
@@ -106,12 +107,19 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
       ctx.fillRect(Math.round(x), Math.round(y), 4 + i % 6, 1);
     }
   }
+  // The player marker: a small cyan chevron above the head (level 1: "this is you"). Static with reduced motion.
+  {
+    const cx = Math.round(player.x), top = Math.round(player.y - 27 + fx.bob) - 9 + (reduced ? 0 : Math.round(Math.sin(time / 280) * 1.5));
+    ctx.fillStyle = "#080b12"; ctx.fillRect(cx - 5, top - 1, 11, 7);
+    ctx.fillStyle = "#83d9f4";
+    for (let r = 0; r < 4; r++) ctx.fillRect(cx - 4 + r, top + r, 9 - 2 * r, 1);
+  }
   // A speech bubble over everyone you can talk to: small and quiet from afar, bigger with "…" when you are close.
   for (const e of room.entities) if (e.interaction === "npc") {
     const close = near === e.id, cx = Math.round(e.x + e.w / 2), y = e.y - (close ? 13 : 7) + (reduced ? 0 : Math.round(Math.sin(time / 300 + e.x) * (close ? 1.5 : 1)));
     const w = close ? 16 : 8, h = close ? 10 : 6;
     ctx.fillStyle = "#080b12"; ctx.fillRect(cx - w / 2 - 1, y - 1, w + 2, h + 2); ctx.fillRect(cx - 2, y + h, 4, 3);
-    ctx.fillStyle = close ? "#f2f6fa" : "#a9bccb"; ctx.fillRect(cx - w / 2, y, w, h); ctx.fillRect(cx - 1, y + h, 2, 2);
+    ctx.fillStyle = close ? "#f2f6fa" : "#83d9f4"; ctx.fillRect(cx - w / 2, y, w, h); ctx.fillRect(cx - 1, y + h, 2, 2);
     ctx.fillStyle = "#080b12";
     if (close) for (let i = 0; i < 3; i++) if (reduced || Math.floor(time / 250) % 4 > i) ctx.fillRect(cx - 5 + i * 4, y + 4, 2, 2);
   }
