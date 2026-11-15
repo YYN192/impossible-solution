@@ -9,6 +9,7 @@ import { LanguageToggle } from "./components/LanguageToggle";
 import { SoundToggle } from "./components/SoundToggle";
 import { FullscreenToggle } from "./components/FullscreenToggle";
 import { BarMenu } from "./components/BarMenu";
+import { GuideLayer, GuideToggle } from "./components/GuideLayer";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { audio } from "./game/audio";
 import { useMusicDirector } from "./game/musicDirector";
@@ -88,6 +89,7 @@ export default function App() {
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
       <LanguageToggle />
       <BarMenu><SoundToggle /><FullscreenToggle />
+        <nav className="guide-nav"><GuideToggle /></nav>
         {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("settings")}>{t("menu.settings")}</button><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
       </BarMenu>
     </div>
@@ -97,5 +99,7 @@ export default function App() {
       : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} campaignId={setup?.campaignId} onPlay={play} onSources={() => openOverlay("sources")} onTeacher={() => openOverlay("teacher")} onChoose={chooseRun} onNew={() => useNav.getState().home()} />
       : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />
       : <ConsolePage onExit={() => setPlace("hub")}>{Current && <Current key={`${screen}-${sol}`} />}</ConsolePage>}
+    {/* First-play guide (#64): points at the next thing to touch; hidden while a page like Settings is open. */}
+    <GuideLayer blocked={Boolean(overlay)} />
   </div>;
 }

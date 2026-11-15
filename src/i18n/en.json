@@ -1304,5 +1304,20 @@
       "storm": "The May 2024 storm",
       "caption": "In May 2024, one solar storm gave Curiosity about as many space rays as 40 quiet days. A rough comparison."
     }
+  },
+  "guide": {
+    "hide": "Hide the tips",
+    "replay": "How to play",
+    "step": {
+      "start": "Press Start mission to fly to your Mars base.",
+      "walk": "Walk to the glowing console, or just tap it.",
+      "goal": "Your goal: earn these 3 stars by the end of the mission.",
+      "drive": "Drive the rover to a rock, then bring it home.",
+      "choose": "Choose what to do today.",
+      "crew": "Tap an astronaut first.",
+      "job": "Now give them a job.",
+      "endSol": "Every astronaut has a job. Now press End sol.",
+      "report": "See what your plan did, then go on."
+    }
   }
 }
