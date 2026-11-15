@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import i18n from "./i18n";
 import PlanScreen from "./PlanScreen";
 import { useSession } from "./game/session";
-import { may2024Mission } from "./data/mission";
+import { campaignMission, may2024Mission } from "./data/mission";
 import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
@@ -175,5 +175,33 @@ describe("PlanScreen preview (#10)", () => {
     expect(
       left.some((li) => li.textContent?.includes(t("jobInfo.panels.skipped"))),
     ).toBe(false);
+  });
+});
+
+describe("PlanScreen mini games on the Moon", () => {
+  it("plays the Moon's own mini game for every job", () => {
+    useMission.setState({ setup: campaignMission("moon", 1) });
+    render(<PlanScreen />);
+    for (const job of jobIds) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.moon.${job}.title`) })).toBeTruthy();
+      expect(screen.queryByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeNull();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
+  });
+});
+
+describe("PlanScreen mini games in Dust Season", () => {
+  it("panels and greenhouse get the Dust Season games; the other jobs keep the Mars ones", () => {
+    useMission.setState({ setup: campaignMission("dust", 1) });
+    render(<PlanScreen />);
+    for (const job of jobIds) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      const dust = job === "panels" || job === "greenhouse";
+      expect(screen.getByRole("heading", { name: t(dust ? `miniGame.dust.${job}.title` : `miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
   });
 });

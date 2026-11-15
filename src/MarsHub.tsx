@@ -122,11 +122,28 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); events.forEach((n) => window.removeEventListener(n, clear)); document.removeEventListener("visibilitychange", clear); };
   }, []);
+  const dragging = useRef(false); // the mouse button (or finger) is held down on the room
+  const pointAt = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
+  };
   const tap = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (dialogue || activating) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const target = tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
+    const target = pointAt(e);
     held.current.clear(); goal.current = target; pending.current = target.entity?.id;
+    dragging.current = true;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  // Click and drag: the player keeps walking after the held mouse. Letting go on a console, NPC or door uses it.
+  const drag = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current || !e.buttons || dialogue || activating) return;
+    const target = pointAt(e);
+    goal.current = target; pending.current = undefined;
+  };
+  const release = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    if (!pending.current && goal.current) pending.current = pointAt(e).entity?.id;
   };
   const closeDialogue = () => {
     audio.playSfx("menu-back");
@@ -141,7 +158,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
       : <div className="world-objective"><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
-      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} />
+      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} onPointerMove={drag} onPointerUp={release} onPointerCancel={() => { dragging.current = false; }} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
       {stormLeft > 0 && !alarm && <div className="dust-cover in-world" style={{ opacity: stormLeft * 0.18 }} aria-hidden="true" />}
       {activating && <div className="console-boot" role="status">{t("world.connecting")}</div>}

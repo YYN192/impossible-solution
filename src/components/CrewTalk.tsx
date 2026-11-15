@@ -21,6 +21,8 @@ import {
   type Speaker,
 } from "../game/talk";
 import { Icon } from "./Icon";
+import { tRun } from "../i18n/dynamic";
+import { useMission } from "../state/mission";
 import "./CrewTalk.css";
 
 const reduced = () =>
@@ -77,6 +79,9 @@ export function CrewTalk({
 }) {
   const { t } = useTranslation();
   const drill = DRILL[speaker];
+  // On the Moon, the crew says the `_moon` lines (where there is one) and has Moon facts to tell.
+  const place = useMission((m) => m.setup?.place);
+  const moon = place === "moon";
   const box = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState<Step>(
     drill
@@ -122,7 +127,7 @@ export function CrewTalk({
         {step.kind === "text" && (
           <TypedLine
             key={step.key}
-            text={t(step.key as never)}
+            text={tRun(step.key, {}, place)}
             blip={blip}
             onNext={() => {
               audio.playSfx("dialogue");
@@ -134,6 +139,8 @@ export function CrewTalk({
                 )
               )
                 setStep({ kind: "drill", drill: step.then as Drill });
+              // A Moon fact has a second line, then the answers come back.
+              else if (step.then.startsWith("talk.")) say(step.then);
               else say(step.then, "close");
             }}
           />
@@ -143,6 +150,9 @@ export function CrewTalk({
             options={[
               [t("talk.ask.who"), () => say(`talk.${speaker}.who`)],
               [t("talk.ask.tip"), () => say(`talk.${speaker}.tip`)],
+              ...(moon
+                ? [[t("talk.ask.lore"), () => say(`talk.${speaker}.lore_moon`, `talk.${speaker}.lore2_moon`)] as [string, () => void]]
+                : []),
               [
                 t("talk.ask.drill"),
                 () => say(`talk.${speaker}.drillIntro`, drill),

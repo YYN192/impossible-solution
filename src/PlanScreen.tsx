@@ -3,6 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
 import { JobMiniGame } from "./components/JobMiniGame";
+import { MoonMiniGame } from "./components/MoonMiniGame";
+import { DustMiniGame } from "./components/DustMiniGame";
+import { hasDustGame } from "./game/dustMiniGames";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { usePhone } from "./components/usePhone";
 import { WhatsThis } from "./components/WhatsThis";
@@ -65,6 +68,10 @@ export default function PlanScreen() {
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
   const focusNext = useRef<"job" | "crew" | null>(null);
+  const closeMiniGame = () => {
+    setMiniGame(null);
+    focusNext.current = "crew";
+  };
   useEffect(() => {
     const want = focusNext.current;
     focusNext.current = null;
@@ -297,17 +304,12 @@ export default function PlanScreen() {
           </div>
         )}
       </div>
-      {miniGame && (
-        <JobMiniGame
-          key={miniGame.seed}
-          job={miniGame.job}
-          seed={miniGame.seed}
-          onClose={() => {
-            setMiniGame(null);
-            focusNext.current = "crew";
-          }}
-        />
-      )}
+      {/* The Moon has its own mini games (no wind, crater ice, a low Sun); Dust Season has its own for the panels and the greenhouse. */}
+      {miniGame && (moon
+        ? <MoonMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+        : setup?.campaignId === "dust" && hasDustGame(miniGame.job)
+          ? <DustMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+          : <JobMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />)}
       <details className="science-details">
         <summary>{t("play.scienceBehind")}</summary>
         <p>
