@@ -488,7 +488,8 @@
       "scientist": "Scientist Amara",
       "drone": "Pip · Maintenance drone",
       "airlock": "Station airlock",
-      "greenhouse": "Greenhouse"
+      "greenhouse": "Greenhouse",
+      "radar": "Space weather radar"
     },
     "greenhouse": "GREENHOUSE"
   },
@@ -516,6 +517,10 @@
     "greenhouse": {
       "hello": "This greenhouse grows our food. Its lights need power.",
       "advice": "No power for the lights means no harvest. Then the food runs low."
+    },
+    "radar": {
+      "hello": "This radar shows what the Sun did this week.",
+      "advice": "Tap a mark to see when it happened and how big it was."
     }
   },
   "lang": {
@@ -870,5 +875,68 @@
       "plants": "Plant new seedlings"
     },
     "fixed": "Greenhouse fixed!"
+  },
+  "siteMap": {
+    "title": "Mission map",
+    "lead": "Your base and every mission site. Finish a mission to open the next one.",
+    "close": "Close the map",
+    "place": {
+      "mars": "Mars",
+      "moon": "The Moon"
+    },
+    "state": {
+      "here": "You are here",
+      "done": "Done",
+      "open": "Open: start it from the menu"
+    },
+    "locked": "Locked. Finish “{{name}}” first."
+  },
+  "radar": {
+    "title": "Space weather radar",
+    "lead": "What the Sun did in the last 7 days, seen from near Earth. Most of it never reaches Mars.",
+    "close": "Close the radar",
+    "loading": "Asking NASA…",
+    "failed": "No space weather data right now. Try again later.",
+    "pick": "Tap or point at a day with marks to see what happened.",
+    "noAnswer": "No answer from NASA",
+    "count_one": "{{count}} event",
+    "count_other": "{{count}} events",
+    "day": "{{row}}, {{date}}: {{count}}",
+    "row": {
+      "flr": "Sun flashes",
+      "cme": "Sun clouds",
+      "sep": "Particle showers",
+      "gst": "Storms at Earth"
+    },
+    "what": {
+      "flr": "solar flares",
+      "cme": "coronal mass ejections",
+      "sep": "solar energetic particles",
+      "gst": "geomagnetic storms"
+    },
+    "size": {
+      "flr": {
+        "tiny": "A tiny flash ({{cls}})",
+        "small": "A small flash ({{cls}})",
+        "big": "A big flash ({{cls}})",
+        "huge": "A huge flash ({{cls}})",
+        "unknown": "A flash"
+      },
+      "cme": {
+        "slow": "A slow cloud ({{speed}} km/s)",
+        "fast": "A fast cloud ({{speed}} km/s)",
+        "veryFast": "A very fast cloud ({{speed}} km/s)",
+        "unknown": "A cloud, speed not measured"
+      },
+      "sep": "Fast particles measured near Earth",
+      "gst": {
+        "small": "A small storm (Kp {{kp}})",
+        "strong": "A strong storm (Kp {{kp}})",
+        "huge": "A huge storm (Kp {{kp}})",
+        "unknown": "A storm"
+      }
+    },
+    "mars": "A NASA forecast says it may reach Mars.",
+    "source": "Data: NASA's space weather database"
   }
 }

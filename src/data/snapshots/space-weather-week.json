@@ -1,0 +1,193 @@
+{
+  "fetchedAt": "2026-11-15T15:42:45.290Z",
+  "source": "https://api.nasa.gov/DONKI/{FLR,SEP,CME,GST}?startDate=2026-11-08&endDate=2026-11-15",
+  "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "Fallback for the radar strip: every flare, CME, particle event and geomagnetic storm DONKI listed in the 7 days before the snapshot date. Seen from near Earth; Mars only where a WSA-Enlil run forecast it.",
+  "data": {
+    "window": {
+      "start": "2026-11-08",
+      "end": "2026-11-15"
+    },
+    "rows": [
+      {
+        "type": "flr",
+        "events": null
+      },
+      {
+        "type": "cme",
+        "events": [
+          {
+            "id": "2026-11-08T00:48:00-CME-001",
+            "time": "2026-11-08T00:48Z",
+            "speedKmS": 591,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49454/-1"
+          },
+          {
+            "id": "2026-11-08T08:48:00-CME-001",
+            "time": "2026-11-08T08:48Z",
+            "speedKmS": 367,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49459/-1"
+          },
+          {
+            "id": "2026-11-09T09:12:00-CME-001",
+            "time": "2026-11-09T09:12Z",
+            "speedKmS": 338,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49466/-1"
+          },
+          {
+            "id": "2026-11-09T10:53:00-CME-001",
+            "time": "2026-11-09T10:53Z",
+            "speedKmS": 299,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49470/-1"
+          },
+          {
+            "id": "2026-11-09T18:15:00-CME-001",
+            "time": "2026-11-09T18:15Z",
+            "speedKmS": 726,
+            "marsForecast": true,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49468/-1"
+          },
+          {
+            "id": "2026-11-10T02:00:00-CME-001",
+            "time": "2026-11-10T02:00Z",
+            "speedKmS": 803,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49484/-1"
+          },
+          {
+            "id": "2026-11-10T02:12:00-CME-001",
+            "time": "2026-11-10T02:12Z",
+            "speedKmS": 346,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49475/-1"
+          },
+          {
+            "id": "2026-11-10T05:30:00-CME-001",
+            "time": "2026-11-10T05:30Z",
+            "speedKmS": 974,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49479/-1"
+          },
+          {
+            "id": "2026-11-11T23:24:00-CME-001",
+            "time": "2026-11-11T23:24Z",
+            "speedKmS": 367,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49505/-1"
+          },
+          {
+            "id": "2026-11-12T01:53:00-CME-001",
+            "time": "2026-11-12T01:53Z",
+            "speedKmS": 327,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49508/-1"
+          },
+          {
+            "id": "2026-11-12T21:12:00-CME-001",
+            "time": "2026-11-12T21:12Z",
+            "speedKmS": 247,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49523/-1"
+          },
+          {
+            "id": "2026-11-13T01:26:00-CME-001",
+            "time": "2026-11-13T01:26Z",
+            "speedKmS": 308,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49525/-1"
+          },
+          {
+            "id": "2026-11-13T03:24:00-CME-001",
+            "time": "2026-11-13T03:24Z",
+            "speedKmS": 525,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49529/-1"
+          },
+          {
+            "id": "2026-11-13T09:24:00-CME-001",
+            "time": "2026-11-13T09:24Z",
+            "speedKmS": 302,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49537/-1"
+          },
+          {
+            "id": "2026-11-13T16:24:00-CME-001",
+            "time": "2026-11-13T16:24Z",
+            "speedKmS": null,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49546/-1"
+          },
+          {
+            "id": "2026-11-13T21:24:00-CME-001",
+            "time": "2026-11-13T21:24Z",
+            "speedKmS": 474,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49547/-1"
+          },
+          {
+            "id": "2026-11-14T01:48:00-CME-001",
+            "time": "2026-11-14T01:48Z",
+            "speedKmS": 399,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49549/-1"
+          },
+          {
+            "id": "2026-11-14T04:00:00-CME-001",
+            "time": "2026-11-14T04:00Z",
+            "speedKmS": 345,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49551/-1"
+          },
+          {
+            "id": "2026-11-14T14:00:00-CME-001",
+            "time": "2026-11-14T14:00Z",
+            "speedKmS": 397,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49554/-1"
+          },
+          {
+            "id": "2026-11-14T16:12:00-CME-001",
+            "time": "2026-11-14T16:12Z",
+            "speedKmS": 453,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49565/-1"
+          },
+          {
+            "id": "2026-11-14T22:15:00-CME-001",
+            "time": "2026-11-14T22:15Z",
+            "speedKmS": 804,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49557/-1"
+          },
+          {
+            "id": "2026-11-15T04:38:00-CME-001",
+            "time": "2026-11-15T04:38Z",
+            "speedKmS": 530,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49570/-1"
+          },
+          {
+            "id": "2026-11-15T09:00:00-CME-001",
+            "time": "2026-11-15T09:00Z",
+            "speedKmS": 303,
+            "marsForecast": false,
+            "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49572/-1"
+          }
+        ]
+      },
+      {
+        "type": "sep",
+        "events": []
+      },
+      {
+        "type": "gst",
+        "events": null
+      }
+    ]
+  }
+}

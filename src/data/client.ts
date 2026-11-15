@@ -78,6 +78,7 @@ export const dataClient = {
   load,
   /** DONKI, last 30 days: flares, particle events, CMEs, geomagnetic storms (seen from near Earth). */
   getSpaceWeather: () => load("space-weather-recent"),
+  getWeatherWeek: () => load("space-weather-week"),
   /** RadLab: Curiosity's dose-rate readings around the 20 May 2024 storm. */
   getRadiationStorm: () => load("radlab-msl-2024-05"),
   /** OSDR space-biology studies, optionally for one topic. */

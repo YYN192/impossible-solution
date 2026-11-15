@@ -14,6 +14,8 @@ import { useNav } from "./state/screen";
 import { readFlags } from "./data/flags";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
+import SiteMap from "./components/SiteMap";
+import SpaceWeatherStrip from "./components/SpaceWeatherStrip";
 import type { StormView } from "./game/renderWorld";
 
 // Physical keys → on-screen hint they light up (keydown on, keyup off).
@@ -45,6 +47,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const [alarm, setAlarm] = useState(stormLeft > 0);
   const [task, setTask] = useState<"panels" | "greenhouse">();
   const [notice, setNotice] = useState("");
+  const [panel, setPanel] = useState<"map" | "radar">(); // the airlock's mission map (#54), the radar's space weather (#60)
   const view = useRef<StormView>({ level: 0, broken: false, marks: [] });
   view.current = { level: alarm ? 1 : stormLeft / 2, broken: !greenhouseDone, marks: [...(panelsDone ? [] : ["airlock"]), ...(greenhouseDone ? [] : ["greenhouse"])] };
   const finishTask = (done: boolean) => {
@@ -54,21 +57,25 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     setTask(undefined); canvas.current?.focus({ preventScroll: true });
   };
   const interact = useCallback(() => {
-    if (!near || activating || dialogue || task || alarm) return;
+    if (!near || activating || dialogue || task || alarm || panel) return;
     held.current.clear(); goal.current = pending.current = undefined;
     if (near.interaction === "console" && stormLeft) { audio.playSfx("machine-warning"); setNotice(t("hubStorm.blocked")); return; }
     if (near.id === "airlock" && !panelsDone) { audio.playSfx("door"); setTask("panels"); return; }
     if (near.id === "greenhouse" && !greenhouseDone) { audio.playSfx("npc"); setTask("greenhouse"); return; }
+    if (near.id === "radar") { audio.playSfx("console"); setPanel("radar"); return; }
     audio.playSfx(near.interaction === "console" ? "console" : near.interaction === "door" ? "door" : "npc");
     if (near.interaction === "console") {
       setActivating(true);
       timer.current = setTimeout(onConsole, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
-    } else { setDialogue(near); setPage(0); }
-  }, [near, activating, dialogue, onConsole, task, alarm, stormLeft, panelsDone, greenhouseDone, t]);
+    } else if (near.id === "airlock") setPanel("map"); // outside a storm (the panel job comes first above)
+    else { setDialogue(near); setPage(0); }
+  }, [near, activating, dialogue, onConsole, task, alarm, panel, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => { const track = musicFor("hub"); audio.playMusic(track); return audio.stopMusic; }, []);
-  useEffect(() => { canvas.current?.focus({ preventScroll: true }); }, []);
+  // Back to the game once a panel has closed (a modal dialog keeps the canvas inert until then).
+  useEffect(() => { if (!panel) canvas.current?.focus({ preventScroll: true }); }, [panel]);
+  const closePanel = () => { audio.playSfx("menu-back"); setPanel(undefined); };
   useEffect(() => {
     const c = canvas.current;
     const ctx = c?.getContext("2d");
@@ -77,7 +84,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     let last = performance.now(), raf = 0, lastNear = "", lastStep = 0, fx = createWalkFx(last);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const frame = (now: number) => {
-      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm;
+      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm && !panel;
       const dx = Number(keys.has("d") || keys.has("arrowright")) - Number(keys.has("a") || keys.has("arrowleft"));
       const dy = Number(keys.has("s") || keys.has("arrowdown")) - Number(keys.has("w") || keys.has("arrowup"));
       let moving = false;
@@ -100,11 +107,12 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     };
     raf = requestAnimationFrame(frame);
     return () => { cancelAnimationFrame(raf); useSession.setState({ position: player }); };
-  }, [dialogue, activating, task, alarm]);
+  }, [dialogue, activating, task, alarm, panel]);
   // The key listeners live for the whole visit. They read the latest state through refs: re-adding them
   // whenever `near` changed used to clear the held keys, so walking past a crew member stopped the player.
   const live = useRef({ interact, busy: false });
-  live.current = { interact, busy: Boolean(dialogue || task || alarm) || activating };
+  // While a panel is open its own listener handles E (busy here, so the closing E cannot reopen it).
+  live.current = { interact, busy: Boolean(dialogue || task || alarm || panel) || activating };
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
@@ -165,6 +173,8 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     </dialog>}
     {stormLeft > 0 && <div className={alarm ? "dust-cover full" : "dust-cover"} style={{ opacity: alarm ? 1 : stormLeft / 3 }} aria-hidden="true" />}
     {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
+    {panel === "map" && <SiteMap current={campaign} onClose={closePanel} />}
+    {panel === "radar" && <SpaceWeatherStrip onClose={closePanel} />}
     {task === "panels" && <PanelsTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
     {task === "greenhouse" && <GreenhouseTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
   </main>;
