@@ -4,7 +4,7 @@ import { audio } from "./game/audio";
 import i18n from "./i18n";
 import PlanScreen from "./PlanScreen";
 import { useSession } from "./game/session";
-import { may2024Mission } from "./data/mission";
+import { campaignMission, may2024Mission } from "./data/mission";
 import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
@@ -14,6 +14,7 @@ import { iconsOf } from "./test/icons";
 
 const t = i18n.t.bind(i18n);
 const jobIds = Object.keys(JOBS) as JobId[];
+const coreJobIds = jobIds.slice(0, 3);
 const btn = (name: string) => screen.getByRole("button", { name });
 const power = () =>
   Number(
@@ -108,11 +109,13 @@ describe("PlanScreen (#9)", () => {
       expect(btn(t("crew.name", { n: 3 })).getAttribute("aria-pressed")).toBe(
         "true",
       );
-      fireEvent.click(btn(t("jobs.science")));
+      fireEvent.click(btn(t("jobs.greenhouse")));
       for (const n of [1, 2, 3])
         expect(btn(t("crew.name", { n })).getAttribute("aria-pressed")).toBe(
           "false",
         );
+      // Everyone has a job: "First choose an astronaut" would be wrong advice now (#95).
+      expect(screen.queryByText(t("play.jobsLocked"))).toBeNull();
     } finally {
       useComfort.setState({ skipMiniGames: false });
     }
@@ -156,6 +159,7 @@ describe("PlanScreen (#9)", () => {
 
 describe("PlanScreen mini games", () => {
   it("assigning a job opens that job's mini game; closing it keeps the job", () => {
+    useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
     render(<PlanScreen />);
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.click(btn(t("crew.name", { n: 2 })));
@@ -174,6 +178,7 @@ describe("PlanScreen mini games", () => {
   it('#77: with "Skip the job mini-games" on, the job is given and no game opens', () => {
     useComfort.setState({ skipMiniGames: true });
     try {
+      useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
       render(<PlanScreen />);
       fireEvent.click(btn(t("crew.name", { n: 2 })));
       fireEvent.click(btn(t("jobs.askEarth")));
@@ -185,6 +190,7 @@ describe("PlanScreen mini games", () => {
   });
 
   it("has a mini game for every job in the list", () => {
+    useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
     render(<PlanScreen />);
     for (const [i, job] of jobIds.slice(0, 3).entries()) {
       fireEvent.click(btn(t("crew.name", { n: i + 1 })));
@@ -220,9 +226,9 @@ describe("PlanScreen preview (#10)", () => {
   it("shows a visible icon domino for every skipped job, effects from the engine", () => {
     render(<PlanScreen />);
     const items = within(skipList()).getAllByRole("listitem");
-    expect(items).toHaveLength(jobIds.length);
+    expect(items).toHaveLength(coreJobIds.length);
     const { fell } = preview({});
-    for (const [i, id] of jobIds.entries()) {
+    for (const [i, id] of coreJobIds.entries()) {
       expect(items[i].textContent).toContain(t(`jobInfo.${id}.skipped`));
       const skip = fell.find((d) => d.id === `sol1-${id}-skipped`);
       if (skip) expect(iconsOf(items[i])).toContain(skip.icon);
@@ -248,9 +254,64 @@ describe("PlanScreen preview (#10)", () => {
     fireEvent.click(btn(t("crew.name", { n: 2 })));
     fireEvent.click(btn(t("jobs.panels")));
     const left = within(skipList()).getAllByRole("listitem");
-    expect(left).toHaveLength(jobIds.length - 2);
+    expect(left).toHaveLength(coreJobIds.length - 2);
     expect(
       left.some((li) => li.textContent?.includes(t("jobInfo.panels.skipped"))),
     ).toBe(false);
+  });
+});
+
+describe("PlanScreen mini games on the Moon", () => {
+  it("plays the Moon's own mini game for every job", () => {
+    useMission.setState({ setup: campaignMission("moon", 1) });
+    useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
+    render(<PlanScreen />);
+    for (const job of jobIds) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      expect(screen.getByRole("heading", { name: t(`miniGame.moon.${job}.title`) })).toBeTruthy();
+      expect(screen.queryByRole("heading", { name: t(`miniGame.${job}.title`) })).toBeNull();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
+  });
+});
+
+describe("PlanScreen mini games in Dust Season", () => {
+  it("panels and greenhouse get the Dust Season games; the other jobs keep the Mars ones", () => {
+    useMission.setState({ setup: campaignMission("dust", 1) });
+    useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
+    render(<PlanScreen />);
+    for (const job of jobIds) {
+      fireEvent.click(btn(t("crew.name", { n: 1 })));
+      fireEvent.click(btn(t(`jobs.${job}`)));
+      const dust = job === "panels" || job === "greenhouse";
+      expect(screen.getByRole("heading", { name: t(dust ? `miniGame.dust.${job}.title` : `miniGame.${job}.title`) })).toBeTruthy();
+      fireEvent.click(btn(t("miniGame.skip")));
+    }
+  });
+});
+
+describe("power flow line (#64)", () => {
+  it("explains the preview's power change as sun, jobs, night and the net result", () => {
+    render(<PlanScreen />);
+    const f = preview({}).flow!.power;
+    const change = f.sun - f.jobs - f.night;
+    screen.getByText(t("play.flow", { sun: f.sun, jobs: f.jobs, night: f.night, change: `+${change}` }));
+  });
+});
+
+describe("job progression (#64)", () => {
+  it.each([1, 2])("shows only three core jobs on sol %i", (sol) => {
+    useGame.setState({ state: { ...useGame.getState().state, sol } });
+    render(<PlanScreen />);
+    for (const job of ["panels", "greenhouse", "shelter"] as JobId[]) expect(btn(t(`jobs.${job}`))).toBeTruthy();
+    expect(screen.queryByRole("button", { name: t("jobs.askEarth") })).toBeNull();
+    expect(screen.queryByRole("button", { name: t("jobs.science") })).toBeNull();
+  });
+
+  it("reveals Ask Earth and Science as new on sol 3", () => {
+    useGame.setState({ state: { ...useGame.getState().state, sol: 3 } });
+    render(<PlanScreen />);
+    for (const job of ["askEarth", "science"] as JobId[]) expect(btn(t(`jobs.${job}`)).textContent).toContain(t("play.newJob"));
   });
 });

@@ -128,6 +128,8 @@ export interface StepResult {
   state: GameState;
   /** Dominoes created by this step (also appended to state.dominoes). */
   fell: Domino[];
+  /** #64: where the power change came from (sun − jobs − night = the change). Missing when the game is over. */
+  flow?: { power: { sun: number; jobs: number; night: number } };
 }
 
 /**

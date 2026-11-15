@@ -4,6 +4,8 @@
  */
 import { describe, expect, it } from "vitest";
 import { ENGINE, act, canAct, createGame, rulesOf, stars, step } from "./engine";
+import { WIPE_PANELS, buildRun, wipeChoice } from "./campaign";
+import { campaignById } from "../data/campaigns";
 import {
   CLASSIC_RULES,
   DOSE,
@@ -264,3 +266,26 @@ describe("each astronaut is good at one thing", () => {
   });
 });
 
+
+describe("#98 Dust Season: hands-on sols still end in the beat's own options", () => {
+  it("the number of panels wiped picks none / half / all", () => {
+    expect(WIPE_PANELS).toBe(6);
+    expect([0, 1, 2, 3, 4, 5, 6].map((n) => wipeChoice(n))).toEqual(["none", "none", "none", "half", "half", "half", "all"]);
+  });
+
+  it("sol 2 is a hands-on wipe and sol 6 a rover drive on the map; the options are unchanged", () => {
+    for (const seed of [1, 2, 3]) {
+      const { beats } = buildRun(campaignById("dust"), seed);
+      expect(beats[2]).toMatchObject({ type: "wipe", hands: true });
+      expect(beats[2].options.map((o) => o.id)).toEqual(["none", "half", "all"]);
+      expect(beats[6].type).toBe("rover");
+      expect(beats[6].map).toBeDefined();
+      expect(beats[6].options.map((o) => o.id)).toEqual(["near", "far", "stay"]);
+    }
+  });
+
+  it("campaign 1 keeps its plain wipe cards", () => {
+    const { beats } = buildRun(campaignById("storm"), 1);
+    expect(Object.values(beats).some((b) => b.hands)).toBe(false);
+  });
+});

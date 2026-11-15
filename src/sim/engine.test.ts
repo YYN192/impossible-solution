@@ -190,3 +190,19 @@ describe("bars stay in range", () => {
     for (const [k, v] of Object.entries(r.bars)) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(k === "dose" ? DOSE.meterMax : 10);
   });
 });
+
+// #64: the plan preview explains the power change as sun, jobs and night; the parts always add up.
+describe("power flow", () => {
+  it.each<[string, Plan]>([
+    ["no jobs", {}],
+    ["greenhouse", { a3: "greenhouse" }],
+    ["busy", { a1: "askEarth", a2: "panels", a3: "greenhouse" }],
+  ])("%s: sun − jobs − night = the change", (_, plan) => {
+    const g = createGame();
+    const { state, flow } = step(g, plan, []);
+    expect(flow).toBeDefined();
+    expect(flow!.power.sun - flow!.power.jobs - flow!.power.night).toBeCloseTo(state.bars.power - g.bars.power);
+    expect(flow!.power.jobs).toBeGreaterThanOrEqual(0);
+    expect(flow!.power.night).toBeGreaterThanOrEqual(0);
+  });
+});

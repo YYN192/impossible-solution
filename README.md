@@ -69,7 +69,7 @@ Needs Git and Node.js 22 LTS (20.19+ works). Then open http://localhost:5173/imp
 
 ## For teachers
 
-Missions normally open one after another. To open **every mission** on a classroom device, go to **For teachers** in the main menu and type the code **`ARES2026`** (any case; spaces and dashes are ignored). The same screen can lock them again. `?teacher=1` in the URL does the same for one visit.
+Missions normally open one after another. To open **every mission** on a classroom device, go to **For teachers** in the main menu and press **Open all missions** (the teacher's key). Press it again to lock them. `?teacher=1` in the URL does the same for one visit.
 
 ## NASA data
 

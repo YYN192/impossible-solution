@@ -273,3 +273,134 @@ button.primary:disabled { background: #141d29; border-color: var(--steel); color
 .morning button.why:hover { background: #12293a; }
 /* Level 3: "Return to station" and similar back buttons sit back. */
 .console-top > button { background: transparent; border-color: var(--steel); box-shadow: none; color: #cfdae4; }
+/* ===== #95: the Plan screen fits a laptop (1366x768, 1440x900) with no page scrolling =====
+   Short job cards everywhere: no 01-05 number, and the cost sits beside the job name when there is room. */
+.expedition .plan-screen .job-number { display: none; }
+.expedition .plan-screen .job-choice { min-height: 0; padding: 8px 12px; gap: 12px; }
+.expedition .plan-screen .job-copy { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+.expedition .plan-screen .job-copy small { order: 1; flex-basis: 100%; }
+@media (min-width: 1001px) {
+  /* "Plan sol 1" and its one-line help share a row. */
+  .expedition .screen:has(> .plan-screen) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 20px; }
+  .expedition .screen:has(> .plan-screen) > .lead { margin: 0; }
+  .expedition .screen > .plan-screen { flex-basis: 100%; margin-top: 10px; grid-template-columns: minmax(0, 2.2fr) minmax(300px, 1fr); }
+  .expedition .plan-screen .step-label { margin-bottom: 8px; }
+  .expedition .plan-screen .planner-guidance { margin-top: 4px; }
+  .expedition .plan-screen .job-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .expedition .plan-screen .job-choice:last-child:nth-child(odd) { grid-column: 1 / -1; } /* an odd last job uses the full row */
+  .expedition .plan-screen .crew-roster { margin-bottom: 14px; }
+  .expedition .plan-screen .crew-tile > button:first-child { flex-direction: row; text-align: left; padding: 8px 10px; gap: 10px; }
+  .expedition .plan-screen .crew-tile.has-job > button:first-child { padding-right: 46px; }
+  .expedition .plan-screen .crew-tile > button:first-child > span { flex: 1; min-width: 0; }
+  .expedition .plan-screen .crew-skill { justify-content: flex-start; text-align: left; }
+  .expedition .plan-screen .crew-tile small { margin-top: 2px; }
+  /* The outlook is exactly as tall as the jobs column (contain: size adds nothing to the row height) and scrolls
+     inside, with End sol pinned to its bottom edge so it is always in view. */
+  .expedition .plan-screen .plan-outlook { contain: size; align-self: stretch; overflow-y: auto; position: static; }
+  /* -20px = the outlook's padding: sticky stops at the padding edge, which let meters peek out below the button. */
+  .expedition .plan-screen .plan-outlook .end-sol { position: sticky; bottom: -20px; z-index: 1; }
+}
+/* One astronaut per row (run.css): name and job share the first line, the skill is the second, so a phone shows
+   all 3 astronauts and the first job above the End sol dock. */
+@media (max-width: 900px) {
+  .expedition .plan-screen .crew-tile > button:first-child { padding-top: 4px; padding-bottom: 4px; } /* still 56 px tall: the 48 px portrait */
+  .expedition .plan-screen .crew-tile > button:first-child > span { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; }
+  .expedition .plan-screen .crew-tile small { grid-area: 1 / 2; margin: 0; }
+  .expedition .plan-screen .crew-skill { grid-column: 1 / -1; }
+  .expedition .plan-screen .crew-roster { margin-bottom: 14px; }
+  .expedition .plan-screen .step-label { margin-bottom: 8px; }
+  .expedition .plan-screen .jobs-locked { margin-bottom: 6px; }
+  .expedition .screen > .plan-screen { margin-top: 12px; }
+}
+
+/* ===== Morning / beat / report / final hierarchy (owner's 1-second test) =====
+   Level 2 "you can choose this": beat options get the cyan "interactive" frame; blocked ones stay grey. */
+.beat-option:not(:disabled) { border-color: #83d9f4; }
+.beat-option:not(:disabled):hover { background: #1a3547; border-color: #c8f1ff; }
+/* Meter "?" help sits back inside the meter cards (info, not an action). Tap size unchanged. */
+.resource-meter .whats-this__button { background: transparent !important; border: 1px solid #52687b !important; box-shadow: none !important; color: #c3d3de !important; }
+.resource-meter .whats-this__button:hover { border-color: #83d9f4 !important; color: #fff !important; }
+/* What changed: the +1 / -1 is coloured and readable next to the number, and the change band shows on every screen. */
+.meter-change { font-size: 1rem !important; font-weight: 700; }
+.meter-change.better { color: #7fe0a0; }
+.meter-change.worse { color: #ff9b9b; }
+.meter-change.same { color: #8ba2b6; font-weight: 400; }
+.meter-track { position: relative; }
+.meter-delta { position: absolute; top: 0; bottom: 0; opacity: .85; }
+.meter-delta.better { background: #7fe0a0; }
+.meter-delta.worse { background: repeating-linear-gradient(135deg, #ff7b7b 0, #ff7b7b 4px, #7a2b2b 4px, #7a2b2b 8px); }
+/* Final screen: one gold "try again"; the other two are quiet. On phones the bar is not sticky (it hid the story). */
+.screen:has(.stars) > .actions button:not(.primary) { background: transparent; border-color: #52687b; box-shadow: none; color: #dce6ee; }
+@media (max-width: 720px) {
+  .screen:has(.stars) > .actions { position: static; background: none; }
+}
+
+/* ===== #96: dialogs, Data Sources, Teacher card, Settings, hub panels =====
+   One gold primary (the next step), everything else outline, cyan = selected/info, decoration muted, and the primary
+   stays pinned to the bottom edge while long text scrolls. Gold #f2c94c / ink #1d1405 is 11:1 (AA needs 4.5). */
+.sources__back, .teacher__bar > .sources__back { background: #f2c94c; border: 2px solid #fff3c4; color: #1d1405; box-shadow: none; }
+.sources__back:hover { background: #ffe08a; }
+.teacher__bar > :not(.primary), .teacher__bar > .sources__back:not(.primary) { background: transparent; border-color: #52687b; color: #dce6ee; }
+.teacher__bar > button[aria-pressed="true"] { border-color: #83d9f4; color: #83d9f4; } /* "on" = selected = cyan, not gold */
+.teacher__bar > button[aria-pressed="true"] + .sources__back { background: #f2c94c; border-color: #fff3c4; color: #1d1405; } /* once unlocked, Back is the next step */
+.wipe-beat { display: contents; }
+.sources__back, .teacher__bar, .menu-settings > .primary, .wipe-beat > .actions, .explore-side > .primary, .storm-dialog .actions {
+  position: sticky; bottom: 0; z-index: 5;
+}
+.teacher__bar { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 8px 0; background: #0b1825f2; border-top: 2px solid #31495e; margin-top: 1rem; }
+.teacher__bar > button { min-height: 48px; margin: 0; }
+.sources__back { box-shadow: 0 0 0 8px #0b1825; } /* a quiet strip behind the lone gold button so text never shows through */
+.menu-settings > .primary, .wipe-beat > .actions { background: #0b1825f2; padding: 8px 0; }
+.menu-settings > .primary { min-height: 52px; box-shadow: 0 0 0 8px #0b1825; }
+/* Storm dialogs: muted frame (the alarm title already pulses), outline "Later", gold button pinned inside the dialog. */
+.storm-dialog, .storm-dialog { border-color: #7a3f1d !important; box-shadow: 6px 6px 0 #020811; }
+.storm-dialog .actions { background: #2a1a10; padding: 8px 0; margin: 0; }
+.storm-dialog .actions button:not(.primary) { background: transparent; border-color: #c98b52; color: #fbe9d6; box-shadow: none; }
+.storm-real { border-style: solid; border-color: #5e3b22; } /* real-data note: info, kept quiet */
+/* Hands-on beats: the gold button leaves the pad's way; the grid and the rover stay the focus. */
+.explore-side > .primary { margin-top: 8px; }
+.explore-switch { background: transparent; border-color: #52687b; box-shadow: none; color: #dce6ee; }
+/* Hub panels (Engineering bay, space weather): only a close button, so it stays in view at the top while the graphs scroll. */
+.hub-dialog-top { position: sticky; top: 0; z-index: 5; background: #14233a; padding-bottom: 4px; }
+.hub-dialog-x { background: transparent; border-color: #52687b; color: #dce6ee; box-shadow: none; }
+.hub-dialog-x:hover { border-color: #83d9f4; }
+.radar-day[aria-pressed="true"] { border-color: #83d9f4; } /* the picked day = selected = cyan */
+@media (min-width: 721px) and (max-height: 900px) {
+  .beat-type { margin: 0 0 2px; }
+  .screen:has(.beat-options) .lead, .screen:has(.wipe-beat) .lead { margin: 0.2rem 0 0.4rem; }
+  .screen:has(.beat-options) .small-counters, .screen:has(.beat-result) .small-counters { display: none; } /* food and science already show in the meters' row on the console */
+  .beat-options { margin: 0.5rem 0; gap: 0.5rem; }
+  .beat-option { padding-block: 8px; }
+  .wipe-beat .storm-panels { grid-template-columns: repeat(6, 1fr); }
+  .wipe-beat .storm-panels button { min-height: 64px; }
+}
+@media (pointer: coarse) { .teacher__bar > button, .storm-dialog .actions button, .hub-dialog-x { min-height: 48px; } }
+html[data-contrast] button.primary, html[data-contrast] .sources__back { background: #ffe08a; color: #000; border-color: #fff; }
+html[data-contrast] .teacher__bar > :not(.primary) { color: #fff; border-color: #fff; }
+.teacher__bar > .sources__back { position: static; box-shadow: none; margin: 0; }
+/* #64 safe zones: a white tick at the game's own line on each meter; an unsafe meter gets a warm frame. */
+.meter-safe { position: absolute; top: -1px; bottom: -1px; width: 3px; margin-left: -1px; background: #f2f6fa; box-shadow: 0 0 0 1px #080b12; }
+.resource-meter.unsafe { border-color: #f5c542; }
+.resource-meter.unsafe > small { color: #ffd77a; }
+.space-watch { margin: 0 0 0.6rem; }
+/* #64: the power flow line under the plan preview. */
+.power-flow { margin: 0.2rem 0 0; font-size: max(1rem, 16px); color: #c3d3de; }
+.job-new { margin-left: 0.5rem; color: #fff; background: #315166; border: 1px solid #8eb7c9; padding: 0.08rem 0.3rem; font-size: 0.75rem; }
+/* #65: the day's changes pop in one by one. Bad news shakes once in the warning colour (no flashing),
+   good news sparkles; +/- and Good / Watch out carry the meaning without colour. Calm mode stills it (data-calm). */
+.sol-changes { margin: 12px 0; }
+.sol-changes h2 { font-size: 1rem; margin: 0 0 8px; }
+.sol-changes ul { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.sol-change { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: var(--px, 4px) solid #65bf83; background: #173b2c; animation: sol-pop 0.3s steps(3) both; }
+.sol-change.bad { border-color: #ff7b7b; background: #3a1d1d; animation: sol-pop 0.3s steps(3) both, sol-shake 0.4s steps(4) 0.3s 1; }
+.sol-change b { font-size: 1.4rem; font-variant-numeric: tabular-nums; min-width: 2.2ch; text-align: right; }
+.sol-change { flex-wrap: wrap; } /* phones: the verdict moves to its own line, numbers never break */
+.sol-change b, .sol-change__diff, .sol-change__verdict { white-space: nowrap; }
+.sol-change__diff { font-weight: 700; }
+.sol-change__verdict { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.sol-change.good .sol-change__verdict { color: #9ff0b8; }
+.sol-change.bad .sol-change__verdict { color: #ffb3b3; }
+.sol-change img { width: 24px; height: 24px; image-rendering: pixelated; }
+@keyframes sol-pop { from { transform: scale(0.6); opacity: 0; } }
+@keyframes sol-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .sol-change, .sol-change.bad { animation: none; } }

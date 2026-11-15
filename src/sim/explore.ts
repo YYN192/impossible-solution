@@ -4,7 +4,7 @@
  * and battery are game rules. The whole drive becomes ONE engine action (`driveAction`).
  */
 import { shuffle } from "./rng";
-import { DOSE, type Action } from "./types";
+import { DOSE, type Action, type CrewId } from "./types";
 
 export type Terrain = "sand" | "rough" | "rock";
 export interface Cell {
@@ -147,6 +147,22 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
     icon: science ? "rover rock" : "rover",
     // Drove out and came back empty-handed: say so, not "stayed at the base".
     textKey: !science && used ? "domino.roverEmpty" : `domino.roverHome${science}`,
-    effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
+    // #66: a full load keeps Amara (the scientist) studying rocks, so she rests from this sol's jobs.
+    effect: { ...(power ? { power } : {}), ...(science ? { science } : {}), ...(science >= EXPLORE.maxScience ? { tired: ["a3"] as CrewId[] } : {}) },
   };
+}
+
+/** Dust Season (#98): the samples farther from the base than the nearest one are "the far crater". */
+export function farSamples(map: ExploreMap): number[] {
+  const cost = reachCost(map);
+  const c = map.samples.map((p) => cost[p.y * map.cols + p.x]);
+  return c.flatMap((v, i) => (v > Math.min(...c) ? [i] : []));
+}
+
+/** Dust Season (#98): which of the rover beat's options the drive counts as. null = stranded away from the base. */
+export function roverChoice(map: ExploreMap, d: Drive): "stay" | "near" | "far" | null {
+  if (!isHome(map, d)) return null;
+  if (!d.collected.length) return "stay";
+  const far = farSamples(map);
+  return d.collected.some((i) => far.includes(i)) ? "far" : "near";
 }

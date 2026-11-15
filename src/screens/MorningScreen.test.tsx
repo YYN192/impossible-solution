@@ -39,8 +39,9 @@ describe("Morning report", () => {
       "wipe x|Nobody cleaned the solar panels.",
     ]);
     screen.getByText("because");
-    // The kid sees the burst only in the end-of-sol report.
+    // The exact burst shows only in the end-of-sol report; the morning gives a "Space watch" hint (#64).
     expect(text()).not.toContain("The Sun just blasted a space-ray storm!");
+    screen.getByText(/The Sun looks busy/);
     expect(text()).not.toMatch(/live/i);
   });
 
@@ -94,5 +95,16 @@ describe("Morning report 'What's this?' tooltips (#16)", () => {
   it("every domino the engine can drop has a tooltip topic", () => {
     for (const key of Object.keys(en.domino))
       expect(helpTopicForDomino(`domino.${key}`), key).toBeDefined();
+  });
+});
+
+describe("Space watch (#64)", () => {
+  afterEach(cleanup);
+  it("warns on the morning before the burst and that morning, not after", () => {
+    showMorning(1);
+    screen.getByText(/The Sun looks busy/);
+    cleanup();
+    showMorning(3);
+    expect(screen.queryByText(/The Sun looks busy/)).toBeNull();
   });
 });

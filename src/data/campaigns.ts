@@ -95,13 +95,16 @@ export const GALE_MAP: DataRef = {
   fetched: galeMap.fetchedAt,
 };
 
+// The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
+const galeExploreMap = (next: () => number) =>
+  buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next);
+
 /** Drive the rover on the real-colour map of the Gale Crater area. The seed places the samples. */
 const explore = (next: () => number): Beat => ({
   id: "explore",
   type: "explore",
   card: GALE_MAP,
-  // The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
-  map: buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next),
+  map: galeExploreMap(next),
   options: [
     option("explore", "near", "rover", { effect: { power: -1, science: 1 } }),
     option("explore", "far", "map", { effect: { power: -3, science: 2 } }),
@@ -186,16 +189,25 @@ const storm: Campaign = {
 };
 
 /** Real dust storms. `solar` is the share of power the panels still made. */
+/** Game numbers (disclosed in gameNumbers.ts): real dust storms last weeks; ours are short so a 6-sol mission can feel one. */
+const DUST_STORM_SOLS = 2;
+/** No verified Opportunity 2018 power figure: this share of normal panel power is a game number (the storm and its date are real). */
+const OPPORTUNITY_SOLAR = 0.3;
+/** Power the heater uses each night: 1 in Dust Season, 2 at Gale Crater (colder nights). Game numbers. */
+const HEATER_POWER = { dust: 1, gale: 2 };
+/** Share of normal power on a Moon "shadow day" (crater walls block the low Sun). Game number. */
+const SHADOW_DAY_SOLAR = 0.2;
+
 const DUST_STORMS = [
   { id: "InSight-2022-10", captionKey: "event.dust.insight2022", solar: 275 / 425, source: INSIGHT_DUST },
   // No published power number we could verify: 0.3 is a game number, the storm and its date are real.
-  { id: "Opportunity-2018-06", captionKey: "event.dust.opportunity2018", solar: 0.3, source: OPPORTUNITY_2018 },
+  { id: "Opportunity-2018-06", captionKey: "event.dust.opportunity2018", solar: OPPORTUNITY_SOLAR, source: OPPORTUNITY_2018 },
 ] as const;
 
 const dust: Campaign = {
   id: "dust",
   place: "mars",
-  rules: { sols: 6, scienceGoal: 3, heater: 1 },
+  rules: { sols: 6, scienceGoal: 3, heater: HEATER_POWER.dust },
   datasets: ["InSight", "Opportunity", "Curiosity REMS", "Curiosity RAD (RadLab)", "DSN"],
   difficulty: 2,
   minutes: 10,
@@ -205,7 +217,7 @@ const dust: Campaign = {
     const start = pick(next, [3, 4]);
     const sun = pick(next, STORMS.filter((s) => s.size === "small"));
     const events: StormEvent[] = [
-      ...[start, start + 1].map((sol) => ({ sol, kind: "dustStorm" as const, id: ds.id, captionKey: ds.captionKey, solar: ds.solar, source: ds.source })),
+      ...Array.from({ length: DUST_STORM_SOLS }, (_, i) => start + i).map((sol) => ({ sol, kind: "dustStorm" as const, id: ds.id, captionKey: ds.captionKey, solar: ds.solar, source: ds.source })),
       ...stormEvents(sun, pick(next, [5, 6]), 6).filter((e) => e.kind === "particleBurst"),
     ];
     return {
@@ -215,18 +227,21 @@ const dust: Campaign = {
           id: "siteMars",
           type: "site",
           options: [
-            option("siteMars", "gale", "mountain", { rules: { heater: 2 }, source: REMS_NIGHT }, true),
+            option("siteMars", "gale", "mountain", { rules: { heater: HEATER_POWER.gale }, source: REMS_NIGHT }, true),
             option("siteMars", "elysium", "plain", { rules: { dustFactor: 0.5 }, source: INSIGHT_POWER }, true),
             option("siteMars", "meridiani", "wind", { rules: { dustFactor: 0.8, solar: 5 }, source: WIND_CLEANING }, true),
           ],
         },
-        2: wipe,
+        2: { ...wipe, hands: true },
         3: upgrade,
         4: radio(LIGHT_DELAY, "night"),
         5: dilemma(next),
         6: {
           id: "rover",
           type: "rover",
+          card: GALE_MAP,
+          // #98: drive it yourself; the samples brought home pick near / far / stay (roverChoice).
+          map: galeExploreMap(next),
           options: [
             option("rover", "near", "rover", { effect: { power: -1, science: 1, dose: DOSE.outsideExtra } }),
             option("rover", "far", "map", { effect: { power: -3, science: 2, dose: 2 * DOSE.outsideExtra } }),
@@ -262,7 +277,7 @@ const moon: Campaign = {
         dose: { inside: MOON_STORM_FACTOR * DOSE.normalDay, outside: MOON_STORM_FACTOR * (DOSE.normalDay + DOSE.outsideExtra) },
       },
       // A game event: even the best ridges are not sunlit all the time.
-      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", game: true, captionKey: "event.shadow.moon", solar: 0.2, source: ARTEMIS_REGIONS },
+      { sol: pick(next, [2, 4, 5]), kind: "dustStorm", id: "shadow-day", game: true, captionKey: "event.shadow.moon", solar: SHADOW_DAY_SOLAR, source: ARTEMIS_REGIONS },
     ];
     const last: Beat = pick(next, [
       {
@@ -318,4 +333,4 @@ export const campaignById = (id: string): Campaign => CAMPAIGNS.find((c) => c.id
 /** Campaigns on the menu. */
 export const MENU_CAMPAIGNS = CAMPAIGNS.filter((c) => !c.hidden);
 /** Game numbers shown on Data Sources. */
-export const CAMPAIGN_NUMBERS = { SMALL_STORM_FACTOR, MOON_STORM_FACTOR };
+export const CAMPAIGN_NUMBERS = { SMALL_STORM_FACTOR, MOON_STORM_FACTOR, DUST_STORM_SOLS, OPPORTUNITY_SOLAR, HEATER_POWER, SHADOW_DAY_SOLAR };

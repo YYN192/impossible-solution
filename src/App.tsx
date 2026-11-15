@@ -11,6 +11,7 @@ import { FullscreenToggle } from "./components/FullscreenToggle";
 import { BarMenu } from "./components/BarMenu";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { audio } from "./game/audio";
+import { useMusicDirector } from "./game/musicDirector";
 import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
 import { EndOfSolScreen } from "./screens/EndOfSolScreen";
@@ -61,6 +62,8 @@ export default function App() {
     if (game.sol === sol && hubStormFor(setup, sol, readFlags().demo) && !repaired(game, "storm-panels")) { stormCalled.current = sol; setPlace("hub"); }
   }, [screen, sol, place, setup, setPlace]);
   const visiblePlace = screen === "title" ? "menu" : place;
+  // The one music source of truth: menu, base/console, real storm (overlays never restart a song).
+  useMusicDirector(visiblePlace);
   const play = () => {
     if (screen === "title") { useSession.getState().clearPlan(); useNav.getState().next(); }
     setPlace("hub");

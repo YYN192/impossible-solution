@@ -1,7 +1,7 @@
 import { Icon } from "./components/Icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { audio, musicFor } from "./game/audio";
+import { audio } from "./game/audio";
 import { useMission } from "./state/mission";
 import { reducedMotion, useComfort } from "./state/comfort";
 import { tRun } from "./i18n/dynamic";
@@ -12,7 +12,7 @@ import { usePressedKeys } from "./game/pressedKeys";
 import { createWalkFx, idleBob, stepWalkFx } from "./game/walkFx";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
-import { useNav } from "./state/screen";
+import { firstSolStarted, useNav } from "./state/screen";
 import { readFlags } from "./data/flags";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
@@ -76,7 +76,6 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   }, [near, activating, dialogue, onConsole, task, alarm, panel, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { const track = musicFor("hub", useMission.getState().setup?.place); audio.playMusic(track); return audio.stopMusic; }, []);
   // Focus the game on arrival and again once a panel has closed (a modal dialog keeps the canvas inert until then).
   useEffect(() => { if (!panel) canvas.current?.focus({ preventScroll: true }); }, [panel]);
   const closePanel = () => { audio.playSfx("menu-back"); setPanel(undefined); };
@@ -107,7 +106,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       // and turns off the walk dust and the idle bounce. Dust follows real movement (pushing into a wall raises none).
       const comfort = useComfort.getState(), reduced = reducedMotion();
       fx = stepWalkFx(fx, { now, moved: player.x !== before.x || player.y !== before.y, walking: moving, x: player.x, y: player.y, facing: player.facing, reduced });
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reduced, comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon", { puffs: fx.puffs, bob: idleBob(fx, now, reduced) });
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reduced, comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon", { puffs: fx.puffs, bob: idleBob(fx, now, reduced) }, firstSolStarted(useNav.getState()));
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -138,11 +137,28 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); events.forEach((n) => window.removeEventListener(n, clear)); document.removeEventListener("visibilitychange", clear); };
   }, []);
+  const dragging = useRef(false); // the mouse button (or finger) is held down on the room
+  const pointAt = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
+  };
   const tap = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (dialogue || activating) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const target = tapTarget(MARS_BASE, { x: (e.clientX - r.left) / r.width * MARS_BASE.width, y: (e.clientY - r.top) / r.height * MARS_BASE.height });
+    const target = pointAt(e);
     held.current.clear(); goal.current = target; pending.current = target.entity?.id;
+    dragging.current = true;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  // Click and drag: the player keeps walking after the held mouse. Letting go on a console, NPC or door uses it.
+  const drag = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current || !e.buttons || dialogue || activating) return;
+    const target = pointAt(e);
+    goal.current = target; pending.current = undefined;
+  };
+  const release = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    if (!pending.current && goal.current) pending.current = pointAt(e).entity?.id;
   };
   const closeDialogue = () => {
     audio.playSfx("menu-back");
@@ -157,7 +173,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
       : <div className="world-objective"><p>{campaign && campaign !== "classic" ? t(`world.objectiveFor.${campaign}` as never) : t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
-      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} />
+      <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={tRun("world.canvas", {}, setup?.place)} aria-describedby="world-description" onPointerDown={tap} onPointerMove={drag} onPointerUp={release} onPointerCancel={() => { dragging.current = false; }} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
       {stormLeft > 0 && !alarm && <div className="dust-cover in-world" style={{ opacity: stormLeft * 0.18 }} aria-hidden="true" />}
       {activating && <div className="console-boot" role="status">{t("world.connecting")}</div>}

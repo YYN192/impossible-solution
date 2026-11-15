@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const contexts: { resume: () => Promise<void>; suspend: () => Promise<void> }[] = [];
 /** Minimal Web Audio stand-in: jsdom has no AudioContext. Records every gain node it hands out. */
 function fakeAudio() {
   const gains: {
@@ -37,11 +38,13 @@ function fakeAudio() {
     decodeAudioData() {
       return Promise.resolve({});
     }
-    resume() {
-      return Promise.resolve();
-    }
+    resume = vi.fn(() => Promise.resolve());
+    suspend = vi.fn(() => Promise.resolve());
   }
-  vi.stubGlobal("AudioContext", FakeContext);
+  contexts.length = 0;
+  vi.stubGlobal("AudioContext", class extends FakeContext {
+    constructor() { super(); contexts.push(this); }
+  });
   const fetch = vi.fn(() =>
     Promise.resolve({
       ok: true,
@@ -63,8 +66,9 @@ describe("audio engine", () => {
     const { audio } = await import("./audio");
     expect(() => {
       audio.playSfx("menu");
-      audio.playMusic("mars-base-ambience");
-      audio.stopMusic();
+      audio.setMusic({ scene: "base", storm: true });
+      audio.miniGameOpened()();
+      audio.setMusic({ scene: "off", storm: false });
     }).not.toThrow();
   });
 
@@ -89,15 +93,35 @@ describe("audio engine", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("never fetches music while the Music volume is 0 (the default)", async () => {
+  it("#62: goes quiet while the tab is hidden and resumes when it is shown again", async () => {
+    fakeAudio();
+    const { audio } = await import("./audio");
+    audio.unlock();
+    const [c] = contexts;
+    let hidden = true;
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => hidden });
+    try {
+      document.dispatchEvent(new Event("visibilitychange"));
+      expect(c.suspend).toHaveBeenCalledTimes(1);
+      hidden = false;
+      vi.mocked(c.resume).mockClear();
+      document.dispatchEvent(new Event("visibilitychange"));
+      expect(c.resume).toHaveBeenCalled();
+    } finally {
+      delete (document as { hidden?: boolean }).hidden;
+    }
+  });
+
+  it("never fetches music while the Music volume is 0", async () => {
+    localStorage.setItem("sol:audio", JSON.stringify({ music: 0 }));
     const { fetch } = fakeAudio();
     const { audio } = await import("./audio");
     audio.unlock();
-    audio.playMusic("mars-base-ambience");
+    audio.setMusic({ scene: "base", storm: false });
     expect(
       fetch.mock.calls
         .map((c: unknown[]) => String(c[0]))
-        .some((u) => u.includes("ambience")),
+        .some((u) => u.includes("ambience") || u.includes("/music/")),
     ).toBe(false);
   });
 });
@@ -110,7 +134,9 @@ describe("music slots for the team's soundtrack", () => {
     expect(musicFor("hub", "moon")).toBe("moon-base-ambience"); // #76: no Mars wind on the Moon
     expect(sounds.get("moon-base-ambience")).toBe(sounds.get("space-menu-ambience"));
     expect(musicFor("console", "dust")).toBe("music-console");
-    expect(musicFor("console", "storm")).toBe("music-mission-storm");
+    // The storm track belongs to a real storm warning only, never to the storm campaign's calm console.
+    expect(musicFor("console", "storm")).toBe("music-console");
+    expect(musicFor("storm")).toBe("music-mission-storm");
     for (const id of [musicFor("lobby"), musicFor("hub"), musicFor("console", "moon")]) expect(sounds.has(id)).toBe(true);
   });
 

@@ -8,7 +8,7 @@ import { JARGON } from "./jargon";
  */
 const KID_SECTIONS = [
   "title", "common", "morning", "domino", "event", "earth", "plan", "endSol", "final",
-  "jobs", "jobInfo", "crew", "planHelp", "bars", "help", "miniGame", "beat", "campaign",
+  "jobs", "jobInfo", "crew", "planHelp", "bars", "help", "miniGame", "beat", "campaign", "talk", "dialogue",
 ] as const;
 
 

@@ -192,3 +192,32 @@ describe("mini-games with the keyboard (#63)", () => {
     screen.getByText(t("miniGame.keys.askEarth"));
   });
 });
+
+describe("JobMiniGame and the music", () => {
+  afterEach(() => { vi.useRealTimers(); });
+  it("tells the music coordinator it is open for exactly as long as it is on screen (rapid open/close)", async () => {
+    const { musicDebug } = await import("../game/audio");
+    const first = render(<JobMiniGame job="panels" seed={SEED} onClose={() => {}} />);
+    expect(musicDebug.miniGames()).toBe(1);
+    first.unmount();
+    expect(musicDebug.miniGames()).toBe(0);
+    for (const job of jobIds) render(<JobMiniGame job={job} seed={SEED} onClose={() => {}} />).unmount();
+    expect(musicDebug.miniGames()).toBe(0);
+  });
+});
+
+describe("Dust and Moon mini games and the music", () => {
+  it("also report open/close to the music coordinator", async () => {
+    const { musicDebug } = await import("../game/audio");
+    const { DustMiniGame } = await import("./DustMiniGame");
+    const { MoonMiniGame } = await import("./MoonMiniGame");
+    const { DUST_JOBS } = await import("../game/dustMiniGames");
+    const dust = render(<DustMiniGame job={DUST_JOBS[0]} seed={SEED} onClose={() => {}} />);
+    expect(musicDebug.miniGames()).toBe(1);
+    dust.unmount();
+    const moon = render(<MoonMiniGame job="panels" seed={SEED} onClose={() => {}} />);
+    expect(musicDebug.miniGames()).toBe(1);
+    moon.unmount();
+    expect(musicDebug.miniGames()).toBe(0);
+  });
+});

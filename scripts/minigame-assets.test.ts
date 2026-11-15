@@ -14,6 +14,12 @@ const SPRITES: Record<string, [number, number]> = {
   block: [32, 16], "block-slot": [32, 16],
   dish: [32, 32], earth: [32, 32], star: [16, 16],
   hole: [32, 16], "rock-plain": [16, 16], sparkle: [16, 16], check: [16, 16],
+  // The Moon's own mini games (src/game/moonMiniGames.ts).
+  "moon-sun": [32, 32], "moon-ice-3": [32, 32], "moon-ice-2": [32, 32], "moon-ice-1": [32, 32], "moon-water": [32, 32],
+  "moon-scoop": [32, 16], "moon-dirt": [32, 16], "moon-signal": [16, 16], "moon-reply": [16, 16],
+  "moon-crater": [32, 16], "moon-ice": [16, 16], "moon-lamp": [16, 16],
+  // Dust Season's own mini games (src/game/dustMiniGames.ts).
+  "dust-gust": [32, 32], "dust-pane": [32, 32], "dust-crack": [32, 32],
 };
 const dir = resolve(process.cwd(), "src/assets/pixel/minigame");
 const colors = new Set(Object.values(palette).map((c) => c.toLowerCase()));
@@ -53,6 +59,12 @@ describe("mini game pixel sprites", () => {
       expect(p[3], "hard edges: no half-transparent pixels").toBe(255);
       expect(colors.has(hex(p)), `${name}: ${hex(p)} is not in palette.json`).toBe(true);
     }
+  });
+
+  it("the Moon's ice really melts: every stage has less ice than the one before", () => {
+    const ice = (name: string) => readPng(resolve(dir, `${name}.png`)).px.filter((p) => p[3] && [palette.cyan, palette.white, palette.silver].map((c) => c.toLowerCase()).includes(hex(p))).length;
+    expect(ice("moon-ice-2")).toBeLessThan(ice("moon-ice-3"));
+    expect(ice("moon-ice-1")).toBeLessThan(ice("moon-ice-2"));
   });
 
   it("the plant really grows: every stage has more plant than the one before", () => {

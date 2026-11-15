@@ -28,9 +28,16 @@ export interface Beat {
   options: BeatOption[];
   /** explore: the map the kid drives on. The options are the "let Pip drive" choices for players who skip the driving. */
   map?: ExploreMap;
+  /** wipe: the kid wipes the panels by hand; the count picks the option (`wipeChoice`). */
+  hands?: true;
   /** Words the seed picked (a crew name), for the beat's text. */
   vars?: Record<string, string>;
 }
+
+/** Game numbers of the hands-on wipe (#98): 6 panels; half of them = "half", all = "all". */
+export const WIPE_PANELS = 6;
+export const wipeChoice = (wiped: number, total = WIPE_PANELS): "none" | "half" | "all" =>
+  wiped >= total ? "all" : wiped * 2 >= total ? "half" : "none";
 
 export type Place = "mars" | "moon";
 

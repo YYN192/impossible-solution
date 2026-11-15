@@ -1,8 +1,8 @@
 import { Icon } from "./components/Icon";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
-import { audio, musicFor, useAudio } from "./game/audio";
+import { audio, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { useComfort } from "./state/comfort";
@@ -38,8 +38,6 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
   const prefs = useAudio();
   const progress = useProgress();
   const special = flags.todaysSun || flags.daily;
-  // Lobby music (off until the player turns music up; never starts before a tap).
-  useEffect(() => { const track = musicFor("lobby"); audio.playMusic(track); return audio.stopMusic; }, []);
   const soundAsked = useComfort((c) => c.soundAsked);
   const answerSound = (muted: boolean) => { audio.mute(muted); useComfort.setState({ soundAsked: true }); };
   const pick = (choice: RunChoice) => { audio.playSfx("select"); onChoose(choice); };

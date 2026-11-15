@@ -46,3 +46,10 @@ export function pickMorning(input: MorningInput): MorningReport {
 
   return { headline, cause, extra };
 }
+
+/**
+ * #64 "Space watch": the morning of a space-ray burst and the morning before, the Sun "looks busy".
+ * A vague hint, never the exact sol: real forecasters see busy sunspots, not the moment particles arrive.
+ */
+export const spaceWatch = (sol: number, events: StormEvent[]) =>
+  events.some((e) => e.kind === "particleBurst" && (e.sol === sol || e.sol === sol + 1));

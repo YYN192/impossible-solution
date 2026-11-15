@@ -38,7 +38,7 @@ export const RAD_BASELINE: DatedDataRef = {
 };
 
 export const INSIGHT_DUST: DatedDataRef = {
-  label: "NASA's InSight lander lost power when dust covered its solar panels",
+  label: "NASA's InSight lander lost power when a dust storm darkened its sky",
   url: "https://www.jpl.nasa.gov/news/nasas-insight-waits-out-dust-storm/",
   mode: "constant",
   fetched: CHECKED_AT,
@@ -103,7 +103,7 @@ export const REAL_FACTS: RealFact[] = [
     what: "Dust on solar panels",
     value:
       "A 2022 dust storm cut InSight's power from 425 to 275 watt-hours per sol (about one third less)",
-    usedFor: "Skipping panel cleaning lowers tomorrow's power by about a third",
+    usedFor: "Stand-in for dusty panels: skipping panel cleaning lowers tomorrow's power by about a third (in the real storm the dusty sky, not the panels, cut the power)",
     ref: INSIGHT_DUST,
   },
   {

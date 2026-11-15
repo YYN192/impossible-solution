@@ -18,7 +18,7 @@ const BG_TEXT: Record<string, string> = {
   "A Mars rover (Curiosity) measured this solar storm on 20 May 2024": "Марсоход (Curiosity) измери тази слънчева буря на 20 май 2024 г.",
   "Curiosity's radiation detector, first measurements on the Mars surface (Hassler et al., Science 2014)":
     "Радиационният детектор на Curiosity, първите измервания на повърхността на Марс (Hassler и колеги, Science 2014)",
-  "NASA's InSight lander lost power when dust covered its solar panels": "Апаратът InSight на НАСА загуби енергия, когато прах покри слънчевите му панели",
+  "NASA's InSight lander lost power when a dust storm darkened its sky": "Апаратът InSight на НАСА загуби енергия, когато прашна буря затъмни небето му",
   "Worked out from the Earth–Mars distance (55 to 401 million km, NASA fact sheet) and the speed of light: 3 to 22 minutes":
     "Изчислено от разстоянието Земя–Марс (от 55 до 401 милиона km, справочник на НАСА) и скоростта на светлината: от 3 до 22 минути",
   "NASA's space weather database (DONKI): the 20 May 2024 solar eruption": "Базата данни на НАСА за космическото време (DONKI): слънчевото изригване от 20 май 2024 г.",

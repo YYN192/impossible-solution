@@ -22,6 +22,9 @@ export interface Nav {
 
 export const START: Nav & { place: Place } = { screen: "title", sol: 1, place: "menu" };
 
+/** The player has got past sol 1's morning, so they know the console (its hub glow can rest, #55). */
+export const firstSolStarted = ({ screen, sol }: Nav) => sol > 1 || (screen !== "title" && screen !== "morning");
+
 /** Pure: the screen after `nav` when the player presses the main button. */
 export function nextNav(
   { screen, sol }: Nav,

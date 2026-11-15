@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createGame } from "../sim/engine";
 import { useGame } from "./game";
-import { nextNav, START, type Nav, useNav } from "./screen";
+import { firstSolStarted, nextNav, START, type Nav, useNav } from "./screen";
 
 describe("nextNav", () => {
   it("walks title → 3 × (morning → plan → endSol) → final", () => {
@@ -86,5 +86,15 @@ describe("navigation lifecycle", () => {
     useNav.getState().endEarly();
 
     expect(useNav.getState()).toMatchObject({ screen: "final", sol: 2 });
+  });
+});
+
+describe("firstSolStarted (#55: the hub console glows until then)", () => {
+  it("is false on the title and sol 1 morning, true from sol 1's plan on", () => {
+    expect(firstSolStarted({ screen: "title", sol: 1 })).toBe(false);
+    expect(firstSolStarted({ screen: "morning", sol: 1 })).toBe(false);
+    expect(firstSolStarted({ screen: "beat", sol: 1 })).toBe(true);
+    expect(firstSolStarted({ screen: "plan", sol: 1 })).toBe(true);
+    expect(firstSolStarted({ screen: "morning", sol: 2 })).toBe(true);
   });
 });

@@ -16,10 +16,12 @@ import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
 import { ExploreBeat } from "./ExploreBeat";
-import { BuildBeat, HeaterDial, RadioRace, WipeBeat, type HandsOnProps } from "./HandsOnBeats";
+import { BuildBeat, HeaterDial, RadioRace, RubPanels, type HandsOnProps } from "./HandsOnBeats";
+import { WipeBeat } from "./WipeBeat";
 
-/** Beat id → its hands-on moment (#59). Beats not listed keep their cards. */
-const HANDS_ON: Partial<Record<string, (p: HandsOnProps) => ReactNode>> = { wipe: WipeBeat, upgrade: BuildBeat, radio: RadioRace, cold: HeaterDial };
+/** Mission 1 (The Storm Season): beat id → its hands-on moment (#59). Other campaigns keep their cards,
+ *  except beats marked `hands` (Dust Season's wipe, #98), which use WipeBeat. */
+const HANDS_ON: Partial<Record<string, (p: HandsOnProps) => ReactNode>> = { wipe: RubPanels, upgrade: BuildBeat, radio: RadioRace, cold: HeaterDial };
 
 const num = (n: number) => `${n > 0 ? "+" : "−"}${Math.abs(Number(n.toFixed(1)))}`;
 
@@ -64,7 +66,7 @@ export function BeatScreen() {
   const next = useNav((s) => s.next);
   const setup = useMission((s) => s.setup);
   const state = useGame((s) => s.state);
-  const [done, setDone] = useState<{ fell: Domino; before: Bars } | null>(null);
+  const [done, setDone] = useState<{ fell: Domino; before: Bars; chips: Chip[] } | null>(null);
   // Explore beats open on the map; "Let Pip drive" shows the plain choices instead.
   const [pipDrives, setPipDrives] = useState(false);
   // Hands-on beats (#59) open as the hands-on moment; "Show the choices instead" shows the plain cards.
@@ -86,11 +88,11 @@ export function BeatScreen() {
     audio.playSfx(action.ask ? "earth-message-send" : "assign");
     const { power, air, dose } = after.bars;
     if (power <= 1 || air <= 2 || dose >= ENGINE.doseLimit) mistake("big"); else if (dose > before.dose) mistake("small"); // the choice cost something
-    setDone({ fell, before });
+    setDone({ fell, before, chips: effects(action, tt) });
   }
   const choose = (o: BeatOption) => act(o.action);
   const onMap = beat.map && !pipDrives && !done;
-  const HandsOn = HANDS_ON[beat.id];
+  const HandsOn = setup.campaignId === "storm" && !beat.hands ? HANDS_ON[beat.id] : undefined;
   const handsOn = HandsOn && !cards && !done;
   const delayMin = Math.round(setup.delay.seconds / 60);
   const pick = (id: string) => { const o = beat.options.find((x) => x.id === id); if (o) choose(o); };
@@ -119,7 +121,7 @@ export function BeatScreen() {
       </div>
       {onMap && beat.map && (
         <>
-          <ExploreBeat map={beat.map} onDone={act} />
+          <ExploreBeat map={beat.map} beat={beat.type === "rover" ? beat : undefined} onDone={act} />
           <button type="button" className="explore-switch" onClick={() => setPipDrives(true)}>{t("exploreUi.pip")}</button>
         </>
       )}
@@ -129,7 +131,8 @@ export function BeatScreen() {
           <button type="button" className="hands-on-switch" onClick={() => setCards(true)}>{t("handsOn.cards")}</button>
         </>
       )}
-      {onMap || handsOn ? null : !done ? (
+      {beat.hands && !done && <WipeBeat beat={beat} onDone={act} />}
+      {onMap || handsOn || (beat.hands && !done) ? null : !done ? (
         <div className="beat-options" role="group" aria-label={t("beatUi.options")} data-type={beat.type}>
           {beat.options.map((o) => {
             const can = canAct(state, o.action);
@@ -156,6 +159,9 @@ export function BeatScreen() {
       ) : (
         <div className="beat-result" role="status">
           <p className="lead"><Icons icon={done.fell.icon} />{" "}{tDynamic(done.fell.textKey)}</p>
+          <p className="beat-effects beat-changed"><b>{t("beatUi.changed")}</b>{" "}
+            {(done.chips.length ? done.chips : [{ text: t("beatUi.nothing") } as Chip]).map((c) => <span key={`${c.icon}-${c.text}`}>{c.icon && <Icon name={c.icon} />} {c.text}</span>)}
+          </p>
           {done.fell.source && <DataChip source={done.fell.source} />}
           {beat.type === "radio" && (state.earthAnswer && place ? <EarthAnswer answer={state.earthAnswer} /> : state.radioed && <p>{t("handsOn.radio.arrived", { n: delayMin })}</p>)}
           <div className="actions">

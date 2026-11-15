@@ -32,8 +32,8 @@ export interface HandsOnProps {
 const Preview = ({ children }: { children: ReactNode }) => <div className="hands-on-preview" data-testid="hands-on-preview">{children}</div>;
 const isPress = (e: React.KeyboardEvent) => gameKey(e) === " " || e.key === " " || e.key === "Enter" || e.code === "Space";
 
-/** Sol 5: rub the dust off six panels. Every clean panel means more time outside, so more space rays. */
-export function WipeBeat({ can, preview, onChoose }: HandsOnProps) {
+/** Sol 5 (mission 1): rub the dust off six panels. Every clean panel means more time outside, so more space rays. */
+export function RubPanels({ can, preview, onChoose }: HandsOnProps) {
   const { t } = useTranslation();
   const [dust, setDust] = useState(startWipe);
   const panels = useRef<(HTMLButtonElement | null)[]>([]);

@@ -36,13 +36,24 @@ describe("beat screen: one interaction per sol, through the engine", () => {
     expect(useGame.getState().state.rules?.heater).toBe(2);
     expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol1-siteMars-gale"]);
     screen.getByText(t("beat.chose", { choice: t("beat.siteMars.gale.label") }));
+    // #64: the result says what the choice changed, not only "You chose X".
+    const result = document.querySelector(".beat-result")!.textContent!;
+    expect(result).toContain(t("beatUi.changed"));
+    expect(result).toContain(t("rule.heater", { n: 2 }));
     fireEvent.click(screen.getByRole("button", { name: new RegExp(t("beatUi.continue")) }));
     expect(useNav.getState()).toMatchObject({ screen: "plan", sol: 1 });
   });
 
+  it("a choice with no resource effect still reports that nothing changed", () => {
+    open("dust", 3);
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(t("beat.upgrade.none.label")) }));
+    const result = document.querySelector(".beat-result")!.textContent!;
+    expect(result).toContain(t("beatUi.changed"));
+    expect(result).toContain(t("beatUi.nothing"));
+  });
+
   it("a choice the base cannot pay for is switched off and says why", () => {
     open("dust", 3);
-    fireEvent.click(screen.getByRole("button", { name: t("handsOn.cards") })); // the upgrade opens hands-on (#59); check the plain cards
     act(() => useGame.setState({ state: { ...useGame.getState().state, bars: { power: 1, air: 5, dose: 0 } } }));
     const brush = screen.getByRole("button", { name: new RegExp(t("beat.upgrade.brush.label")) }) as HTMLButtonElement;
     expect(brush.disabled).toBe(true);
@@ -63,5 +74,21 @@ describe("beat screen: one interaction per sol, through the engine", () => {
     fireEvent.click(screen.getByRole("button", { name: new RegExp(t("beat.radioMoon.call.label")) }));
     expect(useGame.getState().state.earthAnswer).toBeDefined();
     screen.getByText(new RegExp(t("earth.risk.low")));
+  });
+});
+
+describe("#98 Dust Season hands-on sols", () => {
+  beforeEach(() => sessionStorage.clear());
+  it("sol 2: wiping every panel by hand plays the 'all' option through the engine", () => {
+    open("dust", 2);
+    for (let b = screen.queryAllByRole("button", { pressed: false }); b.length; b = screen.queryAllByRole("button", { pressed: false })) fireEvent.click(b[0]);
+    fireEvent.click(screen.getByRole("button", { name: t("hubStorm.backInside") }));
+    expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol2-wipe-all"]);
+  });
+  it("sol 6: the rover drive opens on the map; ending at home plays 'stay'", () => {
+    open("dust", 6);
+    screen.getByRole("application");
+    fireEvent.click(screen.getByRole("button", { name: t("exploreUi.finish") }));
+    expect(useGame.getState().state.dominoes.map((d) => d.id)).toEqual(["sol6-rover-stay"]);
   });
 });

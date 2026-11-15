@@ -56,6 +56,26 @@ describe("walking up to something you can use", () => {
   });
 });
 
+describe("closing a crew talk (#81)", () => {
+  it("gives keyboard focus back to the room, so the arrow keys walk again", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance", "setTimeout"] });
+    try {
+      useSession.setState({ position: { x: 224, y: 210, facing: "back" } }); // just below the commander
+      render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(16); });
+      screen.getByText(t("world.near.commander"));
+      act(() => { fireEvent.keyDown(window, { key: "e" }); });
+      const talk = screen.getByRole("dialog", { name: t("world.near.commander") });
+      act(() => { fireEvent(talk, new Event("cancel", { cancelable: true })); }); // Esc
+      act(() => { vi.advanceTimersByTime(16); });
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(document.activeElement).toBe(document.querySelector("canvas"));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("the station airlock", () => {
   /** Stand next to the airlock, let the canvas loop notice it, then press E. */
   const useAirlock = () => {
@@ -137,5 +157,61 @@ describe("station room signs", () => {
     expect(document.querySelectorAll(".world-label")).toHaveLength(0);
     for (const sign of ["ENGINEERING", "MISSION CONSOLE", "SCIENCE LAB", "AIRLOCK / SURFACE ACCESS"])
       expect(screen.queryByText(sign)).toBeNull();
+  });
+});
+
+describe("mouse: click and drag to walk (#52-#68 playtest)", () => {
+  const rect = { left: 0, top: 0, width: 640, height: 384, right: 640, bottom: 384, x: 0, y: 0, toJSON: () => ({}) };
+  it("follows the mouse while the button is held", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    try {
+      useSession.setState({ position: { x: 320, y: 250, facing: "front" } });
+      const { unmount } = render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      const canvas = document.querySelector("canvas")!;
+      canvas.getBoundingClientRect = () => rect as DOMRect;
+      // Press just right of the player, then drag far to the left without letting go.
+      act(() => { fireEvent.pointerDown(canvas, { clientX: 340, clientY: 250, buttons: 1, pointerId: 1 }); });
+      act(() => { fireEvent.pointerMove(canvas, { clientX: 120, clientY: 250, buttons: 1, pointerId: 1 }); });
+      for (let i = 0; i < 40; i++) act(() => { vi.advanceTimersByTime(16); });
+      unmount();
+      // It walks left after the dragged mouse, not to the pressed spot (340).
+      expect(useSession.getState().position.x).toBeLessThan(300);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not follow a mouse that only hovers (no button held)", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    try {
+      useSession.setState({ position: { x: 320, y: 250, facing: "front" } });
+      const { unmount } = render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      const canvas = document.querySelector("canvas")!;
+      canvas.getBoundingClientRect = () => rect as DOMRect;
+      act(() => { fireEvent.pointerMove(canvas, { clientX: 120, clientY: 250, buttons: 0, pointerId: 1 }); });
+      for (let i = 0; i < 40; i++) act(() => { vi.advanceTimersByTime(16); });
+      unmount();
+      expect(useSession.getState().position.x).toBe(320);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("stops following after the button is let go", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    try {
+      useSession.setState({ position: { x: 320, y: 250, facing: "front" } });
+      const { unmount } = render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      const canvas = document.querySelector("canvas")!;
+      canvas.getBoundingClientRect = () => rect as DOMRect;
+      act(() => { fireEvent.pointerDown(canvas, { clientX: 330, clientY: 250, buttons: 1, pointerId: 1 }); });
+      act(() => { fireEvent.pointerUp(canvas, { clientX: 330, clientY: 250, buttons: 0, pointerId: 1 }); });
+      act(() => { fireEvent.pointerMove(canvas, { clientX: 120, clientY: 250, buttons: 0, pointerId: 1 }); });
+      for (let i = 0; i < 40; i++) act(() => { vi.advanceTimersByTime(16); });
+      unmount();
+      expect(useSession.getState().position.x).toBeGreaterThan(320);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

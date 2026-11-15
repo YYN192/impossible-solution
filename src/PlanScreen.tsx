@@ -3,6 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./plan.css";
 import { useTranslation } from "react-i18next";
 import { JobMiniGame } from "./components/JobMiniGame";
+import { MoonMiniGame } from "./components/MoonMiniGame";
+import { DustMiniGame } from "./components/DustMiniGame";
+import { hasDustGame } from "./game/dustMiniGames";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { usePhone } from "./components/usePhone";
 import { useComfort } from "./state/comfort";
@@ -26,6 +29,12 @@ import { useMission } from "./state/mission";
 import { useNav } from "./state/screen";
 const crew: CrewId[] = ["a1", "a2", "a3"];
 const jobIds = Object.keys(JOBS) as JobId[];
+const coreJobIds = jobIds.slice(0, 3);
+const amount = (value: number) => Math.abs(Number(value.toFixed(1)));
+const signed = (value: number) => {
+  const rounded = Number(value.toFixed(1));
+  return `${rounded >= 0 ? "+" : "−"}${Math.abs(rounded)}`;
+};
 const jobArt: Record<JobId, string> = {
   panels: "power-cell",
   greenhouse: "mineral-green",
@@ -48,6 +57,7 @@ export default function PlanScreen() {
   const setup = useMission((s) => s.setup);
   const plan = useSession((s) => s.draft);
   const assign = useSession((s) => s.assign);
+  const availableJobIds = state.sol <= 2 ? coreJobIds : jobIds;
   const moon = setup?.place === "moon" ? "moon" : undefined;
   const [selected, select] = useState<CrewId | null>(null);
   // Phones: End sol and a one-line preview stay pinned to the bottom of the screen (#75).
@@ -64,6 +74,10 @@ export default function PlanScreen() {
   // Keyboard flow: after a tap, move focus to where the next tap goes (jobs, then the next idle astronaut).
   const root = useRef<HTMLDivElement>(null);
   const focusNext = useRef<"job" | "crew" | null>(null);
+  const closeMiniGame = () => {
+    setMiniGame(null);
+    focusNext.current = "crew";
+  };
   useEffect(() => {
     const want = focusNext.current;
     focusNext.current = null;
@@ -100,7 +114,7 @@ export default function PlanScreen() {
       return;
     }
     resolved.current = true;
-    useSession.setState({ before: { ...state.bars }, draft: {} });
+    useSession.setState({ before: { ...state.bars, food: state.food, science: state.science }, draft: {} });
     const result = useGame.getState().endSol(plan);
     audio.playSfx("resolve");
     if (result.over && state.sol < rulesOf(state).sols)
@@ -197,9 +211,12 @@ export default function PlanScreen() {
                 })
               : t("play.jobsStep")}
           </h2>
-          {!selected && <p className="jobs-locked">{t("play.jobsLocked")}</p>}
+          {!selected && crew.some((c) => !plan[c] && !state.tired.includes(c)) && (
+            <p className="jobs-locked">{t("play.jobsLocked")}</p>
+          )}
           <div className={`job-list ${selected ? "" : "locked"}`}>
-            {jobIds.map((id, i) => {
+            {availableJobIds.map((id) => {
+              const i = jobIds.indexOf(id);
               const owner = crew.find((c) => plan[c] === id);
               return (
                 <button
@@ -250,12 +267,22 @@ export default function PlanScreen() {
                   <span className="job-number">0{i + 1}</span>
                   <img src={asset(`items/${jobArt[id]}`)} alt="" />
                   <span className="job-copy">
-                    <strong>{t(`jobs.${id}`)}</strong>
+                    <strong>
+                      {t(`jobs.${id}`)}
+                      {state.sol === 3 && !coreJobIds.includes(id) && (
+                        <span className="job-new">{t("play.newJob")}</span>
+                      )}
+                    </strong>
                     <small>{t(`jobInfo.${id}.done`)}</small>
+                    {/* Two pieces, so each wraps as a whole beside the job name (#95). */}
                     <span className="job-cost">
                       {t("jobInfo.cost", { count: JOBS[id].powerCost })}
-                      {JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}
                     </span>
+                    {JOBS[id].outside && (
+                      <span className="job-cost job-outside">
+                        {t("jobInfo.outside")}
+                      </span>
+                    )}
                   </span>
                   <span className="job-owner">
                     {owner
@@ -280,6 +307,17 @@ export default function PlanScreen() {
           <h2>{tRun("play.preview", {}, moon)}</h2>
           <p className="note">{t("play.previewMeaning")}</p>
           <ResourceMeters bars={preview.state.bars} previous={state.bars} />
+          {/* #64: where the power change comes from; the three parts add up to the meter's +/−. */}
+          {preview.flow && (
+            <p className="power-flow">
+              {t("play.flow", {
+                sun: amount(preview.flow.power.sun),
+                jobs: amount(preview.flow.power.jobs),
+                night: amount(preview.flow.power.night),
+                change: signed(preview.flow.power.sun - preview.flow.power.jobs - preview.flow.power.night),
+              })}
+            </p>
+          )}
           <div className="small-counters">
             <span>
               {t("bars.food")} <b>{preview.state.food}</b>
@@ -292,7 +330,7 @@ export default function PlanScreen() {
             {t("play.leftBehind")}
           </h3>
           <ul className="skip-dominoes" aria-labelledby="skip-heading">
-            {jobIds
+            {availableJobIds
               .filter((id) => !Object.values(plan).includes(id))
               .map((id) => {
                 // Engine ids are `sol{N}-{job}-skipped`; jobs without a skip domino (Ask Earth, science) show their art with an x badge.
@@ -336,6 +374,17 @@ export default function PlanScreen() {
           </ul>
           {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
+          {/* #95: inside the outlook (it scrolls on its own), so it adds no page height on a laptop. */}
+          <details className="science-details">
+            <summary>{t("play.scienceBehind")}</summary>
+            <p>
+              {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
+            </p>
+            <DataChip source={LIGHT_DELAY} />
+            <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
+            <DataChip source={INSIGHT_DUST} />
+            <DataChip source={RAD_BASELINE} />
+          </details>
         </aside>
         {phone && (
           <div className="plan-bar phone-dock">
@@ -353,27 +402,12 @@ export default function PlanScreen() {
           </div>
         )}
       </div>
-      {miniGame && (
-        <JobMiniGame
-          key={miniGame.seed}
-          job={miniGame.job}
-          seed={miniGame.seed}
-          onClose={() => {
-            setMiniGame(null);
-            focusNext.current = "crew";
-          }}
-        />
-      )}
-      <details className="science-details">
-        <summary>{t("play.scienceBehind")}</summary>
-        <p>
-          {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
-        </p>
-        <DataChip source={LIGHT_DELAY} />
-        <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
-        <DataChip source={INSIGHT_DUST} />
-        <DataChip source={RAD_BASELINE} />
-      </details>
+      {/* The Moon has its own mini games (no wind, crater ice, a low Sun); Dust Season has its own for the panels and the greenhouse. */}
+      {miniGame && (moon
+        ? <MoonMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+        : setup?.campaignId === "dust" && hasDustGame(miniGame.job)
+          ? <DustMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />
+          : <JobMiniGame key={miniGame.seed} job={miniGame.job} seed={miniGame.seed} onClose={closeMiniGame} />)}
     </ScreenFrame>
   );
 }
