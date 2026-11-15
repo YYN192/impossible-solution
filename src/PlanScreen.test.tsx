@@ -113,6 +113,8 @@ describe("PlanScreen (#9)", () => {
         expect(btn(t("crew.name", { n })).getAttribute("aria-pressed")).toBe(
           "false",
         );
+      // Everyone has a job: "First choose an astronaut" would be wrong advice now (#95).
+      expect(screen.queryByText(t("play.jobsLocked"))).toBeNull();
     } finally {
       useComfort.setState({ skipMiniGames: false });
     }

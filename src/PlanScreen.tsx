@@ -197,7 +197,9 @@ export default function PlanScreen() {
                 })
               : t("play.jobsStep")}
           </h2>
-          {!selected && <p className="jobs-locked">{t("play.jobsLocked")}</p>}
+          {!selected && crew.some((c) => !plan[c] && !state.tired.includes(c)) && (
+            <p className="jobs-locked">{t("play.jobsLocked")}</p>
+          )}
           <div className={`job-list ${selected ? "" : "locked"}`}>
             {jobIds.map((id, i) => {
               const owner = crew.find((c) => plan[c] === id);
@@ -252,10 +254,15 @@ export default function PlanScreen() {
                   <span className="job-copy">
                     <strong>{t(`jobs.${id}`)}</strong>
                     <small>{t(`jobInfo.${id}.done`)}</small>
+                    {/* Two pieces, so each wraps as a whole beside the job name (#95). */}
                     <span className="job-cost">
                       {t("jobInfo.cost", { count: JOBS[id].powerCost })}
-                      {JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}
                     </span>
+                    {JOBS[id].outside && (
+                      <span className="job-cost job-outside">
+                        {t("jobInfo.outside")}
+                      </span>
+                    )}
                   </span>
                   <span className="job-owner">
                     {owner
@@ -336,6 +343,17 @@ export default function PlanScreen() {
           </ul>
           {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
+          {/* #95: inside the outlook (it scrolls on its own), so it adds no page height on a laptop. */}
+          <details className="science-details">
+            <summary>{t("play.scienceBehind")}</summary>
+            <p>
+              {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
+            </p>
+            <DataChip source={LIGHT_DELAY} />
+            <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
+            <DataChip source={INSIGHT_DUST} />
+            <DataChip source={RAD_BASELINE} />
+          </details>
         </aside>
         {phone && (
           <div className="plan-bar phone-dock">
@@ -364,16 +382,6 @@ export default function PlanScreen() {
           }}
         />
       )}
-      <details className="science-details">
-        <summary>{t("play.scienceBehind")}</summary>
-        <p>
-          {t("help.askEarth.text")} <WhatsThis topic="askEarth" />
-        </p>
-        <DataChip source={LIGHT_DELAY} />
-        <DataChip source={state.earthAnswer?.source ?? DONKI_ENLIL_MAY23} />
-        <DataChip source={INSIGHT_DUST} />
-        <DataChip source={RAD_BASELINE} />
-      </details>
     </ScreenFrame>
   );
 }
