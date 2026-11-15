@@ -1,6 +1,6 @@
 # Open issues: sorted by importance, then difficulty
 
-_Generated on Sun 15 Nov 2026, 14:40 (Sofia) from https://github.com/YYN192/impossible-solution/issues. The sub-tasks are the checklists in each issue and in its comments; none of these issues uses GitHub's sub-issue feature. Items fixed and verified today are ticked even where GitHub has not been updated yet._
+_Generated on Sun 15 Nov 2026, 14:40 (Sofia), updated after #63 and the #67 "Tap" fix from https://github.com/YYN192/impossible-solution/issues. The sub-tasks are the checklists in each issue and in its comments; none of these issues uses GitHub's sub-issue feature. Items fixed and verified today are ticked even where GitHub has not been updated yet._
 
 **Importance:** Critical = needed for tonight's submission · High = judges or kids will hit it · Medium = clearly worth it · Low = nice to have.  
 **Difficulty:** S = under 1 hour · M = 1–3 hours · L = more than 3 hours.
@@ -13,9 +13,8 @@ _Generated on Sun 15 Nov 2026, 14:40 (Sofia) from https://github.com/YYN192/impo
 | #22 | Global submission + pitch prep | Critical | S | 3/3 | Team task: submission form, pitch, judge pass. Hard deadline 23:59. |
 | #11 | Record the ≤30 s demo video from ?demo=1 | Critical | S | 0/0 | Probably done: the team already has the video (docs/media/launch-video.mp4, 30.0 s). Close it after checking. |
 | #70 | Launch video 15–18 s: Earth-forecast highlight drifts off its line, then the scene dims out too early | High | S | 0/0 | Video edit: 15–18 s highlight drifts and the dim comes too early. Needs the video tool, not code. |
-| #67 | Text audit: remove or replace text that does not add anything | High | S | 9/9 | Quick copy wins: Tap → Choose; one word per resource; failure wording. The BG dust-alarm source line is already done. |
+| #67 | Text audit: remove or replace text that does not add anything | High | S | 8/9 | Quick copy wins: Tap → Choose; one word per resource; failure wording. The BG dust-alarm source line is already done. |
 | #75 | Readability: dust overlay contrast, text under 16 px, small targets, phone layout hides the main action | High | M | 2/6 | Dust veil, text sizes, contrast and buttons are done. Left: phone layout (Start, End sol and preview below the fold) and a contrast check under the dust. |
-| #63 | Mini games: arrow keys / WASD do not move the rover | High | M | 5/5 | P0. Keyboard-only players can only skip mini-games. Add arrow/WASD/Space with gameKey() (same fix as #53). |
 | #64 | Show, don't tell: review every screen and guide the first mission | High | L | 11/11 | Biggest teaching win: goal line, meter safe zones, storm warning before the plan, a result line after each choice. |
 | #59 | Mission 1 needs more hands-on interaction for 8-year-olds | High | L | 9/9 | P0 label, but a design job: new hands-on moments for 8-year-olds, rover screen overload, mini-game clock. |
 | #68 | Rover out of power: play a sound, shake the screen and say "No power" | Medium | S | 6/6 | Rover out of power: sound, short shake, "No power!". Small and self-contained. |
@@ -35,6 +34,7 @@ _Generated on Sun 15 Nov 2026, 14:40 (Sofia) from https://github.com/YYN192/impo
 
 ## Closed today (for reference)
 
+- #63 Mini-games can be played with the keyboard (arrows, A/D, Space).
 - #53 Bulgarian keyboard: WASD and E use the physical key.
 - #56 Help bubble no longer covers the footer.
 - #73 Data honesty: a game event is no longer shown as real, and the report storm matches its card.
@@ -101,7 +101,7 @@ Quick copy wins: Tap → Choose; one word per resource; failure wording. The BG 
 - [ ] All "remove" and "replace" decisions are applied in EN and BG together.
 - [ ] Copy tests (`en.copy.test.ts`, `bg.copy.test.ts`) still pass; BG keeps the same keys as EN.
 - [ ] Before/after screenshots for each changed screen are attached to the PR.
-- [ ] **"Tap" appears in 5 strings** (`en.json` lines 27, 29, 277, 864, 897, plus BG), but keyboard and mouse players don't tap (A6). Use "Choose an astronaut. Then choose a job." and "Press to decode it". ([shared](https://github.com/YYN192/impossible-solution/blob/main/docs/kid-design-research/audit-shared.md) 8)
+- [x] **"Tap" appears in 5 strings** (`en.json` lines 27, 29, 277, 864, 897, plus BG), but keyboard and mouse players don't tap (A6). Use "Choose an astronaut. Then choose a job." and "Press to decode it". ([shared](https://github.com/YYN192/impossible-solution/blob/main/docs/kid-design-research/audit-shared.md) 8)
 - [ ] **One word per resource:** "dose" vs "Space-ray meter" (Pip says "Lower dose is better", `dialogue.drone.advice`), and in BG "ток" vs "Енергия". ([shared](https://github.com/YYN192/impossible-solution/blob/main/docs/kid-design-research/audit-shared.md) 4, [moon](https://github.com/YYN192/impossible-solution/blob/main/docs/kid-design-research/audit-moon.md))
 - [ ] **Bulgarian gaps:**
   - The dust-alarm source line is still English ("Източник: NASA's Opportunity rover…"); translate it through `sourceText.ts`.
@@ -130,19 +130,6 @@ Dust veil, text sizes, contrast and buttons are done. Left: phone layout (Start,
   - A collapsed header menu in the hub.
 - [ ] Re-run `npm run qa` (labels, layout) and add a contrast check under the dust overlay.
 
-### #63 Mini games: arrow keys / WASD do not move the rover
-
-**Importance:** High · **Difficulty:** M · **Labels:** bug, P0 · https://github.com/YYN192/impossible-solution/issues/63
-
-P0. Keyboard-only players can only skip mini-games. Add arrow/WASD/Space with gameKey() (same fix as #53).
-
-**Sub-tasks:**
-
-- [ ] In every mini game that has a rover or a moving piece, arrows and WASD move it, using `KeyboardEvent.code` so it also works with the Bulgarian layout (see the BG interact key issue).
-- [ ] Space / Enter does the main action (drop, send, catch) where one exists.
-- [ ] Keys are released properly when the window loses focus.
-- [ ] Key hints on screen show which keys to use.
-- [ ] Tests first: a keydown in `JobMiniGame` moves the piece.
 
 ### #64 Show, don't tell: review every screen and guide the first mission
 
