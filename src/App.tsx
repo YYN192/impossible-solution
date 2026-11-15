@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type JSX } from "react";
 import { BeatScreen } from "./screens/BeatScreen";
-import { CAMPAIGNS } from "./data/campaigns";
+import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { isOpen, useProgress } from "./state/progress";
 import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";

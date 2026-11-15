@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
 import { audio, musicFor, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
-import { CAMPAIGNS } from "./data/campaigns";
+import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { readFlags } from "./data/flags";
 import { tRun } from "./i18n/dynamic";
 import { isOpen, useProgress } from "./state/progress";

@@ -27,7 +27,7 @@ const createMissionGame = (): GameState => {
   const initialState =
     setup?.initialState ?? (readFlags().demo ? DEMO_START : undefined);
   // The classic mission keeps the engine's default rules; campaigns bring their own.
-  const state = createGame(setup && setup.campaignId !== "storm" ? setup.rules : undefined);
+  const state = createGame(setup && setup.campaignId !== "classic" ? setup.rules : undefined);
   return { ...state, ...initialState };
 };
 

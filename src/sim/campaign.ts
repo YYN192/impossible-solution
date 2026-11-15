@@ -3,11 +3,12 @@
  * `buildRun(campaign, seed)` turns a campaign into one run. Same seed → same run.
  * Real data is never changed by the seed; only which real event and which beat a run gets.
  */
+import type { ExploreMap } from "./explore";
 import { rng } from "./rng";
 import { CLASSIC_RULES, type Action, type DataRef, type Rules, type StormEvent } from "./types";
 
-/** Seven ways a sol can play differently from "assign the crew". Each ends in one engine action. */
-export type BeatType = "site" | "dilemma" | "wipe" | "radio" | "upgrade" | "rover" | "skywatch";
+/** Eight ways a sol can play differently from "assign the crew". Each ends in one engine action. */
+export type BeatType = "site" | "dilemma" | "wipe" | "radio" | "upgrade" | "rover" | "skywatch" | "explore";
 
 export interface BeatOption {
   /** Short id, unique in the beat. Text: `beat.{beat.id}.{id}.label`, and `.real` when `real` is set. */
@@ -24,6 +25,8 @@ export interface Beat {
   /** The real data behind this beat, shown as a card with its source. */
   card?: DataRef;
   options: BeatOption[];
+  /** explore: the map the kid drives on. The options are the "let Pip drive" choices for players who skip the driving. */
+  map?: ExploreMap;
   /** Words the seed picked (a crew name), for the beat's text. */
   vars?: Record<string, string>;
 }
@@ -40,6 +43,8 @@ export interface Campaign {
   /** 1 easy … 3 hard. */
   difficulty: 1 | 2 | 3;
   minutes: number;
+  /** Not on the menu (the quick classic mission: `?campaign=classic`, the demo and the teacher card use it). */
+  hidden?: boolean;
   /** Finish this campaign first (teacher mode opens everything). */
   unlockAfter?: string;
   /** The real event(s) and the beats for one seed. `next` is the seeded random source. */

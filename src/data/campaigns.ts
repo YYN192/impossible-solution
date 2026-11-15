@@ -4,7 +4,9 @@
  * named on the cards decide which way the numbers lean.
  */
 import { option, type Beat, type Campaign } from "../sim/campaign";
+import { buildMap } from "../sim/explore";
 import { pick, shuffle } from "../sim/rng";
+import galeMap from "./snapshots/rover-map-gale.json";
 import { DOSE, type CrewId, type DataRef, type StormEvent } from "../sim/types";
 import { INSIGHT_DUST, LIGHT_DELAY } from "./sources";
 import { STORMS, stormEvents, SMALL_STORM_FACTOR, RADLAB_MEASURED } from "./storms";
@@ -86,18 +88,100 @@ const radio = (card: DataRef, ask: "night" | "now"): Beat => ({
   ],
 });
 
-const storm: Campaign = {
-  id: "storm",
+export const GALE_MAP: DataRef = {
+  label: "The colours of this map are a real NASA Mars Trek picture of the Gale Crater area, averaged into squares of about 20 km",
+  url: "https://trek.nasa.gov/mars/",
+  mode: "snapshot",
+  fetched: galeMap.fetchedAt,
+};
+
+/** Drive the rover on the real-colour map of the Gale Crater area. The seed places the samples. */
+const explore = (next: () => number): Beat => ({
+  id: "explore",
+  type: "explore",
+  card: GALE_MAP,
+  // The crop keeps the crater's dark ring in view; the base sits where Gale Crater is (5.4° S, 137.8° E).
+  map: buildMap({ colors: galeMap.data.colors, cols: galeMap.data.cols, crop: { x0: 2, y0: 4, cols: 12, rows: 8 }, base: { x: 6, y: 3 } }, next),
+  options: [
+    option("explore", "near", "🚙", { effect: { power: -1, science: 1 } }),
+    option("explore", "far", "🗺️", { effect: { power: -3, science: 2 } }),
+    option("explore", "stay", "🏠"),
+  ],
+});
+
+/** A hard choice for one sol. The seed picks which. */
+const dilemma = (next: () => number): Beat =>
+  pick(next, [
+    {
+      id: "cold",
+      type: "dilemma" as const,
+      card: REMS_NIGHT,
+      options: [option("cold", "heat", "🔥", { effect: { power: -2 } }), option("cold", "huddle", "🥶", { effect: { food: -1 } })],
+    },
+    {
+      id: "devil",
+      type: "dilemma" as const,
+      card: WIND_CLEANING,
+      options: [option("devil", "tilt", "🌬️", { effect: { power: -1, panelEfficiency: 1 } }), option("devil", "shut", "🚪")],
+    },
+    crewBeat(next),
+  ]);
+
+const wipe: Beat = {
+  id: "wipe",
+  type: "wipe",
+  card: INSIGHT_SAND,
+  options: [
+    option("wipe", "none", "🧽✗"),
+    option("wipe", "half", "🧽", { effect: { panelEfficiency: 0.8, dose: DOSE.outsideExtra } }),
+    option("wipe", "all", "✨", { effect: { panelEfficiency: 1, dose: 2 * DOSE.outsideExtra } }),
+  ],
+};
+
+const upgrade: Beat = {
+  id: "upgrade",
+  type: "upgrade",
+  options: [
+    option("upgrade", "brush", "🧹", { effect: { power: -2 }, rules: { dustFactor: 0.9 } }),
+    option("upgrade", "shelf", "🥬", { effect: { power: -2 }, rules: { foodGain: 2 } }),
+    option("upgrade", "walls", "🛡️", { effect: { power: -2 }, rules: { shelterFactor: 0.25 } }),
+    option("upgrade", "none", "🔋"),
+  ],
+};
+
+/** The quick 3-sol mission: the recording path (`?demo=1`) and a 5-minute classroom game (`?campaign=classic`). */
+const classic: Campaign = {
+  id: "classic",
   place: "mars",
   rules: {},
   datasets: ["DONKI", "Curiosity RAD (RadLab)", "InSight", "DSN"],
   difficulty: 1,
   minutes: 5,
-  // Counting through the seeds visits every real storm on every sol: tomorrow's daily mission differs from today's.
+  hidden: true,
+  // Counting through the seeds visits every real storm on every sol.
   build: (_next, seed) => {
     const n = Math.abs(seed) % (STORMS.length * 3);
     const s = STORMS[n % STORMS.length];
     return { events: stormEvents(s, 1 + Math.floor(n / STORMS.length)), beats: {}, stormId: s.id };
+  },
+};
+
+const storm: Campaign = {
+  id: "storm",
+  place: "mars",
+  rules: { sols: 5, scienceGoal: 4 },
+  datasets: ["DONKI", "Curiosity RAD (RadLab)", "Mars Trek", "InSight", "DSN"],
+  difficulty: 1,
+  minutes: 8,
+  // Counting through the seeds visits every real storm on sols 2, 3 and 4: tomorrow's daily mission differs from today's.
+  build: (next, seed) => {
+    const n = Math.abs(seed) % (STORMS.length * 3);
+    const s = STORMS[n % STORMS.length];
+    return {
+      events: stormEvents(s, 2 + Math.floor(n / STORMS.length), 5),
+      stormId: s.id,
+      beats: { 1: explore(next), 2: upgrade, 3: radio(LIGHT_DELAY, "night"), 4: dilemma(next), 5: wipe },
+    };
   },
 };
 
@@ -124,21 +208,6 @@ const dust: Campaign = {
       ...[start, start + 1].map((sol) => ({ sol, kind: "dustStorm" as const, id: ds.id, captionKey: ds.captionKey, solar: ds.solar, source: ds.source })),
       ...stormEvents(sun, pick(next, [5, 6]), 6).filter((e) => e.kind === "particleBurst"),
     ];
-    const dilemma: Beat = pick(next, [
-      {
-        id: "cold",
-        type: "dilemma" as const,
-        card: REMS_NIGHT,
-        options: [option("cold", "heat", "🔥", { effect: { power: -2 } }), option("cold", "huddle", "🥶", { effect: { food: -1 } })],
-      },
-      {
-        id: "devil",
-        type: "dilemma" as const,
-        card: WIND_CLEANING,
-        options: [option("devil", "tilt", "🌬️", { effect: { power: -1, panelEfficiency: 1 } }), option("devil", "shut", "🚪")],
-      },
-      crewBeat(next),
-    ]);
     return {
       events,
       beats: {
@@ -151,28 +220,10 @@ const dust: Campaign = {
             option("siteMars", "meridiani", "🌬️", { rules: { dustFactor: 0.8, solar: 5 }, source: WIND_CLEANING }, true),
           ],
         },
-        2: {
-          id: "wipe",
-          type: "wipe",
-          card: INSIGHT_SAND,
-          options: [
-            option("wipe", "none", "🧽✗"),
-            option("wipe", "half", "🧽", { effect: { panelEfficiency: 0.8, dose: DOSE.outsideExtra } }),
-            option("wipe", "all", "✨", { effect: { panelEfficiency: 1, dose: 2 * DOSE.outsideExtra } }),
-          ],
-        },
-        3: {
-          id: "upgrade",
-          type: "upgrade",
-          options: [
-            option("upgrade", "brush", "🧹", { effect: { power: -2 }, rules: { dustFactor: 0.9 } }),
-            option("upgrade", "shelf", "🥬", { effect: { power: -2 }, rules: { foodGain: 2 } }),
-            option("upgrade", "walls", "🛡️", { effect: { power: -2 }, rules: { shelterFactor: 0.25 } }),
-            option("upgrade", "none", "🔋"),
-          ],
-        },
+        2: wipe,
+        3: upgrade,
         4: radio(LIGHT_DELAY, "night"),
-        5: dilemma,
+        5: dilemma(next),
         6: {
           id: "rover",
           type: "rover",
@@ -262,7 +313,9 @@ const moon: Campaign = {
   },
 };
 
-export const CAMPAIGNS: Campaign[] = [storm, dust, moon];
+export const CAMPAIGNS: Campaign[] = [storm, dust, moon, classic];
 export const campaignById = (id: string): Campaign => CAMPAIGNS.find((c) => c.id === id) ?? storm;
+/** Campaigns on the menu. */
+export const MENU_CAMPAIGNS = CAMPAIGNS.filter((c) => !c.hidden);
 /** Game numbers shown on Data Sources. */
 export const CAMPAIGN_NUMBERS = { SMALL_STORM_FACTOR, MOON_STORM_FACTOR };

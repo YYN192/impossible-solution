@@ -55,7 +55,12 @@ export const ENGINE = {
   foodLoss: 1,
   /** Science earned by a successful science trip. */
   scienceGain: 1,
+  /** What each astronaut is best at: Nova (a1) calls Earth for free, Kai (a2) cleans panels for extra power, Amara (a3) grows extra food. */
+  skill: { askEarthCost: 0, panelsPower: 1, greenhouseFood: 1 },
 };
+
+/** Who is the expert for which job. */
+export const EXPERT: Partial<Record<JobId, CrewId>> = { askEarth: "a1", panels: "a2", greenhouse: "a3" };
 
 const CREW: CrewId[] = ["a1", "a2", "a3"];
 const JOB_IDS = Object.keys(JOBS) as JobId[];
@@ -180,10 +185,16 @@ export function step(
 
   // Who works today.
   const assigned = new Set<JobId>();
+  /** Jobs done by their expert today (the expert is awake and has that job). */
+  const expert = new Set<JobId>();
   for (const c of CREW) {
     const job = plan[c];
-    if (job && !state.tired.includes(c)) assigned.add(job);
+    if (!job || state.tired.includes(c)) continue;
+    assigned.add(job);
+    if (EXPERT[job] === c) expert.add(job);
   }
+  const costOf = (job: JobId) =>
+    job === "askEarth" && expert.has(job) ? ENGINE.skill.askEarthCost : JOBS[job].powerCost;
 
   // Morning: is power low today? (Usually it already fell last night, caused by dusty panels.)
   let power = state.bars.power;
@@ -208,9 +219,9 @@ export function step(
       add({ id: p(sol, "no-signal"), sol, icon: "📡🌘", textKey: "domino.noSignal", causeIds: [] });
       continue;
     }
-    const affordable = JOBS[job].powerCost <= power + EPS;
+    const affordable = costOf(job) <= power + EPS;
     if (assignedJob && affordable) {
-      power -= JOBS[job].powerCost;
+      power -= costOf(job);
       done.add(job);
       continue;
     }
@@ -316,7 +327,7 @@ export function step(
     });
 
   // Food: the crew eats every sol; only a greenhouse harvest keeps up.
-  if (done.has("greenhouse")) food += R.foodGain;
+  if (done.has("greenhouse")) food += R.foodGain + (expert.has("greenhouse") ? ENGINE.skill.greenhouseFood : 0);
   else {
     food = Math.max(0, food - ENGINE.foodLoss);
     if (food === 0)
@@ -350,7 +361,12 @@ export function step(
     : state.panelEfficiency * R.dustFactor;
   // Whole units, rounded down: the meter never shows power the jobs cannot spend.
   const powerTomorrow = clamp(
-    Math.floor(power + R.solar * (dustStorm?.solar ?? 1) * panelEfficiency + EPS),
+    Math.floor(
+      power +
+        R.solar * (dustStorm?.solar ?? 1) * panelEfficiency +
+        (done.has("panels") && expert.has("panels") ? ENGINE.skill.panelsPower : 0) +
+        EPS,
+    ),
   );
 
   const over = last || air <= 0 || doseFull;
