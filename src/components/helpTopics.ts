@@ -17,6 +17,9 @@ const BY_DOMINO: Record<string, HelpTopic> = {
   "domino.noPowerShelter": "power",
   "domino.noPowerAskEarth": "power",
   "domino.outsideStorm": "dose",
+  "domino.noSignal": "askEarth",
+  "domino.coldNight": "power",
+  "domino.doseFull": "dose",
 };
 
 export function helpTopicForDomino(textKey: string): HelpTopic | undefined {
@@ -24,5 +27,5 @@ export function helpTopicForDomino(textKey: string): HelpTopic | undefined {
 }
 
 /** Tooltip for a storm event on the morning report. */
-export const helpTopicForEvent = (kind: "particleBurst" | "stormCloud"): HelpTopic =>
-  kind === "particleBurst" ? "burst" : "stormCloud";
+export const helpTopicForEvent = (kind: "particleBurst" | "stormCloud" | "dustStorm"): HelpTopic =>
+  kind === "particleBurst" ? "burst" : kind === "stormCloud" ? "stormCloud" : "dust";

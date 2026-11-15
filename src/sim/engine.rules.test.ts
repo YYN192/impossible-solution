@@ -261,7 +261,7 @@ describe("power and the air machine", () => {
   it("jobs spend today's power, then the air machine needs 2 at night", () => {
     // 6 power: greenhouse 2 + shelter 1 + askEarth 1 = 4, air machine 2 → exactly enough.
     const r = step(initialState(), plan("greenhouse", "shelter", "askEarth"), []);
-    expect(r.state.bars.air).toBe(ENGINE.startAir);
+    expect(r.state.bars.air).toBe(ENGINE.startAir + NIGHT.airGainWithPower);
     expect(ids(r.fell)).not.toContain("sol1-air-low");
   });
 
@@ -369,7 +369,7 @@ describe("Ask Earth", () => {
 
   it("done → Earth's forecast for this sol is waiting next morning", () => {
     const r = step(initialState(), plan("askEarth"), [], { 1: answer });
-    expect(r.state.earthAnswer).toEqual(answer);
+    expect(r.state.earthAnswer).toMatchObject(answer);
   });
 
   it("without a forecast table, Earth answers from the mission's events", () => {
@@ -456,10 +456,10 @@ describe("balance (brute force over every 3-sol plan, May 2024 mission)", () => 
   it("works with the real May 2024 mission setup end to end", () => {
     let s = initialState();
     s = step(s, plan("panels", "shelter", "askEarth"), mission.events, mission.forecasts).state;
-    expect(s.earthAnswer).toEqual(mission.forecasts[1]);
+    expect(s.earthAnswer?.stormCloudInSols).toBe(mission.forecasts[1].stormCloudInSols);
     s = step(s, plan("panels", "greenhouse", "askEarth"), mission.events, mission.forecasts).state;
     expect(s.dominoes.some((d) => d.id === "sol2-dose-high")).toBe(true);
-    expect(s.earthAnswer).toEqual(mission.forecasts[2]);
+    expect(s.earthAnswer?.stormCloudInSols).toBe(mission.forecasts[2].stormCloudInSols);
     s = step(s, plan("panels", "greenhouse", "science"), mission.events, mission.forecasts).state;
     expect(s.over).toBe(true);
   });

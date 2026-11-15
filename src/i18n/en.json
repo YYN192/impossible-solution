@@ -9,14 +9,16 @@
   },
   "common": {
     "solOf": "Sol {{sol}} of {{total}}",
-    "next": "Next"
+    "next": "Next",
+    "solOf_moon": "Day {{sol}} of {{total}}"
   },
   "morning": {
     "heading": "Good morning! Sol {{sol}}",
     "goPlan": "Plan the day",
     "firstDay": "First morning on Mars. Everything works.",
     "nothingFell": "Nothing broke overnight. Good plan!",
-    "because": "because"
+    "because": "because",
+    "heading_moon": "Good morning! Day {{sol}}"
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -30,15 +32,29 @@
     "noPowerGreenhouse": "Not enough power to run the greenhouse lights.",
     "noPowerShelter": "Not enough power to build up the shelter.",
     "noPowerAskEarth": "Not enough power to call Earth.",
-    "outsideStorm": "Astronauts were outside during the storm."
+    "outsideStorm": "Astronauts were outside during the storm.",
+    "noSignal": "No signal: Earth was below the horizon.",
+    "coldNight": "The night was too cold. Plants in the greenhouse froze.",
+    "doseFull": "The space-ray meter is full. The crew had to go home early."
   },
   "event": {
     "burst": {
-      "may2024": "The Sun just blasted a space-ray storm!"
+      "may2024": "The Sun just blasted a space-ray storm!",
+      "sep2017": "The Sun fired a space-ray storm at Mars!",
+      "oct2021": "A space-ray storm from the Sun reached Mars!",
+      "moonMay2024": "The solar storm passed the Moon."
     },
     "stormCloud": {
       "may2024": "A storm cloud from the Sun reached Mars.",
-      "today": "A real storm cloud from the Sun is heading for Mars."
+      "today": "A real storm cloud from the Sun is heading for Mars.",
+      "sep2017": "A storm cloud from the Sun brushed past Mars."
+    },
+    "dust": {
+      "insight2022": "A dust storm dimmed the Sun. The panels made less power.",
+      "opportunity2018": "A giant dust storm hid the Sun. The panels made little power."
+    },
+    "shadow": {
+      "moon": "The Sun slipped behind a ridge. The panels made little power."
     }
   },
   "earth": {
@@ -50,8 +66,20 @@
     "storm": {
       "none": "no storm cloud is coming",
       "coming_one": "a storm cloud arrives in {{count}} sol",
-      "coming_other": "a storm cloud arrives in {{count}} sols"
-    }
+      "coming_other": "a storm cloud arrives in {{count}} sols",
+      "coming_zero": "a storm cloud arrives today",
+      "coming_moon_zero": "a storm cloud arrives today",
+      "coming_moon_one": "a storm cloud arrives in {{count}} day",
+      "coming_moon_other": "a storm cloud arrives in {{count}} days"
+    },
+    "risk": {
+      "high": "A burst of space rays is likely today. Stay inside!",
+      "low": "A burst of space rays is not likely today."
+    },
+    "dustStorm_one": "The dust storm lasts {{count}} more sol.",
+    "dustStorm_other": "The dust storm lasts {{count}} more sols.",
+    "delay": "Your message took {{minutes}} minutes each way today.",
+    "delayMoon": "Your message took about 1.3 seconds each way."
   },
   "chip": {
     "live": "Live NASA data",
@@ -61,12 +89,15 @@
   },
   "plan": {
     "heading": "Plan sol {{sol}}",
-    "endSol": "End sol"
+    "endSol": "End sol",
+    "heading_moon": "Plan day {{sol}}",
+    "endSol_moon": "End day"
   },
   "endSol": {
     "heading": "Night falls on sol {{sol}}",
     "nextMorning": "Go to sleep",
-    "seeResults": "See how it went"
+    "seeResults": "See how it went",
+    "heading_moon": "Day {{sol}} is over"
   },
   "final": {
     "heading": "Mission over",
@@ -87,7 +118,8 @@
     "best_one": "Best: {{count}}★",
     "best_other": "Best: {{count}}★",
     "tryAgain": "Try a different plan",
-    "home": "Back to start"
+    "home": "Back to start",
+    "sol_moon": "Day {{sol}}"
   },
   "data": {
     "badge": {
@@ -377,7 +409,8 @@
     "knownStorm": "Today's space weather",
     "crewReady": "Crew ready",
     "allAssigned": "Everyone has a job.",
-    "tomorrow": "tomorrow"
+    "tomorrow": "tomorrow",
+    "preview_moon": "After this day"
   },
   "world": {
     "menu": "Menu",
@@ -442,5 +475,270 @@
   },
   "sound": {
     "toggle": "Sound on/off"
+  },
+  "campaign": {
+    "storm": {
+      "name": "The Storm Season",
+      "where": "Mars",
+      "hook": "Can you keep 3 astronauts safe through a real solar storm?",
+      "brief": "A real storm from the Sun is on its way. Nobody knows the hour. Plan each sol with care.",
+      "real": "Every storm here is real. A NASA rover measured each one on Mars.",
+      "planners": "Real crews hide in a shielded corner during solar storms."
+    },
+    "dust": {
+      "name": "Dust Season",
+      "where": "Mars",
+      "hook": "Dust stopped a real Mars lander. Can your base keep its lights on?",
+      "brief": "Dust falls on the panels every sol. Less light means less power. Pick a site and keep the base warm.",
+      "real": "Dust cut the power of NASA's InSight lander to about one tenth.",
+      "planners": "The InSight team dropped sand next to a panel. The wind then carried some dust away."
+    },
+    "moon": {
+      "name": "South Pole Outpost",
+      "where": "The Moon",
+      "hook": "Sunlight, ice or a view of Earth? You cannot have all three.",
+      "brief": "NASA studied 13 landing spots near the Moon's south pole. Some are sunny. Some are near ice. Choose yours.",
+      "real": "NASA chose those spots for sunlight, radio contact with Earth and ice.",
+      "planners": "Planners look for long sunlight, a view of Earth and safe ground."
+    }
+  },
+  "beat": {
+    "chose": "You chose: {{choice}}.",
+    "siteMars": {
+      "title": "Where do we land?",
+      "text": "Three real places. A real NASA robot worked in each one.",
+      "gale": {
+        "label": "Gale Crater",
+        "real": "Curiosity measured −71 °C at night here. Reading from 25 August 2026."
+      },
+      "elysium": {
+        "label": "Elysium Planitia",
+        "real": "Dust piled up on the InSight lander here for four years."
+      },
+      "meridiani": {
+        "label": "Meridiani Planum",
+        "real": "Wind sometimes blew the dust off the Opportunity rover here."
+      }
+    },
+    "wipe": {
+      "title": "Dust on the panels",
+      "text": "Go outside and wipe them? Every wipe is time under space rays.",
+      "none": {
+        "label": "Leave the dust"
+      },
+      "half": {
+        "label": "Wipe half of the panels"
+      },
+      "all": {
+        "label": "Wipe every panel"
+      }
+    },
+    "upgrade": {
+      "title": "Build one upgrade",
+      "text": "You have spare parts for one upgrade. Building it costs power today.",
+      "brush": {
+        "label": "Panel brush: dust sticks less"
+      },
+      "shelf": {
+        "label": "Greenhouse shelf: more food each harvest"
+      },
+      "walls": {
+        "label": "Thicker shelter walls: fewer space rays"
+      },
+      "none": {
+        "label": "Build nothing and save the power"
+      }
+    },
+    "radio": {
+      "title": "Radio Earth",
+      "text": "The sky is full of dust. Ask Earth how long it will last?",
+      "call": {
+        "label": "Send the question"
+      },
+      "skip": {
+        "label": "Stay quiet and save the power"
+      }
+    },
+    "radioMoon": {
+      "title": "Radio Earth",
+      "text": "Earth is close. The answer comes back in seconds. Ask about the Sun?",
+      "call": {
+        "label": "Call Earth now"
+      },
+      "skip": {
+        "label": "Stay quiet and save the power"
+      }
+    },
+    "cold": {
+      "title": "A very cold night",
+      "text": "Tonight will be bitter cold. The plants may freeze.",
+      "heat": {
+        "label": "Turn the heater up"
+      },
+      "huddle": {
+        "label": "Let the greenhouse get cold"
+      }
+    },
+    "devil": {
+      "title": "A dust devil!",
+      "text": "A tall swirl of wind is passing the base. Wind can clean panels.",
+      "tilt": {
+        "label": "Tilt the panels into the wind"
+      },
+      "shut": {
+        "label": "Keep everything closed"
+      }
+    },
+    "crew": {
+      "title": "{{crew}} needs help",
+      "text": "{{crew}} is worn out and very hungry.",
+      "meal": {
+        "label": "Give an extra meal"
+      },
+      "rest": {
+        "label": "Give a day of rest"
+      }
+    },
+    "rover": {
+      "title": "One last drive",
+      "text": "The rover can fetch rock samples. Far rocks cost more power.",
+      "near": {
+        "label": "Drive to the near rocks"
+      },
+      "far": {
+        "label": "Drive to the far crater"
+      },
+      "stay": {
+        "label": "Keep the rover at home"
+      }
+    },
+    "siteMoon": {
+      "title": "Where do we build?",
+      "text": "Three real places near the Moon's south pole. Each one lacks something.",
+      "malapert": {
+        "label": "Malapert Massif",
+        "real": "A very tall mountain. It gets much light and can sometimes see Earth."
+      },
+      "shackleton": {
+        "label": "Peak near Shackleton",
+        "real": "A high crater rim, sunny most of the year. Earth is often hidden."
+      },
+      "haworth": {
+        "label": "Haworth",
+        "real": "Close to dark craters that may hold ice. Earth is often hidden."
+      }
+    },
+    "skywatch": {
+      "title": "Sky watch",
+      "text": "A huge eruption on the Sun! It points away from the Moon. Shelter anyway?",
+      "shelter": {
+        "label": "Yes: get the shelter ready"
+      },
+      "work": {
+        "label": "No: keep working"
+      }
+    },
+    "ice": {
+      "title": "Drive for ice",
+      "text": "Ice hides in craters that never see the Sun. Ice becomes water and air.",
+      "rim": {
+        "label": "Scoop ice at the crater rim"
+      },
+      "deep": {
+        "label": "Drive deep into the dark crater"
+      },
+      "stay": {
+        "label": "Stay in the sunlight"
+      }
+    },
+    "lastDay": {
+      "title": "The last day",
+      "text": "There is time for one more job before you leave.",
+      "sample": {
+        "label": "Collect one more rock sample"
+      },
+      "charge": {
+        "label": "Charge the batteries for the next crew"
+      }
+    }
+  },
+  "run": {
+    "pick": "Pick a mission",
+    "sols_one": "{{count}} sol",
+    "sols_other": "{{count}} sols",
+    "sols_moon_one": "{{count}} day",
+    "sols_moon_other": "{{count}} days",
+    "minutes": "about {{count}} min",
+    "locked": "Finish “{{name}}” to open this.",
+    "realData": "Real data: {{list}}",
+    "daily": "Daily mission",
+    "dailyHint": "Today's daily mission. Everyone gets the same run today.",
+    "surprise": "Surprise me",
+    "todayHint": "Today's real Sun: what NASA forecasts for Mars right now.",
+    "seed": "Run number: {{seed}}",
+    "seedHint": "Add ?seed={{seed}} to the link to play this exact run again.",
+    "newMission": "New mission",
+    "again": "Play again with a different storm",
+    "planners": "What real mission teams do",
+    "realThing": "The real thing",
+    "level": {
+      "1": "Easy",
+      "2": "Medium",
+      "3": "Hard"
+    }
+  },
+  "beatUi": {
+    "type": {
+      "site": "Choose a site",
+      "dilemma": "A hard choice",
+      "wipe": "Hands-on",
+      "radio": "Radio Earth",
+      "upgrade": "Upgrade",
+      "rover": "Rover drive",
+      "skywatch": "Sky watch"
+    },
+    "options": "Your choices",
+    "cannot": "Not enough power for this.",
+    "real": "Real",
+    "continue": "Continue to the plan",
+    "nothing": "No change",
+    "delayMars": "Your message takes {{minutes}} minutes each way today.",
+    "delayMoon": "Your message takes about 1.3 seconds each way.",
+    "answerNight": "Earth will answer by the morning.",
+    "now": "Now"
+  },
+  "rule": {
+    "solar": "Panels make {{n}} power a day",
+    "heater": "Heater needs {{n}} power a night",
+    "dustFactor": "Dusty panels keep {{n}}% of their power",
+    "airMachinePower": "Air machine needs {{n}} power a night",
+    "foodGain": "One harvest makes {{n}} food",
+    "shelterFactor": "The shelter lets in {{n}}% of the rays",
+    "earthHidden": "No radio to Earth on days {{days}}",
+    "earthAlways": "Earth is always in view"
+  },
+  "fx": {
+    "shelter": "Shelter ready",
+    "rest": "One astronaut rests",
+    "panels": "Panels up to {{n}}% clean",
+    "ask": "Earth answers"
+  },
+  "storm": {
+    "alarmBurst": "Space-ray storm!",
+    "alarmCloud": "A storm cloud is here!",
+    "alarmDust": "Dust storm!",
+    "pipBurst": "Pip: “Shelter, now! Space rays are hitting the base!”",
+    "pipSmall": "Pip: “A small storm. The meter moved only a little.”",
+    "pipCloud": "Pip: “The storm cloud Earth warned about is passing.”",
+    "real": "It's real!",
+    "id": "NASA event number: {{id}}",
+    "flare": "The flare was class {{flare}}. X is the strongest class.",
+    "fact": {
+      "may2024": "20 May 2024. A NASA rover measured this storm on Mars. At its worst hour, the rays were more than 50 times stronger than usual.",
+      "sep2017": "11 September 2017. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
+      "oct2021": "29 October 2021. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
+      "moon": "20 May 2024. A NASA spacecraft circling the Moon measured this storm. The rays rose only a little. The storm pointed at Mars.",
+      "cloud": "Scientists forecast this storm cloud with a computer model of the Sun's wind."
+    }
   }
 }

@@ -122,7 +122,8 @@ describe("jobs: every job costs something today, every skipped job costs somethi
   it("Ask Earth puts Earth's forecast into the next morning; otherwise there is none", () => {
     const answer: EarthAnswer = { dustTomorrow: "dusty", stormCloudInSols: 1, source: RAD_STORM };
     const g = createGame();
-    expect(step(g, { a1: "askEarth" }, NONE, { 1: answer }).state.earthAnswer).toEqual(answer);
+    // The storm part comes from the mission's forecast; the dust part follows the panels (skipped here → dusty).
+    expect(step(g, { a1: "askEarth" }, NONE, { 1: answer }).state.earthAnswer).toMatchObject(answer);
     expect(step(g, { a1: "panels" }, NONE, { 1: answer }).state.earthAnswer).toBeUndefined();
   });
 });

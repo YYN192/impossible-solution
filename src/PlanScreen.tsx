@@ -14,10 +14,10 @@ import { audio } from "./game/audio";
 import { useSession } from "./game/session";
 import { DataChip } from "./screens/DataChip";
 import { ScreenFrame } from "./components/ScreenFrame";
-import { knownEvents, step } from "./sim/engine";
+import { knownEvents, rulesOf, step } from "./sim/engine";
+import { tRun } from "./i18n/dynamic";
 import {
   JOBS,
-  MISSION_SOLS,
   type CrewId,
   type Domino,
   type JobId,
@@ -47,6 +47,7 @@ export default function PlanScreen() {
   const setup = useMission((s) => s.setup);
   const plan = useSession((s) => s.draft);
   const assign = useSession((s) => s.assign);
+  const moon = setup?.place === "moon" ? "moon" : undefined;
   const [selected, select] = useState<CrewId | null>(null);
   const [confirmIdle, setConfirmIdle] = useState(false);
   const [nudge, setNudge] = useState(false);
@@ -93,11 +94,11 @@ export default function PlanScreen() {
     useSession.setState({ before: { ...state.bars }, draft: {} });
     const result = useGame.getState().endSol(plan);
     audio.playSfx("resolve");
-    if (result.over && state.sol < MISSION_SOLS) useNav.getState().endEarly();
+    if (result.over && state.sol < rulesOf(state).sols) useNav.getState().endEarly();
     else useNav.getState().next();
   }
   return (
-    <ScreenFrame title={t("plan.heading", { sol: state.sol })}>
+    <ScreenFrame title={tRun("plan.heading", { sol: state.sol }, moon)}>
       <p className="lead">{t("planHelp.howTo")}</p>
       <div className="planner-layout plan-screen" ref={root}>
         <div>
@@ -196,7 +197,7 @@ export default function PlanScreen() {
           </div>
         </div>
         <aside className="plan-outlook">
-          <h2>{t("play.preview")}</h2>
+          <h2>{tRun("play.preview", {}, moon)}</h2>
           <p className="note">{t("play.previewMeaning")}</p>
           <ResourceMeters bars={preview.state.bars} previous={state.bars} />
           <div className="small-counters">
@@ -259,7 +260,7 @@ export default function PlanScreen() {
             disabled={!setup}
             onClick={finish}
           >
-            {confirmIdle ? t("play.confirmEnd") : t("plan.endSol")} →
+            {confirmIdle ? t("play.confirmEnd") : tRun("plan.endSol", {}, moon)} →
           </button>
           <p className="note">{t("play.gameUnits")}</p>
         </aside>

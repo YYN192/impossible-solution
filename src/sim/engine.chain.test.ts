@@ -72,7 +72,7 @@ function survey() {
       seen.set(d.id, d.sol);
     }
     starCounts[stars(g).count]++;
-    if (g.bars.power > 10 || g.bars.air > 10 || g.bars.dose >= DOSE.meterMax || Object.values(g.bars).some((v) => v < 0)) outOfRange++;
+    if (g.bars.power > 10 || g.bars.air > 10 || g.bars.dose > DOSE.meterMax || Object.values(g.bars).some((v) => v < 0)) outOfRange++;
     if (!demoStory && traces(g, "sol1-panels-skipped", "domino.crewTired")) demoStory = true;
   }
   return { longest, free, badCause, outOfRange, demoStory, starCounts };
@@ -125,7 +125,7 @@ describe("whole mission (brute force over all 175,616 plans)", () => {
   it("some plan produces a domino chain at least 3 links long", () => expect(r.longest).toBeGreaterThanOrEqual(3));
   it("no plan is free: every mission ends with at least one fallen domino", () => expect(r.free).toBe(0));
   it("every cause points to a domino that already fell", () => expect(r.badCause).toBe(""));
-  it("bars stay in range (power and air 0–10, dose below the meter top)", () => expect(r.outOfRange).toBe(0));
+  it("bars stay in range (power and air 0–10, dose 0 to the meter top)", () => expect(r.outOfRange).toBe(0));
   it("several different plans reach 2–3★", () => expect(r.starCounts[2] + r.starCounts[3]).toBeGreaterThan(1));
   it("at least one plan gets only 1★", () => expect(r.starCounts[1]).toBeGreaterThan(0));
   it("no single job is better in every situation: each one is sometimes the wrong pick", () => expect(dominantJobs()).toEqual([]));

@@ -1,41 +1,69 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import i18n from "./i18n";
 import MainMenu from "./MainMenu";
+import { useProgress } from "./state/progress";
 
 const t = i18n.t.bind(i18n);
-const menu = () =>
-  render(<MainMenu ready resume={false} onPlay={vi.fn()} onSources={vi.fn()} onTeacher={vi.fn()} onChooseSun={onChooseSun} />);
-const onChooseSun = vi.fn();
+const onChoose = vi.fn();
+/** A campaign card: its name comes first (a locked card of another campaign may mention it later). */
+const card = (id: "storm" | "dust" | "moon") => new RegExp(`^(🔒 )?${t(`campaign.${id}.name`)}`);
+const menu = (resume = false, onNew = vi.fn()) =>
+  render(<MainMenu ready resume={resume} campaignId="storm" onPlay={vi.fn()} onSources={vi.fn()} onTeacher={vi.fn()} onChoose={onChoose} onNew={onNew} />);
+beforeEach(() => useProgress.setState({ done: [], teacher: false }));
 afterEach(() => {
   window.history.replaceState({}, "", "/");
-  onChooseSun.mockReset();
+  onChoose.mockReset();
 });
 
-describe("Main menu: no dead buttons", () => {
-  it("has no Quit button (a tab cannot be closed from the page)", () => {
+describe("Main menu: mission picker", () => {
+  it("shows every campaign as a card; the classic is chosen and the others are locked at first", () => {
     menu();
-    expect(screen.queryByRole("button", { name: /^(Quit|Изход)$/ })).toBeNull();
+    const storm = screen.getByRole("button", { name: card("storm") });
+    expect(storm.getAttribute("aria-pressed")).toBe("true");
+    const dust = screen.getByRole("button", { name: card("dust") }) as HTMLButtonElement;
+    expect(dust.disabled).toBe(true);
+    expect(dust.textContent).toContain(t("run.locked", { name: t("campaign.storm.name") }));
+    expect(screen.getByRole("button", { name: card("moon") })).toBeTruthy();
   });
-});
 
-describe("Main menu: which Sun to play (#8)", () => {
-  it("offers today's real Sun and the May 2024 storm; May 2024 is the default", () => {
+  it("a finished campaign opens the next one; tapping it chooses it", () => {
+    useProgress.setState({ done: ["storm"] });
     menu();
-    expect(screen.getByRole("button", { name: t("menu.sunMay") }).getAttribute("aria-pressed")).toBe("true");
+    const dust = screen.getByRole("button", { name: card("dust") });
+    expect(dust.textContent).toContain(t("campaign.dust.hook"));
+    expect(dust.textContent).toContain("InSight");
+    fireEvent.click(dust);
+    expect(onChoose).toHaveBeenCalledWith({ campaign: "dust" });
+  });
+
+  it("offers today's real Sun, the daily mission and a surprise", () => {
+    menu();
     fireEvent.click(screen.getByRole("button", { name: t("menu.sunToday") }));
-    expect(onChooseSun).toHaveBeenCalledWith(true);
+    expect(onChoose).toHaveBeenLastCalledWith({ today: true });
+    fireEvent.click(screen.getByRole("button", { name: t("run.daily") }));
+    expect(onChoose).toHaveBeenLastCalledWith({ daily: true });
+    fireEvent.click(screen.getByRole("button", { name: t("run.surprise") }));
+    expect(onChoose).toHaveBeenLastCalledWith({ surprise: true });
   });
 
-  it("shows today's Sun as chosen with ?sun=today", () => {
-    window.history.replaceState({}, "", "/?sun=today");
-    menu();
-    expect(screen.getByRole("button", { name: t("menu.sunToday") }).getAttribute("aria-pressed")).toBe("true");
-  });
-
-  it("hides the choice offline (?offline=1 / ?demo=1): there is no live Sun without the network", () => {
+  it("hides today's real Sun offline (?offline=1 / ?demo=1): there is no live Sun without the network", () => {
     window.history.replaceState({}, "", "/?offline=1");
     menu();
     expect(screen.queryByRole("button", { name: t("menu.sunToday") })).toBeNull();
+  });
+
+  it("has no Quit button: a web page cannot close its own tab", () => {
+    menu();
+    expect(screen.queryByRole("button", { name: /quit/i })).toBeNull();
+  });
+
+  it("a mission in progress shows Continue and New mission instead of the picker", () => {
+    const onNew = vi.fn();
+    menu(true, onNew);
+    expect(screen.getByRole("button", { name: new RegExp(t("menu.resume")) })).toBeTruthy();
+    expect(screen.queryByRole("group", { name: t("run.pick") })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: t("run.newMission") }));
+    expect(onNew).toHaveBeenCalled();
   });
 });

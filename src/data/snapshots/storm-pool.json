@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-11-14T23:19:42.953Z",
+  "source": "https://api.nasa.gov/DONKI/CME (through our /api/donki/CME proxy)",
+  "attribution": "NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)",
+  "license": "NASA open data; not copyrighted in the US (NASA media usage guidelines)",
+  "about": "The eruptions behind the two older storms in the storm pool, with the WSA-Enlil forecasts that name Mars.",
+  "data": [
+    {
+      "activityID": "2017-09-10T16:09:00-CME-001",
+      "startTime": "2017-09-10T16:09Z",
+      "activeRegionNum": 12673,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/13107/-1",
+      "speeds": [
+        1670,
+        2314,
+        2650
+      ],
+      "marsHits": [
+        {
+          "arrival": "2017-09-14T10:00Z",
+          "glancing": true,
+          "speed": 1670,
+          "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/13110/-1"
+        },
+        {
+          "arrival": "2017-09-13T22:00Z",
+          "glancing": true,
+          "speed": 2650,
+          "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/13114/-1"
+        }
+      ]
+    },
+    {
+      "activityID": "2021-10-28T15:53:00-CME-001",
+      "startTime": "2021-10-28T15:53Z",
+      "activeRegionNum": 12887,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/18106/-1",
+      "speeds": [
+        1109
+      ],
+      "marsHits": []
+    }
+  ]
+}

@@ -5,13 +5,18 @@
  * Order inside one sol:
  *   1. Morning: bars.power is what is stored for today. If it is low, a powerLow domino falls.
  *   2. Jobs run in JOBS order; a job that needs more power than is left does not run.
- *   3. Night: the air machine needs NIGHT.airMachinePower from what is left, or the air drops.
+ *   3. Night: the air machine needs power from what is left, or the air drops. Then the heater (cold sites).
  *   4. The panels charge for tomorrow: leftover + solar × panel efficiency (dusty if nobody cleaned them).
  *   5. Food, shelter, space-ray dose, science and Earth's answer are settled for the next morning.
+ *
+ * Campaigns change the numbers in `state.rules` (see Rules in ./types.ts), never the code path.
+ * Beat choices (site, dilemma, wipe, radio, upgrade, rover, sky watch) go through `act`.
  *
  * Domino ids are `sol{N}-{name}` and text keys are `domino.{key}` from src/i18n/en.json.
  */
 import type {
+  Action,
+  Blame,
   CrewId,
   DataRef,
   Domino,
@@ -19,31 +24,34 @@ import type {
   GameState,
   JobId,
   Plan,
+  Rules,
   StepResult,
   StormEvent,
 } from "./types";
-import { DOSE, JOBS, MISSION_SOLS, NIGHT } from "./types";
+import { CLASSIC_RULES, DOSE, JOBS, NIGHT } from "./types";
 
 /** Engine game numbers (invented, tuned for play). Change only with the balance tests green. */
 export const ENGINE = {
-  startAir: 6,
+  startAir: 5,
   startFood: 1,
   /** Skipped panels: efficiency × this (InSight: 425 → 275 Wh/sol ≈ −35%). */
-  dustFactor: 0.65,
+  dustFactor: CLASSIC_RULES.dustFactor,
   /** Morning power below this is "low today": not enough for the greenhouse plus the air machine. */
   lowPowerToday: JOBS.greenhouse.powerCost + NIGHT.airMachinePower,
   /** Shelter protects today and tomorrow. */
   shelterSols: 2,
   /** Storm cloud (CME) dose: a smaller burst. Game numbers; the real CME is never mapped to a Mars dose. */
-  cloudInside: 1,
-  cloudOutside: 4,
+  cloudInside: 0.6,
+  cloudOutside: 2,
   /** Crew-safe star: final dose must stay below this. */
-  doseLimit: 5,
+  doseLimit: 3,
+  /** Base star: air left for tomorrow must be at least this (power: lowPowerToday, food: 1). */
+  airReady: 6,
   /** Science star. */
-  scienceGoal: 2,
+  scienceGoal: CLASSIC_RULES.scienceGoal,
   /** Food made by a successful greenhouse job. */
-  foodGain: 1,
-  /** Food consumed when the greenhouse job is skipped. */
+  foodGain: CLASSIC_RULES.foodGain,
+  /** Food the crew eats on a sol without a greenhouse harvest. */
   foodLoss: 1,
   /** Science earned by a successful science trip. */
   scienceGain: 1,
@@ -75,27 +83,30 @@ const NO_POWER_DOMINO: Partial<Record<JobId, { icon: string; key: string }>> = {
 
 const clamp = (v: number, max = 10) => Math.min(max, Math.max(0, v));
 
+/** The rules of this run: the campaign's, or the classic mission's. */
+export const rulesOf = (state: GameState): Rules => state.rules ?? CLASSIC_RULES;
+
 /**
  * Storms the player has been told about, so the plan preview can show them. Particle bursts
  * come without warning (tens of minutes); storm clouds only after Earth warned about them.
+ * Dust storms are seen coming on the horizon, so today's is always known.
  */
 export function knownEvents(
   state: GameState,
   events: StormEvent[],
 ): StormEvent[] {
   return events.filter(
-    (e) => e.kind === "stormCloud" && state.warnedSols?.includes(e.sol),
+    (e) =>
+      (e.kind === "stormCloud" && state.warnedSols?.includes(e.sol)) ||
+      (e.kind === "dustStorm" && e.sol === state.sol),
   );
 }
 
-export function createGame(): GameState {
+export function createGame(rules?: Partial<Rules>): GameState {
+  const r = { ...CLASSIC_RULES, ...rules };
   return {
     sol: 1,
-    bars: {
-      power: NIGHT.solarPowerAtFullEfficiency,
-      air: ENGINE.startAir,
-      dose: 0,
-    },
+    bars: { power: r.solar, air: ENGINE.startAir, dose: 0 },
     food: ENGINE.startFood,
     science: 0,
     panelEfficiency: 1,
@@ -103,11 +114,43 @@ export function createGame(): GameState {
     tired: [],
     dominoes: [],
     over: false,
+    ...(rules ? { rules: r } : {}),
   };
 }
 
 /** Same as createGame. */
 export const initialState = createGame;
+
+/**
+ * What Earth can tell the crew about the sols from `from` on: dust (from the panels), the next
+ * storm cloud (the real forecast in `events`) and the chance of a particle burst on sol `from`.
+ */
+export function earthAnswerFor(
+  events: StormEvent[],
+  from: number,
+  panelEfficiency: number,
+  table?: EarthAnswer,
+): EarthAnswer {
+  const coming = events
+    .filter((e) => e.kind === "stormCloud" && e.sol >= from)
+    .sort((a, b) => a.sol - b.sol)[0];
+  const burst = events.some((e) => e.kind === "particleBurst" && e.sol === from);
+  let dustSols = 0;
+  while (events.some((e) => e.kind === "dustStorm" && e.sol === from + dustSols)) dustSols++;
+  return {
+    ...(coming ? { stormCloudInSols: coming.sol - from } : {}),
+    ...(dustSols ? { dustStormSols: dustSols } : {}),
+    source: coming?.source ?? EARTH_REF,
+    ...table,
+    dustTomorrow: panelEfficiency < 1 ? "dusty" : "clear",
+    burstRisk: burst ? "high" : "low",
+  };
+}
+
+const warned = (state: GameState, answer: EarthAnswer | undefined, from: number) => [
+  ...(state.warnedSols ?? []),
+  ...(answer?.stormCloudInSols !== undefined ? [from + answer.stormCloudInSols] : []),
+];
 
 export function step(
   state: GameState,
@@ -118,14 +161,22 @@ export function step(
 ): StepResult {
   if (state.over) return { state, fell: [] };
 
+  const R = rulesOf(state);
   const sol = state.sol;
   const next = sol + 1;
-  const last = sol >= MISSION_SOLS;
+  const last = sol >= R.sols;
   const fell: Domino[] = [];
   const fallen = (id: string) =>
     state.dominoes.some((d) => d.id === id) || fell.some((d) => d.id === id);
   const add = (d: Domino) => fell.push(d);
   const p = (s: number, what: string) => `sol${s}-${what}`;
+  // A beat choice that hurt a resource is named once, by the next problem with that resource.
+  const blame = { ...state.blame };
+  const blamed = (what: Blame): string[] => {
+    const id = blame[what];
+    delete blame[what];
+    return id ? [id] : [];
+  };
 
   // Who works today.
   const assigned = new Set<JobId>();
@@ -142,16 +193,21 @@ export function step(
       sol,
       icon: "⚡↓",
       textKey: "domino.powerLow",
-      causeIds: [],
+      causeIds: blamed("power"),
     });
   const powerLowToday = fallen(p(sol, "power-low"))
     ? [p(sol, "power-low")]
     : [];
 
   // Day: jobs spend today's power.
+  const earthHidden = R.earthHidden.includes(sol);
   const done = new Set<JobId>();
   for (const job of JOB_IDS) {
     const assignedJob = assigned.has(job);
+    if (job === "askEarth" && assignedJob && earthHidden) {
+      add({ id: p(sol, "no-signal"), sol, icon: "📡🌘", textKey: "domino.noSignal", causeIds: [] });
+      continue;
+    }
     const affordable = JOBS[job].powerCost <= power + EPS;
     if (assignedJob && affordable) {
       power -= JOBS[job].powerCost;
@@ -173,22 +229,40 @@ export function step(
 
   // Night: the air machine.
   let air = state.bars.air;
-  if (power + EPS < NIGHT.airMachinePower) {
+  if (power + EPS < R.airMachinePower) {
     air = clamp(air - NIGHT.airLossWithoutPower);
     add({
       id: p(sol, "air-low"),
       sol,
       icon: "🫧↓",
       textKey: "domino.airLow",
-      causeIds: powerLowToday,
+      causeIds: [...powerLowToday, ...blamed("air")],
     });
   } else {
-    power -= NIGHT.airMachinePower;
+    power -= R.airMachinePower;
+    air = clamp(air + NIGHT.airGainWithPower);
+  }
+
+  // Night: the heater (cold sites only). Unpaid: the greenhouse plants freeze.
+  let food = state.food;
+  let coldNight = false;
+  if (R.heater > 0) {
+    if (power + EPS < R.heater) {
+      coldNight = true;
+      food = Math.max(0, food - ENGINE.foodLoss);
+      add({
+        id: p(sol, "cold-night"),
+        sol,
+        icon: "🥶",
+        textKey: "domino.coldNight",
+        causeIds: powerLowToday,
+      });
+    } else power -= R.heater;
   }
 
   // Space rays: shelter, storms, and every astronaut outside.
   const shelterSols = done.has("shelter")
-    ? ENGINE.shelterSols
+    ? Math.max(ENGINE.shelterSols, state.shelterSols)
     : state.shelterSols;
   const sheltered = shelterSols > 0;
   const outsideCount = [...done].filter((j) => JOBS[j].outside).length;
@@ -197,11 +271,15 @@ export function step(
     events.find((e) => e.sol === sol && e.kind === "stormCloud");
   const [inside, outside] = !storm
     ? [DOSE.normalDay, DOSE.normalDay + DOSE.outsideExtra]
-    : storm.kind === "particleBurst"
-      ? [DOSE.burstInside, DOSE.burstOutside]
-      : [ENGINE.cloudInside, ENGINE.cloudOutside];
+    : storm.dose
+      ? [storm.dose.inside, storm.dose.outside]
+      : storm.kind === "particleBurst"
+        ? [DOSE.burstInside, DOSE.burstOutside]
+        : [ENGINE.cloudInside, ENGINE.cloudOutside];
   let doseToday = inside + outsideCount * (outside - inside);
-  if (sheltered) doseToday *= DOSE.shelterFactor;
+  if (sheltered) doseToday *= R.shelterFactor;
+  const dose = clamp(state.bars.dose + doseToday, DOSE.meterMax);
+  const doseFull = dose >= DOSE.meterMax - EPS;
   if (storm) {
     // Being outside gives most of the storm dose, so it is the first cause.
     if (outsideCount > 0)
@@ -217,6 +295,7 @@ export function step(
       ...(sheltered
         ? []
         : [sol - 1, sol].map((s) => p(s, "shelter-skipped")).filter(fallen)),
+      ...blamed("dose"),
     ];
     add({
       id: p(sol, "dose-high"),
@@ -227,10 +306,17 @@ export function step(
       source: storm.source,
     });
   }
+  if (doseFull)
+    add({
+      id: p(sol, "dose-full"),
+      sol,
+      icon: "🚀🏠",
+      textKey: "domino.doseFull",
+      causeIds: storm ? [p(sol, "dose-high")] : blamed("dose"),
+    });
 
-  // Food.
-  let food = state.food;
-  if (done.has("greenhouse")) food += ENGINE.foodGain;
+  // Food: the crew eats every sol; only a greenhouse harvest keeps up.
+  if (done.has("greenhouse")) food += R.foodGain;
   else {
     food = Math.max(0, food - ENGINE.foodLoss);
     if (food === 0)
@@ -239,37 +325,56 @@ export function step(
         sol,
         icon: "🥬0",
         textKey: "domino.foodEmpty",
-        causeIds: [p(sol, "greenhouse-skipped")],
+        causeIds: [
+          p(sol, "greenhouse-skipped"),
+          ...(coldNight ? [p(sol, "cold-night")] : []),
+          ...blamed("food"),
+        ],
       });
   }
   const tired: CrewId[] = food === 0 ? ["a1"] : [];
 
-  // The panels charge for tomorrow.
+  // The panels charge for tomorrow. A dust storm dims the Sun for its sol.
+  const dustStorm = events.find((e) => e.sol === sol && e.kind === "dustStorm");
+  if (dustStorm)
+    add({
+      id: p(sol, "dust-storm"),
+      sol,
+      icon: "🌪️",
+      textKey: dustStorm.captionKey,
+      causeIds: [],
+      source: dustStorm.source,
+    });
   const panelEfficiency = done.has("panels")
     ? 1
-    : state.panelEfficiency * ENGINE.dustFactor;
+    : state.panelEfficiency * R.dustFactor;
   // Whole units, rounded down: the meter never shows power the jobs cannot spend.
   const powerTomorrow = clamp(
-    Math.floor(
-      power + NIGHT.solarPowerAtFullEfficiency * panelEfficiency + EPS,
-    ),
+    Math.floor(power + R.solar * (dustStorm?.solar ?? 1) * panelEfficiency + EPS),
   );
 
-  const over = last || air <= 0;
+  const over = last || air <= 0 || doseFull;
 
   // Next morning's dominoes.
   if (!over) {
     if (
-      !done.has("panels") &&
-      powerTomorrow + EPS < NIGHT.solarPowerAtFullEfficiency
-    )
-      add({
-        id: p(next, "power-low"),
-        sol: next,
-        icon: "⚡↓",
-        textKey: "domino.powerLow",
-        causeIds: [p(sol, "panels-skipped")],
-      });
+      powerTomorrow + EPS < ENGINE.lowPowerToday ||
+      (!done.has("panels") && powerTomorrow + EPS < R.solar)
+    ) {
+      const causeIds = [
+        ...(done.has("panels") ? [] : [p(sol, "panels-skipped")]),
+        ...(dustStorm ? [p(sol, "dust-storm")] : []),
+        ...blamed("power"),
+      ];
+      if (causeIds.length)
+        add({
+          id: p(next, "power-low"),
+          sol: next,
+          icon: "⚡↓",
+          textKey: "domino.powerLow",
+          causeIds,
+        });
+    }
     if (tired.length)
       add({
         id: p(next, "crew-tired"),
@@ -280,36 +385,16 @@ export function step(
       });
   }
 
-  // Earth's answer.
-  let earthAnswer: EarthAnswer | undefined;
-  if (done.has("askEarth")) {
-    earthAnswer = forecasts?.[sol];
-    if (!earthAnswer) {
-      const coming = events
-        .filter((e) => e.kind === "stormCloud" && e.sol > sol)
-        .sort((a, b) => a.sol - b.sol)[0];
-      earthAnswer = {
-        dustTomorrow: panelEfficiency < 1 ? "dusty" : "clear",
-        ...(coming ? { stormCloudInSols: coming.sol - next } : {}),
-        source: coming?.source ?? EARTH_REF,
-      };
-    }
-  }
-
-  const warnedSols = [
-    ...(state.warnedSols ?? []),
-    ...(earthAnswer?.stormCloudInSols !== undefined
-      ? [next + earthAnswer.stormCloudInSols]
-      : []),
-  ];
+  // Earth's answer: the Ask Earth job, or a radio call made in a beat today. It is about tomorrow.
+  const earthAnswer =
+    (done.has("askEarth") || state.radioed) && !earthHidden
+      ? earthAnswerFor(events, next, panelEfficiency, forecasts?.[sol])
+      : undefined;
+  const warnedSols = warned(state, earthAnswer, next);
 
   const newState: GameState = {
     sol: over ? sol : next,
-    bars: {
-      power: powerTomorrow,
-      air,
-      dose: clamp(state.bars.dose + doseToday, DOSE.meterMax),
-    },
+    bars: { power: powerTomorrow, air, dose },
     food,
     science: state.science + (done.has("science") ? ENGINE.scienceGain : 0),
     panelEfficiency,
@@ -319,14 +404,79 @@ export function step(
     ...(warnedSols.length ? { warnedSols } : {}),
     dominoes: [...state.dominoes, ...fell],
     over,
+    ...(state.rules ? { rules: state.rules } : {}),
+    ...(Object.keys(blame).length ? { blame } : {}),
   };
   return { state: newState, fell };
+}
+
+/** Can this beat choice be taken now? (Only power is a price; other effects just happen.) */
+export function canAct(state: GameState, action: Action): boolean {
+  return !state.over && state.bars.power + (action.effect?.power ?? 0) > -EPS;
+}
+
+/**
+ * One beat choice: apply its effect and drop a root domino for it, so later problems can point
+ * back at the choice. Pure. A choice the crew cannot pay for changes nothing.
+ */
+export function act(
+  state: GameState,
+  action: Action,
+  events: StormEvent[] = [],
+): StepResult {
+  if (!canAct(state, action)) return { state, fell: [] };
+  const sol = state.sol;
+  const R = rulesOf(state);
+  if (action.ask && R.earthHidden.includes(sol)) {
+    const d: Domino = { id: `sol${sol}-no-signal`, sol, icon: "📡🌘", textKey: "domino.noSignal", causeIds: [] };
+    return { state: { ...state, dominoes: [...state.dominoes, d] }, fell: [d] };
+  }
+  const e = action.effect ?? {};
+  const id = `sol${sol}-${action.id}`;
+  const domino: Domino = {
+    id,
+    sol,
+    icon: action.icon,
+    textKey: action.textKey,
+    causeIds: [],
+    ...(action.source ? { source: action.source } : {}),
+  };
+  const blame = { ...state.blame };
+  if ((e.power ?? 0) < 0 || (e.panelEfficiency !== undefined && Math.max(state.panelEfficiency, e.panelEfficiency) < 1) || (action.rules?.solar ?? R.solar) < R.solar)
+    blame.power = id;
+  if ((e.air ?? 0) < 0) blame.air = id;
+  if ((e.food ?? 0) < 0) blame.food = id;
+  if ((e.dose ?? 0) > 0) blame.dose = id;
+  const rules = action.rules ? { ...R, ...action.rules } : state.rules;
+  const earthAnswer =
+    action.ask === "now" ? earthAnswerFor(events, sol, state.panelEfficiency) : undefined;
+  const warnedSols = warned(state, earthAnswer, sol);
+  const next: GameState = {
+    ...state,
+    bars: {
+      power: clamp(state.bars.power + (e.power ?? 0)),
+      air: clamp(state.bars.air + (e.air ?? 0)),
+      dose: clamp(state.bars.dose + (e.dose ?? 0), DOSE.meterMax),
+    },
+    food: Math.max(0, state.food + (e.food ?? 0)),
+    science: state.science + (e.science ?? 0),
+    panelEfficiency: Math.max(state.panelEfficiency, e.panelEfficiency ?? 0),
+    shelterSols: Math.max(state.shelterSols, e.shelterSols ?? 0),
+    tired: e.tired ? [...new Set([...state.tired, ...e.tired])] : state.tired,
+    dominoes: [...state.dominoes, domino],
+    ...(rules ? { rules } : {}),
+    ...(Object.keys(blame).length ? { blame } : {}),
+    ...(action.ask === "night" ? { radioed: true } : {}),
+    ...(earthAnswer ? { earthAnswer } : {}),
+    ...(warnedSols.length ? { warnedSols } : {}),
+  };
+  return { state: next, fell: [domino] };
 }
 
 export interface Stars {
   /** Dose stayed under the limit. */
   crewSafe: boolean;
-  /** No bar hit 0. */
+  /** Power, air and food are left for tomorrow. */
   baseRunning: boolean;
   /** Science goal reached. */
   science: boolean;
@@ -335,8 +485,11 @@ export interface Stars {
 
 export function stars(state: GameState): Stars {
   const crewSafe = state.bars.dose < ENGINE.doseLimit;
-  const baseRunning = state.bars.air > 0 && state.bars.power > 0;
-  const science = state.science >= ENGINE.scienceGoal;
+  const baseRunning =
+    state.bars.air >= ENGINE.airReady &&
+    state.bars.power >= ENGINE.lowPowerToday &&
+    state.food >= 1;
+  const science = state.science >= rulesOf(state).scienceGoal;
   return {
     crewSafe,
     baseRunning,
