@@ -27,17 +27,18 @@ describe("Final screen", () => {
   });
   afterEach(cleanup);
 
-  it("shows the chain from the problem back to its first cause", () => {
+  it("shows one row of dominoes from the first cause to the result", () => {
     render(<FinalScreen />);
     expect(chainTexts()).toEqual([
-      "One astronaut is too tired to work.",
-      "The food ran out.",
-      "Nobody ran the greenhouse lights.",
-      "Power is low today.",
       "Nobody cleaned the solar panels.",
+      "Power is low today.",
+      "Nobody ran the greenhouse lights.",
+      "The food ran out.",
+      "One astronaut is too tired to work.",
     ]);
-    // Every link after the first says "because"; each shows its sol.
-    expect(document.querySelectorAll(".chain .because")).toHaveLength(4);
+    // Every link after the first is joined by an arrow ("so" for screen readers); each shows its sol.
+    expect(document.querySelectorAll(".chain .domino-arrow")).toHaveLength(4);
+    expect(document.querySelectorAll(".chain")).toHaveLength(1);
     screen.getByText("Sol 3");
     screen.getAllByText("Sol 2");
     screen.getByText("Sol 1");

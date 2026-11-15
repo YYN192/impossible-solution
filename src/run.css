@@ -40,3 +40,15 @@
 }
 .run-seed { font-family: ui-monospace, Consolas, monospace; }
 .campaign-ending { border: 3px solid #9fe0d8; padding: 0.6rem; margin: 0.75rem 0; background: #0d1622; }
+
+/* Final screen: one row of dominoes per story, first cause on the left, toppling left to right. */
+.chain-row { margin: 0 0 1rem; }
+.chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem 0; padding: 0.6rem; }
+.chain li { display: flex; align-items: center; flex: 1 1 12rem; min-width: min(100%, 11rem); max-width: 22rem; }
+.chain li + li { margin-left: 0; }
+.domino-arrow { flex: none; padding: 0 0.4rem; font-family: var(--font-pixel); font-size: 1.4rem; color: #ffd166; }
+.domino-tile { flex: 1; min-width: 0; }
+.domino-tile .domino { display: grid; gap: 0.3rem; justify-items: start; }
+.domino-tile .domino-icon { font-size: 1.6rem; }
+.chain-times { color: #ffd166; margin: 0.2rem 0 0; }
+.more-chains > summary { margin: 0.5rem 0; }

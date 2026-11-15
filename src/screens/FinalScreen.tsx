@@ -11,13 +11,15 @@ import { useProgress } from "../state/progress";
 import { useBest } from "../state/best";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
-import { buildChains } from "./final/buildChains";
+import { buildRows, type Row } from "./final/buildRows";
 import { audio } from "../game/audio";
 
 export type { Stars };
 
 /** Delay between dominoes in the fall effect (CSS turns animation off for reduced motion). */
 const FALL_STEP_MS = 250;
+/** Rows shown at once; the rest sit behind "Show more" so the screen stays short. */
+const SHOWN = 3;
 
 /**
  * Final screen (#14): every problem traced back to its first cause, 1–3 stars + Best,
@@ -47,7 +49,7 @@ export function FinalView({
   const { restart, home } = useNav();
   const best = useBest((s) => s.best);
   const record = useBest((s) => s.record);
-  const chains = buildChains(dominoes);
+  const rows = buildRows(dominoes);
   const setup = useMission((s) => s.setup);
   const reload = useMission((s) => s.reload);
   const finish = useProgress((s) => s.finish);
@@ -70,7 +72,7 @@ export function FinalView({
     void reload().then(() => restart());
   };
 
-  const longest = Math.max(0, ...chains.map((c) => c.length));
+  const longest = Math.max(0, ...rows.map((r) => r.links.length));
   const won = !endedEarly && stars.count >= 2;
   useEffect(() => {
     // Chains fall side by side, so one tick per step; none when the animation is off.
@@ -89,12 +91,20 @@ export function FinalView({
         best={demo ? undefined : Math.max(best, stars.count)}
       />
 
-      {chains.length > 0 ? (
+      {rows.length > 0 ? (
         <>
           <p className="lead">{t("final.chainIntro")}</p>
-          {chains.map((chain, i) => (
-            <ChainView key={chain[0].id} chain={chain} label={i} />
+          {rows.slice(0, SHOWN).map((row, i) => (
+            <RowView key={row.links.map((l) => l.domino.id).join(">")} row={row} label={i} />
           ))}
+          {rows.length > SHOWN && (
+            <details className="more-chains">
+              <summary>{t("final.more", { count: rows.length - SHOWN })}</summary>
+              {rows.slice(SHOWN).map((row, i) => (
+                <RowView key={row.links.map((l) => l.domino.id).join(">")} row={row} label={SHOWN + i} />
+              ))}
+            </details>
+          )}
         </>
       ) : (
         <p className="lead">{t("final.noChain")}</p>
@@ -156,21 +166,28 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
   );
 }
 
-/** One chain, problem first, falling backwards to the first cause. */
-function ChainView({ chain, label }: { chain: Domino[]; label: number }) {
+/** One row of dominoes: first cause on the left, the result on the right, toppling in order. */
+function RowView({ row, label }: { row: Row; label: number }) {
   const { t } = useTranslation();
   return (
-    <ol className="chain" aria-label={t("final.chainLabel", { n: label + 1 })}>
-      {chain.map((domino, i) => (
-        <li
-          key={domino.id}
-          style={{ "--fall-delay": `${i * FALL_STEP_MS}ms` } as CSSProperties}
-        >
-          {i > 0 && <p className="because">{t("morning.because")}</p>}
-          <p className="chain-sol">{tRun("final.sol", { sol: domino.sol })}</p>
-          <DominoCard domino={domino} fall />
-        </li>
-      ))}
-    </ol>
+    <div className="chain-row">
+      <ol className="chain" aria-label={t("final.chainLabel", { n: label + 1 })}>
+        {row.links.map(({ domino, sols }, i) => (
+          <li key={domino.id} style={{ "--fall-delay": `${i * FALL_STEP_MS}ms` } as CSSProperties}>
+            {i > 0 && (
+              <span className="domino-arrow">
+                <span aria-hidden="true">→</span>
+                <span className="visually-hidden">{t("final.so")}</span>
+              </span>
+            )}
+            <div className="domino-tile">
+              <p className="chain-sol">{tRun("final.sol", { sol: [...new Set(sols)].join(", ") })}</p>
+              <DominoCard domino={domino} fall />
+            </div>
+          </li>
+        ))}
+      </ol>
+      {row.count > 1 && <p className="note chain-times">×{row.count} · {t("final.times", { count: row.count })}</p>}
+    </div>
   );
 }
