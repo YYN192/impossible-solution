@@ -457,6 +457,8 @@
     "crewStep": "01 / Choose an astronaut",
     "pickCrewFirst": "Pick an astronaut first.",
     "jobsStep": "02 / Give them a job",
+    "jobsStepFor": "02 / Give {{name}} a job",
+    "jobsLocked": "First choose an astronaut above ↑",
     "clearCrew": "Clear the job of $t(crew.who.{{n}})",
     "crewNumber": "$t(crew.who.{{n}})",
     "chooseJob": "Choose a job for $t(crew.who.{{n}}).",

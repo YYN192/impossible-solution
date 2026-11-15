@@ -108,3 +108,11 @@
 @keyframes mini-shake{50%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.mini-game *{animation:none!important;transition:none!important}}
 @media (max-width:480px){.mini-game img.pixel.big{width:64px;height:64px}.mini-game img.pixel.ground{width:64px;height:32px}.mini-row{min-height:68px}}
+/* Visual hierarchy: step 01 is the brightest thing until an astronaut is chosen; step 02 is dimmed and solid. */
+.plan-screen .crew-tile.call:not(.selected) { border-color: #83d9f4; animation: plan-call 2.4s ease-in-out infinite; }
+.plan-screen .crew-tile.selected { outline: 4px solid #ffd166; outline-offset: 2px; background: #1d3a4d; box-shadow: 0 0 0 6px #ffd16655; }
+.plan-screen .jobs-locked { margin: 0 0 10px; color: #ffd166; font-size: 1rem; }
+.plan-screen .job-list.locked .job-choice { opacity: 0.4; filter: grayscale(1); border-style: solid; border-color: #3b5367; cursor: not-allowed; }
+.plan-screen .crew-roster.shake { animation: plan-shake 0.4s ease-in-out; }
+@keyframes plan-call { 50% { box-shadow: 0 0 14px 2px #83d9f4aa; } }
+@keyframes plan-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
