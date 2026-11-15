@@ -378,3 +378,8 @@ button.primary:disabled { background: #141d29; border-color: var(--steel); color
 html[data-contrast] button.primary, html[data-contrast] .sources__back { background: #ffe08a; color: #000; border-color: #fff; }
 html[data-contrast] .teacher__bar > :not(.primary) { color: #fff; border-color: #fff; }
 .teacher__bar > .sources__back { position: static; box-shadow: none; margin: 0; }
+/* #64 safe zones: a white tick at the game's own line on each meter; an unsafe meter gets a warm frame. */
+.meter-safe { position: absolute; top: -1px; bottom: -1px; width: 3px; margin-left: -1px; background: #f2f6fa; box-shadow: 0 0 0 1px #080b12; }
+.resource-meter.unsafe { border-color: #f5c542; }
+.resource-meter.unsafe > small { color: #ffd77a; }
+.space-watch { margin: 0 0 0.6rem; }

@@ -28,7 +28,11 @@
     "radioTap": "Press to decode it",
     "decoded": "Decoded!",
     "nasa": "Real NASA data: press to see where it comes from",
-    "firstDay_moon": "First morning on the Moon. Everything works."
+    "firstDay_moon": "First morning on the Moon. Everything works.",
+    "watch": {
+      "title": "Space watch:",
+      "text": "The Sun looks busy. A space-ray storm may come soon. Shelter keeps the crew safe."
+    }
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -468,8 +472,9 @@
     "sunMayHint": "Play the big storm that really hit Mars in May 2024."
   },
   "play": {
-    "lowerBetter": "Lower is better",
-    "higherBetter": "Higher is better",
+    "safeBelow": "Safe: under {{n}}",
+    "safeAbove": "Safe: {{n}} or more",
+    "goalAbove": "Goal: {{n}} or more",
     "crewStep": "01 / Choose an astronaut",
     "pickCrewFirst": "Pick an astronaut first.",
     "jobsStep": "02 / Give them a job",

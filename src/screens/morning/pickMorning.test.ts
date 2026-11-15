@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Domino, EarthAnswer, StormEvent } from "../../sim/types";
-import { pickMorning } from "./pickMorning";
+import { pickMorning, spaceWatch } from "./pickMorning";
 
 const dom = (id: string, causeIds: string[] = []): Domino => ({
   id,
@@ -85,5 +85,19 @@ describe("pickMorning", () => {
       kind: "earth",
       answer: earth,
     });
+  });
+});
+
+// #64: a solar storm is hinted the morning before it hits (and that morning), never the exact moment.
+describe("spaceWatch", () => {
+  const cloud: StormEvent = { ...burst, kind: "stormCloud" };
+  it("is on the sol of a space-ray burst and the sol before it", () => {
+    expect(spaceWatch(1, [burst])).toBe(true);
+    expect(spaceWatch(2, [burst])).toBe(true);
+  });
+  it("is off otherwise, and for storm clouds and dust (Earth warns about those)", () => {
+    expect(spaceWatch(3, [burst])).toBe(false);
+    expect(spaceWatch(1, [cloud])).toBe(false);
+    expect(spaceWatch(1, [])).toBe(false);
   });
 });

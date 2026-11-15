@@ -20,6 +20,7 @@ import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
 import {
   pickMorning,
+  spaceWatch,
   type MorningReport,
 } from "./morning/pickMorning";
 
@@ -40,7 +41,7 @@ export function MorningScreen() {
     events: knownEvents(state, events ?? []),
     earthAnswer: state.earthAnswer,
   });
-  return <MorningReportView sol={sol} report={report} answer={state.earthAnswer} />;
+  return <MorningReportView sol={sol} report={report} answer={state.earthAnswer} watch={spaceWatch(sol, events ?? [])} />;
 }
 
 const reducedMotion = () =>
@@ -65,11 +66,14 @@ export function MorningReportView({
   sol,
   report,
   answer,
+  watch,
 }: {
   sol: number;
   report: MorningReport;
   /** Earth's answer, shown even when today's event is the report's one extra line. */
   answer?: EarthAnswer;
+  /** A space-ray burst is close (#64): show the "Space watch" hint before the plan. */
+  watch?: boolean;
 }) {
   const { t } = useTranslation();
   const next = useNav((s) => s.next);
@@ -105,6 +109,12 @@ export function MorningReportView({
         <span className="sun" aria-hidden="true" />
       </header>
 
+      {watch && (
+        <p className="m-alert m-alert-risk-high space-watch" role="note">
+          <span className="m-alert-icon" aria-hidden="true"><Icon name="sun" /></span>
+          <span><strong>{t("morning.watch.title")}</strong> {t("morning.watch.text")}</span>
+        </p>
+      )}
       <div className="morning-grid">
         {hasLeft && (
           <section className="m-card m-overnight" aria-labelledby="m-over">
