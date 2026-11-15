@@ -41,3 +41,7 @@
 @media(max-height:800px) and (min-width:901px){.mission-menu .menu-bottom{display:none}.menu-head h1{font-size:clamp(2.2rem,1rem + 3.4vw,4rem)}}
 .mission-menu .menu-bottom,.mission-menu .menu-bottom span,.mission-menu .sol-explainer{color:#f4f7fa;text-shadow:0 1px 3px #000,0 0 6px #000}
 .mission-menu .mission-card[aria-pressed="true"]:hover{transform:none;border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}
+/* Hierarchy: Start is the one big action; the secondary links sit back like the top bar. */
+.mission-menu button.launch-button { font-size: 1.3rem !important; min-height: 64px; }
+.mission-menu .menu-quiet button { background: transparent; border-color: transparent; box-shadow: none; color: #d6e2ea; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.mission-menu .menu-quiet button:hover { border-color: #52687b; color: #fff; }
