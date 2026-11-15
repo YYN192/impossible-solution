@@ -17,6 +17,8 @@ const column = (selector: string) => {
 
 /** Plays a Moon mini game through its buttons, a tick at a time, the way a kid would. */
 function playThrough(job: JobId) {
+  // The clock waits for the first press (#81, like the Mars games): tap the board once to start.
+  fireEvent.click(document.querySelector<HTMLButtonElement>(".mini-board button")!);
   for (let i = 0; i < 400 && !won(); i++) {
     switch (job) {
       case "panels": {
@@ -85,5 +87,27 @@ describe("MoonMiniGame", () => {
     await act(async () => { await i18n.changeLanguage("bg"); });
     render(<MoonMiniGame job="askEarth" seed={1} onClose={vi.fn()} />);
     expect(screen.getByRole("heading", { name: t("miniGame.moon.askEarth.title") }).textContent).toMatch(/\p{Script=Cyrillic}/u);
+  });
+});
+
+describe("MoonMiniGame timing (#81, WCAG 2.2.1)", () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it("waits for the first press, and Pause stops the clock", () => {
+    render(<MoonMiniGame job="science" seed={1} onClose={vi.fn()} />);
+    const board = () => document.querySelector(".mini-board")!.innerHTML;
+    const still = board();
+    wait(30);
+    expect(board()).toBe(still); // the lamp does not sweep before the kid starts
+    expect(screen.getByText(t("miniGame.start"))).toBeTruthy();
+    fireEvent.click(document.querySelector<HTMLButtonElement>(".mini-board button")!);
+    const started = board();
+    wait(30);
+    expect(board()).not.toBe(started);
+    fireEvent.click(btn(t("miniGame.pause")));
+    const paused = board();
+    wait(30);
+    expect(board()).toBe(paused);
   });
 });
