@@ -140,10 +140,11 @@ check("resize", async () => {
   // Held movement must stop when the window is rotated/blurred (key-up events get lost).
   const page = await newPage(1366, 768);
   // The world is a canvas, so spy on drawImage: the last "astronaut" sprite drawn is the player.
+  // Only x: the test walks left, and the idle bounce lifts a standing astronaut 1 px up and down.
   await page.addInitScript(() => {
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function (img, ...a) {
-      if (img?.src?.includes("astronaut")) window.__player = `${a[0]},${a[1]}`;
+      if (img?.src?.includes("astronaut")) window.__player = String(a[0]);
       return draw.call(this, img, ...a);
     };
   });

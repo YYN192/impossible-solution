@@ -7,6 +7,7 @@ import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
 import { useSession } from "./game/session";
 import { usePressedKeys } from "./game/pressedKeys";
+import { createWalkFx, idleBob, stepWalkFx } from "./game/walkFx";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
 import { useNav } from "./state/screen";
@@ -73,13 +74,14 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     const ctx = c?.getContext("2d");
     if (!ctx) return;
     let player = { ...useSession.getState().position };
-    let last = performance.now(), raf = 0, lastNear = "", lastStep = 0;
+    let last = performance.now(), raf = 0, lastNear = "", lastStep = 0, fx = createWalkFx(last);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const frame = (now: number) => {
       const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm;
       const dx = Number(keys.has("d") || keys.has("arrowright")) - Number(keys.has("a") || keys.has("arrowleft"));
       const dy = Number(keys.has("s") || keys.has("arrowdown")) - Number(keys.has("w") || keys.has("arrowup"));
       let moving = false;
+      const before = player;
       if (dx || dy) goal.current = pending.current = undefined;
       if (free && (dx || dy)) { player = movePlayer(MARS_BASE, player, dx, dy, seconds); moving = true; }
       else if (free && goal.current) {
@@ -91,7 +93,9 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       last = now;
       const target = nearestInteraction(MARS_BASE, player);
       if ((target?.id ?? "") !== lastNear) { setNear(target); lastNear = target?.id ?? ""; }
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches, view.current);
+      // Dust follows real movement (pushing into a wall raises none); any steering holds off the idle bounce.
+      fx = stepWalkFx(fx, { now, moved: player.x !== before.x || player.y !== before.y, walking: moving, x: player.x, y: player.y, facing: player.facing, reduced: motion.matches });
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches, view.current, { puffs: fx.puffs, bob: idleBob(fx, now, motion.matches) });
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

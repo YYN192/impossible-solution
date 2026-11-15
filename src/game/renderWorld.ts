@@ -1,10 +1,13 @@
 import { getSprite, playerSprite, type Facing } from "./assets";
 import type { Point, Room } from "./world";
+import { puffLook, type Puff } from "./walkFx";
 const floor = "environment/floors/mars-floor-";
 /** The dust storm as the canvas shows it: fog strength 0–1, a broken greenhouse, "!" over jobs to do. */
 export interface StormView { level: number; broken: boolean; marks: string[] }
+/** The astronaut's walk effects (see walkFx.ts): dust puffs on the floor and the idle-bounce lift in px (0 or negative). */
+export interface PlayerFx { puffs: readonly Puff[]; bob: number }
 
-export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }) {
+export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }, fx: PlayerFx = { puffs: [], bob: 0 }) {
   ctx.imageSmoothingEnabled = false;
   const sprite = (path: string, x: number, y: number, w: number, h: number) => {
     const img = getSprite(path);
@@ -49,8 +52,16 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     if (near === e.id) { ctx.strokeStyle = "#a0efea"; ctx.strokeRect(e.x - 2.5, e.y - 2.5, e.w + 5, e.h + 5); }
   }}));
   entities.push({ y: player.y, draw: () => {
-    ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 3), 20, 5);
-    sprite(playerSprite(player.facing, moving && !reduced ? Math.floor(time / 140) % 4 : undefined), player.x - 16, player.y - 27, 32, 32);
+    // The shadow stays on the floor and narrows a little while the idle bounce lifts the astronaut.
+    ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10 - fx.bob), Math.round(player.y - 3), 20 + 2 * fx.bob, 5);
+    sprite(playerSprite(player.facing, moving && !reduced ? Math.floor(time / 140) % 4 : undefined), player.x - 16, player.y - 27 + fx.bob, 32, 32);
+  }});
+  // Puffs sort with everything else, so one behind the feet hides under the astronaut when walking down.
+  for (const p of fx.puffs) entities.push({ y: p.y, draw: () => {
+    const look = puffLook(p, time);
+    ctx.globalAlpha = look.alpha; ctx.fillStyle = look.color;
+    ctx.fillRect(Math.round(p.x - look.size / 2), Math.round(p.y - look.rise - look.size / 2), look.size, look.size);
+    ctx.globalAlpha = 1;
   }});
   entities.sort((a, b) => a.y - b.y).forEach((e) => e.draw());
   if (storm.level > 0) {
