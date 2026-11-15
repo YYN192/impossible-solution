@@ -54,7 +54,7 @@ describe("complete expedition", () => {
       expect(useGame.getState().state).toEqual(expected);
       click(sol < 3 ? t("endSol.nextMorning") : t("endSol.seeResults"));
     }
-    screen.getByRole("heading", { name: t("final.heading") });
+    screen.getByRole("heading", { name: /^Mission complete! \d of 3 stars$/ });
     expect(document.querySelectorAll(".chain").length).toBeGreaterThan(0);
     expect(document.querySelectorAll(".chain .chip a").length).toBeGreaterThan(0);
     click(t("final.tryAgain"));

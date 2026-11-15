@@ -136,14 +136,12 @@
     }
   },
   "final": {
-    "heading": "Mission over",
+    "heading": "Mission complete! {{count}} of 3 stars",
     "endedEarly": "Mission ended early. Here is what caused it.",
     "chainIntro": "Here is how one thing led to another:",
     "chainLabel": "Domino chain {{n}}",
     "noChain": "No dominoes fell. Every problem was stopped in time!",
     "sol": "Sol {{sol}}",
-    "stars_one": "{{count}} star out of 3",
-    "stars_other": "{{count}} stars out of 3",
     "goal": {
       "crewSafe": "Crew safe from space rays",
       "baseRunning": "Base kept running",
@@ -158,7 +156,12 @@
     "sol_moon": "Day {{sol}}",
     "so": "so",
     "times": "This happened {{count}} times.",
-    "more": "Show {{count}} more"
+    "more": "Show {{count}} more",
+    "next": {
+      "crewSafe": "Next time: build up the shelter before space rays come.",
+      "baseRunning": "Next time: clean the panels early. Clean panels make power.",
+      "science": "Next time: send someone on a science trip."
+    }
   },
   "data": {
     "badge": {
@@ -567,7 +570,7 @@
     },
     "radar": {
       "hello": "This radar shows what the Sun did this week.",
-      "advice": "Tap a mark. See when it happened and how big it was."
+      "advice": "Choose a day with marks. See when it happened and how big it was."
     }
   },
   "lang": {
@@ -728,7 +731,7 @@
     },
     "siteMoon": {
       "title": "Where do we build?",
-      "text": "Three real places near the Moon's south pole. Each one lacks something.",
+      "text": "Three real places near the Moon's south pole. Each has sun, ice or Earth, never all three.",
       "malapert": {
         "label": "Malapert Massif",
         "real": "A very tall mountain. It gets much light and can sometimes see Earth."
@@ -861,7 +864,7 @@
     "pipSmall": "Pip: “A small storm. The meter moved only a little.”",
     "pipCloud": "Pip: “The storm cloud Earth warned about is passing.”",
     "real": "It's real!",
-    "id": "NASA event number: {{id}}",
+    "id": "NASA's name for this storm: {{id}}",
     "flare": "The Sun flashed a {{flare}} flare. X is the biggest kind.",
     "fact": {
       "may2024": "20 May 2024. A NASA rover measured this storm on Mars. At its worst hour, the rays were more than 50 times stronger than usual.",
@@ -898,7 +901,7 @@
     "rocksRule": "Pick up the closest sample for the near rocks. A sample in a yellow frame is at the far crater: more science, more power."
   },
   "wipeUi": {
-    "rule": "Tap a panel to wipe it. Wipe {{half}} for half. Wipe all {{all}} for every panel.",
+    "rule": "Choose a panel to wipe it. Wipe {{half}} for half. Wipe all {{all}} for every panel.",
     "dose": "Extra space rays from this trip: +{{n}}",
     "now": "Right now: {{choice}}."
   },
@@ -910,8 +913,8 @@
     "greenhouse": "Fix the greenhouse.",
     "realTitle": "This really happens on Mars",
     "real": {
-      "opportunity2018": "In June 2018 a dust storm covered all of Mars. The rover Opportunity got almost no sunlight on its solar panels. Its last message came on 10 June 2018.",
-      "insight2022": "In October 2022 a dust storm hit NASA's InSight lander. Its solar panels made about 275 watt-hours a sol instead of 425 (a watt-hour is a small amount of electricity). That is about one third less power."
+      "opportunity2018": "In 2018, dust covered all of Mars. Opportunity sent its last message.",
+      "insight2022": "In 2022, dust hit NASA's InSight lander. It made one third less power."
     },
     "source": "Source",
     "go": "Let's fix it!",
@@ -949,7 +952,7 @@
     "state": {
       "here": "You are here",
       "done": "Done",
-      "open": "Open: tap to travel there"
+      "open": "Open: choose it to travel there"
     },
     "locked": "Locked. Finish “{{name}}” first.",
     "travelAsk": "Travel to {{name}}? The mission you are playing ends here.",
@@ -962,7 +965,7 @@
     "close": "Close the radar",
     "loading": "Asking NASA…",
     "failed": "No space weather data right now. Try again later.",
-    "pick": "Tap or point at a day with marks to see what happened.",
+    "pick": "Point at or choose a day with marks to see what happened.",
     "noAnswer": "No answer from NASA",
     "count_one": "{{count}} event",
     "count_other": "{{count}} events",
@@ -1070,7 +1073,7 @@
       },
       "greenhouse": {
         "title": "Melt ice for the plants",
-        "lead": "Tap the ice to melt it. The cold freezes it back!",
+        "lead": "Press the ice to melt it. The cold freezes it back!",
         "fact": "Dark craters near the pole hide ice. Ice can become water.",
         "block": "Ice {{n}}: {{state}}",
         "frozen": "frozen",
@@ -1198,7 +1201,7 @@
       "who_moon": "Moon rocks are very, very old. Crashing space rocks dug the craters and threw rocks all around. I read them like a book.",
       "drillIntro": "Let's practise! Thirsty plants stop growing. Water each plant before it dries out.",
       "win": "What a harvest! On the mission, the greenhouse needs power for its lights. Then it grows food.",
-      "drillIntro_moon": "Let's practise! Tap the ice to melt it. The cold freezes it back!",
+      "drillIntro_moon": "Let's practise! Press the ice to melt it. The cold freezes it back!",
       "mission": {
         "storm": "Science trips outside earn science. But outside, you get more space rays. The greenhouse grows food, if its lights get power.",
         "dust": "Cold nights need the heater, and the heater needs power. In our game, if the heater stops, our plants freeze! On the last sol, the rover can drive out for rock samples. The far crater gives more science, but costs more power.",
@@ -1250,7 +1253,7 @@
       "inside": "Go back inside"
     },
     "build": {
-      "hint": "Drag one part onto the base. Or tap a part, then tap its spot.",
+      "hint": "Drag one part onto the base. Or pick a part, then its spot.",
       "base": "Your base",
       "pick": "Pick up a part.",
       "holding": "You are holding: {{part}}. Now choose its spot.",
@@ -1314,11 +1317,11 @@
     "replay": "How to play",
     "step": {
       "start": "Press Start mission to fly to your Mars base.",
-      "walk": "Walk to the glowing console, or just tap it.",
+      "walk": "Walk to the glowing console.",
       "goal": "Your goal: earn these 3 stars by the end of the mission.",
       "drive": "Drive the rover to a rock, then bring it home.",
       "choose": "Choose what to do today.",
-      "crew": "Tap an astronaut first.",
+      "crew": "Choose an astronaut first.",
       "job": "Now give them a job.",
       "endSol": "Every astronaut has a job. Now press End sol.",
       "report": "See what your plan did, then go on."

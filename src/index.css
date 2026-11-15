@@ -134,6 +134,19 @@ a {
   border-radius: 0.75rem;
 }
 /* Final screen: stars + domino chain */
+/* #67: one "Next time: …" tip under the stars; neutral colours (yellow = warnings, cyan = you can press this). */
+.next-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0.6rem 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 4px solid #b8c4d0;
+  background: #132536;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.next-time .px-icon { width: 24px; height: 24px; flex-shrink: 0; }
 .stars-count {
   font-size: 1.4rem;
   margin: 0;

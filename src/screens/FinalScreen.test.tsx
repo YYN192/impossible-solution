@@ -18,6 +18,38 @@ const chainTexts = () =>
     (d) => d.textContent,
   );
 
+describe("Final screen wording (#67)", () => {
+  beforeEach(() => { localStorage.clear(); useBest.setState({ best: 0 }); });
+  afterEach(cleanup);
+  const tt = t as unknown as (k: string, o?: object) => string;
+
+  it('says "Mission complete! N of 3 stars" and gives one tip for the first goal it missed', () => {
+    render(<FinalView dominoes={[]} stars={stars(1)} />);
+    screen.getByRole("heading", { name: tt("final.heading", { count: 1 }) });
+    const tips = document.querySelectorAll(".next-time");
+    expect(tips).toHaveLength(1);
+    expect(tips[0].textContent!.trim()).toBe(tt("final.next.baseRunning"));
+  });
+
+  it("no tip when every star was earned", () => {
+    render(<FinalView dominoes={[]} stars={stars(3)} />);
+    screen.getByRole("heading", { name: tt("final.heading", { count: 3 }) });
+    expect(document.querySelectorAll(".next-time")).toHaveLength(0);
+  });
+
+  it("does not repeat the star count under the heading (the star icons stay)", () => {
+    render(<FinalView dominoes={[]} stars={stars(2)} />);
+    expect(document.querySelector(".stars-count")!.textContent!.trim()).toBe("");
+    expect(document.querySelectorAll(".stars-count .px-icon").length).toBe(3);
+  });
+
+  it("a mission that ended early still says what to try next time", () => {
+    render(<FinalView dominoes={[]} stars={stars(0)} endedEarly />);
+    screen.getByRole("heading", { name: tt("final.endedEarly") });
+    expect(document.querySelector(".next-time")!.textContent!.trim()).toBe(tt("final.next.crewSafe"));
+  });
+});
+
 describe("Final screen", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -55,7 +87,7 @@ describe("Final screen", () => {
 
   it("shows the stars and which goals were reached", () => {
     render(<FinalView dominoes={FAKE_DOMINOES} stars={stars(2)} />);
-    screen.getByText("2 stars out of 3");
+    screen.getByRole("heading", { name: "Mission complete! 2 of 3 stars" }); // #67: the count is in the heading
     expect(document.querySelectorAll(".star-goals .won")).toHaveLength(2);
     expect(
       document.querySelector(".star-goals .missed")?.textContent,
@@ -67,7 +99,7 @@ describe("Final screen", () => {
     screen.getByText("Best: 2 stars");
     cleanup();
     render(<FinalView dominoes={[]} stars={stars(1)} />);
-    screen.getByText("1 star out of 3");
+    screen.getByRole("heading", { name: "Mission complete! 1 of 3 stars" });
     screen.getByText("Best: 2 stars");
     expect(localStorage.getItem(BEST_KEY)).toBe("2");
   });

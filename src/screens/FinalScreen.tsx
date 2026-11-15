@@ -77,6 +77,7 @@ export function FinalView({
 
   const longest = Math.max(0, ...rows.map((r) => r.links.length));
   const won = !endedEarly && stars.count >= 2;
+  const nextTip = (["crewSafe", "baseRunning", "science"] as const).find((g) => !stars[g]);
   useEffect(() => {
     // Chains fall side by side, so one tick per step; none when the animation is off.
     const falls = reducedMotion() ? 0 : longest;
@@ -87,12 +88,14 @@ export function FinalView({
 
   return (
     <ScreenFrame
-      title={endedEarly ? t("final.endedEarly") : t("final.heading")}
+      title={endedEarly ? t("final.endedEarly") : t("final.heading", { count: stars.count })}
     >
       <StarRow
         stars={stars}
         best={demo ? undefined : Math.max(best, stars.count)}
       />
+      {/* #67: one concrete tip for the first goal that was missed, instead of only "(missed)". */}
+      {nextTip && <p className="next-time"><Icon name="why" /> {t(`final.next.${nextTip}`)}</p>}
 
       {rows.length > 0 ? (
         <>
@@ -144,11 +147,11 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
   ] as const;
   return (
     <div className="stars">
+      {/* The heading already says "N of 3 stars" (#67): the icons show it, no repeated text. */}
       <p className="stars-count">
         <span className="star-icons" aria-hidden="true">
           {[0, 1, 2].map((i) => <Icon key={i} name={i < stars.count ? "star" : "star-empty"} />)}
-        </span>{" "}
-        {t("final.stars", { count: stars.count })}
+        </span>
       </p>
       <ul className="star-goals">
         {goals.map(({ key, won }) => (
