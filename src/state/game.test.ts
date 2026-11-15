@@ -1,4 +1,4 @@
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createGame, stars } from "../sim/engine";
@@ -36,6 +36,7 @@ describe("game store (real engine)", () => {
     useGame.getState().endSol({ a1: "greenhouse" }); // nobody cleans the panels
     useNav.setState({ screen: "morning", sol: 2 });
     render(createElement(MorningScreen));
+    fireEvent.click(screen.getByRole("button", { name: /Why\?/ }));
     expect(dominoTexts(".domino")).toEqual([
       "⚡↓Power is low today.",
       "🧽✗Nobody cleaned the solar panels.",

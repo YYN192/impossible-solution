@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import i18n from "../i18n";
 import { useNav } from "../state/screen";
@@ -30,6 +30,8 @@ describe("Morning report", () => {
 
   it("sol 2: fallen domino first, then its cause; the burst is NOT announced (no warning possible)", () => {
     showMorning(2);
+    expect(document.querySelectorAll(".domino")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: /Why\?/ }));
     const dominoes = [...document.querySelectorAll(".domino")].map(
       (d) => d.textContent,
     );
@@ -48,7 +50,9 @@ describe("Morning report", () => {
     expect(document.querySelector(".domino-fall")?.textContent).toContain(
       "One astronaut is too tired to work.",
     );
+    fireEvent.click(screen.getByRole("button", { name: /Why\?/ }));
     screen.getByText("The food ran out.");
+    fireEvent.click(screen.getByRole("button", { name: /Message from Earth/ }));
     screen.getByText(
       "📡 Earth says: dusty skies tomorrow, and a storm cloud arrives in 1 sol.",
     );

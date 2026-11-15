@@ -18,7 +18,15 @@
     "firstDay": "First morning on Mars. Everything works.",
     "nothingFell": "Nothing broke overnight. Good plan!",
     "because": "because",
-    "heading_moon": "Good morning! Day {{sol}}"
+    "heading_moon": "Good morning! Day {{sol}}",
+    "overnight": "What happened overnight",
+    "why": "Why?",
+    "hideWhy": "Hide",
+    "fromEarth": "News from outside",
+    "radio": "Message from Earth",
+    "radioTap": "Tap to decode it",
+    "decoded": "Decoded!",
+    "nasa": "Real NASA data: tap to see where it comes from"
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
