@@ -83,13 +83,21 @@ describe("JobMiniGame", () => {
     expect(btn(t("miniGame.panels.panel", { n: 1, state: t("miniGame.panels.dusty") }))).toBeTruthy();
   });
 
-  it("dropping the block at the wrong moment is a gentle miss", () => {
+  it("dropping the block at the wrong moment is a gentle miss (the very first press drops it)", () => {
     render(<JobMiniGame job="shelter" seed={SEED} onClose={() => {}} />);
     expect(screen.queryByText(t("miniGame.shelter.now"))).toBeNull();
-    fireEvent.click(btn(t("miniGame.shelter.drop"))); // the first press only starts the block
-    expect(screen.queryByText(t("miniGame.shelter.oops"))).toBeNull();
     fireEvent.click(btn(t("miniGame.shelter.drop")));
     expect(screen.getByText(t("miniGame.shelter.oops"))).toBeTruthy();
+  });
+
+  it("Shelter: the block slides as soon as the game opens; no press needed to start it", () => {
+    render(<JobMiniGame job="shelter" seed={SEED} onClose={() => {}} />);
+    expect(screen.queryByText(t("miniGame.start"))).toBeNull();
+    btn(t("miniGame.pause")); // the clock is already running, so it can be paused
+    const where = () => document.querySelector(".mini-board")!.innerHTML;
+    const before = where();
+    wait(2);
+    expect(where()).not.toBe(before); // the block moved by itself
   });
 
   it("the dish only sends while it points at Earth", () => {

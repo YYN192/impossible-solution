@@ -119,6 +119,16 @@ describe("shelter: drop the sliding block on the stack", () => {
     expect(game.placed).toBe(STACK_GOAL);
     expect(won(game)).toBe(true);
   });
+
+  it('a miss shows "oops" only until the block moves on, so the "Now!" cue can come back', () => {
+    let game: Of<"shelter"> = of("shelter");
+    while (game.pos === STACK_CENTER) game = tick(game) as Of<"shelter">;
+    game = drop(game) as Of<"shelter">;
+    expect(game.miss).toBe(true);
+    const at = game.pos;
+    while (game.pos === at) game = tick(game) as Of<"shelter">;
+    expect(game.miss).toBe(false);
+  });
 });
 
 describe("Ask Earth: follow Earth across the sky", () => {
