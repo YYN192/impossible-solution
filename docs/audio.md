@@ -69,3 +69,16 @@ Sounds called by their manifest id:
 | Try a different plan | `replay-start` | `FinalScreen.tsx` |
 
 Every other sound's intended trigger is in its manifest entry (`trigger`) and on the preview page.
+
+## Soundtrack slots (add your own music here)
+
+The game asks for music by slot. Each slot tries the ids below in order and plays the first one that is in `public/audio/audio-manifest.json`, so a new track needs no code change: put the file in `public/audio/music/`, add a manifest entry with that id (`"loop": true`, a `web` `.m4a` copy for size), and it plays.
+
+| Slot | Where it plays | Ids tried, in order |
+| --- | --- | --- |
+| Lobby | main menu | `music-lobby`, then `space-menu-ambience` |
+| Station | the walkable base | `music-hub`, then `mars-base-ambience` |
+| Console | mission screens | `music-mission-storm` / `music-mission-dust` / `music-mission-moon` (the mission being played), then `music-console`, then `mission-console-ambience` |
+
+Music volume is 0 until the player raises it in Settings, and nothing plays before the first tap. Credit every new track in `CREDITS.md` (author, licence) and log any AI tool in `docs/ai-usage-log.md`.
+

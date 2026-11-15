@@ -54,6 +54,21 @@ for (const s of manifest.sounds as {
   sounds.set(s.id, sound);
   for (const alias of s.aliases ?? []) sounds.set(alias, sound);
 }
+/**
+ * Music slots. The team's soundtrack drops in by manifest id (see docs/audio.md): lobby music,
+ * station music, console music, and one track per mission. Until a track is in the manifest,
+ * the slot plays the ambience loop that is already there.
+ */
+const MUSIC_SLOTS = {
+  lobby: () => ["music-lobby", "space-menu-ambience"],
+  hub: () => ["music-hub", "mars-base-ambience"],
+  console: (mission?: string) => [`music-mission-${mission}`, "music-console", "mission-console-ambience"],
+};
+export const musicFor = (slot: keyof typeof MUSIC_SLOTS, mission?: string): string => {
+  const ids = MUSIC_SLOTS[slot](mission);
+  return ids.find((id) => sounds.has(id)) ?? ids[ids.length - 1];
+};
+
 /** Small, frequent sounds fetched on the first tap; everything else loads the first time it plays. */
 const PRELOAD = [
   "menu-hover",

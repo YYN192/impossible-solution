@@ -21,7 +21,7 @@ export function EarthAnswer({ answer }: { answer: Answer }) {
       <p>{t("earth.answer", { dust: t(`earth.dust.${answer.dustTomorrow}`), storm })}</p>
       {answer.burstRisk && <p className={`risk risk-${answer.burstRisk}`}>{t(`earth.risk.${answer.burstRisk}`)}</p>}
       {answer.dustStormSols !== undefined && <p>{t("earth.dustStorm", { count: answer.dustStormSols })}</p>}
-      <DataChip source={answer.source} />
+      {answer.stormCloudInSols !== undefined && <DataChip source={answer.source} />}
       {setup && (
         <>
           <p className="note">

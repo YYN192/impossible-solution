@@ -22,7 +22,8 @@ const BG = strings(bg as Tree);
 const placeholders = (s: string) => [...s.matchAll(/\{\{\s*(\w+)\s*\}\}/g)].map((m) => m[1]).sort();
 
 /** Strings that stay the same in every language: the game's brand name and language names. */
-const SAME_IN_EVERY_LANGUAGE = new Set(["app.name", "lang.en", "lang.bg"]);
+// crew.name and play.crewNumber only point at the translated crew names (crew.who.*).
+const SAME_IN_EVERY_LANGUAGE = new Set(["app.name", "lang.en", "lang.bg", "crew.name", "play.crewNumber"]);
 
 const KID_SECTIONS = [
   "title", "common", "morning", "domino", "event", "earth", "plan", "endSol", "final",

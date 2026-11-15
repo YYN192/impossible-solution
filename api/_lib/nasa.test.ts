@@ -81,6 +81,15 @@ describe("/api/donki/:type", () => {
     );
   });
 
+  it("Vercel adds the route parameter to the query (?type=notifications&type=all): the notification type is still read", async () => {
+    const f = noCcmc(async () => ok(""));
+    const r = await handleDonki(req("/api/donki/notifications?type=notifications&startDate=2026-11-08&endDate=2026-11-15&type=all"), { fetchImpl: f, now });
+    expect(r.status).toBe(200);
+    expect(new URL(String(f.mock.calls[1]?.[0])).searchParams.getAll("type")).toEqual(["all"]);
+    const bad = await handleDonki(req("/api/donki/notifications?type=notifications&type=EVIL"), { fetchImpl: f, now });
+    expect(bad.status).toBe(400);
+  });
+
   it("uses DEMO_KEY when no key is set and defaults to the last 30 days", async () => {
     const f = noCcmc(async () => ok(""));
     const r = await handleDonki(req("/api/donki/notifications?type=all"), {

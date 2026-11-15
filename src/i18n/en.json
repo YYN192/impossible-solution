@@ -234,10 +234,15 @@
     "outside": "Outside: more space rays"
   },
   "crew": {
-    "name": "Astronaut {{n}}",
+    "name": "$t(crew.who.{{n}})",
     "tired": "Too tired to work today",
     "idle": "No job yet",
-    "idleWarning": "An astronaut with no job is a wasted worker."
+    "idleWarning": "An astronaut with no job is a wasted worker.",
+    "who": {
+      "1": "Nova",
+      "2": "Kai",
+      "3": "Amara"
+    }
   },
   "planHelp": {
     "howTo": "Tap an astronaut. Then tap a job.",
@@ -405,9 +410,9 @@
     "crewStep": "01 / Choose an astronaut",
     "pickCrewFirst": "Pick an astronaut first.",
     "jobsStep": "02 / Give them a job",
-    "clearCrew": "Clear astronaut {{n}}'s job",
-    "crewNumber": "Crew {{n}}",
-    "chooseJob": "Choose a job for astronaut {{n}}.",
+    "clearCrew": "Clear the job of $t(crew.who.{{n}})",
+    "crewNumber": "$t(crew.who.{{n}})",
+    "chooseJob": "Choose a job for $t(crew.who.{{n}}).",
     "chooseCrew": "Choose an astronaut to change their job.",
     "preview": "After this sol",
     "previewMeaning": "Your plan, after jobs, night needs and solar charging.",

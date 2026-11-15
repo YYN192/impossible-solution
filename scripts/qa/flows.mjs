@@ -41,7 +41,7 @@ export const toPlan = (page, mode = "mouse") => btn(page, EN.morning.goPlan, mod
 /** Give every awake astronaut the first free, affordable job. */
 export async function assignAll(page, mode = "mouse") {
   for (let n = 1; n <= 3; n++) {
-    const crew = button(page, fmt(EN.crew.name, { n }));
+    const crew = button(page, EN.crew.who[n]);
     if (!(await crew.isEnabled())) continue;
     await press(page, crew, mode);
     for (const id of Object.keys(EN.jobs)) {

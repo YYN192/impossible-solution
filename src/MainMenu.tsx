@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
-import { audio, useAudio } from "./game/audio";
+import { audio, musicFor, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
 import { CAMPAIGNS } from "./data/campaigns";
 import { readFlags } from "./data/flags";
@@ -34,6 +34,8 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
   const prefs = useAudio();
   const progress = useProgress();
   const special = flags.todaysSun || flags.daily;
+  // Lobby music (off until the player turns music up; never starts before a tap).
+  useEffect(() => { const track = musicFor("lobby"); audio.playMusic(track); return audio.stopMusic; }, []);
   const pick = (choice: RunChoice) => { audio.playSfx("select"); onChoose(choice); };
   return <main className="mission-menu">
     <div className="drifting-stars" aria-hidden="true">{stars.map((style, i) => <i key={i} style={style} />)}</div>

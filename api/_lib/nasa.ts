@@ -176,7 +176,8 @@ export async function handleDonki(
   if (days > 60) return bad(req, "The window can be at most 60 days");
   let query = `${type}?startDate=${start}&endDate=${end}`;
   if (type === "notifications") {
-    const t = url.searchParams.get("type") ?? "all";
+    // Vercel adds the route parameter itself as ?type=notifications: skip it.
+    const t = url.searchParams.getAll("type").find((v) => v !== "notifications") ?? "all";
     if (!NOTIFICATION_TYPES.has(t))
       return bad(req, "Unknown notification type");
     query += `&type=${t}`;

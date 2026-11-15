@@ -1,6 +1,6 @@
 # Project page draft (NASA Space Apps Challenge 2026)
 
-> Draft — the lead agent updates the game description at the end of the overnight run.
+> Draft, updated Sun 15 Nov 06:40 with the three campaigns. `TODO(team)` items are yours.
 
 Fields follow the Space Apps project page. `TODO(team)` marks what only the humans can fill in.
 
@@ -19,6 +19,14 @@ Can you keep 3 astronauts safe through a real Mars solar storm?
 ## High-level summary
 
 The Impossible SOLution is a free browser game for kids aged 7–12 and their classrooms, in English and Bulgarian. Kids run a Mars base for 3 sols (a sol is one day on Mars). There are 3 astronauts and 5 jobs, so 2 jobs always stay undone and every choice costs something. Real NASA data decides the storm that hits the base. At the end, a domino chain shows which of the player's choices caused each problem. No login, works on phones, and works offline.
+
+### Three campaigns, one engine (added 15 Nov)
+
+- **The Storm Season (Mars, 3 sols).** Each run replays one of three real solar storms that NASA's Curiosity rover measured on Mars: 20 May 2024 (worst hour about 74 times the usual level), 11 Sep 2017 and 29 Oct 2021 (about 3 times each). The burst lands on a different sol each run, so the winning plan changes. Earth can give the chance of a burst, never the hour.
+- **Dust Season (Mars, 6 sols).** Pick a real landing site (Gale Crater, Elysium Planitia, Meridiani Planum), wipe dust off the panels, build one upgrade, radio Earth with today's real light delay from NASA's Deep Space Network, live through a real dust storm, and drive the rover.
+- **South Pole Outpost (the Moon, 5 days).** Pick one of NASA's candidate landing regions (sunlight, ice or a view of Earth: never all three), call Earth with a 1.3-second delay, read a real eruption and decide whether to shelter, and drive into a dark crater for ice.
+
+Every day in the long campaigns has a different interaction, and every choice goes through the same simulation engine, so it shows up in the domino chain at the end. Every run has a number; `?seed=<number>` replays it, and the Daily mission gives a whole class the same run.
 
 ## Project demo link
 

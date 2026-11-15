@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
-import { audio } from "./game/audio";
+import { audio, musicFor } from "./game/audio";
+import { useMission } from "./state/mission";
+import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
 import { useSession } from "./game/session";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
@@ -10,8 +12,10 @@ import { useGame } from "./state/game";
 // Area names as HTML over the canvas (world coords), so they stay sharp and readable at any size.
 const LABELS = [["world.supplies", 128, 96], ["world.console", 320, 220], ["world.research", 496, 152], ["world.airlock", 320, 382]] as const;
 
+/** The station header names the place of the campaign being played (the classic keeps Gale Crater). */
 export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; onMenu: () => void }) {
   const { t } = useTranslation();
+  const campaign = useMission((m) => m.setup?.campaignId);
   const canvas = useRef<HTMLCanvasElement>(null);
   const held = useRef(new Set<string>());
   const goal = useRef<Point>(undefined); // tap-to-walk target
@@ -34,7 +38,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   }, [near, activating, dialogue, onConsole]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { audio.playMusic("mars-base-ambience"); return audio.stopMusic; }, []);
+  useEffect(() => { const track = musicFor("hub"); audio.playMusic(track); return audio.stopMusic; }, []);
   useEffect(() => { canvas.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => {
     const c = canvas.current;
@@ -99,7 +103,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
   const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue}-portrait`;
   return <main className="station">
-    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{t("common.solOf", { sol, total: 3 })}</span></header>
+    <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{campaign && campaign !== "storm" ? `${tRun(`campaign.${campaign}.where`)} / ${tRun(`campaign.${campaign}.name`)}` : t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{tRun("common.solOf", { sol, total: useMission.getState().setup?.rules.sols ?? 3 }, useMission.getState().setup?.place)}</span></header>
     <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />
