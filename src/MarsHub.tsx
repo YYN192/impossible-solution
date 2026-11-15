@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { audio, musicFor } from "./game/audio";
 import { useMission } from "./state/mission";
+import { reducedMotion, useComfort } from "./state/comfort";
 import { tRun } from "./i18n/dynamic";
 import { renderWorld } from "./game/renderWorld";
 import { gameKey } from "./game/pressedKeys";
@@ -62,12 +63,12 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     audio.playSfx(near.interaction === "console" ? "console" : near.interaction === "door" ? "door" : "npc");
     if (near.interaction === "console") {
       setActivating(true);
-      timer.current = setTimeout(onConsole, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
+      timer.current = setTimeout(onConsole, reducedMotion() ? 0 : 350);
     } else setDialogue(near);
   }, [near, activating, dialogue, onConsole, task, alarm, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { const track = musicFor("hub"); audio.playMusic(track); return audio.stopMusic; }, []);
+  useEffect(() => { const track = musicFor("hub", useMission.getState().setup?.place); audio.playMusic(track); return audio.stopMusic; }, []);
   useEffect(() => { canvas.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => {
     const c = canvas.current;
@@ -75,7 +76,6 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     if (!ctx) return;
     let player = { ...useSession.getState().position };
     let last = performance.now(), raf = 0, lastNear = "", lastStep = 0;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const frame = (now: number) => {
       const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm;
       const dx = Number(keys.has("d") || keys.has("arrowright")) - Number(keys.has("a") || keys.has("arrowleft"));
@@ -92,7 +92,9 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       last = now;
       const target = nearestInteraction(MARS_BASE, player);
       if ((target?.id ?? "") !== lastNear) { setNear(target); lastNear = target?.id ?? ""; }
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches, view.current);
+      // High contrast drops the dust fog (the "!" marks stay); calm mode stills the canvas like reduced motion.
+      const comfort = useComfort.getState();
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, reducedMotion(), comfort.contrast ? { ...view.current, level: 0 } : view.current, useMission.getState().setup?.place === "moon");
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

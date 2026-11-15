@@ -1,3 +1,4 @@
+import { reducedMotion } from "../state/comfort";
 import { Icon } from "../components/Icon";
 import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
@@ -77,7 +78,7 @@ export function FinalView({
   const won = !endedEarly && stars.count >= 2;
   useEffect(() => {
     // Chains fall side by side, so one tick per step; none when the animation is off.
-    const falls = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? 0 : longest;
+    const falls = reducedMotion() ? 0 : longest;
     const timers = Array.from({ length: falls }, (_, i) => setTimeout(() => audio.playSfx("domino-fall"), i * FALL_STEP_MS + 300));
     timers.push(setTimeout(() => audio.playSfx(won ? "mission-success" : "mission-failure"), falls * FALL_STEP_MS + 600));
     return () => timers.forEach(clearTimeout);

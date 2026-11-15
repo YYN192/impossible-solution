@@ -950,7 +950,11 @@
       "science": "Arrow keys move. Space or Enter grabs.",
       "shelter": "Space drops the block.",
       "askEarth": "← → aim the dish. Space sends."
-    }
+    },
+    "start": "The clock starts when you press a button.",
+    "pause": "Pause",
+    "resume": "Go on",
+    "paused": "Paused. Press Go on when you are ready."
   },
   "talk": {
     "next": "Next",
@@ -1033,5 +1037,19 @@
       "left_other": "{{count}} blocks left",
       "done": "Go inside"
     }
+  },
+  "comfort": {
+    "title": "Comfort",
+    "quiet": "Quiet class: all sound off",
+    "calm": "Calm mode: nothing shakes, flashes or blows",
+    "contrast": "High contrast",
+    "textSize": "Text size",
+    "skipMiniGames": "Skip the job mini-games",
+    "slowMiniGames": "Slow mini-games",
+    "saved": "These settings stay on this device.",
+    "soundAsk": "Sound?",
+    "soundOn": "On",
+    "soundOff": "Off",
+    "headphones": "Headphones help."
   }
 }
