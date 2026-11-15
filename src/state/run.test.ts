@@ -7,7 +7,7 @@ import { useMission } from "./mission";
 import { RUN_KEY, restoreRun, saveRun } from "./persist";
 import { DONE_KEY, isOpen, useProgress } from "./progress";
 import { nextNav, START, useNav, type Nav } from "./screen";
-import { CAMPAIGNS, campaignById } from "../data/campaigns";
+import { MENU_CAMPAIGNS as CAMPAIGNS, campaignById } from "../data/campaigns";
 
 function reset() {
   sessionStorage.clear();

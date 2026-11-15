@@ -147,5 +147,6 @@ export const SIMPLIFICATION_KEYS = [
   "simplifies.sites",
   "simplifies.moon",
   "simplifies.risk",
+  "simplifies.rover",
   "simplifies.real",
 ] as const;

@@ -20,6 +20,10 @@ const BY_DOMINO: Record<string, HelpTopic> = {
   "domino.noSignal": "askEarth",
   "domino.coldNight": "power",
   "domino.doseFull": "dose",
+  "domino.roverHome0": "power",
+  "domino.roverHome1": "power",
+  "domino.roverHome2": "power",
+  "domino.roverStranded": "dose",
 };
 
 export function helpTopicForDomino(textKey: string): HelpTopic | undefined {

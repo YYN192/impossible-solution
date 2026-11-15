@@ -131,14 +131,14 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
     return {
       id: "explore-stranded",
       icon: "🚙⚠️",
-      textKey: "domino.rover.stranded",
+      textKey: "domino.roverStranded",
       effect: { power, dose: 2 * DOSE.outsideExtra },
     };
   const science = Math.min(EXPLORE.maxScience, d.collected.length);
   return {
     id: `explore-home${science}`,
     icon: science ? "🚙🪨" : "🚙",
-    textKey: `domino.rover.home${science}`,
+    textKey: `domino.roverHome${science}`,
     effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
   };
 }

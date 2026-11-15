@@ -35,6 +35,8 @@ const jobArt: Record<JobId, string> = {
   science: "sample-container",
 };
 const portraits = ["mission-commander", "engineer", "scientist"];
+/** What each astronaut is best at (ENGINE.skill): Nova radio, Kai panels, Amara greenhouse. */
+const skillArt = ["skill-radio", "skill-wrench", "skill-leaf"];
 /** Every engine domino that this one knocks over, directly or further down the chain. */
 function effectsOf(fell: Domino[], id: string): Domino[] {
   return fell
@@ -128,6 +130,7 @@ export default function PlanScreen() {
                   />
                   <span>
                     <strong>{t("crew.name", { n: i + 1 })}</strong>
+                    <span className="crew-skill"><img src={asset(`campaign/${skillArt[i]}`)} alt="" />{t(`crew.skill.${id}`)}</span>
                     <small>
                       {state.tired.includes(id)
                         ? t("crew.tired")

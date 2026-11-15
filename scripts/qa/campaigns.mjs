@@ -11,7 +11,7 @@ const VIEWS = [
   { name: "390", viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true },
   { name: "1366", viewport: { width: 1366, height: 768 } },
 ];
-const RUNS = [["storm", 3], ["storm", 7], ["dust", 7], ["dust", 12], ["moon", 3], ["moon", 8]];
+const RUNS = [["classic", 3], ["storm", 3], ["storm", 7], ["dust", 7], ["dust", 12], ["moon", 3], ["moon", 8]];
 const findings = [];
 const types = new Set();
 const shot = new Set();
@@ -44,15 +44,29 @@ try {
       await click(page.getByRole("button", { name: new RegExp("^" + EN.world.goConsole) }).first());
       let reloaded = false;
       let done = false;
-      for (let i = 0; i < 80 && !done; i++) {
+      for (let i = 0; i < 110 && !done; i++) {
         await page.waitForTimeout(120);
         if (await page.locator(".stars").count()) { done = true; break; }
+        if (await page.locator(".explore-map").count()) {
+          types.add("explore");
+          await overflow("beat explore");
+          // Drive two squares out and back with the keys (laptop) or the on-screen buttons (phone).
+          for (const dir of ["right", "down", "up", "left", "left", "right"]) {
+            if (view.hasTouch) await click(page.locator(`.explore-pad [data-dir="${dir}"]`));
+            else { await page.locator(".explore-map").focus(); await page.keyboard.press({ right: "ArrowRight", left: "ArrowLeft", up: "ArrowUp", down: "ArrowDown" }[dir]); }
+          }
+          if (shots && !shot.has("explore" + view.name)) { shot.add("explore" + view.name); await page.screenshot({ path: `docs/qa/beat-explore-${view.name}.png`, fullPage: true }); }
+          if (seed % 2) { await click(page.locator(".explore-switch")); continue; } // odd seeds: let Pip drive (plain choices)
+          await click(page.locator(".explore .primary"));
+          await click(page.locator(".beat-result .primary"));
+          continue;
+        }
         if (await page.locator(".beat-options").count()) {
           const type = await page.locator(".beat-options").getAttribute("data-type");
           types.add(type);
           await overflow(`beat ${type}`);
           if (shots && view.name === "390" && !shot.has(type)) { shot.add(type); await page.screenshot({ path: `docs/qa/beat-${type}-390.png`, fullPage: true }); }
-          const open = page.locator(".beat-options button:not(:disabled)");
+          const open = page.locator(".beat-options button.beat-option:not(:disabled)");
           if (!(await open.count())) { findings.push(`${tag}: beat ${type} has no option the base can pay for`); break; }
           await click(open.nth((i + seed) % (await open.count())));
           await click(page.locator(".beat-result .primary"));
@@ -97,6 +111,6 @@ try {
 }
 for (const f of findings) console.log(f);
 console.log(`beat types met: ${[...types].sort().join(", ")} (${types.size})`);
-if (types.size < 5) findings.push("fewer than 5 beat types");
+if (types.size < 8) findings.push("fewer than 8 beat types met");
 console.log(findings.length ? `FAIL campaigns (${findings.length} findings)` : "PASS campaigns");
 process.exit(findings.length ? 1 : 0);

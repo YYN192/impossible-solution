@@ -3,7 +3,7 @@ import { act, canAct, createGame, rulesOf, stars, step } from "../sim/engine";
 import { buildRun, signature, type BeatType } from "../sim/campaign";
 import { pick, rng } from "../sim/rng";
 import type { GameState, JobId, Plan } from "../sim/types";
-import { CAMPAIGNS, campaignById } from "./campaigns";
+import { CAMPAIGNS, MENU_CAMPAIGNS, campaignById } from "./campaigns";
 import { STORMS } from "./storms";
 import en from "../i18n/en.json";
 import bg from "../i18n/bg.json";
@@ -35,7 +35,9 @@ function playRandom(campaignId: string, seed: number): GameState {
 
 describe("campaign set (P1-C1)", () => {
   it("has the classic 3-sol mission and at least 2 longer campaigns of 5–7 sols", () => {
-    expect(campaignById("storm").rules.sols ?? 3).toBe(3);
+    expect(campaignById("classic").rules.sols ?? 3).toBe(3);
+    expect(campaignById("classic").hidden).toBe(true);
+    expect(MENU_CAMPAIGNS.every((c) => (c.rules.sols ?? 3) >= 5 && (c.rules.sols ?? 3) <= 7)).toBe(true);
     const long = CAMPAIGNS.filter((c) => (c.rules.sols ?? 3) >= 5 && (c.rules.sols ?? 3) <= 7);
     expect(long.length).toBeGreaterThanOrEqual(2);
     expect(new Set(CAMPAIGNS.map((c) => c.place))).toEqual(new Set(["mars", "moon"]));

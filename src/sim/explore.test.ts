@@ -94,7 +94,7 @@ describe("the drive is one engine action", () => {
     expect(action.effect?.dose).toBeUndefined();
     const { state, fell } = act(createGame(), action);
     expect(state.science).toBe(1);
-    expect(fell[0].textKey).toBe("domino.rover.home1");
+    expect(fell[0].textKey).toBe("domino.roverHome1");
   });
 
   it("stranded away from the base: no science, and the crew walks out to tow it (space rays)", () => {
@@ -103,13 +103,13 @@ describe("the drive is one engine action", () => {
     const action = driveAction(m, d);
     expect(action.effect?.science).toBeUndefined();
     expect(action.effect?.dose).toBeGreaterThan(0);
-    expect(action.textKey).toBe("domino.rover.stranded");
+    expect(action.textKey).toBe("domino.roverStranded");
   });
 
   it("not driving at all costs nothing", () => {
     const m = map(2);
     const action = driveAction(m, startDrive(m));
     expect(action.effect).toEqual({});
-    expect(action.textKey).toBe("domino.rover.home0");
+    expect(action.textKey).toBe("domino.roverHome0");
   });
 });
