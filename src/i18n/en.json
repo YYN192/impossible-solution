@@ -24,9 +24,9 @@
     "hideWhy": "Hide",
     "fromEarth": "News from outside",
     "radio": "Message from Earth",
-    "radioTap": "Tap to decode it",
+    "radioTap": "Press to decode it",
     "decoded": "Decoded!",
-    "nasa": "Real NASA data: tap to see where it comes from",
+    "nasa": "Real NASA data: press to see where it comes from",
     "firstDay_moon": "First morning on the Moon. Everything works."
   },
   "domino": {
@@ -283,7 +283,7 @@
     }
   },
   "planHelp": {
-    "howTo": "Tap an astronaut. Then tap a job.",
+    "howTo": "Choose an astronaut. Then choose a job.",
     "leftUndone_one": "{{count}} job is left undone.",
     "leftUndone_other": "{{count}} jobs are left undone.",
     "tomorrow": "tomorrow",
@@ -877,7 +877,7 @@
     "clear": "Storm damage fixed! Now go to the console.",
     "outside": "Outside the base",
     "panelsTitle": "Wipe every solar panel",
-    "panelsLead": "Tap each dusty panel to wipe it. Being outside gives your crew a little extra radiation (invisible energy from space).",
+    "panelsLead": "Choose each dusty panel to wipe it. Being outside gives your crew a little extra radiation (invisible energy from space).",
     "panel": "Panel {{n}}: {{state}}",
     "dusty": "dusty",
     "clean": "clean",
@@ -910,7 +910,7 @@
     },
     "greenhouse": {
       "title": "Keep the plants growing",
-      "lead": "Tap a plant to water it. Thirsty plants stop growing!",
+      "lead": "Choose a plant to water it. Thirsty plants stop growing!",
       "plant": "Plant {{n}}: {{state}}",
       "thirsty": "thirsty",
       "watered": "has water",

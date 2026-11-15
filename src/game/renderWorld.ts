@@ -34,10 +34,13 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   for (const x of [32, 592]) sprite("environment/decorations/mars-pipe", x, 144, 16, 64);
   for (const x of [64, 192, 416, 560]) sprite("environment/decorations/mars-vent", x, 336, 32, 16);
   // Marked console bay and light strips make the goal easy to find.
+  // The bay outline pulses gently to guide the player to Mission Control (steady with reduced motion).
+  ctx.globalAlpha = reduced ? 1 : 0.55 + 0.45 * Math.sin(time / 380);
   ctx.strokeStyle = "#57829b"; ctx.lineWidth = 1; ctx.strokeRect(272.5, 104.5, 95, 94);
+  ctx.globalAlpha = 1;
   ctx.fillStyle = "#29445b"; ctx.fillRect(272, 198, 96, 3);
   const entities = room.entities.map((e) => ({ y: e.y + e.h, draw: () => {
-    if (e.id === "greenhouse") { greenhouse(ctx, e.x, e.y, storm.broken); if (near === e.id) { ctx.strokeStyle = "#a0efea"; ctx.strokeRect(e.x - 2.5, e.y - 2.5, e.w + 5, e.h + 5); } return; }
+    if (e.id === "greenhouse") { greenhouse(ctx, e.x, e.y, storm.broken); return; }
     let path = e.sprite;
     if (e.id === "console") path = `consoles/mission-console-${near === e.id ? "highlighted" : !reduced && Math.floor(time / 1100) % 4 === 0 ? "inactive" : "active"}`;
     if (e.interaction === "door" && near === e.id) path = "environment/doors/mars-door-airlock-open";
@@ -46,7 +49,6 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     if (e.interaction === "npc" && !reduced && Math.floor(time / 1700 + e.x) % 5 === 0) {
       ctx.fillStyle = "#a1e5e5"; ctx.fillRect(e.x + 15, e.y - 5, 2, 2);
     }
-    if (near === e.id) { ctx.strokeStyle = "#a0efea"; ctx.strokeRect(e.x - 2.5, e.y - 2.5, e.w + 5, e.h + 5); }
   }}));
   entities.push({ y: player.y, draw: () => {
     ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 3), 20, 5);
