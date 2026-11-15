@@ -91,6 +91,11 @@ describe("DataSources game numbers (#7)", () => {
       "storm-panels-dose",
       "storm-greenhouse-power",
       "wipe-panels",
+      "dust-storm-sols",
+      "opportunity-solar",
+      "heater-power-dust",
+      "heater-power-gale",
+      "shadow-day-solar",
     ];
     expect(GAME_NUMBERS.map(({ id }) => id)).toEqual(expected);
   });

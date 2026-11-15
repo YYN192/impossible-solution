@@ -48,7 +48,12 @@ type GameNumberName =
   | "dustStormChance"
   | "stormPanelsDose"
   | "stormGreenhousePower"
-  | "wipePanels";
+  | "wipePanels"
+  | "dustStormSols"
+  | "opportunitySolar"
+  | "heaterPowerDust"
+  | "heaterPowerGale"
+  | "shadowDaySolar";
 
 export interface GameNumberDescriptor {
   /** Stable DOM/test identifier; do not derive this from translated copy. */
@@ -116,6 +121,11 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("storm-panels-dose", "stormPanelsDose", DOSE.outsideExtra),
   value("storm-greenhouse-power", "stormGreenhousePower", 1),
   value("wipe-panels", "wipePanels", WIPE_PANELS),
+  value("dust-storm-sols", "dustStormSols", CAMPAIGN_NUMBERS.DUST_STORM_SOLS),
+  value("opportunity-solar", "opportunitySolar", CAMPAIGN_NUMBERS.OPPORTUNITY_SOLAR),
+  value("heater-power-dust", "heaterPowerDust", CAMPAIGN_NUMBERS.HEATER_POWER.dust),
+  value("heater-power-gale", "heaterPowerGale", CAMPAIGN_NUMBERS.HEATER_POWER.gale),
+  value("shadow-day-solar", "shadowDaySolar", CAMPAIGN_NUMBERS.SHADOW_DAY_SOLAR),
 ];
 
 function value(
