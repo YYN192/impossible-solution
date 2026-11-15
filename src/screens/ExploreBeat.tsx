@@ -4,10 +4,14 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
+import { usePressedKeys } from "../game/pressedKeys";
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] } as const;
 type Dir = keyof typeof DIRS;
 const KEYS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", s: "down", a: "left", d: "right" };
+
+// Same keys, lower-cased, so the pad lights up while a key is held (Caps Lock included).
+const HINT_KEYS = Object.fromEntries(Object.entries(KEYS).map(([k, d]) => [k.toLowerCase(), d]));
 
 /**
  * Rover drive: the kid steers the rover over a map whose colours come from a real NASA picture.
@@ -19,6 +23,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
   const [drive, setDrive] = useState(() => startDrive(map));
   const [facing, setFacing] = useState<Dir>("right");
   const home = isHome(map, drive);
+  const pressed = usePressedKeys(HINT_KEYS);
 
   function go(dir: Dir) {
     const [dx, dy] = DIRS[dir];
@@ -84,7 +89,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
         </p>
         <div className="explore-pad">
           {(["up", "left", "right", "down"] as Dir[]).map((dir) => (
-            <button type="button" key={dir} data-dir={dir} aria-label={t(`exploreUi.${dir}`)} onClick={() => go(dir)}>
+            <button type="button" key={dir} data-dir={dir} data-pressed={pressed.has(dir) ? "" : undefined} aria-label={t(`exploreUi.${dir}`)} onClick={() => go(dir)}>
               {{ up: "▲", down: "▼", left: "◀", right: "▶" }[dir]}
             </button>
           ))}

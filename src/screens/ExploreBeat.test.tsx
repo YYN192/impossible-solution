@@ -40,3 +40,14 @@ describe("rover drive on the map", () => {
     expect(onDone).toHaveBeenCalledWith(expect.objectContaining({ id: "explore-home0" }));
   });
 });
+
+describe("rover drive pad lights up with the keyboard", () => {
+  it("lights the pad button for the held arrow / WASD key and turns it off on release", () => {
+    render(<ExploreBeat map={map} onDone={vi.fn()} />);
+    const left = screen.getByRole("button", { name: t("exploreUi.left") });
+    fireEvent.keyDown(screen.getByRole("application"), { key: "a" });
+    expect(left.hasAttribute("data-pressed")).toBe(true);
+    fireEvent.keyUp(screen.getByRole("application"), { key: "a" });
+    expect(left.hasAttribute("data-pressed")).toBe(false);
+  });
+});

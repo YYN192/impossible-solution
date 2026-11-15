@@ -19,7 +19,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 .world-viewport{flex:1 1 0;min-height:min(56vw,200px);container-type:size;display:grid;place-items:start center;border:0;box-shadow:none;background:none;padding:8px}
 .world-screen{position:relative;width:100%;width:min(100cqw,100cqh*5/3);box-shadow:0 0 0 clamp(3px,.8cqmin,8px) #2d4154,0 0 0 calc(clamp(3px,.8cqmin,8px) + 1px) #52677b;background:#070e19;container-type:inline-size}
 .world-viewport canvas{width:100%;height:auto;cursor:pointer}
-.world-label{position:absolute;transform:translate(-50%,-100%);font-size:clamp(.625rem,.25rem + 1.3cqi,1.1rem);line-height:1;letter-spacing:.06em;font-weight:700;color:#d2e1ea;text-shadow:1px 1px #03080e,-1px -1px #03080e,1px -1px #03080e,-1px 1px #03080e;white-space:nowrap;pointer-events:none}
+
 .world-controls{margin-top:clamp(8px,2vmin,24px);gap:clamp(12px,3vw,40px)}.interaction-guide{display:flex;flex-direction:column;align-items:center}.go-console{text-decoration:underline;font-size:.75rem;padding:.4rem .6rem}
 /* Phones: "Start mission" must be visible without scrolling. */
 @media(max-width:720px){.mission-menu{padding-top:18px}.menu-story h1{font-size:clamp(2rem,1.2rem + 4vw,2.6rem);margin:10px 0 8px}.menu-tagline{margin-bottom:8px}.menu-landscape,.mission-facts{display:none}.menu-layout{gap:16px}}
