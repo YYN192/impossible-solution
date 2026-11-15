@@ -1,3 +1,4 @@
+import { Icon } from "./Icon";
 import { useTranslation } from "react-i18next";
 import { audio, useAudio } from "../game/audio";
 
@@ -14,7 +15,7 @@ export function SoundToggle() {
       aria-pressed={!muted}
       onClick={() => audio.mute(!muted)}
     >
-      <span aria-hidden="true">{muted ? "🔇" : "🔊"}</span>
+      <Icon name={muted ? "sound-off" : "sound-on"} />
     </button>
   );
 }

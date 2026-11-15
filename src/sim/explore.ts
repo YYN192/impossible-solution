@@ -130,14 +130,14 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
   if (!isHome(map, d))
     return {
       id: "explore-stranded",
-      icon: "🚙⚠️",
+      icon: "rover warning",
       textKey: "domino.roverStranded",
       effect: { power, dose: 2 * DOSE.outsideExtra },
     };
   const science = Math.min(EXPLORE.maxScience, d.collected.length);
   return {
     id: `explore-home${science}`,
-    icon: science ? "🚙🪨" : "🚙",
+    icon: science ? "rover rock" : "rover",
     textKey: `domino.roverHome${science}`,
     effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
   };

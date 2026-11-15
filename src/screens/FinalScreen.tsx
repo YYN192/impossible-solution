@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { DominoCard } from "../components/DominoCard";
@@ -142,16 +143,15 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
   return (
     <div className="stars">
       <p className="stars-count">
-        <span aria-hidden="true">
-          {"★".repeat(stars.count)}
-          <span className="star-empty">{"☆".repeat(3 - stars.count)}</span>
+        <span className="star-icons" aria-hidden="true">
+          {[0, 1, 2].map((i) => <Icon key={i} name={i < stars.count ? "star" : "star-empty"} />)}
         </span>{" "}
         {t("final.stars", { count: stars.count })}
       </p>
       <ul className="star-goals">
         {goals.map(({ key, won }) => (
           <li key={key} className={won ? "won" : "missed"}>
-            <span aria-hidden="true">{won ? "★ " : "☆ "}</span>
+            <Icon name={won ? "star" : "star-empty"} />{" "}
             {t(`final.goal.${key}`)}{" "}
             <span className="visually-hidden">
               {won ? t("final.goalWon") : t("final.goalMissed")}
@@ -160,7 +160,7 @@ function StarRow({ stars, best }: { stars: Stars; best?: number }) {
         ))}
       </ul>
       {best !== undefined && (
-        <p className="note">{t("final.best", { count: best })}</p>
+        <p className="note"><Icon name="star" /> {t("final.best", { count: best })}</p>
       )}
     </div>
   );

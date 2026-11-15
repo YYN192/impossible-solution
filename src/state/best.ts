@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 /**
- * Best star count so far ("Best: 2★"). Kept in localStorage so it survives a reload; if storage
+ * Best star count so far ("Best: 2 stars"). Kept in localStorage so it survives a reload; if storage
  * is blocked (private window, school laptop policy) it just lasts for this visit.
  */
 export const BEST_KEY = "impossible-solution.best";

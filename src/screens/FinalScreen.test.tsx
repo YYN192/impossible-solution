@@ -64,11 +64,11 @@ describe("Final screen", () => {
 
   it("Best keeps the highest score and survives a reload", () => {
     render(<FinalView dominoes={[]} stars={stars(2)} />);
-    screen.getByText("Best: 2★");
+    screen.getByText("Best: 2 stars");
     cleanup();
     render(<FinalView dominoes={[]} stars={stars(1)} />);
     screen.getByText("1 star out of 3");
-    screen.getByText("Best: 2★");
+    screen.getByText("Best: 2 stars");
     expect(localStorage.getItem(BEST_KEY)).toBe("2");
   });
 

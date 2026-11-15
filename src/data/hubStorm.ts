@@ -43,12 +43,12 @@ export function hubStormFor(setup: Pick<MissionSetup, "place" | "seed" | "events
 
 /** Going outside in the storm: clean panels, but the crew gets a little extra radiation. */
 export const panelsAction = (storm: HubStorm): Action => ({
-  id: "storm-panels", icon: "🧽☀️", textKey: "domino.stormPanels", source: storm.source,
+  id: "storm-panels", icon: "wipe sun", textKey: "domino.stormPanels", source: storm.source,
   effect: { panelEfficiency: 1, dose: DOSE.outsideExtra },
 });
 /** Fixing the greenhouse uses 1 power when there is any (a repair must never get stuck at 0). */
 export const greenhouseAction = (state: GameState): Action => ({
-  id: "storm-greenhouse", icon: "🌱🔧", textKey: "domino.stormGreenhouse",
+  id: "storm-greenhouse", icon: "sprout wrench", textKey: "domino.stormGreenhouse",
   effect: state.bars.power >= 1 ? { power: -1 } : {},
 });
 /** Done = the engine already holds the domino of that repair for this sol (survives a reload). */

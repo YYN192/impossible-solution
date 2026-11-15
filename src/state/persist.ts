@@ -12,7 +12,8 @@ import { useMission } from "./mission";
 import { useNav, type Place, type Screen } from "./screen";
 
 export const RUN_KEY = "sol:run";
-const VERSION = 2;
+// 3: icons are pixel-icon names, not emoji (#50); older saved runs start fresh.
+const VERSION = 3;
 
 interface Saved {
   v: number;
