@@ -53,9 +53,28 @@ export interface MissionSetup {
   beats: Record<number, Beat>;
   /** The real storm this run replays (classic mission), for the storm card. */
   stormId?: string;
+  /** Today's Sun: the real Mars-bound storm cloud DONKI forecast (shown as a card; never a dose). */
+  sun?: SunReport;
   /** Radio delay to Earth: today's Deep Space Network reading for Mars, a constant for the Moon. */
   delay: LightDelay;
 }
+
+/** The newest Mars-bound CME from DONKI, as facts for the kid card. It only times the storm: the dose stays a game number. */
+export interface SunReport {
+  cmeId?: string;
+  /** km/s, leaving the Sun */
+  speed?: number;
+  /** ISO time WSA-Enlil forecasts it reaching Mars */
+  arrival: string;
+  /** true when the arrival is already in the past */
+  passed: boolean;
+  url: string;
+  source: DataSource;
+  fetchedAt: number;
+}
+
+/** Today's Sun looks back this far (issue #8: "last 30 days"). */
+export const SUN_WINDOW_DAYS = 30;
 
 /** The saved Mars delay (14 Nov 2026): every setup starts with it; getMissionSetup swaps in today's. */
 const SAVED_DELAY = await getMarsDelay({ offline: true });
@@ -164,13 +183,24 @@ export function todaysSunMission(
   fetchedAt: number,
   now: Date,
 ): MissionSetup {
-  const newest = hits[0];
+  // Only storm clouds that reach (or reached) Mars inside the window: an old snapshot must not pass as "this month".
+  const newest = hits.find((h) => Date.parse(h.arrival) >= now.getTime() - SUN_WINDOW_DAYS * 864e5);
   if (!newest) {
     return { ...may2024Mission(), noticeKey: "notice.sunQuiet" };
   }
+  const passed = Date.parse(newest.arrival) < now.getTime();
+  const sun: SunReport = {
+    ...(newest.cmeId ? { cmeId: newest.cmeId } : {}),
+    ...(newest.speed ? { speed: newest.speed } : {}),
+    arrival: newest.arrival,
+    passed,
+    url: newest.link ?? "https://kauai.ccmc.gsfc.nasa.gov/DONKI/",
+    source,
+    fetchedAt,
+  };
   // Already reached Mars: never tell kids it is "heading for Mars".
-  if (Date.parse(newest.arrival) < now.getTime()) {
-    return { ...may2024Mission(), noticeKey: "notice.sunPassed" };
+  if (passed) {
+    return { ...may2024Mission(), noticeKey: "notice.sunPassed", sun };
   }
   const days = Math.round((Date.parse(newest.arrival) - now.getTime()) / 864e5);
   // Show it on the sol it would arrive (capped to the mission).
@@ -197,6 +227,7 @@ export function todaysSunMission(
       {
         sol,
         kind: "stormCloud",
+        ...(newest.cmeId ? { id: newest.cmeId } : {}),
         captionKey: "event.stormCloud.today",
         source: ref,
       },
@@ -204,6 +235,7 @@ export function todaysSunMission(
     forecasts,
     dataSource: source,
     dataFetchedAt: fetchedAt,
+    sun,
   };
 }
 
