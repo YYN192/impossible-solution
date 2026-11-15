@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
+import { mistake } from "../game/feedback";
 import {
   DISH_STEPS, GROW_TARGET, WATER_MAX, STACK_CENTER, STACK_GOAL, TICK_MS,
   drop, progress, send, startMiniGame, tap, tick, turn, won, type MiniGame,
@@ -33,7 +34,7 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   useEffect(() => {
     if (done || !started || paused) return;
-    const clock = setInterval(() => setGame((g) => tick(g)), TICK_MS * (slow ? 2 : 1));
+    const clock = setInterval(() => setGame((g) => { const n = tick(g); if (setbackIn(g, n)) mistake("small", box.current); return n; }), TICK_MS * (slow ? 2 : 1));
     return () => clearInterval(clock);
   }, [done, started, paused, slow]);
   // "Great job!" shows for 1 s, then the game goes back to the plan by itself (the latest onClose, without restarting the second).
@@ -53,18 +54,28 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
     }
     if (nextGame === game) return;
     const missed = "miss" in nextGame && nextGame.miss;
-    audio.playSfx(missed ? "menu-error" : sound);
+    if (missed) mistake("small", box.current); else audio.playSfx(sound);
     setGame(nextGame);
   };
+  // Ask Earth keys live on window: the ← button disables at the edge and focus would drop to <body>.
+  useEffect(() => {
+    if (game.job !== "askEarth" || done) return;
+    const onWindowKey = (e: KeyboardEvent) => {
+      const k = gameKey(e);
+      const turnBy = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
+      if (turnBy) { e.preventDefault(); play(turn(game, turnBy)); return; }
+      if (k === " " || k === "w") {
+        e.preventDefault();
+        if (game.aim === game.earth) play(send(game), "earth-message-send"); else mistake("small", box.current);
+      }
+    };
+    window.addEventListener("keydown", onWindowKey);
+    return () => window.removeEventListener("keydown", onWindowKey);
+  });
   // #63: the keyboard plays every mini-game, by physical key (works on Bulgarian layouts).
   const onKey = (e: React.KeyboardEvent<HTMLDialogElement>) => {
     if (done) return;
     const k = gameKey(e.nativeEvent);
-    if (game.job === "askEarth") {
-      const turnBy = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
-      if (turnBy) { e.preventDefault(); play(turn(game, turnBy)); return; }
-      if (k === " ") { e.preventDefault(); if (game.aim === game.earth) play(send(game), "earth-message-send"); return; }
-    }
     if (game.job === "shelter" && (k === " " || k === "enter") && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); play(drop(game), "job-assign"); return; }
     // Grid games: arrows move focus between the tiles.
     const tile = (e.target as HTMLElement).closest?.(".mini-tile");
@@ -103,6 +114,13 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
       </div>
     </div>
   </dialog>;
+}
+
+/** True when a tick just undid the kid's work: dust on a clean panel, or a plant that ran out of water. */
+function setbackIn(a: MiniGame, b: MiniGame): boolean {
+  if (a.job === "panels" && b.job === "panels") return b.clean.filter(Boolean).length < a.clean.filter(Boolean).length;
+  if (a.job === "greenhouse" && b.job === "greenhouse") return b.water.some((w, i) => w === 0 && a.water[i] > 0);
+  return false;
 }
 
 function Hint({ game }: { game: MiniGame }) {

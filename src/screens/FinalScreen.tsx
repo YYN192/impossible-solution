@@ -15,6 +15,7 @@ import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
 import { buildRows, type Row } from "./final/buildRows";
 import { audio } from "../game/audio";
+import { shake } from "../game/feedback";
 
 export type { Stars };
 
@@ -80,7 +81,7 @@ export function FinalView({
     // Chains fall side by side, so one tick per step; none when the animation is off.
     const falls = reducedMotion() ? 0 : longest;
     const timers = Array.from({ length: falls }, (_, i) => setTimeout(() => audio.playSfx("domino-fall"), i * FALL_STEP_MS + 300));
-    timers.push(setTimeout(() => audio.playSfx(won ? "mission-success" : "mission-failure"), falls * FALL_STEP_MS + 600));
+    timers.push(setTimeout(() => { audio.playSfx(won ? "mission-success" : "mission-failure"); if (!won) shake(); }, falls * FALL_STEP_MS + 600));
     return () => timers.forEach(clearTimeout);
   }, [longest, won]);
 
