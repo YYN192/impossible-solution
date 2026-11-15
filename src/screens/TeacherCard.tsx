@@ -8,17 +8,21 @@ import "./TeacherCard.css";
 const QUESTIONS = ["teacher.q1", "teacher.q2", "teacher.q3"] as const;
 
 /** Teacher's key: one switch that opens every mission on this device (saved), and locks them again. */
-function TeacherKey() {
+function TeacherKey({ children }: { children?: React.ReactNode }) {
   const { t } = useTranslation();
   const on = useProgress((p) => p.teacher);
   const setTeacher = useProgress((p) => p.setTeacher);
   return (
     <div className="teacher__key">
       <h3>{t("teacher.keyTitle")}</h3>
-      <button type="button" aria-pressed={on} onClick={() => setTeacher(!on)}>
-        <Icon name={on ? "check" : "lock"} /> {t("teacher.keyButton")}
-      </button>
       <p role="status">{t(on ? "teacher.keyOn" : "teacher.keyOff")}</p>
+      <div className="teacher__bar">
+        {/* Gold = the next step: unlock. Once on, the switch is "selected" (cyan) and Back takes over. */}
+        <button type="button" className={on ? undefined : "primary"} aria-pressed={on} onClick={() => setTeacher(!on)}>
+          <Icon name={on ? "check" : "lock"} /> {t("teacher.keyButton")}
+        </button>
+        {children}
+      </div>
     </div>
   );
 }
@@ -49,13 +53,13 @@ export function TeacherCard({ onBack }: { onBack?: () => void }) {
       <h3>{t("teacher.realTitle")}</h3>
       <p>{t("teacher.real")}</p>
 
-      <TeacherKey />
-
-      {onBack ? (
-        <button type="button" className="sources__back" onClick={onBack}>
-          {t("teacher.back")}
-        </button>
-      ) : null}
+      <TeacherKey>
+        {onBack ? (
+          <button type="button" className="sources__back" onClick={onBack}>
+            {t("teacher.back")}
+          </button>
+        ) : null}
+      </TeacherKey>
     </section>
   );
 }
