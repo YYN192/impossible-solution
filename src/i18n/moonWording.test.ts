@@ -26,6 +26,8 @@ describe("Moon wording (#76, #83)", () => {
       const text = tRun(key, opts, "moon");
       // JS \b only knows ASCII letters, so the Bulgarian "сол" needs a Unicode lookbehind.
       expect(text, key).not.toMatch(/Mars|Марс|Gale|Гейл|Ares|Арес|\bsols?\b|(?<!\p{L})сол/iu);
+      // The Moon has no air: no wind and no dust storms.
+      expect(text, key).not.toMatch(/\bwind\b|вятър|dust storm|прахов\p{L}* бур/iu);
       expect(text, key).not.toBe(key);
     }
     await i18n.changeLanguage("en");
