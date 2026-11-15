@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type JSX } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { BeatScreen } from "./screens/BeatScreen";
 import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { isOpen, useProgress } from "./state/progress";
@@ -91,6 +92,7 @@ export default function App() {
   });
   const Current = screen !== "title" ? SCREENS[screen] : null;
   return <div className="expedition">
+    <Analytics />
     <div className="mission-status-bar">
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
       <LanguageToggle />
