@@ -5,6 +5,7 @@ import bg from "../i18n/bg.json";
 import { TICK_MS } from "../game/miniGames";
 import { JOBS, type JobId } from "../sim/types";
 import { JobMiniGame } from "./JobMiniGame";
+import { useComfort } from "../state/comfort";
 
 const t = i18n.t.bind(i18n);
 const jobIds = Object.keys(JOBS) as JobId[];
@@ -18,8 +19,11 @@ const column = (selector: string) => {
   return cell ? [...cell.parentElement!.children].indexOf(cell) : -1;
 };
 
+/** The first press starts the clock (#77); any button on the board does it. */
+const startClock = () => fireEvent.click(document.querySelector(".mini-board button:not(:disabled)")!);
 /** Plays the mini game through its buttons, a tick at a time, the way a kid would. */
 function playThrough(job: JobId) {
+  startClock();
   for (let i = 0; i < 300 && !won(); i++) {
     switch (job) {
       case "panels":
@@ -82,6 +86,8 @@ describe("JobMiniGame", () => {
   it("dropping the block at the wrong moment is a gentle miss", () => {
     render(<JobMiniGame job="shelter" seed={SEED} onClose={() => {}} />);
     expect(screen.queryByText(t("miniGame.shelter.now"))).toBeNull();
+    fireEvent.click(btn(t("miniGame.shelter.drop"))); // the first press only starts the block
+    expect(screen.queryByText(t("miniGame.shelter.oops"))).toBeNull();
     fireEvent.click(btn(t("miniGame.shelter.drop")));
     expect(screen.getByText(t("miniGame.shelter.oops"))).toBeTruthy();
   });
@@ -102,10 +108,42 @@ describe("JobMiniGame", () => {
     const start = vi.spyOn(globalThis, "setInterval");
     const stop = vi.spyOn(globalThis, "clearInterval");
     const { unmount } = render(<JobMiniGame job="science" seed={SEED} onClose={() => {}} />);
+    startClock();
     const clock = start.mock.results.at(-1)?.value;
     expect(clock).toBeDefined();
     unmount();
     expect(stop).toHaveBeenCalledWith(clock);
+  });
+
+  it("#77: the clock waits for the first press, pauses, and runs at half speed in slow mode", () => {
+    const start = vi.spyOn(globalThis, "setInterval");
+    const ticking = () => start.mock.calls.filter(([, ms]) => ms === TICK_MS || ms === TICK_MS * 2).length;
+    render(<JobMiniGame job="panels" seed={SEED} onClose={() => {}} />);
+    screen.getByText(t("miniGame.start"));
+    expect(ticking()).toBe(0);
+    startClock();
+    expect(ticking()).toBe(1);
+    const stop = vi.spyOn(globalThis, "clearInterval");
+    fireEvent.click(btn(t("miniGame.pause")));
+    expect(stop).toHaveBeenCalled();
+    screen.getByText(t("miniGame.paused"));
+    const before = ticking();
+    fireEvent.click(btn(t("miniGame.resume")));
+    expect(ticking()).toBe(before + 1);
+    act(() => { useComfort.setState({ slowMiniGames: true }); });
+    expect(start.mock.calls.at(-1)?.[1]).toBe(TICK_MS * 2);
+    act(() => { useComfort.setState({ slowMiniGames: false }); });
+  });
+
+  it("#77: \"Great job!\" shows for 1 s, then goes back to the plan by itself", () => {
+    const onClose = vi.fn();
+    render(<JobMiniGame job="panels" seed={SEED} onClose={onClose} />);
+    playThrough("panels");
+    expect(won()).toBe(true);
+    act(() => { vi.advanceTimersByTime(999); });
+    expect(onClose).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onClose).toHaveBeenCalledWith(true);
   });
 
   it("speaks Bulgarian when the game is in Bulgarian", async () => {

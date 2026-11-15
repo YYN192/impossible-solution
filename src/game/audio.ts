@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import manifest from "../../public/audio/audio-manifest.json";
+import { useComfort } from "../state/comfort";
 export interface AudioPreferences {
   master: number;
   music: number;
@@ -61,7 +62,8 @@ for (const s of manifest.sounds as {
  */
 const MUSIC_SLOTS = {
   lobby: () => ["music-lobby", "space-menu-ambience"],
-  hub: () => ["music-hub", "mars-base-ambience"],
+  // The Moon base has no Mars wind: a quiet space loop until it gets its own track.
+  hub: (place?: string) => place === "moon" ? ["music-hub-moon", "moon-base-ambience"] : ["music-hub", "mars-base-ambience"],
   console: (mission?: string) => [`music-mission-${mission}`, "music-console", "mission-console-ambience"],
 };
 export const musicFor = (slot: keyof typeof MUSIC_SLOTS, mission?: string): string => {
@@ -153,6 +155,9 @@ useAudio.subscribe((prefs) => {
   syncVolumes();
 });
 
+/** Calm mode (#77): warnings and alarms play at 40 % so they inform without startling. */
+export const alarmFactor = (id: string, kind: Kind) =>
+  kind === "sfx" && useComfort.getState().calm && /warning|alarm|burst|radiation/.test(id) ? 0.4 : 1;
 function play(id: string, kind: Kind) {
   const sound = sounds.get(id);
   const c = context(false); // created only by the gesture listener below
@@ -165,7 +170,7 @@ function play(id: string, kind: Kind) {
     const gain = c.createGain();
     source.buffer = buffer;
     source.loop = kind === "music";
-    gain.gain.value = sound.volume;
+    gain.gain.value = sound.volume * alarmFactor(id, kind);
     source.connect(gain).connect(buses[kind]);
     source.start();
     return source;

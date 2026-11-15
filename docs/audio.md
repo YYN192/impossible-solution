@@ -55,7 +55,7 @@ Sounds called by their manifest id:
 | Sound off / on | `mute` / `unmute` | `audio.mute` (status-bar toggle, Settings) |
 | EN / BG toggle | `console-button` | `LanguageToggle.tsx` |
 | Walking (alternating) | `player-step-metal-1` / `-2` | `step` in `audio.ts` |
-| Hub ambience (only if Music > 0) | `mars-base-ambience` | `MarsHub.tsx` |
+| Hub ambience (only if Music > 0) | `mars-base-ambience`; on the Moon `moon-base-ambience` (an alias of `space-menu-ambience`) | `MarsHub.tsx` |
 | Console opens | `console-boot` + `mission-console-ambience` | `ConsolePage.tsx` |
 | Return to base | `console-close` | `ConsolePage.tsx` |
 | Unassign a crew member | `job-remove` | `PlanScreen.tsx` |
@@ -77,7 +77,7 @@ The game asks for music by slot. Each slot tries the ids below in order and play
 | Slot | Where it plays | Ids tried, in order |
 | --- | --- | --- |
 | Lobby | main menu | `music-lobby`, then `space-menu-ambience` |
-| Station | the walkable base | `music-hub`, then `mars-base-ambience` |
+| Station | the walkable base | `music-hub`, then `mars-base-ambience`; Moon: `music-hub-moon`, then `moon-base-ambience` |
 | Console | mission screens | `music-mission-storm` / `music-mission-dust` / `music-mission-moon` (the mission being played), then `music-console`, then `mission-console-ambience` |
 
 Music volume is 0 until the player raises it in Settings, and nothing plays before the first tap. Credit every new track in `CREDITS.md` (author, licence) and log any AI tool in `docs/ai-usage-log.md`.

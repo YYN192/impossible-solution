@@ -8,6 +8,7 @@ import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
+import { useComfort } from "./state/comfort";
 import { iconsOf } from "./test/icons";
 
 const t = i18n.t.bind(i18n);
@@ -109,6 +110,19 @@ describe("PlanScreen mini games", () => {
     fireEvent.click(btn(t("miniGame.skip")));
     expect(screen.queryByRole("heading", { name: t("miniGame.askEarth.title") })).toBeNull();
     expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+  });
+
+  it("#77: with \"Skip the job mini-games\" on, the job is given and no game opens", () => {
+    useComfort.setState({ skipMiniGames: true });
+    try {
+      render(<PlanScreen />);
+      fireEvent.click(btn(t("crew.name", { n: 2 })));
+      fireEvent.click(btn(t("jobs.askEarth")));
+      expect(useSession.getState().draft).toEqual({ a2: "askEarth" });
+      expect(screen.queryByRole("dialog")).toBeNull();
+    } finally {
+      useComfort.setState({ skipMiniGames: false });
+    }
   });
 
   it("has a mini game for every job in the list", () => {
