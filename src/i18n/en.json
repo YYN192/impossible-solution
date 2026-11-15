@@ -347,6 +347,10 @@
     "q3": "Why can Earth warn you about a storm cloud but not about a space-ray storm?",
     "realTitle": "What is real",
     "real": "The 20 May 2024 solar storm, normal Mars radiation, dust on solar panels, and the Earth–Mars message delay are real NASA science. Job costs are game numbers.",
+    "keyTitle": "Teacher's key",
+    "keyButton": "Open all missions",
+    "keyOff": "Missions open one by one as the class finishes them.",
+    "keyOn": "Every mission is open on this device. Press again to lock them.",
     "open": "For teachers",
     "back": "Back"
   },

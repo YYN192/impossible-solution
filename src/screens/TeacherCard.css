@@ -5,6 +5,6 @@
 /* Print the card on its own: dark background off, no buttons or top bar. */
 @media print {
   body:has(.teacher) { background: #fff !important; color: #000 !important; }
-  body:has(.teacher) :is(.topbar, .notice, .note, .sources__back) { display: none !important; }
+  body:has(.teacher) :is(.topbar, .notice, .note, .sources__back, .teacher__key) { display: none !important; }
   .teacher__goal { color: #000; }
 }
