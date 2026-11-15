@@ -61,7 +61,7 @@ describe("complete expedition", () => {
     expect(useGame.getState().state).toEqual(start);
     expect(useMission.getState().setup).toBe(setup);
     screen.getByRole("heading", { name: t("morning.heading", { sol: 1 }) });
-  });
+  }, 20_000); // plays a whole run and replays it (about 4 s alone): under a full parallel run it needs more than the 5 s default
   it("keeps a draft and the player's position while leaving the console", async () => {
     await launch(); click(t("morning.goPlan"));
     const start = useGame.getState().state;

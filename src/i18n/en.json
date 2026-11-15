@@ -949,9 +949,12 @@
     "state": {
       "here": "You are here",
       "done": "Done",
-      "open": "Open: start it from the menu"
+      "open": "Open: tap to travel there"
     },
-    "locked": "Locked. Finish “{{name}}” first."
+    "locked": "Locked. Finish “{{name}}” first.",
+    "travelAsk": "Travel to {{name}}? The mission you are playing ends here.",
+    "travel": "Travel",
+    "stay": "Stay here"
   },
   "radar": {
     "title": "Space weather radar",
@@ -1142,6 +1145,7 @@
     "paused": "Paused. Press Go on when you are ready."
   },
   "talk": {
+    "storm": "We must fix all the systems!!!",
     "next": "Next",
     "choose": "What do you say?",
     "ask": {

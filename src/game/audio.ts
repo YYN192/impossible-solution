@@ -245,7 +245,10 @@ function stopPlaying(fade = FADE_OUT) {
   g.cancelScheduledValues(now);
   g.setValueAtTime(g.value, now);
   g.linearRampToValueAtTime(0, now + fade);
-  try { entry.source.stop(now + fade); } catch { /* already ended */ }
+  const { source, fade: node } = entry;
+  try { source.stop(now + fade); } catch { /* already ended */ }
+  // Belt and braces: once the fade is over, cut it off for sure (a held-up stop() must never leave a storm loop playing).
+  setTimeout(() => { try { source.stop(); } catch { /* already ended */ } node.disconnect?.(); }, fade * 1000 + 50);
 }
 
 function startTrack(id: string, mode: Entry["mode"]) {
@@ -302,13 +305,24 @@ function reconcileMusic() {
 }
 
 
-/** Create/resume the context and preload the UI set. Must run inside a user gesture. */
+let preloaded = false;
+/** Create (once) or resume the context, preload the UI set, start the current music. Any tap or key does it. */
 function unlock() {
-  const first = !ctx;
-  if (context(true) && first) {
+  if (!context(true)) return;
+  if (!preloaded) {
+    preloaded = true;
     for (const id of PRELOAD) void load(sounds.get(id)!.url);
-    reconcileMusic();
   }
+  reconcileMusic();
+}
+/**
+ * On page start: try to begin the menu music at once. Where the browser allows audio without a gesture
+ * (site already trusted), it plays now; otherwise the context waits "suspended" with the track already
+ * loading, and the first tap or key anywhere resumes it. Never bypasses the browser's autoplay rules.
+ */
+function autostart() {
+  if (!context(true)) return;
+  reconcileMusic();
 }
 if (typeof window !== "undefined")
   for (const type of ["pointerdown", "keydown", "touchend", "click"])
@@ -324,6 +338,7 @@ if (typeof document !== "undefined") document.addEventListener("visibilitychange
 /** Original 8-bit sounds from public/audio (see docs/audio.md). Never autoplays: nothing sounds before the first tap. */
 export const audio = {
   unlock,
+  autostart,
   playSfx: (id: string, gapMs = id === "volume-change" ? 150 : 70) => {
     if (id === "step")
       id = (stepFlip = !stepFlip)

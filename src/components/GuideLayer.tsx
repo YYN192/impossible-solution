@@ -32,7 +32,10 @@ function readCtx(blocked: boolean): GuideCtx {
 export function GuideLayer({ blocked = false }: { blocked?: boolean }) {
   const { t } = useTranslation();
   const [at, setAt] = useState<{ step: StepId; box: Box } | null>(null);
+  const on = useGuide((g) => g.on);
   useEffect(() => {
+    // Off (after the first play, or hidden): no polling at all.
+    if (!on) return;
     const update = () => {
       const guide = useGuide.getState(), ctx = readCtx(blocked);
       const after = guideAfter(ctx, guide);
@@ -47,9 +50,9 @@ export function GuideLayer({ blocked = false }: { blocked?: boolean }) {
     const timer = setInterval(update, 200);
     window.addEventListener("scroll", update, true);
     window.addEventListener("resize", update);
-    return () => { clearInterval(timer); window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); };
-  }, [blocked]);
-  if (!at) return null;
+    return () => { clearInterval(timer); window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); setAt(null); };
+  }, [blocked, on]);
+  if (!at || !on) return null;
   const { step, box } = at;
   // The bubble sits below the control when there is room, else above; kept inside the screen with a 16 px gutter.
   const vw = window.innerWidth || 1024, vh = window.innerHeight || 768;

@@ -51,5 +51,6 @@ export function useMusicDirector(visible: Place) {
   const scene = musicScene(visible, setup);
   const storm = scene !== "menu" && scene !== "off" && stormMusic(setup, { screen, sol }, game, readFlags().demo);
   useEffect(() => { audio.setMusic({ scene, storm }); }, [scene, storm]);
-  useEffect(() => () => audio.setMusic({ scene: "off", storm: false }), []);
+  // After the intent above: try to start the menu song as the page opens (the browser may hold it until a tap).
+  useEffect(() => { audio.autostart(); return () => audio.setMusic({ scene: "off", storm: false }); }, []);
 }
