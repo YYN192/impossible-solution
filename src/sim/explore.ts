@@ -4,7 +4,7 @@
  * and battery are game rules. The whole drive becomes ONE engine action (`driveAction`).
  */
 import { shuffle } from "./rng";
-import { DOSE, type Action } from "./types";
+import { DOSE, type Action, type CrewId } from "./types";
 
 export type Terrain = "sand" | "rough" | "rock";
 export interface Cell {
@@ -147,7 +147,8 @@ export function driveAction(map: ExploreMap, d: Drive): Action {
     icon: science ? "rover rock" : "rover",
     // Drove out and came back empty-handed: say so, not "stayed at the base".
     textKey: !science && used ? "domino.roverEmpty" : `domino.roverHome${science}`,
-    effect: { ...(power ? { power } : {}), ...(science ? { science } : {}) },
+    // #66: a full load keeps Amara (the scientist) studying rocks, so she rests from this sol's jobs.
+    effect: { ...(power ? { power } : {}), ...(science ? { science } : {}), ...(science >= EXPLORE.maxScience ? { tired: ["a3"] as CrewId[] } : {}) },
   };
 }
 

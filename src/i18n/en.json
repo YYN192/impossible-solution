@@ -52,7 +52,7 @@
     "doseFull": "The space-ray meter is full. The crew had to go home early.",
     "roverHome0": "The rover stayed at the base.",
     "roverHome1": "The rover came home with 1 sample.",
-    "roverHome2": "The rover came home with 2 samples.",
+    "roverHome2": "The rover came home with 2 samples. Amara studies them and rests today.",
     "roverStranded": "The rover got stuck far from home. The crew walked out to tow it.",
     "stormPanels": "You wiped the panels in the dust storm. More power, more radiation.",
     "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power.",
@@ -884,6 +884,8 @@
     "square": "One square is about 20 km of real Mars.",
     "cost": "This drive costs {{n}} power so far.",
     "labLimit": "The lab can test {{max}} samples. More give no extra science.",
+    "tiredNext": "A second sample tires Amara. She would rest today.",
+    "tiredNow": "Amara will study the samples. She rests today.",
     "noPower": "No power!",
     "pick": "If you end now: {{choice}}.",
     "rocksRule": "Pick up the closest sample for the near rocks. A sample in a yellow frame is at the far crater: more science, more power."
