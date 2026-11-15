@@ -15,7 +15,7 @@ function Modal({ label, onClose, className = "", children }: { label: string; on
 export function StormAlarm({ storm, onClose }: { storm: HubStorm; onClose: () => void }) {
   const { t } = useTranslation();
   useEffect(() => { audio.playSfx("storm-warning"); }, []);
-  return <Modal label="storm-title" onClose={onClose} className="storm-alarm">
+  return <Modal label="storm-title" onClose={onClose} className="dust-alarm">
     <div>
       <p className="eyebrow">⚠ {t("hubStorm.eyebrow")}</p>
       <h2 id="storm-title">🌪️ {t("hubStorm.title")}</h2>
