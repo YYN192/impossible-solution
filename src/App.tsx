@@ -80,8 +80,14 @@ export default function App() {
     } else if (choice.campaign) q.set("campaign", choice.campaign);
     const search = q.toString();
     window.history.replaceState({}, "", `${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`);
-    void reload();
+    return reload();
   };
+  // #106: fast travel from the airlock map. The menu's choice loads that base's mission, then its sol 1 starts
+  // right here in the station (Mars and the Moon share the room, so the astronaut steps out of the same airlock).
+  const travel = (campaign: string) => chooseRun({ campaign }).then(() => {
+    useSession.getState().clearPlan();
+    useNav.getState().restart();
+  });
   const Current = screen !== "title" ? SCREENS[screen] : null;
   return <div className="expedition">
     <div className="mission-status-bar">
@@ -95,7 +101,7 @@ export default function App() {
       : setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}
     {overlay ? <main className="information-panel">{overlay === "settings" ? <section className="menu-settings"><SettingsPanel onBack={() => setOverlay(null)} /></section> : overlay === "teacher" ? <TeacherCard onBack={closeOverlay} /> : <DataSources onBack={closeOverlay} missionSource={setup?.dataSource} missionFetchedAt={setup?.dataFetchedAt} liveData={!readFlags().offline && import.meta.env.MODE !== "test"} />}</main>
       : visiblePlace === "menu" ? <MainMenu ready={Boolean(setup)} resume={screen !== "title"} campaignId={setup?.campaignId} onPlay={play} onSources={() => openOverlay("sources")} onTeacher={() => openOverlay("teacher")} onChoose={chooseRun} onNew={() => useNav.getState().home()} />
-      : visiblePlace === "hub" ? <MarsHub onConsole={openConsole} onMenu={() => setPlace("menu")} />
+      : visiblePlace === "hub" ? <MarsHub key={setup?.campaignId} onConsole={openConsole} onMenu={() => setPlace("menu")} onTravel={travel} />
       : <ConsolePage onExit={() => setPlace("hub")}>{Current && <Current key={`${screen}-${sol}`} />}</ConsolePage>}
   </div>;
 }
