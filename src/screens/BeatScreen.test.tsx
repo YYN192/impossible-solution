@@ -42,6 +42,7 @@ describe("beat screen: one interaction per sol, through the engine", () => {
 
   it("a choice the base cannot pay for is switched off and says why", () => {
     open("dust", 3);
+    fireEvent.click(screen.getByRole("button", { name: t("handsOn.cards") })); // the upgrade opens hands-on (#59); check the plain cards
     act(() => useGame.setState({ state: { ...useGame.getState().state, bars: { power: 1, air: 5, dose: 0 } } }));
     const brush = screen.getByRole("button", { name: new RegExp(t("beat.upgrade.brush.label")) }) as HTMLButtonElement;
     expect(brush.disabled).toBe(true);

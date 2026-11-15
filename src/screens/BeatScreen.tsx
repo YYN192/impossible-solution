@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { EarthAnswer } from "../components/EarthAnswer";
 import { Icon, Icons } from "../components/Icon";
@@ -15,6 +15,10 @@ import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
 import { DataChip } from "./DataChip";
 import { ExploreBeat } from "./ExploreBeat";
+import { BuildBeat, HeaterDial, RadioRace, WipeBeat, type HandsOnProps } from "./HandsOnBeats";
+
+/** Beat id → its hands-on moment (#59). Beats not listed keep their cards. */
+const HANDS_ON: Partial<Record<string, (p: HandsOnProps) => ReactNode>> = { wipe: WipeBeat, upgrade: BuildBeat, radio: RadioRace, cold: HeaterDial };
 
 const num = (n: number) => `${n > 0 ? "+" : "−"}${Math.abs(Number(n.toFixed(1)))}`;
 
@@ -62,6 +66,8 @@ export function BeatScreen() {
   const [done, setDone] = useState<{ fell: Domino; before: Bars } | null>(null);
   // Explore beats open on the map; "Let Pip drive" shows the plain choices instead.
   const [pipDrives, setPipDrives] = useState(false);
+  // Hands-on beats (#59) open as the hands-on moment; "Show the choices instead" shows the plain cards.
+  const [cards, setCards] = useState(false);
   const beat = setup?.beats[sol];
   // No beat for this sol (old link, restored run): go on to the plan.
   useEffect(() => {
@@ -81,6 +87,12 @@ export function BeatScreen() {
   }
   const choose = (o: BeatOption) => act(o.action);
   const onMap = beat.map && !pipDrives && !done;
+  const HandsOn = HANDS_ON[beat.id];
+  const handsOn = HandsOn && !cards && !done;
+  const delayMin = Math.round(setup.delay.seconds / 60);
+  const pick = (id: string) => { const o = beat.options.find((x) => x.id === id); if (o) choose(o); };
+  const canPick = (id: string) => { const o = beat.options.find((x) => x.id === id); return Boolean(o && canAct(state, o.action)); };
+  const chipsOf = (id: string) => { const o = beat.options.find((x) => x.id === id); const chips = o ? effects(o.action, tt) : []; return (chips.length ? chips : [{ text: t("beatUi.nothing") } as Chip]).map((c) => <span key={`${c.icon}-${c.text}`}>{c.icon && <Icon name={c.icon} />} {c.text}</span>); };
 
   return (
     <ScreenFrame title={tRun(`beat.${beat.id}.title`, vars)}>
@@ -108,7 +120,13 @@ export function BeatScreen() {
           <button type="button" className="explore-switch" onClick={() => setPipDrives(true)}>{t("exploreUi.pip")}</button>
         </>
       )}
-      {onMap ? null : !done ? (
+      {handsOn && HandsOn && (
+        <>
+          <HandsOn beat={beat} can={canPick} preview={chipsOf} onChoose={pick} delayMin={delayMin} />
+          <button type="button" className="hands-on-switch" onClick={() => setCards(true)}>{t("handsOn.cards")}</button>
+        </>
+      )}
+      {onMap || handsOn ? null : !done ? (
         <div className="beat-options" role="group" aria-label={t("beatUi.options")} data-type={beat.type}>
           {beat.options.map((o) => {
             const can = canAct(state, o.action);
@@ -130,12 +148,13 @@ export function BeatScreen() {
             );
           })}
           {beat.map && <button type="button" className="explore-switch" onClick={() => setPipDrives(false)}>{t("exploreUi.back")}</button>}
+          {HandsOn && <button type="button" className="hands-on-switch" onClick={() => setCards(false)}>{t("handsOn.back")}</button>}
         </div>
       ) : (
         <div className="beat-result" role="status">
           <p className="lead"><Icons icon={done.fell.icon} />{" "}{tDynamic(done.fell.textKey)}</p>
           {done.fell.source && <DataChip source={done.fell.source} />}
-          {beat.type === "radio" && (state.earthAnswer && place ? <EarthAnswer answer={state.earthAnswer} /> : state.radioed && <p>{t("beatUi.answerNight")}</p>)}
+          {beat.type === "radio" && (state.earthAnswer && place ? <EarthAnswer answer={state.earthAnswer} /> : state.radioed && <p>{t("handsOn.radio.arrived", { n: delayMin })}</p>)}
           <div className="actions">
             <button type="button" className="primary" onClick={() => { audio.playSfx("select"); next(); }}>{t("beatUi.continue")} →</button>
           </div>

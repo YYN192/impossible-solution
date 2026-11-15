@@ -84,6 +84,17 @@ try {
           await click(page.locator(".beat-result .primary"));
           continue;
         }
+        if (await page.locator(".hands-on").count()) {
+          // Hands-on beats (#59): even seeds finish with the moment's own button, odd seeds switch to the plain cards.
+          const type = "hands-on " + (await page.locator(".hands-on").getAttribute("class")).split(" ")[1];
+          types.add(type);
+          await overflow(`beat ${type}`);
+          if (shots && view.name === "390" && !shot.has(type)) { shot.add(type); await page.screenshot({ path: `docs/qa/beat-${type.replace(" ", "-")}-390.png`, fullPage: true }); }
+          if (seed % 2) { await click(page.locator(".hands-on-switch")); continue; }
+          await click(page.locator(".hands-on .hands-on-done"));
+          await click(page.locator(".beat-result .primary"));
+          continue;
+        }
         if (await page.locator(".beat-options").count()) {
           const type = await page.locator(".beat-options").getAttribute("data-type");
           types.add(type);
