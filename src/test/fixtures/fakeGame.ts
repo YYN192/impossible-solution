@@ -3,7 +3,7 @@
  * through useGame). It follows the demo chain from docs/concept.md:
  *   sol 1 skip panels → sol 2 power low (+ the 20 May 2024 burst) → sol 3 astronaut too tired.
  */
-import type { MissionSetup } from "../../data/mission";
+import { may2024Mission, type MissionSetup } from "../../data/mission";
 import { createGame } from "../../sim/engine";
 import type { DataRef, Domino, EarthAnswer, StormEvent } from "../../sim/types";
 import { useGame } from "../../state/game";
@@ -108,6 +108,6 @@ export function loadFakeGame(sol: number, { final = false } = {}) {
   });
   useMission.setState({
     status: "ready",
-    setup: { events: FAKE_EVENTS, forecasts: {} } as unknown as MissionSetup,
+    setup: { ...may2024Mission(), events: FAKE_EVENTS, forecasts: {} } satisfies MissionSetup,
   });
 }

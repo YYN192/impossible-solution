@@ -9,14 +9,16 @@
   },
   "common": {
     "solOf": "Sol {{sol}} of {{total}}",
-    "next": "Next"
+    "next": "Next",
+    "solOf_moon": "Day {{sol}} of {{total}}"
   },
   "morning": {
     "heading": "Good morning! Sol {{sol}}",
     "goPlan": "Plan the day",
     "firstDay": "First morning on Mars. Everything works.",
     "nothingFell": "Nothing broke overnight. Good plan!",
-    "because": "because"
+    "because": "because",
+    "heading_moon": "Good morning! Day {{sol}}"
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -64,8 +66,20 @@
     "storm": {
       "none": "no storm cloud is coming",
       "coming_one": "a storm cloud arrives in {{count}} sol",
-      "coming_other": "a storm cloud arrives in {{count}} sols"
-    }
+      "coming_other": "a storm cloud arrives in {{count}} sols",
+      "coming_zero": "a storm cloud arrives today",
+      "coming_moon_zero": "a storm cloud arrives today",
+      "coming_moon_one": "a storm cloud arrives in {{count}} day",
+      "coming_moon_other": "a storm cloud arrives in {{count}} days"
+    },
+    "risk": {
+      "high": "A burst of space rays is likely today. Stay inside!",
+      "low": "A burst of space rays is not likely today."
+    },
+    "dustStorm_one": "The dust storm lasts {{count}} more sol.",
+    "dustStorm_other": "The dust storm lasts {{count}} more sols.",
+    "delay": "Your message took {{minutes}} minutes each way today.",
+    "delayMoon": "Your message took about 1.3 seconds each way."
   },
   "chip": {
     "live": "Live NASA data",
@@ -75,12 +89,15 @@
   },
   "plan": {
     "heading": "Plan sol {{sol}}",
-    "endSol": "End sol"
+    "endSol": "End sol",
+    "heading_moon": "Plan day {{sol}}",
+    "endSol_moon": "End day"
   },
   "endSol": {
     "heading": "Night falls on sol {{sol}}",
     "nextMorning": "Go to sleep",
-    "seeResults": "See how it went"
+    "seeResults": "See how it went",
+    "heading_moon": "Day {{sol}} is over"
   },
   "final": {
     "heading": "Mission over",
@@ -101,7 +118,8 @@
     "best_one": "Best: {{count}}★",
     "best_other": "Best: {{count}}★",
     "tryAgain": "Try a different plan",
-    "home": "Back to start"
+    "home": "Back to start",
+    "sol_moon": "Day {{sol}}"
   },
   "data": {
     "badge": {
@@ -391,7 +409,8 @@
     "knownStorm": "Today's space weather",
     "crewReady": "Crew ready",
     "allAssigned": "Everyone has a job.",
-    "tomorrow": "tomorrow"
+    "tomorrow": "tomorrow",
+    "preview_moon": "After this day"
   },
   "world": {
     "menu": "Menu",
@@ -641,6 +660,85 @@
       "charge": {
         "label": "Charge the batteries for the next crew"
       }
+    }
+  },
+  "run": {
+    "pick": "Pick a mission",
+    "sols_one": "{{count}} sol",
+    "sols_other": "{{count}} sols",
+    "sols_moon_one": "{{count}} day",
+    "sols_moon_other": "{{count}} days",
+    "minutes": "about {{count}} min",
+    "locked": "Finish “{{name}}” to open this.",
+    "realData": "Real data: {{list}}",
+    "daily": "Daily mission",
+    "dailyHint": "Today's daily mission. Everyone gets the same run today.",
+    "surprise": "Surprise me",
+    "todayHint": "Today's real Sun: what NASA forecasts for Mars right now.",
+    "seed": "Run number: {{seed}}",
+    "seedHint": "Add ?seed={{seed}} to the link to play this exact run again.",
+    "newMission": "New mission",
+    "again": "Play again with a different storm",
+    "planners": "What real mission teams do",
+    "realThing": "The real thing",
+    "level": {
+      "1": "Easy",
+      "2": "Medium",
+      "3": "Hard"
+    }
+  },
+  "beatUi": {
+    "type": {
+      "site": "Choose a site",
+      "dilemma": "A hard choice",
+      "wipe": "Hands-on",
+      "radio": "Radio Earth",
+      "upgrade": "Upgrade",
+      "rover": "Rover drive",
+      "skywatch": "Sky watch"
+    },
+    "options": "Your choices",
+    "cannot": "Not enough power for this.",
+    "real": "Real",
+    "continue": "Continue to the plan",
+    "nothing": "No change",
+    "delayMars": "Your message takes {{minutes}} minutes each way today.",
+    "delayMoon": "Your message takes about 1.3 seconds each way.",
+    "answerNight": "Earth will answer by the morning.",
+    "now": "Now"
+  },
+  "rule": {
+    "solar": "Panels make {{n}} power a day",
+    "heater": "Heater needs {{n}} power a night",
+    "dustFactor": "Dusty panels keep {{n}}% of their power",
+    "airMachinePower": "Air machine needs {{n}} power a night",
+    "foodGain": "One harvest makes {{n}} food",
+    "shelterFactor": "The shelter lets in {{n}}% of the rays",
+    "earthHidden": "No radio to Earth on days {{days}}",
+    "earthAlways": "Earth is always in view"
+  },
+  "fx": {
+    "shelter": "Shelter ready",
+    "rest": "One astronaut rests",
+    "panels": "Panels up to {{n}}% clean",
+    "ask": "Earth answers"
+  },
+  "storm": {
+    "alarmBurst": "Space-ray storm!",
+    "alarmCloud": "A storm cloud is here!",
+    "alarmDust": "Dust storm!",
+    "pipBurst": "Pip: “Shelter, now! Space rays are hitting the base!”",
+    "pipSmall": "Pip: “A small storm. The meter moved only a little.”",
+    "pipCloud": "Pip: “The storm cloud Earth warned about is passing.”",
+    "real": "It's real!",
+    "id": "NASA event number: {{id}}",
+    "flare": "The flare was class {{flare}}. X is the strongest class.",
+    "fact": {
+      "may2024": "20 May 2024. A NASA rover measured this storm on Mars. At its worst hour, the rays were more than 50 times stronger than usual.",
+      "sep2017": "11 September 2017. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
+      "oct2021": "29 October 2021. A NASA rover measured this storm on Mars. The rays were about 3 times stronger than usual.",
+      "moon": "20 May 2024. A NASA spacecraft circling the Moon measured this storm. The rays rose only a little. The storm pointed at Mars.",
+      "cloud": "Scientists forecast this storm cloud with a computer model of the Sun's wind."
     }
   }
 }

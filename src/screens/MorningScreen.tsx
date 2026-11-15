@@ -8,9 +8,9 @@ import {
   helpTopicForEvent,
 } from "../components/helpTopics";
 import { WhatsThis } from "../components/WhatsThis";
-import { tDynamic } from "../i18n/dynamic";
+import { tDynamic, tRun } from "../i18n/dynamic";
+import { EarthAnswer } from "../components/EarthAnswer";
 import { knownEvents } from "../sim/engine";
-import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "../state/game";
 import { useMission } from "../state/mission";
 import { useNav } from "../state/screen";
@@ -50,6 +50,8 @@ export function MorningReportView({
 }) {
   const { t } = useTranslation();
   const next = useNav((s) => s.next);
+  const setup = useMission((s) => s.setup);
+  const moon = setup?.place === "moon" ? "moon" : undefined;
   const { headline, cause, extra } = report;
   const alert = extra?.kind === "event" ? extra.event.kind : extra?.kind;
   useEffect(() => {
@@ -60,8 +62,8 @@ export function MorningReportView({
   }, [sol, alert]);
 
   return (
-    <ScreenFrame title={t("morning.heading", { sol })}>
-      <p className="note">{t("common.solOf", { sol, total: MISSION_SOLS })}</p>
+    <ScreenFrame title={tRun("morning.heading", { sol }, moon)}>
+      <p className="note">{tRun("common.solOf", { sol, total: setup?.rules.sols ?? 3 }, moon)}</p>
 
       {headline ? (
         <div className="fallen">
@@ -80,6 +82,13 @@ export function MorningReportView({
         <p className="lead">
           {sol === 1 ? t("morning.firstDay") : t("morning.nothingFell")}
         </p>
+      )}
+      {/* Sol 1: Pip's briefing for this campaign and the real thing behind it. */}
+      {sol === 1 && setup && (
+        <div className="campaign-ending">
+          <p className="lead">{tRun(`campaign.${setup.campaignId}.brief`)}</p>
+          <p><strong>{t("run.realThing")}:</strong> {tRun(`campaign.${setup.campaignId}.real`)}</p>
+        </div>
       )}
 
       {extra && <ExtraLine extra={extra} />}
@@ -100,7 +109,6 @@ function DominoHelp({ textKey }: { textKey: string }) {
 }
 
 function ExtraLine({ extra }: { extra: Extra }) {
-  const { t } = useTranslation();
   if (extra.kind === "event") {
     return (
       <div className="extra">
@@ -112,23 +120,10 @@ function ExtraLine({ extra }: { extra: Extra }) {
       </div>
     );
   }
-  const { answer } = extra;
-  const storm =
-    answer.stormCloudInSols === undefined
-      ? t("earth.storm.none")
-      : t("earth.storm.coming", { count: answer.stormCloudInSols });
   return (
     <div className="extra">
-      <p className="lead">
-        <span>
-          {t("earth.answer", {
-            dust: t(`earth.dust.${answer.dustTomorrow}`),
-            storm,
-          })}
-        </span>{" "}
-        <WhatsThis topic="askEarth" />
-      </p>
-      <DataChip source={answer.source} />
+      <EarthAnswer answer={extra.answer} />
+      <WhatsThis topic="askEarth" />
     </div>
   );
 }

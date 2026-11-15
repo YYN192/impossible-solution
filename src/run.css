@@ -1,0 +1,39 @@
+/* Mission picker, beat screen and storm alarm. Colours and button shapes come from ui.css. */
+.mission-picker { display: grid; gap: 0.6rem; margin: 0.5rem 0 0.75rem; }
+.mission-card { display: grid; gap: 0.2rem; text-align: left; width: 100%; padding: 0.6rem 0.8rem; }
+.mission-card strong { font-size: 1.05rem; }
+.mission-card small, .mission-card .mission-meta, .mission-card .mission-tags { font-family: var(--font-body); font-size: 0.875rem; line-height: 1.35; }
+.mission-card .mission-tags { color: #9fe0d8; }
+.mission-card[aria-pressed="true"] { border-color: #ffd166; background: #26384d; }
+.mission-card:disabled { opacity: 0.7; }
+.mission-extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.5rem; }
+.mission-extras button[aria-pressed="true"] { border-color: #ffd166; }
+
+.beat-type { color: #ffd166; }
+.beat-delay { font-weight: 700; }
+.beat-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.beat-option { display: grid; gap: 0.35rem; justify-items: start; text-align: left; align-content: start; padding: 0.8rem; }
+.beat-option .beat-icon { font-size: 1.8rem; line-height: 1; }
+.beat-option strong { font-size: 1.05rem; }
+.beat-option small, .beat-effects { font-family: var(--font-body); font-size: 0.9rem; line-height: 1.35; }
+.beat-real { color: #9fe0d8; }
+.beat-effects { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; }
+.beat-effects > span { background: #0d1622; border: 2px solid #3d4c60; padding: 0.1rem 0.4rem; }
+.beat-cannot { color: #ffb4a2; }
+.beat-result { border: 3px solid #ffd166; padding: 0.8rem; margin: 1rem 0; background: #111c2a; }
+.earth-answer .risk-high { color: #ffb4a2; font-weight: 700; }
+
+.storm-alarm { border: 4px solid #e2573b; background: #2a1414; padding: 0.8rem; margin: 0.75rem 0; }
+.storm-alarm[data-size="small"], .storm-alarm[data-kind="dustStorm"] { border-color: #ffd166; background: #2a2414; }
+.storm-alarm h2 { margin: 0 0 0.4rem; color: #ffd9cf; }
+.storm-alarm .pip-line { display: flex; gap: 0.6rem; align-items: center; font-weight: 700; }
+.storm-alarm .pip-line img { width: 48px; height: 48px; }
+.real-card { border: 3px solid #9fe0d8; background: #0d1622; padding: 0.6rem; margin-top: 0.6rem; }
+.real-card > strong { font-family: var(--font-pixel); color: #9fe0d8; }
+.real-card .event-id { font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) {
+  .storm-alarm[data-kind="particleBurst"] { animation: storm-flash 0.9s steps(2, jump-none) 2; }
+  @keyframes storm-flash { 50% { background: #5a1c14; } }
+}
+.run-seed { font-family: ui-monospace, Consolas, monospace; }
+.campaign-ending { border: 3px solid #9fe0d8; padding: 0.6rem; margin: 0.75rem 0; background: #0d1622; }

@@ -71,7 +71,7 @@ export const dailySeed = (now: Date): number => Number(now.toISOString().slice(0
 /** One run of a campaign: bundled real data, picked by the seed. */
 export function campaignMission(id: string, seed: number): MissionSetup {
   const run: Run = buildRun(campaignById(id), seed);
-  return {
+  return withDelay({
     ...CLASSIC,
     kind: "campaign",
     titleKey: `campaign.${run.campaignId}.name`,
@@ -85,7 +85,7 @@ export function campaignMission(id: string, seed: number): MissionSetup {
     rules: run.rules,
     beats: run.beats,
     ...(run.stormId ? { stormId: run.stormId } : {}),
-  };
+  }, SAVED_DELAY);
 }
 
 /**

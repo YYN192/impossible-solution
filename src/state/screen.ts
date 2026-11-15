@@ -1,29 +1,39 @@
 import { create } from "zustand";
 import { MISSION_SOLS } from "../sim/types";
 import { useGame } from "./game";
+import { useMission } from "./mission";
 
 /**
  * Which screen is showing. The game itself (bars, dominoes, sol results) lives in the
  * engine's GameState, held by useGame (./game.ts); this store only handles navigation.
  * Every way into sol 1 (Start mission, Try a different plan) starts a fresh game.
  *
- * Flow: title → (morning → plan → endSol) × MISSION_SOLS → final → morning sol 1 (same start)
+ * Flow: title → (morning → [beat] → plan → endSol) × sols → final → morning sol 1 (same start).
+ * A beat is the campaign's interaction for that sol (site, dilemma, radio …), when it has one.
  */
-export type Screen = "title" | "morning" | "plan" | "endSol" | "final";
+export type Screen = "title" | "morning" | "beat" | "plan" | "endSol" | "final";
+/** Where the player is: the menu, the walkable station, or the mission console. */
+export type Place = "menu" | "hub" | "console";
 
 export interface Nav {
   screen: Screen;
   sol: number;
 }
 
-export const START: Nav = { screen: "title", sol: 1 };
+export const START: Nav & { place: Place } = { screen: "title", sol: 1, place: "menu" };
 
 /** Pure: the screen after `nav` when the player presses the main button. */
-export function nextNav({ screen, sol }: Nav, totalSols = MISSION_SOLS): Nav {
+export function nextNav(
+  { screen, sol }: Nav,
+  totalSols = MISSION_SOLS,
+  hasBeat: (sol: number) => boolean = () => false,
+): Nav {
   switch (screen) {
     case "title":
       return { screen: "morning", sol: 1 };
     case "morning":
+      return { screen: hasBeat(sol) ? "beat" : "plan", sol };
+    case "beat":
       return { screen: "plan", sol };
     case "plan":
       return { screen: "endSol", sol };
@@ -37,6 +47,8 @@ export function nextNav({ screen, sol }: Nav, totalSols = MISSION_SOLS): Nav {
 }
 
 interface NavStore extends Nav {
+  place: Place;
+  go: (place: Place) => void;
   /** Main button: go to the next screen in the loop. */
   next: () => void;
   /** "Try a different plan": back to sol 1 morning (same start). */
@@ -49,9 +61,11 @@ interface NavStore extends Nav {
 
 export const useNav = create<NavStore>()((set) => ({
   ...START,
+  go: (place) => set({ place }),
   next: () =>
     set((s) => {
-      const to = nextNav(s);
+      const setup = useMission.getState().setup;
+      const to = nextNav(s, setup?.rules.sols, (sol) => Boolean(setup?.beats[sol]));
       // The title and final screen both enter a new run through morning 1.
       // Reset here—not in home()—so returning home preserves the completed run
       // until the player explicitly starts again.

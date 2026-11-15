@@ -3,8 +3,11 @@ import { useTranslation } from "react-i18next";
 import { DominoCard } from "../components/DominoCard";
 import { ScreenFrame } from "../components/ScreenFrame";
 import { readFlags } from "../data/flags";
-import { stars as starsOf, type Stars } from "../sim/engine";
-import { MISSION_SOLS, type Domino } from "../sim/types";
+import { rulesOf, stars as starsOf, type Stars } from "../sim/engine";
+import type { Domino } from "../sim/types";
+import { tRun } from "../i18n/dynamic";
+import { useMission } from "../state/mission";
+import { useProgress } from "../state/progress";
 import { useBest } from "../state/best";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
@@ -26,7 +29,7 @@ export function FinalScreen() {
     <FinalView
       dominoes={state.dominoes}
       stars={starsOf(state)}
-      endedEarly={state.sol < MISSION_SOLS}
+      endedEarly={state.sol < rulesOf(state).sols}
     />
   );
 }
@@ -45,12 +48,27 @@ export function FinalView({
   const best = useBest((s) => s.best);
   const record = useBest((s) => s.record);
   const chains = buildChains(dominoes);
+  const setup = useMission((s) => s.setup);
+  const reload = useMission((s) => s.reload);
+  const finish = useProgress((s) => s.finish);
   // The ?demo=1 recording must look the same every time: no Best from earlier games.
   const demo = readFlags().demo;
 
   useEffect(() => {
     if (!demo) record(stars.count);
-  }, [demo, record, stars.count]);
+    // Finishing a campaign (not an early trip home) opens the next one.
+    if (!demo && !endedEarly && setup) finish(setup.campaignId);
+  }, [demo, record, stars.count, endedEarly, setup, finish]);
+
+  /** A new run of the same campaign: without a seed in the link, the next run draws a new one. */
+  const again = () => {
+    const q = new URLSearchParams(window.location.search);
+    q.delete("seed");
+    const search = q.toString();
+    window.history.replaceState({}, "", `${window.location.pathname}${search ? `?${search}` : ""}`);
+    audio.playSfx("replay-start");
+    void reload().then(() => restart());
+  };
 
   const longest = Math.max(0, ...chains.map((c) => c.length));
   const won = !endedEarly && stars.count >= 2;
@@ -82,10 +100,20 @@ export function FinalView({
         <p className="lead">{t("final.noChain")}</p>
       )}
 
+      {setup && (
+        <div className="campaign-ending">
+          <p><strong>{t("run.planners")}:</strong> {tRun(`campaign.${setup.campaignId}.planners`)}</p>
+          {!demo && <p className="note run-seed" title={t("run.seedHint", { seed: setup.seed })}>{t("run.seed", { seed: setup.seed })}</p>}
+        </div>
+      )}
+
       <div className="actions">
         <button type="button" className="primary" onClick={() => { audio.playSfx("replay-start"); restart(); }}>
           {t("final.tryAgain")}
         </button>
+        {!demo && setup?.kind === "campaign" && (
+          <button type="button" onClick={again}>{t("run.again")}</button>
+        )}
         <button type="button" onClick={() => { audio.playSfx("menu-back"); home(); }}>
           {t("final.home")}
         </button>
@@ -139,7 +167,7 @@ function ChainView({ chain, label }: { chain: Domino[]; label: number }) {
           style={{ "--fall-delay": `${i * FALL_STEP_MS}ms` } as CSSProperties}
         >
           {i > 0 && <p className="because">{t("morning.because")}</p>}
-          <p className="chain-sol">{t("final.sol", { sol: domino.sol })}</p>
+          <p className="chain-sol">{tRun("final.sol", { sol: domino.sol })}</p>
           <DominoCard domino={domino} fall />
         </li>
       ))}
