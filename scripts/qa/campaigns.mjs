@@ -86,6 +86,7 @@ try {
       else {
         await overflow("final");
         if (!(await page.getByText(new RegExp(String(seed))).count())) findings.push(`${tag}: run number ${seed} not shown on the final screen`);
+        if (shots && campaign === "dust" && seed === 7) await page.waitForTimeout(2500); // let the dominoes fall
         if (shots && campaign === "dust" && seed === 7) await page.screenshot({ path: `docs/qa/campaign-final-${view.name}.png`, fullPage: true });
       }
       await context.close();

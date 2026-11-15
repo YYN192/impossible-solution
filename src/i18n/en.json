@@ -119,7 +119,10 @@
     "best_other": "Best: {{count}}★",
     "tryAgain": "Try a different plan",
     "home": "Back to start",
-    "sol_moon": "Day {{sol}}"
+    "sol_moon": "Day {{sol}}",
+    "so": "so",
+    "times": "This happened {{count}} times.",
+    "more": "Show {{count}} more"
   },
   "data": {
     "badge": {
