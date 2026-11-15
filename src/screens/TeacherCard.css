@@ -8,3 +8,10 @@
   body:has(.teacher) :is(.topbar, .notice, .note, .sources__back) { display: none !important; }
   .teacher__goal { color: #000; }
 }
+.teacher__unlock { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 1.2rem 0; padding: 14px; border: 2px dashed #48647b; }
+.teacher__unlock label { flex-basis: 100%; font-weight: 700; }
+.teacher__unlock input { min-height: 48px; padding: 0 12px; font: inherit; letter-spacing: .1em; text-transform: uppercase; background: #0a1624; color: inherit; border: 2px solid #8fa7b9; }
+.teacher__unlock input[aria-invalid="true"] { border-color: #ff7a59; }
+.teacher__unlock button { min-height: 48px; }
+.teacher__unlock p { flex-basis: 100%; margin: 0; font-size: .85rem; }
+@media print { .teacher__unlock { display: none; } }

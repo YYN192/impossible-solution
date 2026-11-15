@@ -1,13 +1,13 @@
-/** Crew talks in the hub: who has which answers and which practice game, plus the pure rules of those games. */
+import type { JobId } from "../sim/types";
+/** Crew talks in the hub: who has which answers, which practice game, and what they say about this mission. */
 export type Speaker =
-  "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse" | "radar";
-export type Drill = "jobs" | "power" | "grow" | "shelter";
+  "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse" | "radar" | "engineering";
 
 /** Crew members have a menu of answers and one practice game; places (airlock, greenhouse) just talk. */
-export const DRILL: Partial<Record<Speaker, Drill>> = {
-  commander: "jobs",
-  engineer: "power",
-  scientist: "grow",
+export const DRILL: Partial<Record<Speaker, JobId>> = {
+  commander: "askEarth",
+  engineer: "panels",
+  scientist: "greenhouse",
   drone: "shelter",
 };
 
@@ -18,6 +18,7 @@ export const PORTRAIT: Record<Speaker, string> = {
   drone: "characters/robots/assistant-drone-portrait",
   airlock: "consoles/mission-monitor",
   greenhouse: "characters/npcs/scientist-portrait",
+  engineering: "environment/decorations/mars-shelf", // the shelves open the Engineering bay graphs
   radar: "consoles/radar", // the radar opens its space weather strip (#60); listed so every station object can talk
 };
 
@@ -25,27 +26,6 @@ export const PORTRAIT: Record<Speaker, string> = {
 export const lettersShown = (text: string, ms: number, cps = 40) =>
   Math.min(text.length, Math.floor((ms * cps) / 1000));
 
-// Commander: 3 crew, 4 jobs. Whatever you pick, one job waits — that is the trade-off.
-export const JOBS = ["panels", "greenhouse", "shelter", "science"] as const;
-export const CREW = 3;
-export const toggleJob = (picked: string[], job: string) =>
-  picked.includes(job)
-    ? picked.filter((j) => j !== job)
-    : picked.length < CREW
-      ? [...picked, job]
-      : picked;
-
-// Engineer: 2 power cells, 3 machines. The air machine must stay on.
-export const MACHINES = ["air", "lamp", "radio"] as const;
-export const CELLS = 2;
-export const powerResult = (on: string[]) =>
-  on.length < CELLS ? "more" : on.includes("air") ? "ok" : "noAir";
-
-// Scientist: the sprout needs water, then light, again and again (5 steps to harvest).
-export const GROW_STEPS = 5;
-export const growNeed = (stage: number): "water" | "light" =>
-  stage % 2 === 0 ? "water" : "light";
-
-// Drone: stack shelter blocks before the space rays arrive. Each block lowers the dose.
-export const BLOCKS = 4;
-export const SHELTER_SECONDS = 12;
+/** "What is our mission?": each crew member explains the campaign being played from their own job (classic → storm). */
+export const missionTalkKey = (speaker: Speaker, campaign?: string) =>
+  `talk.${speaker}.mission.${campaign === "dust" || campaign === "moon" ? campaign : "storm"}`;

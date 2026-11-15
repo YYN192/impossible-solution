@@ -90,6 +90,3 @@
 /* #68: the rover runs out of power away from the base. */
 .explore-map { position: relative; }
 .explore-nopower { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3; margin: 0; padding: 0.6rem 1.2rem; background: #2a1a10; border: 3px solid #f5c542; color: #ffe9a8; font-size: clamp(1.4rem, 1rem + 2vw, 2.4rem); font-weight: 900; box-shadow: 6px 6px #03070d; pointer-events: none; white-space: nowrap; }
-.explore.shake { animation: rover-shake 0.4s steps(6) 1; }
-@keyframes rover-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-@media (prefers-reduced-motion: reduce) { .explore.shake { animation: none; } }

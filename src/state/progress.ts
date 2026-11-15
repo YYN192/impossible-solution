@@ -48,3 +48,8 @@ export const useProgress = create<Progress>()((set, get) => ({
 
 export const isOpen = (c: Campaign, p: Pick<Progress, "done" | "teacher">): boolean =>
   p.teacher || !c.unlockAfter || p.done.includes(c.unlockAfter);
+
+/** The class code a teacher types on the "For teachers" screen to open every mission (not a secret: it is in the README). */
+export const TEACHER_CODE = "ARES2026";
+/** Forgiving match: any case, spaces and dashes ignored ("ares-2026" works). */
+export const isTeacherCode = (input: string): boolean => input.replace(/[\s-]/g, "").toUpperCase() === TEACHER_CODE;

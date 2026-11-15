@@ -5,10 +5,11 @@ import { Icon, Icons } from "../components/Icon";
 import { ResourceMeters } from "../components/ResourceMeters";
 import { ScreenFrame } from "../components/ScreenFrame";
 import { audio } from "../game/audio";
+import { mistake } from "../game/feedback";
 import { tDynamic, tRun } from "../i18n/dynamic";
 import type { BeatOption } from "../sim/campaign";
 import type { IconName } from "../sim/icons";
-import { canAct, rulesOf } from "../sim/engine";
+import { ENGINE, canAct, rulesOf } from "../sim/engine";
 import type { Action, Bars, Domino, Rules } from "../sim/types";
 import { useGame } from "../state/game";
 import { useMission } from "../state/mission";
@@ -83,6 +84,8 @@ export function BeatScreen() {
     const fell = after.dominoes.at(-1);
     if (!fell) return;
     audio.playSfx(action.ask ? "earth-message-send" : "assign");
+    const { power, air, dose } = after.bars;
+    if (power <= 1 || air <= 2 || dose >= ENGINE.doseLimit) mistake("big"); else if (dose > before.dose) mistake("small"); // the choice cost something
     setDone({ fell, before });
   }
   const choose = (o: BeatOption) => act(o.action);

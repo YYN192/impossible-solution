@@ -115,6 +115,22 @@ describe("the radar console", () => {
   });
 });
 
+describe("the engineering bay shelves", () => {
+  it("open the graphs panel", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    try {
+      useSession.setState({ position: { x: 96, y: 160, facing: "back" } }); // just below the shelves
+      render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(16); });
+      screen.getByText(t("world.near.engineering"));
+      act(() => { fireEvent.keyDown(window, { key: "e" }); });
+      expect(screen.getByRole("dialog", { name: t("engineering.title") })).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("station room signs", () => {
   it("shows no area signs (Engineering, Mission console, Science lab, Airlock) over the game", () => {
     render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
