@@ -13,6 +13,8 @@ interface GameStore {
   state: GameState;
   /** Dominoes from the last step (StepResult.fell): what the next morning report shows first. */
   fell: Domino[];
+  /** Base state before this sol’s timed storm repairs; retained across menu visits. */
+  stormCheckpoint?: GameState;
   /** Run one sol with `plan` and the mission's storm events / Earth's forecasts. */
   endSol: (plan: Plan) => GameState;
   /** One beat choice (site, dilemma, radio …), through the engine. */
@@ -44,7 +46,7 @@ export const useGame = create<GameStore>()((set, get) => ({
       setup?.events ?? [],
       setup?.forecasts,
     );
-    set({ state, fell });
+    set({ state, fell, stormCheckpoint: undefined });
     return state;
   },
   choose: (action) => {
@@ -52,5 +54,5 @@ export const useGame = create<GameStore>()((set, get) => ({
     set({ state });
     return state;
   },
-  reset: () => set({ state: createMissionGame(), fell: [] }),
+  reset: () => set({ state: createMissionGame(), fell: [], stormCheckpoint: undefined }),
 }));

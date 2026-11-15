@@ -906,6 +906,8 @@
     "now": "Right now: {{choice}}."
   },
   "hubStorm": {
+    "timer": "Time to fix the base",
+    "retry": "Time ran out! Restarting the storm…",
     "eyebrow": "Alarm",
     "title": "Dust storm!",
     "lead": "Dust is blowing over the whole base. The Sun is hidden. Fix two things before you plan the day.",
