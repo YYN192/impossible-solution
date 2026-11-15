@@ -9,8 +9,8 @@
 .mission-card:disabled { opacity: 0.7; }
 /* Long campaigns: the progress strip shows numbers only, so 6 or 7 days fit a phone. */
 .sol-navigation.many > span { min-width: 0; text-align: center; }
-.mission-extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.5rem; }
-.mission-extras button[aria-pressed="true"] { border-color: #ffd166; }
+
+
 
 .beat-type { color: #ffd166; }
 .beat-delay { font-weight: 700; }
@@ -75,8 +75,15 @@
 .explore-pad [data-dir="up"] { grid-area: up; } .explore-pad [data-dir="down"] { grid-area: down; }
 .explore-pad [data-dir="left"] { grid-area: left; } .explore-pad [data-dir="right"] { grid-area: right; }
 .explore-switch { margin: 0.5rem 0; }
-.crew-skill { display: flex; align-items: center; gap: 0.3rem; color: #9fe0d8; font-family: var(--font-body); font-size: 0.85rem; font-weight: 400; }
+.crew-skill { display: flex; align-items: center; justify-content: center; gap: 0.3rem; color: #9fe0d8; font-family: var(--font-body); font-size: 0.875rem; font-weight: 400; }
 .crew-skill img { width: 16px; height: 16px; image-rendering: pixelated; }
 .mission-card { grid-template-columns: 96px 1fr; column-gap: 0.7rem; align-items: start; }
 .mission-card > .mission-art { grid-row: 1 / span 4; width: 96px; height: 60px; image-rendering: pixelated; border: 2px solid var(--ink, #080b12); }
 .mission-card > :not(.mission-art) { grid-column: 2; }
+/* Narrow screens: one crew member per row (picture left, text right), so the name, skill and job stay at 14 px+ in 3 lines. */
+@media (max-width: 900px) {
+  .crew-roster { grid-template-columns: 1fr; }
+  .crew-roster .crew-tile > button:first-child { flex-direction: row; min-height: 0; padding: 10px 52px 10px 12px; gap: 12px; text-align: left; }
+  .crew-tile > button:first-child > span { flex: 1; min-width: 0; }
+  .crew-roster .crew-skill { justify-content: flex-start; text-align: left; }
+}

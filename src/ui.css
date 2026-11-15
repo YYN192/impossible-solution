@@ -17,21 +17,20 @@
 @media (pointer: coarse) { :root { --tap: 48px; } }
 html { -webkit-text-size-adjust: 100%; }
 body { font-size: 1rem; }
-img, canvas, .world-viewport, .menu-landscape img { image-rendering: pixelated; }
+img, canvas, .world-viewport{ image-rendering: pixelated; }
 
 /* Paragraphs and list text: readable Nunito, never below 1rem. (!important beats the many one-off minified sizes.) */
 p, li, dd, summary + * { font-family: var(--font-body); }
 p, li { font-size: max(1rem, 1em) !important; line-height: 1.5; overflow-wrap: anywhere; }
-.eyebrow, .note, .chip, .sol-tag, .chain-sol, .console-footer, .menu-bottom, .meter-label, .step-label, .menu-landscape span,
-.mission-facts > span, .sol-navigation > span, .planner-guidance, .meter-change, .meter-value small, .resource-meter > small,
+.eyebrow, .note, .chip, .sol-tag, .chain-sol, .console-footer, .menu-bottom, .meter-label, .step-label, .sol-navigation > span, .planner-guidance, .meter-change, .meter-value small, .resource-meter > small,
 .job-number, .world-objective > span:last-child, .station-tip, .data-badge { font-size: 0.875rem !important; }
 .note, .chip, .chain-sol, .station-tip, .planner-guidance { line-height: 1.4; }
 
 /* Headings and labels: pixel font. */
-h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .mission-facts, .data-badge {
+h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge {
   font-family: var(--font-pixel); letter-spacing: 0; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto;
 }
-.menu-story h1 { letter-spacing: 0; text-shadow: 3px 3px 0 var(--ink); }
+
 .eyebrow { letter-spacing: 0.06em; }
 
 /* ONE button system: every button, button-like control and summary. */
@@ -129,7 +128,7 @@ kbd[data-pressed] { background: #08202a; color: #83d9f4; border-color: #08202a; 
    keeps the pixel font. To bring it back everywhere, delete the next three rules. */
 :root { --font-pixel: var(--font-body); }
 :is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge, .job-copy strong, .crew-tile strong, .mission-card strong, .beat-option strong) { font-weight: 700; }
-:root:not(:lang(bg)) .menu-story h1 { font-family: "Pixelify Sans", var(--font-body); font-weight: 400; }
+
 /* A 44 px link inside a chip must grow the chip, not spill onto the next card. */
 p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35rem; }
 /* A job card with no astronaut picked yet looks "not ready" but still answers when tapped. */
