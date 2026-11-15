@@ -160,7 +160,7 @@
       "nightSolarPower": "Power made by clean panels",
       "doseNormal": "Normal-sol space-ray meter rise",
       "doseOutsideExtra": "Extra space-ray meter rise for outside work",
-      "doseBurstOutside": "Particle-burst dose outside (game scale; the 39× normal-day ratio is real)",
+      "doseBurstOutside": "Particle-burst dose outside, huge storm (game number)",
       "doseBurstInside": "Particle-burst dose inside",
       "doseShelterFactor": "Shelter dose multiplier",
       "startAir": "Starting air",
@@ -176,7 +176,12 @@
       "foodLoss": "Food used when the greenhouse is skipped",
       "scienceGain": "Science earned by one science trip",
       "demoStartFood": "Saved demo's starting food",
-      "demoStartPanels": "Saved demo's starting panel efficiency"
+      "demoStartPanels": "Saved demo's starting panel efficiency",
+      "nightAirGain": "Air gained each night the machine runs",
+      "airReady": "Air needed at the end for the base star",
+      "meterMax": "Top of the space-ray meter (a full meter ends the mission)",
+      "smallStormFactor": "Small storm: dose as a multiple of a normal day (real peak: about 3 times)",
+      "moonStormFactor": "May 2024 storm at the Moon: multiple of a normal day (real: about 1.3 times)"
     },
     "simplifies": "What this game simplifies",
     "back": "Back"
@@ -185,10 +190,14 @@
     "crew": "This game has 3 crew members. A real base would have many more people and jobs.",
     "sols": "Our short sols are game rounds. Real storm clouds take several days to reach Mars; we squeeze that into a sol or two.",
     "costs": "Job costs (power, food, the size of each bar) are game numbers we chose so the game is fair and fun.",
-    "dose": "The space-ray meter uses game units. The size of a storm compared with a normal day is real.",
+    "dose": "The space-ray meter uses game units. Which storm is huge and which is small comes from real readings.",
     "forecast": "Earth's storm warning is a computer forecast, not a measurement. Our dust forecast is made up for the game.",
     "dates": "Normal Mars radiation was measured in 2012–13; the big storm happened in 2024.",
-    "real": "Real: the 20 May 2024 storm, normal Mars radiation, the dust effect on solar panels, and the message delay."
+    "real": "Real: three dated solar storms measured on Mars, the dust effect on solar panels, today's radio delay, and the landing places.",
+    "storms": "Each storm is compared only with the quiet level just before it, on the same detector. A small storm is played as 3 times a normal day for a whole sol; its real peak lasted hours.",
+    "sites": "Site numbers (sun, dust, heater, ice) and upgrade numbers are game numbers. The real record of each place decides which way they lean.",
+    "moon": "On the Moon, the day the Sun hides behind a ridge and the days Earth is hidden are game events. So is the power cut of the 2018 dust storm.",
+    "risk": "In the game, Earth's burst forecast is always right, because we replay history. Real forecasts give a chance and can be wrong."
   },
   "jobs": {
     "panels": "Clean solar panels",

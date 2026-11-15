@@ -88,7 +88,7 @@ export const REAL_FACTS: RealFact[] = [
     what: "Normal radiation on the Mars surface",
     value: `${RAD_BASELINE.value} absorbed (0.64 mSv per day dose equivalent)`,
     usedFor:
-      "The normal daily rise of the space-ray meter. The burst is about 39 normal days at once.",
+      "The normal daily rise of the space-ray meter. (We do not compare it with the 2024 storm: different years and series.)",
     ref: RAD_BASELINE,
   },
   {
@@ -143,5 +143,9 @@ export const SIMPLIFICATION_KEYS = [
   "simplifies.dose",
   "simplifies.forecast",
   "simplifies.dates",
+  "simplifies.storms",
+  "simplifies.sites",
+  "simplifies.moon",
+  "simplifies.risk",
   "simplifies.real",
 ] as const;

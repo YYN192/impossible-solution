@@ -17,6 +17,17 @@
 | NASA Mars Trek, Viking MDIM 2.1 colour mosaic (NASA/JPL-Caltech, USGS), 4 tiles around Gale Crater | https://trek.nasa.gov/mars/ | "Where is our base?" map; copies in public/data/trek/ | 2026-11-14 (snapshot) |
 | DONKI FLR, SEP, CME, GST, notifications, last 30 days | https://api.nasa.gov/DONKI/ | "What the Sun did this month" (context only; most never reach Mars) | 2026-11-14 (snapshot), refreshed every 3 h by the deploy workflow |
 | Astronomy Picture of the Day (science.nasa.gov) — each picture has its own credit/copyright | https://science.nasa.gov/wp-json/wp/v2/apod-basic | Link + credit only; the picture is never copied | 2026-11-14 (snapshot), refreshed every 3 h |
+| DONKI CME 2017-09-10T16:09:00-CME-001 and 2021-10-28T15:53:00-CME-001 with their WSA-Enlil Mars forecasts | https://ccmc.gsfc.nasa.gov/DONKI/view/CME/13107/-1 · https://ccmc.gsfc.nasa.gov/DONKI/view/CME/18106/-1 | Storm pool: the Sep 2017 and Oct 2021 storms, storm cloud of 13 Sep 2017 | 2026-11-14 (snapshot `storm-pool.json`, through our /api proxy) |
+| Curiosity RAD dose rates 8–14 Sep 2017 and 26 Oct–1 Nov 2021 (MSL-RAD-Surface) — NASA OSDR RadLab | https://visualization.osdr.nasa.gov/radlab/gui/ | Size of the two small storms (worst hour ÷ quiet level, about 3 times each) | 2026-11-14 (read by us; values in `src/data/storms.ts`) |
+| LRO CRaTER dose rates, May 2024 (CRaTER-D1D2) — NASA OSDR RadLab | https://visualization.osdr.nasa.gov/radlab/gui/ | South Pole Outpost: the storm seen from the Moon's orbit (about 1.3 times) | 2026-11-14 (read by us) |
+| NASA Deep Space Network Now (round-trip light time of Mars links) | https://eyes.nasa.gov/dsn/dsn.html | Today's radio delay in Ask Earth and the radio beat | live through /api/dsn/mars + 2026-11-14 snapshot `dsn-mars.json` |
+| InSight power after landing and in spring 2022 (NASA Photojournal) | https://science.nasa.gov/photojournal/insights-power-generation-after-landing-and-spring-2022 | Dust Season briefing and Elysium Planitia site | 2026-11-14 (constant) |
+| InSight sand-trickle power boost, May 2021 (NASA/JPL news) | https://www.nasa.gov/feature/jpl/nasa-s-insight-mars-lander-gets-a-power-boost | Dust Season: wipe beat, ending card | 2026-11-14 (constant) |
+| Opportunity's last message, 10 June 2018 (NASA/JPL) | https://www.jpl.nasa.gov/images/opportunitys-last-message | Dust Season: the 2018 global dust storm | 2026-11-14 (constant) |
+| Spirit and Opportunity wind cleaning events (The Planetary Society, from JPL mission updates) | https://www.planetary.org/articles/08-31-mer-update-1 | Dust Season: Meridiani site, dust-devil choice | 2026-11-14 (constant) |
+| Curiosity REMS weather feed, sol 4995 (25 Aug 2026), min −71 °C — NASA/JPL-Caltech/CAB (CSIC-INTA) | https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json | Dust Season: Gale Crater site, cold-night choice (labelled "reading from 25 Aug 2026", never live) | 2026-11-14 (constant) |
+| NASA Artemis candidate landing regions (news release, 19 Aug 2022) | https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/ | South Pole Outpost: site names and what they were chosen for | 2026-11-14 (constant) |
+| Earth–Moon distance (NASA Moon fact sheet) | https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html | Moon radio delay, about 1.3 s | 2026-11-14 (constant) |
 
 ## Partner agency resources
 
