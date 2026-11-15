@@ -199,7 +199,7 @@ export default function PlanScreen() {
           </h2>
           {!selected && <p className="jobs-locked">{t("play.jobsLocked")}</p>}
           <div className={`job-list ${selected ? "" : "locked"}`}>
-            {jobIds.map((id, i) => {
+            {jobIds.map((id) => {
               const owner = crew.find((c) => plan[c] === id);
               return (
                 <button
@@ -247,15 +247,22 @@ export default function PlanScreen() {
                     );
                   }}
                 >
-                  <span className="job-number">0{i + 1}</span>
                   <img src={asset(`items/${jobArt[id]}`)} alt="" />
                   <span className="job-copy">
-                    <strong>{t(`jobs.${id}`)}</strong>
-                    <small>{t(`jobInfo.${id}.done`)}</small>
-                    <span className="job-cost">
-                      {t("jobInfo.cost", { count: JOBS[id].powerCost })}
-                      {JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}
+                    <span className="job-head">
+                      <strong>{t(`jobs.${id}`)}</strong>
+                      <span
+                        className="job-cost"
+                        title={`${t("jobInfo.cost", { count: JOBS[id].powerCost })}${JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}`}
+                      >
+                        {t("jobInfo.cost", { count: JOBS[id].powerCost })}
+                        {JOBS[id].outside ? ` · ${t("jobInfo.outside")}` : ""}
+                      </span>
                     </span>
+                    {/* One line on laptops; the full sentence is in the title and still read by screen readers. */}
+                    <small title={t(`jobInfo.${id}.done`)}>
+                      {t(`jobInfo.${id}.done`)}
+                    </small>
                   </span>
                   <span className="job-owner">
                     {owner
@@ -275,6 +282,8 @@ export default function PlanScreen() {
                 ? t("play.pickCrewFirst")
                 : t("play.chooseCrew")}
           </div>
+          {/* Left column on laptops: the outlook on the right is already tall, and the button stays pinned (sticky). */}
+          {!phone && <div className="plan-end">{endSol}</div>}
         </div>
         <aside className="plan-outlook">
           <h2>{tRun("play.preview", {}, moon)}</h2>
@@ -334,7 +343,6 @@ export default function PlanScreen() {
                 );
               })}
           </ul>
-          {!phone && endSol}
           <p className="note">{t("play.gameUnits")}</p>
         </aside>
         {phone && (

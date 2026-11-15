@@ -116,3 +116,53 @@
 .plan-screen .crew-roster.shake { animation: plan-shake 0.4s ease-in-out; }
 @keyframes plan-call { 50% { box-shadow: 0 0 14px 2px #83d9f4aa; } }
 @keyframes plan-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+/* ===== #95 Plan fits the screen: compact crew + 2-column jobs + slim outlook (no page scroll on laptops) ===== */
+.plan-screen .job-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.plan-screen .job-head strong { flex-shrink: 0; max-width: 100%; }
+.plan-screen .job-head .job-cost { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.plan-screen .job-choice { min-height: 56px; padding: 6px 10px; gap: 10px; }
+.plan-screen .job-copy { gap: 2px; }
+.plan-screen .job-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plan-screen .crew-roster { margin-bottom: 10px; }
+.plan-screen .crew-roster .crew-tile > button:first-child { flex-direction: row; min-height: 0; padding: 6px 40px 6px 8px; gap: 10px; text-align: left; }
+.plan-screen .crew-tile > button:first-child > img { width: 40px; height: 40px; flex-shrink: 0; }
+.plan-screen .crew-tile > button:first-child > span { flex: 1; min-width: 0; display: grid; gap: 0; }
+.plan-screen .crew-roster .crew-skill { justify-content: flex-start; text-align: left; }
+.plan-screen .step-label { margin: 0 0 6px; }
+.plan-screen .jobs-locked { margin: 0 0 6px; }
+.plan-screen .planner-guidance { margin-top: 6px; }
+@media (min-width: 721px) {
+  .planner-layout.plan-screen { margin-top: 10px; gap: 16px; grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); }
+  .plan-screen .crew-roster .crew-tile > button:first-child { padding-right: 8px; }
+  .plan-screen .job-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .plan-screen .plan-outlook { padding: 10px 14px; }
+  .plan-screen .plan-outlook > h2 { margin: 0 0 2px; font-size: 1.1rem; }
+  .plan-screen .plan-outlook > .note:first-of-type { display: none; }
+  .plan-screen .resource-meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 4px 0; }
+  .plan-screen .resource-meter { padding: 6px 8px; }
+  .plan-screen .meter-label { flex-wrap: nowrap; gap: 6px; }
+  .plan-screen .meter-label > span:not(.whats-this),
+  .plan-screen .meter-track,
+  .plan-screen .resource-meter > small { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .plan-screen .meter-label .whats-this { margin-left: auto; }
+  .plan-screen .meter-value { margin: 2px 0 0; }
+  .plan-screen .meter-value strong { font-size: 1.25rem; }
+  .plan-screen .small-counters { padding: 4px 0; }
+  .plan-screen .skip-heading { margin: 6px 0 4px; }
+  .plan-screen .skip-dominoes { gap: 4px; }
+  .plan-screen .mini-domino { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; padding: 4px 8px; }
+  .plan-screen .mini-chain { flex-wrap: nowrap; }
+  .plan-screen .mini-link small { display: none; }
+  .plan-screen .plan-end { position: sticky; bottom: 0; z-index: 5; margin-top: 8px; padding: 6px 0; background: #101e2c; }
+  .plan-screen .plan-end .end-sol { width: 100%; margin: 0; }
+  .plan-screen .plan-outlook > .note:last-child { margin: 4px 0 0; }
+  .science-details { margin-top: 6px; }
+}
+/* Short laptops: the lead sentence repeats the two step labels right below it. */
+@media (min-width: 721px) and (max-height: 800px) { .screen > .lead { display: none; } }
+/* Touch: every target at least 48px */
+@media (pointer: coarse) { .plan-screen .job-choice, .plan-screen .crew-tile > button:first-child, .plan-screen .end-sol { min-height: 48px; } .plan-screen .crew-tile .unassign { min-width: 48px; min-height: 48px; } }
+.plan-screen .job-copy strong, .plan-screen .job-copy small, .plan-screen .job-cost { line-height: 1.2 !important; }
+/* Phones are narrow: the cost drops under the name instead of being cut. */
+@media (max-width: 720px) { .plan-screen .job-head { flex-wrap: wrap; gap: 0 8px; } .plan-screen .job-head .job-cost { white-space: normal; } }
