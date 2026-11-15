@@ -83,6 +83,19 @@ describe("MoonMiniGame", () => {
     expect(onClose).toHaveBeenCalledWith(false);
   });
 
+  it("sun panels: arrows keep working after the edge button disables and focus drops to the page", () => {
+    render(<MoonMiniGame job="panels" seed={1} onClose={vi.fn()} />);
+    const panel = () => column(".mini-sky.dish .panel-here");
+    const press = (code: string) => fireEvent.keyDown(document.body, { code, key: code });
+    // A browser moves focus to <body> when the focused ← / → button becomes disabled at the edge.
+    act(() => { (document.activeElement as HTMLElement | null)?.blur(); });
+    const start = panel();
+    press(start > 0 ? "ArrowLeft" : "ArrowRight");
+    expect(panel()).toBe(start > 0 ? start - 1 : start + 1);
+    press("KeyD"); press("KeyA"); // A / D work too, by physical key
+    expect(panel()).toBe(start > 0 ? start - 1 : start + 1);
+  });
+
   it("speaks Bulgarian too", async () => {
     await act(async () => { await i18n.changeLanguage("bg"); });
     render(<MoonMiniGame job="askEarth" seed={1} onClose={vi.fn()} />);

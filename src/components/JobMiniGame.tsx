@@ -24,11 +24,18 @@ const SHINY_ART = ["items/mineral-blue", "items/mineral-green", "items/mineral-r
  */
 export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; onClose: (won: boolean) => void }) {
   const { t } = useTranslation();
-  const [game, setGame] = useState<MiniGame>(() => startMiniGame(job, seed));
+  const [game, setGameState] = useState<MiniGame>(() => startMiniGame(job, seed));
+  // The newest game, updated the moment it changes (not at the next render): a quick second key
+  // press or a clock tick always builds on the last move, so no press is lost and no tick undone.
+  const now = useRef(game);
+  const setGame = (next: MiniGame) => { now.current = next; setGameState(next); };
   const box = useRef<HTMLDialogElement>(null);
   const done = won(game);
-  const { started, paused, togglePause, go } = useGameClock(done, () =>
-    setGame((g) => { const n = tick(g); if (setbackIn(g, n)) mistake("small", box.current); return n; }));
+  const { started, paused, togglePause, go } = useGameClock(done, () => {
+    const g = now.current, n = tick(g);
+    if (setbackIn(g, n)) mistake("small", box.current);
+    setGame(n);
+  });
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
   useEffect(() => audio.miniGameOpened(), []);
@@ -41,9 +48,11 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
     const back = setTimeout(() => close.current(true), 1000);
     return () => clearTimeout(back);
   }, [done]);
-  const play = (nextGame: MiniGame, sound = "console-button") => {
+  const play = (move: Move, sound = "console-button") => {
     go();
+    const game = now.current;
     if (!started && game.job === "shelter") return; // the first press only starts the sliding block
+    const nextGame = move(game);
     if (nextGame === game) return;
     const missed = "miss" in nextGame && nextGame.miss;
     if (missed) mistake("small", box.current); else audio.playSfx(sound);
@@ -55,10 +64,11 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
     const onWindowKey = (e: KeyboardEvent) => {
       const k = gameKey(e);
       const turnBy = k === "arrowleft" || k === "a" ? -1 : k === "arrowright" || k === "d" ? 1 : 0;
-      if (turnBy) { e.preventDefault(); play(turn(game, turnBy)); return; }
+      if (turnBy) { e.preventDefault(); play((g) => turn(g, turnBy)); return; }
       if (k === " " || k === "w") {
         e.preventDefault();
-        if (game.aim === game.earth) play(send(game), "earth-message-send"); else mistake("small", box.current);
+        const g = now.current;
+        if (g.job === "askEarth" && g.aim === g.earth) play(send, "earth-message-send"); else mistake("small", box.current);
       }
     };
     window.addEventListener("keydown", onWindowKey);
@@ -68,7 +78,7 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const onKey = (e: React.KeyboardEvent<HTMLDialogElement>) => {
     if (done) return;
     const k = gameKey(e.nativeEvent);
-    if (game.job === "shelter" && (k === " " || k === "enter") && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); play(drop(game), "job-assign"); return; }
+    if (game.job === "shelter" && (k === " " || k === "enter") && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); play((g) => drop(g), "job-assign"); return; }
     // Grid games: arrows move focus between the tiles.
     const tile = (e.target as HTMLElement).closest?.(".mini-tile");
     const step = { arrowleft: -1, arrowright: 1, arrowup: -2, arrowdown: 2 }[k as "arrowleft"];
@@ -129,7 +139,10 @@ function Hint({ game }: { game: MiniGame }) {
   }
 }
 
-function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: string) => void }) {
+/** A move: the next game from the newest one (never from a copy kept since the last render). */
+type Move = (game: MiniGame) => MiniGame;
+
+function Board({ game, play }: { game: MiniGame; play: (move: Move, sound?: string) => void }) {
   const { t } = useTranslation();
   const row = (fill: (i: number) => React.ReactNode, className = "") =>
     <div className={`mini-row ${className}`} aria-hidden="true">{Array.from({ length: DISH_STEPS }, (_, i) => <span key={i}>{fill(i)}</span>)}</div>;
@@ -138,7 +151,7 @@ function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: str
       return <div className="mini-grid panels">{game.clean.map((c, i) =>
         <button key={i} type="button" autoFocus={i === 0} className={`mini-tile ${c ? "clean" : "dusty"}`} aria-pressed={c}
           aria-label={t("miniGame.panels.panel", { n: i + 1, state: t(c ? "miniGame.panels.clean" : "miniGame.panels.dusty") })}
-          onClick={() => play(tap(game, i))} onPointerEnter={(e) => { if (e.buttons) play(tap(game, i)); }}>
+          onClick={() => play((g) => tap(g, i))} onPointerEnter={(e) => { if (e.buttons) play((g) => tap(g, i)); }}>
           <Sprite name={c ? "campaign/panel-clean" : "campaign/panel-dusty"} className="big" />
         </button>)}</div>;
     case "greenhouse":
@@ -147,7 +160,7 @@ function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: str
         const state = g >= GROW_TARGET ? "grown" : w > 0 ? "watered" : "thirsty";
         return <button key={i} type="button" autoFocus={i === 0} className={`mini-tile plant ${state}`} aria-pressed={g >= GROW_TARGET}
           aria-label={t("miniGame.greenhouse.plant", { n: i + 1, state: t(`miniGame.greenhouse.${state}`) })}
-          onClick={() => play(tap(game, i))}>
+          onClick={() => play((g) => tap(g, i))}>
           <Sprite name={`minigame/plant-${g}`} className="big" />
           <span className="mini-drops">{g >= GROW_TARGET
             ? <Sprite name="minigame/check" />
@@ -161,7 +174,7 @@ function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: str
         <div className="mini-stack" aria-hidden="true">{Array.from({ length: STACK_GOAL }, (_, i) =>
           <Sprite key={i} name={i < game.placed ? "minigame/block" : "minigame/block-slot"} className="wide" />).reverse()}</div>
         <div className="mini-dish-controls">
-          <button type="button" className="primary" autoFocus onClick={() => play(drop(game), "job-assign")}>{t("miniGame.shelter.drop")}</button>
+          <button type="button" className="primary" autoFocus onClick={() => play((g) => drop(g), "job-assign")}>{t("miniGame.shelter.drop")}</button>
         </div>
       </>;
     case "askEarth": {
@@ -170,9 +183,9 @@ function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: str
         {row((i) => <Sprite name={i === game.earth ? "minigame/earth" : "minigame/star"} className={i === game.earth ? "big earth" : "star"} />, "mini-sky")}
         {row((i) => i === game.aim ? <Sprite name="minigame/dish" className={`big dish-here ${aimed ? "aimed" : ""}`} /> : null, "mini-sky dish")}
         <div className="mini-dish-controls">
-          <button type="button" autoFocus disabled={game.aim === 0} onClick={() => play(turn(game, -1))}><span aria-hidden="true">←</span> {t("miniGame.askEarth.left")}</button>
-          <button type="button" className="primary" disabled={!aimed} onClick={() => play(send(game), "earth-message-send")}>{t("miniGame.askEarth.send")}</button>
-          <button type="button" disabled={game.aim === DISH_STEPS - 1} onClick={() => play(turn(game, 1))}>{t("miniGame.askEarth.right")} <span aria-hidden="true">→</span></button>
+          <button type="button" autoFocus disabled={game.aim === 0} onClick={() => play((g) => turn(g, -1))}><span aria-hidden="true">←</span> {t("miniGame.askEarth.left")}</button>
+          <button type="button" className="primary" disabled={!aimed} onClick={() => play((g) => send(g), "earth-message-send")}>{t("miniGame.askEarth.send")}</button>
+          <button type="button" disabled={game.aim === DISH_STEPS - 1} onClick={() => play((g) => turn(g, 1))}>{t("miniGame.askEarth.right")} <span aria-hidden="true">→</span></button>
         </div>
       </>;
     }
@@ -180,7 +193,7 @@ function Board({ game, play }: { game: MiniGame; play: (g: MiniGame, sound?: str
       return <div className="mini-grid rocks">{game.cells.map((c, i) =>
         <button key={i} type="button" autoFocus={i === 0} className={`mini-tile hole ${c ?? "empty"}`}
           aria-label={t("miniGame.science.rock", { n: i + 1, state: t(`miniGame.science.${c ?? "empty"}`) })}
-          onClick={() => play(tap(game, i), "science-discovery")}>
+          onClick={() => play((g) => tap(g, i), "science-discovery")}>
           {c && <Sprite name={c === "shiny" ? SHINY_ART[i % SHINY_ART.length] : "minigame/rock-plain"} className="rock" />}
           {c === "shiny" && <Sprite name="minigame/sparkle" className="glint" />}
           <Sprite name="minigame/hole" className="wide ground" />
