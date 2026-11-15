@@ -192,3 +192,16 @@ describe("mini-games with the keyboard (#63)", () => {
     screen.getByText(t("miniGame.keys.askEarth"));
   });
 });
+
+describe("JobMiniGame and the music", () => {
+  afterEach(() => { vi.useRealTimers(); });
+  it("tells the music coordinator it is open for exactly as long as it is on screen (rapid open/close)", async () => {
+    const { musicDebug } = await import("../game/audio");
+    const first = render(<JobMiniGame job="panels" seed={SEED} onClose={() => {}} />);
+    expect(musicDebug.miniGames()).toBe(1);
+    first.unmount();
+    expect(musicDebug.miniGames()).toBe(0);
+    for (const job of jobIds) render(<JobMiniGame job={job} seed={SEED} onClose={() => {}} />).unmount();
+    expect(musicDebug.miniGames()).toBe(0);
+  });
+});

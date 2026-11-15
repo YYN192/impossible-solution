@@ -63,8 +63,9 @@ describe("audio engine", () => {
     const { audio } = await import("./audio");
     expect(() => {
       audio.playSfx("menu");
-      audio.playMusic("mars-base-ambience");
-      audio.stopMusic();
+      audio.setMusic({ scene: "base", storm: true });
+      audio.miniGameOpened()();
+      audio.setMusic({ scene: "off", storm: false });
     }).not.toThrow();
   });
 
@@ -93,11 +94,11 @@ describe("audio engine", () => {
     const { fetch } = fakeAudio();
     const { audio } = await import("./audio");
     audio.unlock();
-    audio.playMusic("mars-base-ambience");
+    audio.setMusic({ scene: "base", storm: false });
     expect(
       fetch.mock.calls
         .map((c: unknown[]) => String(c[0]))
-        .some((u) => u.includes("ambience")),
+        .some((u) => u.includes("ambience") || u.includes("/music/")),
     ).toBe(false);
   });
 });
@@ -110,7 +111,9 @@ describe("music slots for the team's soundtrack", () => {
     expect(musicFor("hub", "moon")).toBe("moon-base-ambience"); // #76: no Mars wind on the Moon
     expect(sounds.get("moon-base-ambience")).toBe(sounds.get("space-menu-ambience"));
     expect(musicFor("console", "dust")).toBe("music-console");
-    expect(musicFor("console", "storm")).toBe("music-mission-storm");
+    // The storm track belongs to a real storm warning only, never to the storm campaign's calm console.
+    expect(musicFor("console", "storm")).toBe("music-console");
+    expect(musicFor("storm")).toBe("music-mission-storm");
     for (const id of [musicFor("lobby"), musicFor("hub"), musicFor("console", "moon")]) expect(sounds.has(id)).toBe(true);
   });
 

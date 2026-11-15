@@ -1,7 +1,7 @@
 import { Icon } from "./components/Icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { audio, musicFor } from "./game/audio";
+import { audio } from "./game/audio";
 import { useMission } from "./state/mission";
 import { reducedMotion, useComfort } from "./state/comfort";
 import { tRun } from "./i18n/dynamic";
@@ -76,7 +76,6 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   }, [near, activating, dialogue, onConsole, task, alarm, panel, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { const track = musicFor("hub", useMission.getState().setup?.place); audio.playMusic(track); return audio.stopMusic; }, []);
   // Focus the game on arrival and again once a panel has closed (a modal dialog keeps the canvas inert until then).
   useEffect(() => { if (!panel) canvas.current?.focus({ preventScroll: true }); }, [panel]);
   const closePanel = () => { audio.playSfx("menu-back"); setPanel(undefined); };

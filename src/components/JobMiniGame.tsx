@@ -32,6 +32,8 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const [paused, setPaused] = useState(false);
   const slow = useComfort((c) => c.slowMiniGames);
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
+  // Music only: the mini-game theme comes at the next song end (game/audio.ts); the game itself is unchanged.
+  useEffect(() => audio.miniGameOpened(), []);
   useEffect(() => {
     if (done || !started || paused) return;
     const clock = setInterval(() => setGame((g) => { const n = tick(g); if (setbackIn(g, n)) mistake("small", box.current); return n; }), TICK_MS * (slow ? 2 : 1));
