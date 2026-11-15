@@ -56,6 +56,26 @@ describe("walking up to something you can use", () => {
   });
 });
 
+describe("closing a crew talk (#81)", () => {
+  it("gives keyboard focus back to the room, so the arrow keys walk again", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance", "setTimeout"] });
+    try {
+      useSession.setState({ position: { x: 224, y: 210, facing: "back" } }); // just below the commander
+      render(<MarsHub onConsole={vi.fn()} onMenu={vi.fn()} />);
+      for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(16); });
+      screen.getByText(t("world.near.commander"));
+      act(() => { fireEvent.keyDown(window, { key: "e" }); });
+      const talk = screen.getByRole("dialog", { name: t("world.near.commander") });
+      act(() => { fireEvent(talk, new Event("cancel", { cancelable: true })); }); // Esc
+      act(() => { vi.advanceTimersByTime(16); });
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(document.activeElement).toBe(document.querySelector("canvas"));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("the station airlock", () => {
   /** Stand next to the airlock, let the canvas loop notice it, then press E. */
   const useAirlock = () => {
