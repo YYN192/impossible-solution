@@ -26,7 +26,8 @@
     "radio": "Message from Earth",
     "radioTap": "Tap to decode it",
     "decoded": "Decoded!",
-    "nasa": "Real NASA data: tap to see where it comes from"
+    "nasa": "Real NASA data: tap to see where it comes from",
+    "firstDay_moon": "First morning on the Moon. Everything works."
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -94,7 +95,9 @@
     "dustStorm_other": "The dust storm lasts {{count}} more sols.",
     "delay": "Your message took {{minutes}} minutes each way today.",
     "delayMoon": "Your message took about 1.3 seconds each way.",
-    "delaySaved": "Your message took about {{minutes}} minutes each way. This is a saved reading."
+    "delaySaved": "Your message took about {{minutes}} minutes each way. This is a saved reading.",
+    "dustStorm_moon_one": "The dark spell lasts {{count}} more day.",
+    "dustStorm_moon_other": "The dark spell lasts {{count}} more days."
   },
   "chip": {
     "live": "Live NASA data",
@@ -503,7 +506,10 @@
       "airlock": "Station airlock",
       "greenhouse": "Greenhouse"
     },
-    "greenhouse": "GREENHOUSE"
+    "greenhouse": "GREENHOUSE",
+    "name_moon": "Artemis Outpost",
+    "canvas_moon": "Moon base. Use WASD or arrow keys. Press E near a console or crew member.",
+    "explore_moon": "Explore your home on the Moon."
   },
   "dialogue": {
     "commander": {

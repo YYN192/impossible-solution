@@ -133,3 +133,12 @@ kbd[data-pressed] { background: #08202a; color: #83d9f4; border-color: #08202a; 
 p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35rem; }
 /* A job card with no astronaut picked yet looks "not ready" but still answers when tapped. */
 .job-choice[aria-disabled="true"] { border-style: dashed; color: #cfdae4; }
+
+/* #75 readability minimums (kid-design audit, 15 Nov). Sentences are at least 16 px; labels may stay at 14 px. */
+.expedition :is(.mini-text, .mini-link small, .sol-explainer, .job-cost, .job-copy small, .small-counters, .crew-tile small, .beat-option small, .beat-effects, .night-results, .storm-left) { font-size: max(1rem, 16px) !important; line-height: 1.45; }
+.expedition .lead { max-width: 62ch; }
+/* Low-contrast greys on the dark job cards lifted to WCAG AA (≥ 4.5:1 on #142536). */
+.expedition :is(.job-number, .job-cost, .job-copy small, .mini-link small) { color: #c3d3de !important; }
+/* Help buttons and the main "next" buttons: bigger for ages 7–9. */
+.expedition .whats-this__button { min-width: 44px !important; min-height: 44px !important; }
+.expedition :is(.end-sol, .beat-result .primary, .morning-go, .screen .actions .primary, .launch-button) { min-height: 56px; }
