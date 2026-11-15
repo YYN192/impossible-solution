@@ -3,7 +3,7 @@
 import { chromium } from "playwright-core";
 import { mkdirSync } from "node:fs";
 import { EN, SCREENS, openMenu, startMission, skipToConsole, toPlan, assignAll, endSol, nextFromNight, playToFinal,
-  openSources, openTeacher, closeOverlay, openDialogue, closeDialogue, restart, button, heading, fmt, tabTo, press } from "./flows.mjs";
+  openSources, closeOverlay, openDialogue, closeDialogue, restart, button, heading, fmt, press } from "./flows.mjs";
 
 const args = process.argv.slice(2);
 const opt = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
