@@ -1,3 +1,4 @@
+import { Icon } from "./components/Icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
@@ -137,9 +138,9 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue === "greenhouse" ? "scientist" : dialogue?.dialogue}-portrait`;
   return <main className={stormLeft ? "station in-storm" : "station"}>
     <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{campaign && campaign !== "storm" ? `${tRun(`campaign.${campaign}.where`)} / ${tRun(`campaign.${campaign}.name`)}` : t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{tRun("common.solOf", { sol, total: useMission.getState().setup?.rules.sols ?? 3 }, useMission.getState().setup?.place)}</span></header>
-    {stormLeft ? <div className="world-objective storm-objective"><p><strong>🌪️ {t("hubStorm.todo")}</strong></p><ul>
-      <li className={panelsDone ? "done" : ""}>{panelsDone ? "✅" : "☀️"} {t("hubStorm.panels")}</li>
-      <li className={greenhouseDone ? "done" : ""}>{greenhouseDone ? "✅" : "🌱"} {t("hubStorm.greenhouse")}</li></ul></div>
+    {stormLeft ? <div className="world-objective storm-objective"><p><strong><Icon name="dust-storm" /> {t("hubStorm.todo")}</strong></p><ul>
+      <li className={panelsDone ? "done" : ""}><Icon name={panelsDone ? "check" : "sun"} /> {t("hubStorm.panels")}</li>
+      <li className={greenhouseDone ? "done" : ""}><Icon name={greenhouseDone ? "check" : "sprout"} /> {t("hubStorm.greenhouse")}</li></ul></div>
       : <div className="world-objective"><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />

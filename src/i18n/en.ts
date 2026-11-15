@@ -68,28 +68,28 @@ export const en = {
     },
     jobs: {
       panels: {
-        icon: "🧽",
+        icon: "wipe",
         title: "Clean solar panels",
         description: "Brush away dust so the panels can make more power.",
         effect: "Full power tomorrow",
         cost: "Outside · small dose",
       },
       greenhouse: {
-        icon: "🥬",
+        icon: "food",
         title: "Run greenhouse lights",
         description: "Use the grow lights to make fresh food for the crew.",
         effect: "+1 food",
         cost: "Inside · costs power",
       },
       shelter: {
-        icon: "🛡️",
+        icon: "shield",
         title: "Build up the shelter",
         description: "Add shielding to protect the crew from space rays.",
         effect: "Half the dose today + tomorrow",
         cost: "Inside · costs power",
       },
       askEarth: {
-        icon: "📡",
+        icon: "radio",
         title: "Ask Earth",
         description:
           "Send a question. Scientists reply while your crew sleeps.",
@@ -97,7 +97,7 @@ export const en = {
         cost: "Inside · costs power",
       },
       science: {
-        icon: "🔬",
+        icon: "science",
         title: "Science trip",
         description: "Go outside and learn something new about Mars.",
         effect: "+1 science star",

@@ -14,7 +14,7 @@
 .mission-menu .mission-card .mission-meta{color:#c9d8e4}
 .mission-menu .mission-card .mission-tags{font-size:.875rem;opacity:.9}
 .mission-menu .mission-card[aria-pressed="true"]{border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}
-.mission-menu .mission-card[aria-pressed="true"]::after{content:"✓";position:absolute;top:8px;right:8px;width:2rem;height:2rem;display:grid;place-items:center;background:#5eead4;color:#04121a;font-weight:700;font-size:1.2rem;border:2px solid var(--ink,#080b12)}
+.mission-menu .mission-card[aria-pressed="true"]::after{content:"";position:absolute;top:8px;right:8px;width:2rem;height:2rem;display:grid;place-items:center;background:#5eead4 url("./assets/pixel/icons/check.png") center/100% no-repeat;image-rendering:pixelated;color:#04121a;font-weight:700;font-size:1.2rem;border:2px solid var(--ink,#080b12)}
 .mission-menu .mission-card:focus-visible,.menu-stage button:focus-visible{outline:3px solid #5eead4;outline-offset:3px}
 .menu-actions{display:flex;flex-direction:column;align-items:center;gap:.6rem}
 .menu-actions .launch-button{min-height:64px;min-width:min(22rem,90vw);font-size:clamp(1.3rem,1rem + 1vw,2rem);padding:.4rem 2.2rem;margin:0}

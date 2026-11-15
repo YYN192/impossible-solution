@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
@@ -76,13 +77,13 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
       </div>
       <div className="explore-side">
         <p className="explore-battery" role="status">
-          <span aria-hidden="true">🔋 </span>
+          <Icon name="battery" />{" "}
           {t("exploreUi.battery", { n: drive.battery, max: map.battery })}
           <span className="explore-pips" aria-hidden="true">
             {Array.from({ length: map.battery }, (_, i) => <i key={i} data-on={i < drive.battery ? "" : undefined} />)}
           </span>
         </p>
-        <p><span aria-hidden="true">🪨 </span>{t("exploreUi.samples", { n: drive.collected.length })}</p>
+        <p><Icon name="rock" />{" "}{t("exploreUi.samples", { n: drive.collected.length })}</p>
         <p className={home ? "explore-home" : "explore-away"} role="status">
           {drive.battery === 0 && !home ? t("exploreUi.empty") + " " : ""}
           {home ? t("exploreUi.home") : t("exploreUi.away")}

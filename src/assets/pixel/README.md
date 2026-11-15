@@ -4,6 +4,8 @@ This is an original, procedural pixel-art set for the Mars game. PNGs are drawn 
 
 **Hub art is now drawn with pxl** (floors, walls, player, commander/engineer/scientist, assistant drone, mission console, crate: 49 PNGs). Source: `art-src/pixel/hub.px.js`. Rebuild with `node <pxl>/bin/pxl.js build art-src/pixel/hub.px.js --out <tmp>` (Node ≥ 22.18), then `node art-src/pixel/export.mjs <tmp>`; the export refuses any size change. Rerunning `generate-pixel-assets.mjs` overwrites these files, so run the pxl export after it.
 
+**UI icons are drawn with pxl** (#50): 55 PNGs, 16×16, in `icons/` (category `icon` in the manifest). Source: `art-src/pixel/icons.px.js`; rebuild and export the same way as the hub art. The game shows them with `<Icon name="power" />` and, for dominoes and choices, `<Icons icon="food power x" />` (`src/components/Icon.tsx`): names separated by spaces, and a badge (`x`, `up`, `down`, `zero`) sits on the corner of the icon before it. The names live in `src/sim/icons.ts`; a test checks that every name has a PNG and every engine icon uses real names. No emoji in the game.
+
 ## Current integration
 
 The app is a React screen-based mission planner, not a Canvas tile game. The title screen uses `backgrounds/mars-menu-hero.png`, and its Start button uses the pixel treatment in `src/index.css`. Player, NPC, tile, console, item, and UI sprites are prepared for future screen/game use; no room renderer or movement system exists to consume them yet.

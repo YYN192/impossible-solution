@@ -1,3 +1,4 @@
+import { dominoView } from "../test/icons";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -12,6 +13,7 @@ import { useGame } from "./game";
 import { useMission } from "./mission";
 import { START, useNav } from "./screen";
 
+const dominoViews = (sel: string) => [...document.querySelectorAll(sel)].map(dominoView);
 const dominoTexts = (sel: string) =>
   [...document.querySelectorAll(sel)].map((d) => d.textContent);
 
@@ -37,9 +39,9 @@ describe("game store (real engine)", () => {
     useNav.setState({ screen: "morning", sol: 2 });
     render(createElement(MorningScreen));
     fireEvent.click(screen.getByRole("button", { name: /Why\?/ }));
-    expect(dominoTexts(".domino")).toEqual([
-      "⚡↓Power is low today.",
-      "🧽✗Nobody cleaned the solar panels.",
+    expect(dominoViews(".domino")).toEqual([
+      "power down|Power is low today.",
+      "wipe x|Nobody cleaned the solar panels.",
     ]);
   });
 
@@ -50,9 +52,8 @@ describe("game store (real engine)", () => {
     expect(state.over).toBe(true);
     useNav.setState({ screen: "final", sol: MISSION_SOLS });
     render(createElement(FinalScreen));
-    expect(document.querySelector(".stars-count")?.textContent).toContain(
-      "★".repeat(stars(state).count),
-    );
+    expect(document.querySelectorAll('.stars-count [data-icon="star"]')).toHaveLength(stars(state).count);
+    expect(document.querySelectorAll('.stars-count [data-icon="star-empty"]')).toHaveLength(3 - stars(state).count);
     expect(dominoTexts(".chain .domino-text")).toContain(
       "Nobody cleaned the solar panels.",
     );

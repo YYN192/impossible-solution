@@ -143,7 +143,7 @@ describe("campaign rules", () => {
 });
 
 describe("act: one beat choice changes the game through the engine", () => {
-  const lamps: Action = { id: "dilemma-lamps", icon: "💡", textKey: "beat.x", effect: { food: -1, shelterSols: 2 } };
+  const lamps: Action = { id: "dilemma-lamps", icon: "lamp", textKey: "beat.x", effect: { food: -1, shelterSols: 2 } };
 
   it("applies the effect and drops a root domino for the choice", () => {
     const { state, fell } = act({ ...createGame(), food: 2 }, lamps);
@@ -162,7 +162,7 @@ describe("act: one beat choice changes the game through the engine", () => {
   });
 
   it("a choice that costs more power than there is cannot be taken", () => {
-    const costly: Action = { id: "upgrade-battery", icon: "🔋", textKey: "beat.x", effect: { power: -7 } };
+    const costly: Action = { id: "upgrade-battery", icon: "battery", textKey: "beat.x", effect: { power: -7 } };
     expect(canAct(createGame(), costly)).toBe(false);
     expect(act(createGame(), costly).state).toEqual(createGame());
     expect(canAct(createGame(), lamps)).toBe(true);
@@ -170,7 +170,7 @@ describe("act: one beat choice changes the game through the engine", () => {
 
   it("the next problem with that resource names the choice as a cause", () => {
     // Wiping only a little leaves the panels dusty: tomorrow's low power points back at the wipe.
-    const wipe: Action = { id: "wipe-1", icon: "🧽", textKey: "beat.x", effect: { panelEfficiency: 0.4, dose: 0.1 } };
+    const wipe: Action = { id: "wipe-1", icon: "wipe", textKey: "beat.x", effect: { panelEfficiency: 0.4, dose: 0.1 } };
     const after = act({ ...createGame(), panelEfficiency: 0.3 }, wipe).state;
     expect(after.panelEfficiency).toBe(0.4);
     expect(act(createGame(), wipe).state.panelEfficiency).toBe(1); // clean panels stay clean
@@ -181,13 +181,13 @@ describe("act: one beat choice changes the game through the engine", () => {
   });
 
   it("a site or an upgrade changes the rules for the rest of the mission", () => {
-    const site: Action = { id: "site-ridge", icon: "📍", textKey: "beat.x", rules: { solar: 8, heater: 1 } };
+    const site: Action = { id: "site-ridge", icon: "pin", textKey: "beat.x", rules: { solar: 8, heater: 1 } };
     const s = act(createGame({ sols: 5 }), site).state;
     expect(rulesOf(s)).toMatchObject({ sols: 5, solar: 8, heater: 1 });
   });
 
   it("radio on Mars: the answer comes with the next morning, without the Ask Earth job", () => {
-    const radio: Action = { id: "radio-storm", icon: "📡", textKey: "beat.x", effect: { power: -1 }, ask: "night" };
+    const radio: Action = { id: "radio-storm", icon: "radio", textKey: "beat.x", effect: { power: -1 }, ask: "night" };
     const asked = act(createGame(), radio, [cloud(3)]).state;
     expect(asked.earthAnswer).toBeUndefined();
     expect(asked.bars.power).toBe(createGame().bars.power - 1);
@@ -198,7 +198,7 @@ describe("act: one beat choice changes the game through the engine", () => {
   });
 
   it("radio on the Moon: the answer is there at once", () => {
-    const radio: Action = { id: "radio-storm", icon: "📡", textKey: "beat.x", ask: "now" };
+    const radio: Action = { id: "radio-storm", icon: "radio", textKey: "beat.x", ask: "now" };
     const s = act(createGame(), radio, [cloud(2), burst(1)]).state;
     expect(s.earthAnswer?.stormCloudInSols).toBe(1);
     expect(s.earthAnswer?.burstRisk).toBe("high");
@@ -206,7 +206,7 @@ describe("act: one beat choice changes the game through the engine", () => {
   });
 
   it("no signal when Earth is out of view: the radio costs nothing and answers nothing", () => {
-    const radio: Action = { id: "radio-storm", icon: "📡", textKey: "beat.x", effect: { power: -1 }, ask: "now" };
+    const radio: Action = { id: "radio-storm", icon: "radio", textKey: "beat.x", effect: { power: -1 }, ask: "now" };
     const { state, fell } = act(createGame({ earthHidden: [1] }), radio, [cloud(2)]);
     expect(state.earthAnswer).toBeUndefined();
     expect(state.bars.power).toBe(createGame().bars.power);
@@ -214,7 +214,7 @@ describe("act: one beat choice changes the game through the engine", () => {
   });
 
   it("a choice can send one astronaut to rest for the day", () => {
-    const rest: Action = { id: "dilemma-rest", icon: "🛌", textKey: "beat.x", effect: { tired: ["a2"] } };
+    const rest: Action = { id: "dilemma-rest", icon: "rest", textKey: "beat.x", effect: { tired: ["a2"] } };
     const s = act(createGame(), rest).state;
     expect(s.tired).toEqual(["a2"]);
     expect(step(s, { a2: "science" }, []).state.science).toBe(0);

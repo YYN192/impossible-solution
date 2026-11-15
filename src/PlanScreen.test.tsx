@@ -8,6 +8,7 @@ import { createGame, step } from "./sim/engine";
 import { DOSE, JOBS, type JobId, type Plan } from "./sim/types";
 import { useGame } from "./state/game";
 import { useMission } from "./state/mission";
+import { iconsOf } from "./test/icons";
 
 const t = i18n.t.bind(i18n);
 const jobIds = Object.keys(JOBS) as JobId[];
@@ -147,26 +148,25 @@ describe("PlanScreen preview (#10)", () => {
     for (const [i, id] of jobIds.entries()) {
       expect(items[i].textContent).toContain(t(`jobInfo.${id}.skipped`));
       const skip = fell.find((d) => d.id === `sol1-${id}-skipped`);
-      if (skip) expect(items[i].textContent).toContain(skip.icon);
+      if (skip) expect(iconsOf(items[i])).toContain(skip.icon);
       for (const effect of fell.filter(
         (d) => skip && d.causeIds.includes(skip.id),
       )) {
-        expect(items[i].textContent).toContain(effect.icon);
+        expect(iconsOf(items[i])).toContain(effect.icon);
         if (effect.sol > 1)
           expect(items[i].textContent).toContain(t("play.tomorrow"));
       }
     }
     // With the greenhouse using power, skipping panels → less power tomorrow (engine decides).
-    expect(items[0].textContent).not.toContain("⚡↓");
+    expect(iconsOf(items[0])).not.toContain("power down");
     fireEvent.click(btn(t("crew.name", { n: 1 })));
     fireEvent.click(btn(t("jobs.greenhouse")));
     expect(preview({ a1: "greenhouse" }).fell.map((d) => d.id)).toContain(
       "sol2-power-low",
     );
     const panelsRow = within(skipList()).getAllByRole("listitem")[0];
-    expect(panelsRow.textContent).toMatch(
-      new RegExp(`🧽✗.*⚡↓${t("play.tomorrow")}`),
-    );
+    expect(iconsOf(panelsRow)).toMatch(/wipe x.*power down/);
+    expect(panelsRow.textContent).toContain(t("play.tomorrow"));
 
     fireEvent.click(btn(t("crew.name", { n: 2 })));
     fireEvent.click(btn(t("jobs.panels")));

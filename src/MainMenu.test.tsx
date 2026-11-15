@@ -7,7 +7,7 @@ import { useProgress } from "./state/progress";
 const t = i18n.t.bind(i18n);
 const onChoose = vi.fn();
 /** A campaign card: its name comes first (a locked card of another campaign may mention it later). */
-const card = (id: "storm" | "dust" | "moon") => new RegExp(`^(🔒 )?${t(`campaign.${id}.name`)}`);
+const card = (id: "storm" | "dust" | "moon") => new RegExp(`^\\s*${t(`campaign.${id}.name`)}`);
 const menu = (resume = false, onNew = vi.fn()) =>
   render(<MainMenu ready resume={resume} campaignId="storm" onPlay={vi.fn()} onSources={vi.fn()} onTeacher={vi.fn()} onChoose={onChoose} onNew={onNew} />);
 beforeEach(() => useProgress.setState({ done: [], teacher: false }));

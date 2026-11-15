@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { EarthAnswer } from "../components/EarthAnswer";
+import { Icon, Icons } from "../components/Icon";
 import { ResourceMeters } from "../components/ResourceMeters";
 import { ScreenFrame } from "../components/ScreenFrame";
 import { audio } from "../game/audio";
 import { tDynamic, tRun } from "../i18n/dynamic";
 import type { BeatOption } from "../sim/campaign";
+import type { IconName } from "../sim/icons";
 import { canAct, rulesOf } from "../sim/engine";
 import type { Action, Bars, Domino, Rules } from "../sim/types";
 import { useGame } from "../state/game";
@@ -16,30 +18,33 @@ import { ExploreBeat } from "./ExploreBeat";
 
 const num = (n: number) => `${n > 0 ? "+" : "−"}${Math.abs(Number(n.toFixed(1)))}`;
 
+interface Chip { icon?: IconName; text: string }
+
 /** What an option costs and gives, as short chips. Numbers come straight from the engine action. */
-function effects(action: Action, t: (k: string, o?: object) => string): string[] {
+function effects(action: Action, t: (k: string, o?: object) => string): Chip[] {
   const e = action.effect ?? {};
   const r: Partial<Rules> = action.rules ?? {};
   const pct = (v: number) => Math.round(v * 100);
+  const chip = (icon: IconName, text: string): Chip => ({ icon, text });
   return [
-    e.power && `⚡ ${num(e.power)} ${t("bars.power")}`,
-    e.air && `🫧 ${num(e.air)} ${t("bars.air")}`,
-    e.food && `🥬 ${num(e.food)} ${t("bars.food")}`,
-    e.science && `🔬 ${num(e.science)} ${t("bars.science")}`,
-    e.dose && `☢️ ${num(e.dose)} ${t("bars.dose")}`,
-    e.shelterSols && `🛡️ ${t("fx.shelter")}`,
-    e.tired && `😴 ${t("fx.rest")}`,
-    e.panelEfficiency && `🧽 ${t("fx.panels", { n: pct(e.panelEfficiency) })}`,
-    action.ask && `📡 ${t("fx.ask")}`,
-    r.solar !== undefined && `☀️ ${t("rule.solar", { n: r.solar })}`,
-    r.heater !== undefined && `🔥 ${t("rule.heater", { n: r.heater })}`,
-    r.dustFactor !== undefined && `🧽 ${t("rule.dustFactor", { n: pct(r.dustFactor) })}`,
-    r.airMachinePower !== undefined && `🫧 ${t("rule.airMachinePower", { n: r.airMachinePower })}`,
-    r.foodGain !== undefined && `🥬 ${t("rule.foodGain", { n: r.foodGain })}`,
-    r.shelterFactor !== undefined && `🛡️ ${t("rule.shelterFactor", { n: pct(r.shelterFactor) })}`,
+    e.power && chip("power", `${num(e.power)} ${t("bars.power")}`),
+    e.air && chip("air", `${num(e.air)} ${t("bars.air")}`),
+    e.food && chip("food", `${num(e.food)} ${t("bars.food")}`),
+    e.science && chip("science", `${num(e.science)} ${t("bars.science")}`),
+    e.dose && chip("dose", `${num(e.dose)} ${t("bars.dose")}`),
+    e.shelterSols && chip("shield", t("fx.shelter")),
+    e.tired && chip("tired", t("fx.rest")),
+    e.panelEfficiency && chip("wipe", t("fx.panels", { n: pct(e.panelEfficiency) })),
+    action.ask && chip("radio", t("fx.ask")),
+    r.solar !== undefined && chip("sun", t("rule.solar", { n: r.solar })),
+    r.heater !== undefined && chip("heater", t("rule.heater", { n: r.heater })),
+    r.dustFactor !== undefined && chip("wipe", t("rule.dustFactor", { n: pct(r.dustFactor) })),
+    r.airMachinePower !== undefined && chip("air", t("rule.airMachinePower", { n: r.airMachinePower })),
+    r.foodGain !== undefined && chip("food", t("rule.foodGain", { n: r.foodGain })),
+    r.shelterFactor !== undefined && chip("shield", t("rule.shelterFactor", { n: pct(r.shelterFactor) })),
     r.earthHidden !== undefined &&
-      `📡 ${r.earthHidden.length ? t("rule.earthHidden", { days: r.earthHidden.join(", ") }) : t("rule.earthAlways")}`,
-  ].filter((x): x is string => Boolean(x));
+      chip("radio", r.earthHidden.length ? t("rule.earthHidden", { days: r.earthHidden.join(", ") }) : t("rule.earthAlways")),
+  ].filter((x): x is Chip => Boolean(x));
 }
 
 /**
@@ -108,7 +113,7 @@ export function BeatScreen() {
             const chips = effects(o.action, tt);
             return (
               <button type="button" className="beat-option" key={o.id} disabled={!can} onClick={() => choose(o)}>
-                <span className="beat-icon" aria-hidden="true">{o.action.icon}</span>
+                <span className="beat-icon" aria-hidden="true"><Icons icon={o.action.icon} /></span>
                 <strong>{tRun(`beat.${beat.id}.${o.id}.label`, vars)}</strong>
                 {o.real && (
                   <small className="beat-real">
@@ -116,7 +121,7 @@ export function BeatScreen() {
                   </small>
                 )}
                 <span className="beat-effects">
-                  {(chips.length ? chips : [t("beatUi.nothing")]).map((c) => <span key={c}>{c}</span>)}
+                  {(chips.length ? chips : [{ text: t("beatUi.nothing") } as Chip]).map((c) => <span key={`${c.icon}-${c.text}`}>{c.icon && <Icon name={c.icon} />} {c.text}</span>)}
                 </span>
                 {!can && <small className="beat-cannot">{t("beatUi.cannot")}</small>}
               </button>
@@ -126,7 +131,7 @@ export function BeatScreen() {
         </div>
       ) : (
         <div className="beat-result" role="status">
-          <p className="lead"><span aria-hidden="true">{done.fell.icon} </span>{tDynamic(done.fell.textKey)}</p>
+          <p className="lead"><Icons icon={done.fell.icon} />{" "}{tDynamic(done.fell.textKey)}</p>
           {done.fell.source && <DataChip source={done.fell.source} />}
           {beat.type === "radio" && (state.earthAnswer && place ? <EarthAnswer answer={state.earthAnswer} /> : state.radioed && <p>{t("beatUi.answerNight")}</p>)}
           <div className="actions">
