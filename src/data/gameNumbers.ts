@@ -1,5 +1,6 @@
 import { ENGINE } from "../sim/engine";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT, type JobId } from "../sim/types";
+import { CAMPAIGN_NUMBERS } from "./campaigns";
 import { DEMO_START } from "./demo";
 
 export type GameNumberKey =
@@ -28,6 +29,11 @@ type GameNumberName =
   | "foodGain"
   | "foodLoss"
   | "scienceGain"
+  | "nightAirGain"
+  | "airReady"
+  | "meterMax"
+  | "smallStormFactor"
+  | "moonStormFactor"
   | "demoStartFood"
   | "demoStartPanels";
 
@@ -80,6 +86,11 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("food-gain", "foodGain", ENGINE.foodGain),
   value("food-loss", "foodLoss", ENGINE.foodLoss),
   value("science-gain", "scienceGain", ENGINE.scienceGain),
+  value("night-air-gain", "nightAirGain", NIGHT.airGainWithPower),
+  value("air-ready", "airReady", ENGINE.airReady),
+  value("meter-max", "meterMax", DOSE.meterMax),
+  value("small-storm-factor", "smallStormFactor", CAMPAIGN_NUMBERS.SMALL_STORM_FACTOR),
+  value("moon-storm-factor", "moonStormFactor", CAMPAIGN_NUMBERS.MOON_STORM_FACTOR),
   value("demo-start-food", "demoStartFood", DEMO_START.food),
   value("demo-start-panels", "demoStartPanels", DEMO_START.panelEfficiency),
 ];

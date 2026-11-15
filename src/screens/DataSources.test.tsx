@@ -74,6 +74,11 @@ describe("DataSources game numbers (#7)", () => {
       "food-gain",
       "food-loss",
       "science-gain",
+      "night-air-gain",
+      "air-ready",
+      "meter-max",
+      "small-storm-factor",
+      "moon-storm-factor",
       "demo-start-food",
       "demo-start-panels",
     ];

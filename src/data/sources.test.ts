@@ -62,9 +62,10 @@ describe("science check: real-data wording", () => {
     expect(all).toMatch(/3 crew/i);
     expect(all).toMatch(/short sols/i);
     expect(all).toMatch(/job costs.*game numbers/i);
-    expect(all).toMatch(
-      /storm, normal Mars radiation,.*dust effect.*message delay/i,
-    );
+    // Updated 15 Nov: three real storms, and the storm size rule, are now on the card.
+    expect(all).toMatch(/three dated solar storms.*dust effect.*radio delay/i);
+    expect(all).toMatch(/compared only with the quiet level just before it/i);
+    expect(all).not.toMatch(/39/);
   });
 });
 
