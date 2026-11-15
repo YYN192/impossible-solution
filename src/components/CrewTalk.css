@@ -5,6 +5,14 @@
   align-items: flex-start;
   flex-wrap: nowrap;
 }
+/* Practice games need room: the window grows wider (smoothly) so their buttons are never a tall column of
+   one or two words. It shrinks back for the talk. */
+.crew-talk.npc-dialogue {
+  transition: max-width 0.25s ease-out;
+}
+.crew-talk.crew-talk--wide {
+  max-width: 900px;
+}
 .crew-talk__who {
   display: flex;
   flex-direction: column;
@@ -95,8 +103,12 @@
 }
 .crew-drill__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 8px;
+}
+/* Four choices sit as 2 × 2, never 3 + 1. */
+.crew-drill__grid:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 .crew-drill__grid button {
   min-height: 52px;
@@ -104,6 +116,10 @@
   align-items: center;
   gap: 8px;
   text-align: left;
+  /* Whole words: break inside a word only if that one word cannot fit on its own line. */
+  overflow-wrap: break-word;
+  hyphens: manual;
+  text-wrap: pretty;
 }
 .crew-drill__grid button[aria-pressed="true"] {
   border-color: #a0efea;

@@ -87,7 +87,7 @@ export function CrewTalk({
   return (
     <dialog
       ref={box}
-      className="npc-dialogue crew-talk"
+      className={`npc-dialogue crew-talk${step.kind === "drill" ? " crew-talk--wide" : ""}`}
       aria-labelledby="crew-talk-name"
       onCancel={(e) => {
         e.preventDefault();
