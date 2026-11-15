@@ -22,7 +22,7 @@ describe("music scene", () => {
     expect(musicScene("hub", undefined)).toBe("off");
     expect(musicScene("hub", { place: "mars" } as MissionSetup)).toBe("base");
     expect(musicScene("console", { place: "mars" } as MissionSetup)).toBe("base");
-    expect(musicScene("hub", { place: "moon" } as MissionSetup)).toBe("moon-hub");
+    expect(musicScene("hub", { place: "moon" } as MissionSetup)).toBe("base"); // the Moon base gets the same songs
     expect(musicScene("console", { place: "moon" } as MissionSetup)).toBe("base");
   });
 });

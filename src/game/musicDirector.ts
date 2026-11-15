@@ -13,11 +13,11 @@ import { audio, type MusicScene } from "./audio";
  * that decides music; screens never start or stop tracks themselves.
  */
 
-/** Pure: which music scene the visible place is. */
+/** Pure: which music scene the visible place is. Mars or Moon, hub or console: the same base songs. */
 export function musicScene(visible: Place, setup: Pick<MissionSetup, "place"> | undefined): MusicScene {
   if (visible === "menu") return "menu";
   if (!setup) return "off"; // still loading: no mission yet, no music
-  return setup.place === "moon" && visible === "hub" ? "moon-hub" : "base";
+  return "base";
 }
 
 /**

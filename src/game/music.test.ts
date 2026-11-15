@@ -300,31 +300,14 @@ describe("music coordinator", () => {
   });
 });
 
-describe("first-visit Sound on", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.resetModules();
+describe("default levels", () => {
+  afterEach(() => { vi.resetModules(); localStorage.clear(); });
+  it("Music starts at 100 % for a new player; a saved level (even 0) is kept", async () => {
     localStorage.clear();
-  });
-  it("gives a quiet music level when the player never chose one", async () => {
-    const { audio, useAudio, FIRST_MUSIC_LEVEL } = await import("./audio");
-    audio.soundOn();
-    expect(useAudio.getState().music).toBe(FIRST_MUSIC_LEVEL);
-    expect(FIRST_MUSIC_LEVEL).toBeLessThanOrEqual(0.3);
-  });
-  it("keeps a Music 0 the player chose, and keeps mute off/on as asked", async () => {
-    localStorage.setItem("sol:music-chosen", "1");
-    const { audio, useAudio } = await import("./audio");
-    audio.mute(true);
-    audio.soundOn();
-    expect(useAudio.getState()).toMatchObject({ music: 0, muted: false });
-  });
-  it("moving the Music slider counts as a choice", async () => {
-    const { audio, useAudio } = await import("./audio");
-    useAudio.setState({ music: 0.5 });
-    useAudio.setState({ music: 0 });
-    audio.soundOn();
-    expect(useAudio.getState().music).toBe(0);
+    expect((await import("./audio")).useAudio.getState().music).toBe(1);
+    vi.resetModules();
+    localStorage.setItem("sol:audio", JSON.stringify({ music: 0 }));
+    expect((await import("./audio")).useAudio.getState().music).toBe(0);
   });
 });
 

@@ -26,7 +26,7 @@ All sounds are made by our own code in `scripts/generate-audio.mjs` using square
 
 - One `AudioContext`, created on the player's first tap or key press (never before, so nothing autoplays). The same gesture preloads a small UI set (menu, steps, console, crew select/assign; about 150 KB). Every other sound is fetched the first time it plays and its decoded `AudioBuffer` is cached, so rapid sounds such as footsteps reuse one buffer instead of creating audio elements.
 - Gain chain: per-sound manifest `volume` → Sound effects / Music bus → Master → speakers. The Settings sliders and the Sound on/off button (status bar, `aria-pressed`) set these gains; preferences persist in `localStorage` (`sol:audio`).
-- **Music is off by default** (Music slider 0%). The hub and console ambience loops are only downloaded once a player raises it.
+- **Music is on at 100 % by default** (Music slider; the tracks themselves play at manifest volume 0.25, under Master 70 %). A saved Music level, including 0, is kept, and Sound off silences everything. Music files download only when music is audible.
 - The same id is never stacked: at most one play per 70 ms (150 ms for `volume-change`). A one-shot that arrives more than 400 ms late on a slow network is skipped.
 - jsdom has no Web Audio, so in tests every call is a no-op. `scripts/audio-assets.test.ts` checks that every quoted id inside `audio.playSfx`/`playMusic` in `src/` exists in the manifest.
 
@@ -80,5 +80,5 @@ The game asks for music by slot. Each slot tries the ids below in order and play
 | Station | the walkable base | `music-hub`, then `mars-base-ambience`; Moon: `music-hub-moon`, then `moon-base-ambience` |
 | Console | mission screens | `music-mission-storm` / `music-mission-dust` / `music-mission-moon` (the mission being played), then `music-console`, then `mission-console-ambience` |
 
-Music volume is 0 until the player raises it in Settings, and nothing plays before the first tap. Credit every new track in `CREDITS.md` (author, licence) and log any AI tool in `docs/ai-usage-log.md`.
+Nothing plays before the first tap. Which track plays when (menu, Mars and Moon base, mini games, real storms) is decided in one place: `src/game/musicDirector.ts` + the coordinator in `src/game/audio.ts`. Credit every new track in `CREDITS.md` (author, licence) and log any AI tool in `docs/ai-usage-log.md`.
 

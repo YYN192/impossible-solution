@@ -7,10 +7,10 @@ export interface AudioPreferences {
   sfx: number;
   muted: boolean;
 }
-// Music (ambience loops, 1–3 MB each) is off by default so cheap phones never download it unasked.
+// Music is on at full level by default (owner's choice); Settings, the Music slider and mute still turn it down or off.
 const defaults: AudioPreferences = {
   master: 0.7,
-  music: 0,
+  music: 1,
   sfx: 0.7,
   muted: false,
 };
@@ -147,8 +147,7 @@ function syncVolumes() {
   buses.music.gain.setValueAtTime(p.music, ctx.currentTime);
   reconcileMusic();
 }
-useAudio.subscribe((prefs, before) => {
-  if (prefs.music !== before.music) markMusicChosen();
+useAudio.subscribe((prefs) => {
   try {
     localStorage.setItem("sol:audio", JSON.stringify(prefs));
   } catch {
@@ -187,7 +186,7 @@ function playEffect(id: string) {
  *                          song always finishes first; closing the game before then cancels it)
  *   4. Mars base/console → whole songs of music-console / music-minigames, picked at random at each
  *                          natural end (never the same song three times in a row)
- *   5. Moon base hub     → the Moon ambience loop (#76); nothing at all when off
+ *   The Moon base plays the same base songs (no storm song there); nothing at all when off.
  * Loops use source.loop; playlist songs play once and their `onended` picks the next. Every started
  * track is an Entry: a late load or `onended` of an entry that is no longer `playing` is ignored, so
  * stale callbacks can never bring old music back or skip ahead in the playlist.
@@ -302,21 +301,6 @@ function reconcileMusic() {
   startTrack(id, "once");
 }
 
-/** Has the player ever set the Music level? The quiet first-visit level must never override that. */
-const CHOSEN_KEY = "sol:music-chosen";
-let musicChosen = (() => {
-  try {
-    return localStorage.getItem(CHOSEN_KEY) === "1" || readPreferences().music > 0;
-  } catch {
-    return false;
-  }
-})();
-function markMusicChosen() {
-  musicChosen = true;
-  try { localStorage.setItem(CHOSEN_KEY, "1"); } catch { /* optional storage */ }
-}
-/** The Music level that "Sound on" in the first-visit question gives (Master 70 % × Music 30 % × track 0.25). */
-export const FIRST_MUSIC_LEVEL = 0.3;
 
 /** Create/resume the context and preload the UI set. Must run inside a user gesture. */
 function unlock() {
@@ -365,11 +349,6 @@ export const audio = {
     openMiniGames.add(token);
     reconcileMusic();
     return () => { openMiniGames.delete(token); };
-  },
-  /** First-visit "Sound on": a quiet Music level, but only if the player never chose one (a chosen 0 stays 0). */
-  soundOn: () => {
-    audio.mute(false);
-    if (!musicChosen && useAudio.getState().music === 0) useAudio.setState({ music: FIRST_MUSIC_LEVEL });
   },
   mute: (muted: boolean) => {
     if (muted) audio.playSfx("mute");

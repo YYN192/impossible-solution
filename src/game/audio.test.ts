@@ -112,7 +112,8 @@ describe("audio engine", () => {
     }
   });
 
-  it("never fetches music while the Music volume is 0 (the default)", async () => {
+  it("never fetches music while the Music volume is 0", async () => {
+    localStorage.setItem("sol:audio", JSON.stringify({ music: 0 }));
     const { fetch } = fakeAudio();
     const { audio } = await import("./audio");
     audio.unlock();

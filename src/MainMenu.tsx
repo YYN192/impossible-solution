@@ -39,7 +39,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
   const progress = useProgress();
   const special = flags.todaysSun || flags.daily;
   const soundAsked = useComfort((c) => c.soundAsked);
-  const answerSound = (muted: boolean) => { if (muted) audio.mute(true); else audio.soundOn(); useComfort.setState({ soundAsked: true }); };
+  const answerSound = (muted: boolean) => { audio.mute(muted); useComfort.setState({ soundAsked: true }); };
   const pick = (choice: RunChoice) => { audio.playSfx("select"); onChoose(choice); };
   return <main className="mission-menu">
     <div className="drifting-stars" aria-hidden="true">{stars.map((style, i) => <i key={i} style={style} />)}</div>
