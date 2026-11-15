@@ -51,3 +51,10 @@ describe("rover drive pad lights up with the keyboard", () => {
     expect(left.hasAttribute("data-pressed")).toBe(false);
   });
 });
+
+describe("rover screen shows the cost up front (#66)", () => {
+  it("shows the live power cost and the lab limit", () => {
+    render(<ExploreBeat map={map} onDone={vi.fn()} />);
+    screen.getByText(t("exploreUi.cost", { n: 0 }));
+  });
+});

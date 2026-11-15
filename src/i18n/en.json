@@ -50,7 +50,8 @@
     "roverHome2": "The rover came home with 2 samples.",
     "roverStranded": "The rover got stuck far from home. The crew walked out to tow it.",
     "stormPanels": "You wiped the panels in the dust storm. More power, more radiation.",
-    "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power."
+    "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power.",
+    "roverEmpty": "The rover drove out but came home with no samples."
   },
   "event": {
     "burst": {
@@ -854,7 +855,9 @@
     "right": "Drive right",
     "map": "Map of the Gale Crater area. Use the arrow keys or the buttons to drive.",
     "legend": "Light ground costs 1 battery. Dark, rough ground costs 2. Rocks block the way.",
-    "square": "One square is about 20 km of real Mars."
+    "square": "One square is about 20 km of real Mars.",
+    "cost": "This drive costs {{n}} power so far.",
+    "labLimit": "The lab can test {{max}} samples. More give no extra science."
   },
   "hubStorm": {
     "eyebrow": "Alarm",

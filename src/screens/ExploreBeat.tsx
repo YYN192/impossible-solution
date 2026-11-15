@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
-import { driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
+import { EXPLORE, drivePower, driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
 import { gameKey, usePressedKeys } from "../game/pressedKeys";
 
@@ -84,6 +84,8 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
           </span>
         </p>
         <p><Icon name="rock" />{" "}{t("exploreUi.samples", { n: drive.collected.length })}</p>
+        <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+        {drive.collected.length >= EXPLORE.maxScience && <p className="note">{t("exploreUi.labLimit", { max: EXPLORE.maxScience })}</p>}
         <p className={home ? "explore-home" : "explore-away"} role="status">
           {drive.battery === 0 && !home ? t("exploreUi.empty") + " " : ""}
           {home ? t("exploreUi.home") : t("exploreUi.away")}
