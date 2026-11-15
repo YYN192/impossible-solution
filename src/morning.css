@@ -1,0 +1,69 @@
+/* Morning screen: sunrise hero, tap-to-reveal chain, radio card. Palette: src/assets/pixel/palette.json */
+.morning [hidden] { display: none !important; }
+.morning { display: grid; gap: 1rem; width: 100%; max-width: 100%; }
+.morning-hero { position: relative; overflow: hidden; border: 3px solid #080B12; padding: 1rem 1rem 0.5rem; min-height: 9.5rem; display: grid; align-content: space-between; gap: 1rem;
+  background: linear-gradient(#101A2B 0%, #3a2b52 35%, #A84730 70%, #D86E3B 88%, #E6BD5D 100%); }
+.morning-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2.8rem; background: repeating-linear-gradient(90deg, #6e2f24 0 12px, #5a261d 12px 24px); border-top: 3px solid #080B12; }
+.morning-hero .sun { position: absolute; right: 12%; bottom: 2.6rem; width: 4.5rem; height: 2.25rem; border-radius: 4.5rem 4.5rem 0 0; background: #E6BD5D; border: 3px solid #080B12; border-bottom: 0; box-shadow: 0 0 0 0.5rem rgba(230,189,93,.25), 0 0 0 1rem rgba(230,189,93,.12); animation: m-rise 1.4s ease-out both; }
+.console-content .morning-hero h1, .morning-hero h1 { position: relative; z-index: 1; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); color: #E8F0F7; text-shadow: 3px 3px 0 #080B12; letter-spacing: 0; }
+.sol-track { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0 0.5rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 0.25rem; }
+.sol-track li { display: grid; justify-items: center; gap: 0.1rem; min-width: 1.8rem; }
+.sol-track .rover { font-size: 1.6rem; line-height: 1; min-height: 1.6rem; animation: m-drive .9s ease-out both; }
+.sol-track i { font-style: normal; font-weight: 700; display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border: 3px solid #080B12; background: #B8C4D0; color: #080B12; font-size: 1rem; }
+.sol-track .done i { background: #65BF83; }
+.sol-track .now i { background: #E6BD5D; transform: scale(1.2); }
+.morning-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: start; }
+.m-card { border: 3px solid #3b5a78; background: #0e1b2b; padding: 1rem; display: grid; gap: 0.8rem; min-width: 0; }
+.m-card h2 { margin: 0; font-size: 1.1rem; color: #83D9F4; }
+.m-calm { font-size: 1.2rem; margin: 0; }
+.m-calm span { font-size: 2rem; vertical-align: middle; }
+.morning .fallen { display: grid; gap: 0.8rem; }
+.morning .domino { display: flex; align-items: center; gap: 0.9rem; padding: 0.9rem; border: 3px solid #080B12; background: #2a1d24; font-size: 1.15rem; }
+.morning .domino-icon { font-size: 3rem; line-height: 1; flex: none; }
+.morning .domino-text { font-size: 1.2rem; font-weight: 700; }
+.morning .cause .domino { background: #1d2a1f; }
+.morning .fallen__row { display: flex; align-items: center; gap: 0.5rem; }
+.morning .fallen__row .domino-record { flex: 1; min-width: 0; }
+.morning .because { margin: 0; text-align: center; font-size: 1.1rem; color: #E6BD5D; font-weight: 700; }
+.morning button.why, .morning .radio-btn { min-height: 56px; font-size: 1.15rem; font-weight: 700; cursor: pointer; border: 3px solid #080B12; background: #E6BD5D; color: #080B12; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.morning button.why:hover, .morning .radio-btn:hover:not(:disabled) { background: #f3d489; }
+.morning .cause-fall { transform-origin: top left; animation: m-tip .6s ease-out both; }
+.morning .radio-btn { width: 100%; justify-content: flex-start; background: #83D9F4; text-align: left; }
+.morning .radio-btn:disabled { opacity: 1; background: #65BF83; cursor: default; color: #080B12; }
+.morning .radio-btn small { display: block; font-size: 1rem; font-weight: 400; }
+.radio-icon { font-size: 2.2rem; }
+.radio-btn:not(:disabled) .radio-icon { animation: m-pulse 1.2s ease-in-out infinite; }
+.radio-msg { display: grid; gap: 0.7rem; }
+.radio-text { margin: 0; font-size: 1.25rem; line-height: 1.4; min-height: 2.8em; padding: 0.8rem; background: #07101a; border: 3px solid #3b5a78; color: #9de9e3; }
+.caret { animation: m-blink 1s steps(2) infinite; }
+.m-alert { display: flex; align-items: center; gap: 0.8rem; margin: 0; padding: 0.8rem; border: 3px solid #080B12; font-size: 1.15rem; font-weight: 700; background: #E6BD5D; color: #080B12; animation: m-pop .4s ease-out both; }
+.m-alert-icon { font-size: 2.2rem; line-height: 1; flex: none; }
+.m-alert-risk-high, .m-alert-particleBurst { background: #ffb4a2; }
+.m-alert-risk-low { background: #65BF83; }
+.m-note { margin: 0; font-size: 1.05rem; }
+.nasa { border: 3px solid #3b5a78; background: #0a1522; }
+.nasa summary { cursor: pointer; min-height: 52px; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.9rem; font-weight: 700; font-size: 1rem; color: #E8F0F7; }
+.nasa[open] summary { border-bottom: 3px solid #3b5a78; }
+.nasa > :not(summary) { margin-left: 0.9rem; margin-right: 0.9rem; }
+.nasa > :last-child { margin-bottom: 0.9rem; }
+.nasa .chip { font-size: 1rem; margin-top: 0.6rem; }
+.nasa .note { font-size: 1rem; margin: 0.4rem 0 0; }
+.delay { padding-top: 0.6rem; }
+.signal { display: flex; align-items: center; gap: 0.4rem; font-size: 1.4rem; }
+.signal i { flex: 1; height: 0; border-top: 3px dashed #83D9F4; position: relative; }
+.signal i::after { content: ""; position: absolute; top: -8px; left: 0; width: 13px; height: 13px; background: #E6BD5D; border: 2px solid #080B12; animation: m-travel 3s linear infinite; }
+.morning .actions { margin-top: 0; }
+.morning .morning-go { min-height: 64px; font-size: 1.3rem; width: 100%; }
+.morning .campaign-ending { border-top: 3px dashed #3b5a78; padding-top: 0.8rem; }
+.morning .campaign-ending p { font-size: 1.05rem; }
+.morning button:focus-visible, .morning summary:focus-visible { outline: 4px solid #fff; outline-offset: 2px; }
+@keyframes m-rise { from { transform: translateY(100%); } }
+@keyframes m-drive { from { transform: translateX(-3rem); opacity: 0; } }
+@keyframes m-tip { from { transform: rotate(-12deg) translateY(-1rem); opacity: 0; } }
+@keyframes m-pop { from { transform: scale(.8); opacity: 0; } }
+@keyframes m-pulse { 50% { transform: scale(1.18) rotate(-6deg); } }
+@keyframes m-blink { 50% { opacity: 0; } }
+@keyframes m-travel { from { left: 0; } to { left: calc(100% - 13px); } }
+@media (prefers-reduced-motion: reduce) { .morning *, .morning *::before, .morning *::after { animation: none !important; transition: none !important; } }
+.radio { display: grid; gap: 0.7rem; }
+.morning-go span { margin-left: 0.5rem; }

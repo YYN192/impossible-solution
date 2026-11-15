@@ -44,7 +44,7 @@ describe("complete expedition", () => {
     const plans: JobId[][] = [["greenhouse", "panels", "askEarth"], ["panels", "greenhouse", "science"], ["panels", "greenhouse", "shelter"]];
     for (let sol = 1; sol <= 3; sol++) {
       expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t("morning.heading", { sol }));
-      if (sol === 2) screen.getByRole("complementary", { name: t("play.earthInbox") });
+      if (sol === 2) screen.getByRole("button", { name: new RegExp(t("morning.radio")) });
       click(t("morning.goPlan"));
       for (const [i, job] of plans[sol - 1].entries()) { click(t("crew.name", { n: i + 1 })); click(t(`jobs.${job}`)); }
       const before = useGame.getState().state;
