@@ -857,7 +857,8 @@
     "legend": "Light ground costs 1 battery. Dark, rough ground costs 2. Rocks block the way.",
     "square": "One square is about 20 km of real Mars.",
     "cost": "This drive costs {{n}} power so far.",
-    "labLimit": "The lab can test {{max}} samples. More give no extra science."
+    "labLimit": "The lab can test {{max}} samples. More give no extra science.",
+    "noPower": "No power!"
   },
   "hubStorm": {
     "eyebrow": "Alarm",

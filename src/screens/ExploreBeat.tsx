@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
-import { EXPLORE, drivePower, driveAction, isHome, move, startDrive, type ExploreMap } from "../sim/explore";
+import { EXPLORE, drivePower, driveAction, isHome, move, ranOutOfPower, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
 import { gameKey, usePressedKeys } from "../game/pressedKeys";
 
@@ -23,6 +23,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
   const { t } = useTranslation();
   const [drive, setDrive] = useState(() => startDrive(map));
   const [facing, setFacing] = useState<Dir>("right");
+  const [shake, setShake] = useState(false);
   const home = isHome(map, drive);
   const pressed = usePressedKeys(HINT_KEYS);
 
@@ -32,11 +33,15 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
     const next = move(map, drive, dx, dy);
     if (next === drive) return audio.playSfx("job-remove");
     audio.playSfx(next.collected.length > drive.collected.length ? "assign" : "select");
+    if (ranOutOfPower(map, drive, next)) {
+      audio.playSfx("rover-power-down");
+      if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setShake(true); setTimeout(() => setShake(false), 400); }
+    }
     setDrive(next);
   }
 
   return (
-    <div className="explore">
+    <div className={shake ? "explore shake" : "explore"}>
       <div
         className="explore-map"
         role="application"
@@ -50,6 +55,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
           go(dir);
         }}
       >
+        {drive.battery === 0 && !home && <p className="explore-nopower" role="alert">{t("exploreUi.noPower")}</p>}
         {map.cells.map((cell, i) => {
           const x = i % map.cols, y = Math.floor(i / map.cols);
           const sample = map.samples.findIndex((s) => s.x === x && s.y === y);

@@ -58,3 +58,18 @@ describe("rover screen shows the cost up front (#66)", () => {
     screen.getByText(t("exploreUi.cost", { n: 0 }));
   });
 });
+
+describe("rover out of power (#68)", () => {
+  it("plays one power-down sound and shows No power! when the battery empties away from home", async () => {
+    const { audio } = await import("../game/audio");
+    const play = vi.spyOn(audio, "playSfx");
+    // A tiny 3-square sand strip: two moves right empty a 2-unit battery away from the base.
+    const strip = { cols: 3, rows: 1, cells: [0, 1, 2].map(() => ({ color: "#c08060", terrain: "sand" as const })), base: { x: 0, y: 0 }, samples: [], battery: 2 };
+    render(<ExploreBeat map={strip} onDone={vi.fn()} />);
+    const pad = screen.getByRole("application");
+    for (let i = 0; i < 5; i++) fireEvent.keyDown(pad, { key: "ArrowRight", code: "ArrowRight" });
+    expect(play.mock.calls.filter((c) => c[0] === "rover-power-down")).toHaveLength(1);
+    expect(screen.getByRole("alert").textContent).toContain(t("exploreUi.noPower"));
+    play.mockRestore();
+  });
+});
