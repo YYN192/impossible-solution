@@ -6,7 +6,8 @@ import type { Facing } from "./assets";
 export const useSession = create<{
   position: { x: number; y: number; facing: Facing };
   draft: Plan;
-  before?: Bars;
+  /** The numbers when the plan was sent: the end-of-sol screen shows what the night changed (#65). */
+  before?: Bars & { food?: number; science?: number };
   assign: (crew: CrewId, job?: JobId) => void;
   clearPlan: () => void;
 }>()((set) => ({

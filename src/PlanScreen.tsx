@@ -114,7 +114,7 @@ export default function PlanScreen() {
       return;
     }
     resolved.current = true;
-    useSession.setState({ before: { ...state.bars }, draft: {} });
+    useSession.setState({ before: { ...state.bars, food: state.food, science: state.science }, draft: {} });
     const result = useGame.getState().endSol(plan);
     audio.playSfx("resolve");
     if (result.over && state.sol < rulesOf(state).sols)

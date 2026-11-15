@@ -141,6 +141,23 @@ describe("rover scoring (#66)", () => {
     }
   });
 
+  it("a second sample tires Amara: she studies the rocks and rests today", () => {
+    const m = map(3);
+    const home = startDrive(m);
+    expect(driveAction(m, { ...home, collected: [0] }).effect?.tired).toBeUndefined();
+    const two = driveAction(m, { ...home, collected: [0, 1] });
+    expect(two.effect).toMatchObject({ science: 2, tired: ["a3"] });
+    expect(two.textKey).toBe("domino.roverHome2");
+    // The drive is a morning beat, so she misses this sol's plan: the cost is right there.
+    expect(act(createGame(), two).state.tired).toEqual(["a3"]);
+  });
+
+  it("a stranded rover tires nobody (its cost is power and space rays)", () => {
+    const m = map(3);
+    const away = { ...startDrive(m), x: m.base.x + 3, collected: [0, 1] };
+    expect(driveAction(m, away).effect?.tired).toBeUndefined();
+  });
+
   it("the power cost shown during the drive is the cost the engine charges", () => {
     const m = map(3);
     const d = follow(m, route(m, m.samples[0]));

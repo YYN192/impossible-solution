@@ -57,6 +57,23 @@ describe("rover screen shows the cost up front (#66)", () => {
     render(<ExploreBeat map={map} onDone={vi.fn()} />);
     screen.getByText(t("exploreUi.cost", { n: 0 }));
   });
+
+  it("warns that a second sample tires Amara before she is tired, and the drive does tire her", () => {
+    const onDone = vi.fn();
+    // A 3-square sand strip with a sample one and two squares from the base.
+    const strip = { cols: 3, rows: 1, cells: [0, 1, 2].map(() => ({ color: "#c08060", terrain: "sand" as const })), base: { x: 0, y: 0 }, samples: [{ x: 1, y: 0 }, { x: 2, y: 0 }], battery: 10 };
+    render(<ExploreBeat map={strip} onDone={onDone} />);
+    const pad = screen.getByRole("application");
+    const drive = (key: string) => fireEvent.keyDown(pad, { key, code: key });
+    expect(screen.queryByText(t("exploreUi.tiredNext"))).toBeNull(); // no samples, no crew cost yet
+    drive("ArrowRight");
+    screen.getByText(t("exploreUi.tiredNext")); // one on board: the warning comes before the choice
+    drive("ArrowRight");
+    screen.getByText(t("exploreUi.tiredNow"));
+    drive("ArrowLeft"); drive("ArrowLeft");
+    fireEvent.click(screen.getByRole("button", { name: t("exploreUi.finish") }));
+    expect(onDone.mock.calls[0][0].effect).toMatchObject({ science: 2, tired: ["a3"] });
+  });
 });
 
 describe("rover out of power (#68)", () => {

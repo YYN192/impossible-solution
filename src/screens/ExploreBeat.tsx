@@ -101,7 +101,12 @@ export function ExploreBeat({ map, beat, onDone }: { map: ExploreMap; beat?: Bea
         {beat ? (
           option && <p className="explore-cost" aria-live="polite">{t("exploreUi.pick", { choice: tRun(`beat.${beat.id}.${option.id}.label`) })}</p>
         ) : (
-          <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+          <>
+            <p className="explore-cost">{t("exploreUi.cost", { n: drivePower(map, drive) })}</p>
+            {/* #66: the crew cost shows before the second sample is picked up, not only after. */}
+            {drive.collected.length > 0 && <p className="explore-cost" aria-live="polite"><Icon name="tired" />{" "}
+              {t(drive.collected.length < EXPLORE.maxScience ? "exploreUi.tiredNext" : "exploreUi.tiredNow")}</p>}
+          </>
         )}
         {drive.collected.length >= EXPLORE.maxScience && <p className="note">{t("exploreUi.labLimit", { max: EXPLORE.maxScience })}</p>}
         <p className={home ? "explore-home" : "explore-away"} role="status">

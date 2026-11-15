@@ -13,6 +13,8 @@ import { tDynamic, tRun } from "../i18n/dynamic";
 import { useMission } from "../state/mission";
 import { STORMS, stormById } from "../data/storms";
 import { DataChip } from "./DataChip";
+import { solChanges } from "./endSol/changes";
+import { SolChanges } from "./endSol/SolChanges";
 import { useGame } from "../state/game";
 import { useNav } from "../state/screen";
 
@@ -57,6 +59,7 @@ export function EndOfSolScreen() {
       </div>
     </section>}
     <div className="night-banner"><img src={asset("backgrounds/mars-menu-space")} alt="" /><p>{t("play.nightSummary")}</p></div>
+    <SolChanges changes={solChanges(before, { ...state.bars, food: state.food, science: state.science })} />
     <ResourceMeters bars={state.bars} previous={before} />
     <div className="small-counters"><span>{t("bars.food")} <b>{state.food}</b></span><span>{t("bars.science")} <b>{state.science}</b></span></div>
     <div className="night-results">{fell.filter((d) => d.causeIds.length > 0 || d.source).map((d) => <DominoCard key={d.id} domino={d} />)}</div>

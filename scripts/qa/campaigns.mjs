@@ -101,7 +101,8 @@ try {
           const n = await crew.count();
           for (let c = 0; c < n; c++) {
             await click(page.locator(".crew-tile > button:not(:disabled):not(.unassign)").nth(c));
-            await click(page.locator(".job-choice").nth((c + i) % 5));
+            // Sols 1-2 show only the 3 core jobs (#64), later sols all 5: pick among the ones on screen.
+            await click(page.locator(".job-choice").nth((c + i) % await page.locator(".job-choice").count()));
             // Each job opens an optional mini-game: skip it (it never changes the result).
             const mini = page.locator("dialog.mini-game[open]");
             if (await mini.count()) await click(mini.getByRole("button", { name: new RegExp("^" + EN.miniGame.skip) }));

@@ -386,3 +386,21 @@ html[data-contrast] .teacher__bar > :not(.primary) { color: #fff; border-color: 
 /* #64: the power flow line under the plan preview. */
 .power-flow { margin: 0.2rem 0 0; font-size: max(1rem, 16px); color: #c3d3de; }
 .job-new { margin-left: 0.5rem; color: #fff; background: #315166; border: 1px solid #8eb7c9; padding: 0.08rem 0.3rem; font-size: 0.75rem; }
+/* #65: the day's changes pop in one by one. Bad news shakes once in the warning colour (no flashing),
+   good news sparkles; +/- and Good / Watch out carry the meaning without colour. Calm mode stills it (data-calm). */
+.sol-changes { margin: 12px 0; }
+.sol-changes h2 { font-size: 1rem; margin: 0 0 8px; }
+.sol-changes ul { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.sol-change { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: var(--px, 4px) solid #65bf83; background: #173b2c; animation: sol-pop 0.3s steps(3) both; }
+.sol-change.bad { border-color: #ff7b7b; background: #3a1d1d; animation: sol-pop 0.3s steps(3) both, sol-shake 0.4s steps(4) 0.3s 1; }
+.sol-change b { font-size: 1.4rem; font-variant-numeric: tabular-nums; min-width: 2.2ch; text-align: right; }
+.sol-change { flex-wrap: wrap; } /* phones: the verdict moves to its own line, numbers never break */
+.sol-change b, .sol-change__diff, .sol-change__verdict { white-space: nowrap; }
+.sol-change__diff { font-weight: 700; }
+.sol-change__verdict { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.sol-change.good .sol-change__verdict { color: #9ff0b8; }
+.sol-change.bad .sol-change__verdict { color: #ffb3b3; }
+.sol-change img { width: 24px; height: 24px; image-rendering: pixelated; }
+@keyframes sol-pop { from { transform: scale(0.6); opacity: 0; } }
+@keyframes sol-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .sol-change, .sol-change.bad { animation: none; } }
