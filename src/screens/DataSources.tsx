@@ -5,6 +5,7 @@ import { CAMPAIGN_FACTS } from "../data/campaignFacts";
 import { GAME_NUMBERS } from "../data/gameNumbers";
 import { SNAPSHOT_DATES } from "../data/donki";
 import { DataBadge } from "../components/DataBadge";
+import { localFact, localText } from "../i18n/sourceText";
 import { MoreRealData } from "./MoreRealData";
 import type { DataSource } from "../data/http";
 import "./DataSources.css";
@@ -47,7 +48,7 @@ export function DataSources({
 
       <h3>{t("dataSources.real")}</h3>
       <ul className="sources__list">
-        {[...REAL_FACTS, ...CAMPAIGN_FACTS].map((f) => (
+        {[...REAL_FACTS, ...CAMPAIGN_FACTS].map((fact) => ({ ...fact, ...localFact(fact, i18n.language) })).map((f) => (
           <li key={f.id} className="sources__item">
             <dl className="sources__facts">
               <div>
@@ -66,7 +67,7 @@ export function DataSources({
                 <dt>{t("dataSources.source")}</dt>
                 <dd>
                   <a href={f.ref.url} target="_blank" rel="noreferrer">
-                    {f.ref.label}
+                    {localText(f.ref.label, i18n.language)}
                   </a>
                 </dd>
               </div>
