@@ -22,10 +22,9 @@ import {
 } from "../game/talk";
 import { Icon } from "./Icon";
 import "./CrewTalk.css";
+import { reducedMotion } from "../state/comfort";
 
-const reduced = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const reduced = reducedMotion;
 
 /** Arcade-style typewriter: letters appear one by one with a soft blip. A click or key shows the whole line at once. */
 function useTyped(text: string, blip: string) {

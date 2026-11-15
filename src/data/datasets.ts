@@ -61,6 +61,28 @@ export const SpaceWeather = z.object({
 });
 export type SpaceWeather = z.infer<typeof SpaceWeather>;
 
+/** One DONKI event on the radar strip (#60). Size fields per type: flare class, CME speed, storm Kp. */
+export const WeatherEvent = z.object({
+  id: z.string(),
+  time: z.string(),
+  link: z.string().optional(),
+  flareClass: z.string().nullable().optional(),
+  speedKmS: z.number().nullable().optional(),
+  kp: z.number().nullable().optional(),
+  /** Only when a DONKI WSA-Enlil run lists Mars (never guessed). */
+  marsForecast: z.boolean(),
+});
+export const WeatherWeek = z.object({
+  window: z.object({ start: z.string(), end: z.string() }),
+  rows: z.array(z.object({
+    type: z.enum(["flr", "cme", "sep", "gst"]),
+    /** null: DONKI did not answer for this type (shown as "no answer", never as 0). */
+    events: z.array(WeatherEvent).nullable(),
+  })),
+});
+export type WeatherWeek = z.infer<typeof WeatherWeek>;
+export type WeatherEvent = z.infer<typeof WeatherEvent>;
+
 export const RadiationStorm = z.object({
   instrument: z.literal("MSL-RAD-Surface"),
   stormStart: z.string(),
@@ -162,6 +184,7 @@ export const SCHEMAS = {
   },
   "enlil-mars-recent": { schema: envelope(z.array(Sim)), required: true },
   "space-weather-recent": { schema: envelope(SpaceWeather), required: false },
+  "space-weather-week": { schema: envelope(WeatherWeek), required: false },
   "radlab-msl-2024-05": { schema: envelope(RadiationStorm), required: true },
   "osdr-studies": { schema: envelope(Studies), required: true },
   "mission-images": {

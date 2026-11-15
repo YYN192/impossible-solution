@@ -7,7 +7,7 @@ export interface Entity extends Rect {
   sprite: string;
   solid?: boolean;
   interaction?: "console" | "npc" | "door" | "task";
-  dialogue?: "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse";
+  dialogue?: "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse" | "radar";
 }
 export interface Room { id: string; width: number; height: number; bounds: Rect; entities: Entity[] }
 const object = (id: string, sprite: string, x: number, y: number, w = 32, h = 32): Entity => ({ id, sprite, x, y, w, h, solid: true });
@@ -21,7 +21,8 @@ export const MARS_BASE: Room = {
     object("lab2", "environment/decorations/mars-research-equipment", 528, 96),
     object("supply", "environment/decorations/mars-shelf", 64, 112, 64, 32),
     object("supply2", "environment/decorations/mars-shelf", 144, 112, 64, 32),
-    object("radar", "consoles/radar", 400, 96),
+    // The space weather radar (#60): opens the DONKI strip.
+    { ...object("radar", "consoles/radar", 400, 96), interaction: "task", dialogue: "radar" },
     object("map", "consoles/planet-map", 432, 96),
     object("table", "environment/decorations/mars-table", 448, 272, 64, 32),
     object("chair", "environment/decorations/mars-chair", 464, 310, 24, 24),

@@ -732,8 +732,11 @@
       "channels": 2,
       "loop": true,
       "volume": 0.25,
-      "trigger": "Background loop on the main menu (never autoplay; start after the first click)",
-      "web": "/audio/ambience/space-menu-ambience.m4a"
+      "trigger": "Background loop on the main menu (never autoplay; start after the first click); also the Moon base hub (no Mars wind on the Moon)",
+      "web": "/audio/ambience/space-menu-ambience.m4a",
+      "aliases": [
+        "moon-base-ambience"
+      ]
     },
     {
       "id": "Mars_Main_Menu_8bit",

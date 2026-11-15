@@ -1,8 +1,11 @@
 import { getSprite, playerSprite, type Facing } from "./assets";
 import type { Point, Room } from "./world";
+import { puffLook, type Puff } from "./walkFx";
 const floor = "environment/floors/mars-floor-";
 /** The dust storm as the canvas shows it: fog strength 0–1, a broken greenhouse, "!" over jobs to do. */
 export interface StormView { level: number; broken: boolean; marks: string[] }
+/** The astronaut's walk effects (see walkFx.ts): dust puffs on the floor and the idle-bounce lift in px (0 or negative). */
+export interface PlayerFx { puffs: readonly Puff[]; bob: number }
 
 const ready = (path: string) => { const img = getSprite(path); return img.complete && img.naturalWidth > 0; };
 /** Every look an entity can switch to (crew facing four ways, console states, the open airlock), loaded with the
@@ -16,7 +19,7 @@ function preload(room: Room) {
   }
 }
 
-export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }) {
+export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: Point & { facing: Facing }, time: number, moving: boolean, near: string | undefined, reduced: boolean, storm: StormView = { level: 0, broken: false, marks: [] }, moon = false, fx: PlayerFx = { puffs: [], bob: 0 }) {
   if (!preloaded.has(room)) preload(room);
   ctx.imageSmoothingEnabled = false;
   const sprite = (path: string, x: number, y: number, w: number, h: number) => {
@@ -24,8 +27,9 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     if (img.complete && img.naturalWidth) ctx.drawImage(img, Math.round(x), Math.round(y), w, h);
   };
   ctx.fillStyle = "#070e19"; ctx.fillRect(0, 0, room.width, room.height);
-  // Warm Mars beyond the base; the habitat itself stays silver and blue.
-  sprite("backgrounds/mars-menu-space", 0, -104, 640, 256);
+  // Warm Mars beyond the base; the habitat itself stays silver and blue. On the Moon: black sky, grey ground, Earth.
+  if (moon) moonSky(ctx, getSprite("icons/earth"));
+  else sprite("backgrounds/mars-menu-space", 0, -104, 640, 256);
   for (let y = 64; y < 352; y += 16) for (let x = 16; x < 624; x += 16) {
     sprite(floor + ((x >= 288 && x < 352) || (y >= 240 && y < 256) ? "reinforced" : "metal"), x, y, 16, 16);
     // Calm floor: plain metal, a stable hash lightens ~1 tile in 9 very slightly (no busy "panel" grid).
@@ -40,7 +44,11 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     sprite("environment/walls/mars-wall-left-edge", 16, y, 16, 16);
     sprite("environment/walls/mars-wall-right-edge", 608, y, 16, 16);
   }
-  for (const x of [64, 144, 400, 480]) sprite("environment/windows/mars-window-mountains", x, 40, 64, 40);
+  for (const x of [64, 144, 400, 480]) {
+    if (moon) moonWindow(ctx, x, 40, x === 144 || x === 480 ? getSprite("icons/earth") : undefined);
+    else sprite("environment/windows/mars-window-mountains", x, 40, 64, 40);
+    ctx.fillStyle = "#070e198c"; ctx.fillRect(x, 40, 64, 40); // decoration stays in the background (visual hierarchy level 3)
+  }
   for (const x of [40, 240, 376, 584]) for (const y of [96, 208, 320]) {
     sprite("environment/decorations/mars-floor-light", x, y, 16, 16);
   }
@@ -49,9 +57,9 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
   // Console bay guide: a calm outline with soft "chase lights" running all the way round (classic arcade marquee).
   // It rests once the player arrives, and while a storm sends them elsewhere first.
   if (near !== "console" && !storm.marks.length) {
-    ctx.lineWidth = 1; ctx.strokeStyle = "#3d5d73"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.lineWidth = 2; ctx.strokeStyle = "#83d9f4"; ctx.strokeRect(272, 108, 96, 91);
     ctx.setLineDash([4, 8]); ctx.lineDashOffset = reduced ? 0 : -time / 45;
-    ctx.strokeStyle = "#8fd3e8aa"; ctx.strokeRect(272.5, 108.5, 95, 90);
+    ctx.strokeStyle = "#f2f6fa"; ctx.strokeRect(272, 108, 96, 91);
     ctx.setLineDash([]);
   }
   ctx.fillStyle = "#29445b"; ctx.fillRect(272, 198, 96, 3);
@@ -70,10 +78,21 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
     // turned. Until the new look is ready, keep drawing the one we already have.
     if (!ready(path)) path = ready(e.sprite) ? e.sprite : path;
     sprite(path, e.x, e.y + bob, e.w, e.h);
+    // On the Moon the console screen and the wall map show the Moon, not the orange Mars globe in their art.
+    if (moon && e.id === "map") moonDisc(ctx, e.x + 16, e.y + 16, 8);
+    if (moon && e.id === "console") moonDisc(ctx, e.x + 20, e.y + 19, 9);
   }}));
   entities.push({ y: player.y, draw: () => {
-    ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10), Math.round(player.y - 3), 20, 5);
-    sprite(playerSprite(player.facing, moving && !reduced ? Math.floor(time / 140) % 4 : undefined), player.x - 16, player.y - 27, 32, 32);
+    // The shadow stays on the floor and narrows a little while the idle bounce lifts the astronaut.
+    ctx.fillStyle = "#090f1d88"; ctx.fillRect(Math.round(player.x - 10 - fx.bob), Math.round(player.y - 3), 20 + 2 * fx.bob, 5);
+    sprite(playerSprite(player.facing, moving && !reduced ? Math.floor(time / 140) % 4 : undefined), player.x - 16, player.y - 27 + fx.bob, 32, 32);
+  }});
+  // Puffs sort with everything else, so one behind the feet hides under the astronaut when walking down.
+  for (const p of fx.puffs) entities.push({ y: p.y, draw: () => {
+    const look = puffLook(p, time);
+    ctx.globalAlpha = look.alpha; ctx.fillStyle = look.color;
+    ctx.fillRect(Math.round(p.x - look.size / 2), Math.round(p.y - look.rise - look.size / 2), look.size, look.size);
+    ctx.globalAlpha = 1;
   }});
   entities.sort((a, b) => a.y - b.y).forEach((e) => e.draw());
   if (storm.level > 0) {
@@ -88,12 +107,19 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
       ctx.fillRect(Math.round(x), Math.round(y), 4 + i % 6, 1);
     }
   }
+  // The player marker: a small cyan chevron above the head (level 1: "this is you"). Static with reduced motion.
+  {
+    const cx = Math.round(player.x), top = Math.round(player.y - 27 + fx.bob) - 9 + (reduced ? 0 : Math.round(Math.sin(time / 280) * 1.5));
+    ctx.fillStyle = "#080b12"; ctx.fillRect(cx - 5, top - 1, 11, 7);
+    ctx.fillStyle = "#83d9f4";
+    for (let r = 0; r < 4; r++) ctx.fillRect(cx - 4 + r, top + r, 9 - 2 * r, 1);
+  }
   // A speech bubble over everyone you can talk to: small and quiet from afar, bigger with "…" when you are close.
   for (const e of room.entities) if (e.interaction === "npc") {
     const close = near === e.id, cx = Math.round(e.x + e.w / 2), y = e.y - (close ? 13 : 7) + (reduced ? 0 : Math.round(Math.sin(time / 300 + e.x) * (close ? 1.5 : 1)));
     const w = close ? 16 : 8, h = close ? 10 : 6;
     ctx.fillStyle = "#080b12"; ctx.fillRect(cx - w / 2 - 1, y - 1, w + 2, h + 2); ctx.fillRect(cx - 2, y + h, 4, 3);
-    ctx.fillStyle = close ? "#f2f6fa" : "#a9bccb"; ctx.fillRect(cx - w / 2, y, w, h); ctx.fillRect(cx - 1, y + h, 2, 2);
+    ctx.fillStyle = close ? "#f2f6fa" : "#83d9f4"; ctx.fillRect(cx - w / 2, y, w, h); ctx.fillRect(cx - 1, y + h, 2, 2);
     ctx.fillStyle = "#080b12";
     if (close) for (let i = 0; i < 3; i++) if (reduced || Math.floor(time / 250) % 4 > i) ctx.fillRect(cx - 5 + i * 4, y + 4, 2, 2);
   }
@@ -153,6 +179,44 @@ function door(ctx: CanvasRenderingContext2D, closed: HTMLImageElement, x: number
   ctx.drawImage(closed, leaf.x, leaf.y, half, leaf.h, lx - shift, ly, half * sx, lh);
   ctx.drawImage(closed, leaf.x + half, leaf.y, half, leaf.h, lx + half * sx + shift, ly, half * sx, lh);
   ctx.restore();
+}
+
+/** Fixed star spots (x, y), so the sky never flickers between frames. */
+const STARS = [[30, 8], [92, 20], [150, 6], [210, 30], [266, 12], [330, 24], [388, 5], [446, 18], [508, 34], [570, 9], [612, 26], [8, 40]];
+/** The Moon outside the base: black sky with stars, Earth, and grey ground showing beside the walls. */
+function moonSky(ctx: CanvasRenderingContext2D, earth: HTMLImageElement) {
+  ctx.fillStyle = "#05070d"; ctx.fillRect(0, 0, 640, 152);
+  ctx.fillStyle = "#c8d0dc"; for (const [x, y] of STARS) ctx.fillRect(x, y, 1, 1);
+  ctx.fillStyle = "#5d636e"; ctx.fillRect(0, 104, 640, 48);
+  ctx.fillStyle = "#8a909a"; ctx.fillRect(0, 104, 640, 2);
+  if (earth.complete && earth.naturalWidth) ctx.drawImage(earth, 586, 10, 16, 16);
+}
+/** A grey pixel Moon (outline, shaded right side, three craters) over the Mars globe in the console and map art. */
+function moonDisc(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  const disc = (radius: number, color: string, onlyRight = false) => {
+    ctx.fillStyle = color;
+    for (let dy = -radius; dy <= radius; dy++) {
+      const half = Math.round(Math.sqrt(radius * radius - dy * dy));
+      if (onlyRight) ctx.fillRect(cx + Math.round(half / 3), cy + dy, half - Math.round(half / 3), 1);
+      else ctx.fillRect(cx - half, cy + dy, half * 2, 1);
+    }
+  };
+  disc(r, "#080b12"); disc(r - 1, "#b8bec8"); disc(r - 1, "#8a909a", true);
+  ctx.fillStyle = "#7d838e";
+  for (const [dx, dy, s] of [[-4, -3, 3], [1, 2, 2], [-2, 4, 2]]) ctx.fillRect(cx + dx, cy + dy, s, s);
+}
+/** A base window looking out on the Moon: steel frame, black sky, grey ridges, and Earth in some of them. */
+function moonWindow(ctx: CanvasRenderingContext2D, x: number, y: number, earth?: HTMLImageElement) {
+  const box = (c: string, dx: number, dy: number, w: number, h: number) => { ctx.fillStyle = c; ctx.fillRect(x + dx, y + dy, w, h); };
+  box("#252c38", 0, 0, 64, 40); box("#b8c4d0", 1, 1, 62, 38); box("#3a4150", 3, 3, 58, 34); box("#687586", 5, 5, 54, 30);
+  box("#05070d", 6, 6, 52, 28);
+  for (const [sx, sy] of STARS.slice(0, 5)) box("#c8d0dc", 7 + ((sx + x) % 48), 7 + (sy % 12), 1, 1);
+  // Two soft grey ridges along the bottom of the glass.
+  for (let i = 0; i < 52; i++) {
+    const h = 5 + Math.round(3 * Math.sin((i + x) / 7)) + (i % 13 < 6 ? 2 : 0);
+    box("#5d636e", 6 + i, 34 - h, 1, h); box("#a3a9b3", 6 + i, 34 - h, 1, 1);
+  }
+  if (earth?.complete && earth.naturalWidth) ctx.drawImage(earth, x + 40, y + 9, 12, 12);
 }
 
 /** A small pixel greenhouse (glass dome over a planter), drawn in code; `broken` after a dust storm. */

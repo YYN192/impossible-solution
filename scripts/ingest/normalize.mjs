@@ -95,6 +95,34 @@ export function summarizeSpaceWeather(raw, window, { missing = [] } = {}) {
   };
 }
 
+/**
+ * The radar's space weather strip (#60): one row per event type, one entry per event in `window`
+ * (dates, inclusive), oldest first. A part in `missing` did not answer: its events are null, never [].
+ * `marsForecast` only when a DONKI WSA-Enlil run lists Mars (the #8 rule: we never guess a Mars hit).
+ */
+export function weatherWeek(raw, window, { missing = [] } = {}) {
+  const inWindow = (t) => typeof t === "string" && t.slice(0, 10) >= window.start && t.slice(0, 10) <= window.end;
+  const rowOf = (type, events) => ({
+    type,
+    events: missing.includes(type)
+      ? null
+      : events.filter((e) => inWindow(e.time)).sort((a, b) => a.time.localeCompare(b.time)),
+  });
+  const mars = (c) =>
+    list(c.cmeAnalyses).some((a) => list(a.enlilList).some((e) => list(e.impactList).some((i) => i.location === "Mars")));
+  const kps = (g) => list(g.allKpIndex).map((k) => Number(k.kpIndex)).filter(Number.isFinite);
+  const link = (e) => (typeof e.link === "string" ? { link: e.link } : {});
+  return {
+    window,
+    rows: [
+      rowOf("flr", list(raw.flr).map((f) => ({ id: String(f.flrID ?? f.peakTime ?? ""), time: f.peakTime ?? f.beginTime, flareClass: f.classType ?? null, marsForecast: false, ...link(f) }))),
+      rowOf("cme", list(raw.cme).map((c) => ({ id: String(c.activityID ?? c.startTime ?? ""), time: c.startTime, speedKmS: list(c.cmeAnalyses).find((a) => a.isMostAccurate)?.speed ?? null, marsForecast: mars(c), ...link(c) }))),
+      rowOf("sep", list(raw.sep).map((s) => ({ id: String(s.sepID ?? s.eventTime ?? ""), time: s.eventTime, marsForecast: false, ...link(s) }))),
+      rowOf("gst", list(raw.gst).map((g) => ({ id: String(g.gstID ?? g.startTime ?? ""), time: g.startTime, kp: kps(g).length ? Math.max(...kps(g)) : null, marsForecast: false, ...link(g) }))),
+    ],
+  };
+}
+
 // ---------- RadLab (OSDR) ----------
 
 const median = (xs) => {

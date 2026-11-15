@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { asset } from "./game/assets";
 import { audio, musicFor, useAudio } from "./game/audio";
 import { WhatsThis } from "./components/WhatsThis";
+import { SettingsPanel } from "./components/SettingsPanel";
+import { useComfort } from "./state/comfort";
 import { MENU_CAMPAIGNS as CAMPAIGNS } from "./data/campaigns";
 import { readFlags } from "./data/flags";
 import { tRun } from "./i18n/dynamic";
@@ -38,6 +40,8 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
   const special = flags.todaysSun || flags.daily;
   // Lobby music (off until the player turns music up; never starts before a tap).
   useEffect(() => { const track = musicFor("lobby"); audio.playMusic(track); return audio.stopMusic; }, []);
+  const soundAsked = useComfort((c) => c.soundAsked);
+  const answerSound = (muted: boolean) => { audio.mute(muted); useComfort.setState({ soundAsked: true }); };
   const pick = (choice: RunChoice) => { audio.playSfx("select"); onChoose(choice); };
   return <main className="mission-menu">
     <div className="drifting-stars" aria-hidden="true">{stars.map((style, i) => <i key={i} style={style} />)}</div>
@@ -50,6 +54,11 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
         <header className="menu-head">
           <p className="eyebrow">{t("menu.eyebrow")}</p>
           <h1>{t("app.name")}</h1><p className="menu-tagline">{t("menu.tagline")}</p>
+          {/* #77: asked once, on the first visit; the answer is saved with the comfort settings. */}
+          {!soundAsked && <p className="sound-ask"><span>{t("comfort.soundAsk")}</span>
+            <button type="button" aria-pressed={!prefs.muted} onClick={() => answerSound(false)}>{t("comfort.soundOn")}</button>
+            <button type="button" aria-pressed={prefs.muted} onClick={() => answerSound(true)}>{t("comfort.soundOff")}</button>
+            <span>{t("comfort.headphones")}</span></p>}
         </header>
         {resume ? <p className="menu-resume">{t("menu.intro")}</p> : <div className="mission-picker" role="group" aria-label={t("run.pick")}>
           {CAMPAIGNS.map((c) => {
@@ -77,12 +86,7 @@ export default function MainMenu({ onPlay, onSources, onTeacher, onChoose, onNew
           <button onClick={onTeacher}>{t("teacher.open")}</button>
         </nav>
         <p className="sol-explainer"><span>{t("title.solLine")}</span><WhatsThis topic="sol" placement="up" /></p>
-      </> : <section className="menu-panel menu-settings">
-        <p className="eyebrow">{t("menu.preferences")}</p><h2>{t("menu.settings")}</h2>
-        {(["master", "music", "sfx"] as const).map((key) => <label className="volume-control" key={key}>{t(`menu.${key}`)}<span>{Math.round(prefs[key] * 100)}%</span><input type="range" min={0} max={100} value={Math.round(prefs[key] * 100)} onChange={(e) => { useAudio.setState({ [key]: Number(e.target.value) / 100 }); audio.playSfx("volume-change"); }} /></label>)}
-        <button aria-pressed={prefs.muted} onClick={() => audio.mute(!prefs.muted)}>{prefs.muted ? t("menu.unmute") : t("menu.mute")}</button>
-        <p className="note">{t("menu.silent")}</p><button className="primary" onClick={() => { audio.playSfx("menu-back"); showSettings(false); }}>{t("dataSources.back")}</button>
-      </section>}
+      </> : <section className="menu-panel menu-settings"><SettingsPanel onBack={() => showSettings(false)} /></section>}
     </div>
     <footer className="menu-bottom"><span>{t("menu.edition")}</span><span>{t("app.disclaimer")}</span></footer>
   </main>;

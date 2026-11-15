@@ -103,23 +103,16 @@ describe("audio engine", () => {
 });
 
 describe("music slots for the team's soundtrack", () => {
- 
-it("uses installed music and falls back when needed", async () => {
-  const { musicFor, sounds } = await import("./audio");
-
-  expect(musicFor("lobby")).toBe("music-lobby");
-  expect(musicFor("hub")).toBe("mars-base-ambience");
-  expect(musicFor("console", "dust")).toBe("music-console");
-  expect(musicFor("console", "storm")).toBe("music-mission-storm");
-
-  for (const id of [
-    musicFor("lobby"),
-    musicFor("hub"),
-    musicFor("console", "moon"),
-  ]) {
-    expect(sounds.has(id)).toBe(true);
-  }
-});
+  it("uses installed soundtracks while preserving the Moon ambience fallback", async () => {
+    const { musicFor, sounds } = await import("./audio");
+    expect(musicFor("lobby")).toBe("music-lobby");
+    expect(musicFor("hub")).toBe("mars-base-ambience");
+    expect(musicFor("hub", "moon")).toBe("moon-base-ambience"); // #76: no Mars wind on the Moon
+    expect(sounds.get("moon-base-ambience")).toBe(sounds.get("space-menu-ambience"));
+    expect(musicFor("console", "dust")).toBe("music-console");
+    expect(musicFor("console", "storm")).toBe("music-mission-storm");
+    for (const id of [musicFor("lobby"), musicFor("hub"), musicFor("console", "moon")]) expect(sounds.has(id)).toBe(true);
+  });
 
   it("use a mission's own track as soon as it is in the manifest, then the shared console track", async () => {
     const { musicFor, sounds } = await import("./audio");
@@ -133,4 +126,3 @@ it("uses installed music and falls back when needed", async () => {
     sounds.delete("music-mission-dust");
   });
 });
-

@@ -7,6 +7,7 @@ import {
   drop, progress, send, startMiniGame, tap, tick, turn, won, type MiniGame,
 } from "../game/miniGames";
 import { gameKey } from "../game/pressedKeys";
+import { useComfort } from "../state/comfort";
 import type { JobId } from "../sim/types";
 
 /** A pixel sprite (src/assets/pixel): hard edges, scaled by whole pixels in CSS. */
@@ -25,13 +26,31 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
   const [game, setGame] = useState<MiniGame>(() => startMiniGame(job, seed));
   const box = useRef<HTMLDialogElement>(null);
   const done = won(game);
+  // #77: the clock waits for the first press, can be paused, and runs at half speed in slow mode.
+  const [started, setStarted] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const slow = useComfort((c) => c.slowMiniGames);
   useEffect(() => { const b = box.current; if (b && !b.open) b.showModal(); return () => b?.close?.(); }, []);
   useEffect(() => {
-    if (done) { audio.playSfx("job-complete"); return; }
-    const clock = setInterval(() => setGame((g) => tick(g)), TICK_MS);
+    if (done || !started || paused) return;
+    const clock = setInterval(() => setGame((g) => tick(g)), TICK_MS * (slow ? 2 : 1));
     return () => clearInterval(clock);
+  }, [done, started, paused, slow]);
+  // "Great job!" shows for 1 s, then the game goes back to the plan by itself (the latest onClose, without restarting the second).
+  const close = useRef(onClose);
+  useEffect(() => { close.current = onClose; });
+  useEffect(() => {
+    if (!done) return;
+    audio.playSfx("job-complete");
+    const back = setTimeout(() => close.current(true), 1000);
+    return () => clearTimeout(back);
   }, [done]);
   const play = (nextGame: MiniGame, sound = "console-button") => {
+    setPaused(false);
+    if (!started) {
+      setStarted(true);
+      if (game.job === "shelter") return; // the first press only starts the sliding block
+    }
     if (nextGame === game) return;
     const missed = "miss" in nextGame && nextGame.miss;
     audio.playSfx(missed ? "menu-error" : sound);
@@ -70,13 +89,17 @@ export function JobMiniGame({ job, seed, onClose }: { job: JobId; seed: number; 
       <p className="note mini-keys">{t(`miniGame.keys.${job}`)}</p>
       <div className="mini-meter" aria-hidden="true">{Array.from({ length: total }, (_, i) => <span key={i} className={i < count ? "on" : ""} />)}</div>
       <p aria-live="polite" className="storm-left">
-        {done ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong> : <Hint game={game} />}
+        {done ? <strong className="mini-won"><img className="pixel" src={asset("minigame/sparkle")} alt="" /><span>{t("miniGame.won")}</span></strong>
+          : !started ? <span>{t("miniGame.start")}</span> : paused ? <span>{t("miniGame.paused")}</span> : <Hint game={game} />}
         {!done && <span className="mini-count"> {t("miniGame.progress", { done: count, total })}</span>}
       </p>
       <div className="actions">
         {done
           ? <button type="button" className="primary" autoFocus onClick={() => onClose(true)}>{t("miniGame.finish")} <span aria-hidden="true">→</span></button>
-          : <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>}
+          : <>
+            {started && <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>{t(paused ? "miniGame.resume" : "miniGame.pause")}</button>}
+            <button type="button" onClick={() => onClose(false)}>{t("miniGame.skip")}</button>
+          </>}
       </div>
     </div>
   </dialog>;

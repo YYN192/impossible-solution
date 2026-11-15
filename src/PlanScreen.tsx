@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { JobMiniGame } from "./components/JobMiniGame";
 import { ResourceMeters } from "./components/ResourceMeters";
 import { usePhone } from "./components/usePhone";
+import { useComfort } from "./state/comfort";
 import { WhatsThis } from "./components/WhatsThis";
 import {
   INSIGHT_DUST,
@@ -194,7 +195,9 @@ export default function PlanScreen() {
                     assign(selected, id);
                     select(null);
                     plays.current += 1;
-                    setMiniGame({ job: id, seed: state.sol * 97 + plays.current });
+                    // #77: "Skip mini-games" in Settings: the job is given, no game opens.
+                    if (useComfort.getState().skipMiniGames) focusNext.current = "crew";
+                    else setMiniGame({ job: id, seed: state.sol * 97 + plays.current });
                     audio.playSfx(id === "askEarth" ? "earth-message-send" : "assign");
                   }}
                 >

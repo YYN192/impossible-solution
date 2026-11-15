@@ -1,3 +1,4 @@
+import { reducedMotion as calmOrReduced } from "../state/comfort";
 import { Icon } from "../components/Icon";
 import { useEffect, useRef, useState } from "react";
 import "../morning.css";
@@ -45,7 +46,7 @@ export function MorningScreen() {
 const reducedMotion = () =>
   typeof window === "undefined" || !window.matchMedia
     ? true // no matchMedia (tests): skip the animation
-    : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    : calmOrReduced();
 
 /** Reveals `text` one letter at a time once `on`; instantly under reduced motion. */
 function useTypewriter(text: string, on: boolean) {

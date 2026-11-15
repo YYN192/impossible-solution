@@ -1,3 +1,4 @@
+import { reducedMotion } from "../state/comfort";
 import { Icon } from "../components/Icon";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -35,7 +36,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
     audio.playSfx(next.collected.length > drive.collected.length ? "assign" : "select");
     if (ranOutOfPower(map, drive, next)) {
       audio.playSfx("rover-power-down");
-      if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setShake(true); setTimeout(() => setShake(false), 400); }
+      if (!reducedMotion()) { setShake(true); setTimeout(() => setShake(false), 400); }
     }
     setDrive(next);
   }

@@ -4,7 +4,7 @@
 //        'curated' = picked by hand, checked by the script
 import { readFile } from 'node:fs/promises'
 import { checkLink, daysAgo, fetchBytes, fetchJson, NASA_KEY, writePublic, ymd } from './lib.mjs'
-import { apodEntry, imageItem, osdrCard, pickCme, pickSim, radlabStorm, summarizeSpaceWeather, trekTile } from './normalize.mjs'
+import { apodEntry, imageItem, osdrCard, pickCme, pickSim, radlabStorm, summarizeSpaceWeather, trekTile, weatherWeek } from './normalize.mjs'
 
 const DONKI_ATTR = 'NASA CCMC Space Weather Database Of Notifications, Knowledge, Information (DONKI)'
 const NASA_LICENSE = 'NASA open data; not copyrighted in the US (NASA media usage guidelines)'
@@ -101,6 +101,37 @@ export const SOURCES = [
         license: NASA_LICENSE,
         about: 'What the Sun did in the last 30 days, as seen from near Earth: flares, particle events, CMEs, geomagnetic storms. Context only — most of these never reach Mars.',
         data: summarizeSpaceWeather(got, { start: ymd(daysAgo(30, now)), end: ymd(now) }, { missing }),
+      }
+    },
+  },
+
+  {
+    name: 'space-weather-week',
+    group: 'recent',
+    async run() {
+      const now = new Date()
+      const q = range(7, now)
+      const parts = { flr: `/FLR?${q}`, sep: `/SEP?${q}`, cme: `/CME?${q}`, gst: `/GST?${q}` }
+      const got = {}
+      const missing = []
+      let src = null
+      for (const [k, path] of Object.entries(parts)) {
+        try {
+          const r = await donki(path)
+          got[k] = r.data
+          src ??= r.source
+        } catch (e) {
+          console.warn(`    ${k} unavailable: ${e.message}`)
+          missing.push(k)
+        }
+      }
+      if (missing.includes('cme') || missing.length > 2) throw new Error(`too many DONKI parts missing: ${missing.join(', ')}`)
+      return {
+        source: `${src.split('/', 4).slice(0, 4).join('/')}/{FLR,SEP,CME,GST}?${q}`,
+        attribution: DONKI_ATTR,
+        license: NASA_LICENSE,
+        about: 'Fallback for the radar strip: every flare, CME, particle event and geomagnetic storm DONKI listed in the 7 days before the snapshot date. Seen from near Earth; Mars only where a WSA-Enlil run forecast it.',
+        data: weatherWeek(got, { start: ymd(daysAgo(7, now)), end: ymd(now) }, { missing }),
       }
     },
   },
