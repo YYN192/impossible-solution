@@ -4,6 +4,7 @@ import { asset } from "../game/assets";
 import { audio } from "../game/audio";
 import { gameKey } from "../game/pressedKeys";
 import { DRILL, PORTRAIT, lettersShown, missionTalkKey, type Speaker } from "../game/talk";
+import { tRun } from "../i18n/dynamic";
 import { useMission } from "../state/mission";
 import { JobMiniGame } from "./JobMiniGame";
 import "./CrewTalk.css";
@@ -62,6 +63,7 @@ export function CrewTalk({
   const { t } = useTranslation();
   const drill = DRILL[speaker];
   const campaign = useMission((m) => m.setup?.campaignId);
+  const place = useMission((m) => m.setup?.place); // a Moon run reads the `_moon` lines (#83)
   const box = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState<Step>(
     drill
@@ -107,7 +109,7 @@ export function CrewTalk({
         {step.kind === "text" && (
           <TypedLine
             key={step.key}
-            text={t(step.key as never)}
+            text={tRun(step.key, {}, place)}
             blip={blip}
             onNext={() => {
               audio.playSfx("dialogue");
