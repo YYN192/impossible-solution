@@ -52,3 +52,5 @@
 .domino-tile .domino-icon { font-size: 1.6rem; }
 .chain-times { color: #ffd166; margin: 0.2rem 0 0; }
 .more-chains > summary { margin: 0.5rem 0; }
+/* Inside a card only the name is bold; the detail lines stay regular weight so they are easy to read. */
+.mission-card small, .mission-card .mission-meta, .mission-card .mission-tags, .beat-option small, .beat-effects, .beat-cannot { font-weight: 400; }

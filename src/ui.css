@@ -121,9 +121,12 @@ button:focus-visible, summary:focus-visible, a:focus-visible, canvas:focus-visib
   .console-top > button, .station-header > button { flex: 1 1 auto; }
 }
 
-/* Pixelify Sans Cyrillic is hard to read at small sizes (kids misread "сол"): Bulgarian uses bold Nunito for headings and buttons. */
-:root:lang(bg) { --font-pixel: var(--font-body); }
-:root:lang(bg) :is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge) { font-weight: 700; }
+/* Owner feedback (15 Nov): the pixel font is hard to read. Every label, button and heading now uses bold Nunito
+   in both languages; the 8-bit look stays in the borders, stepped shadows and sprites. Only the game's title
+   keeps the pixel font. To bring it back everywhere, delete the next three rules. */
+:root { --font-pixel: var(--font-body); }
+:is(button, summary, h1, h2, h3, .eyebrow, .sol-tag, .step-label, .meter-label, .console-top b, .sol-navigation > span, .data-badge, .job-copy strong, .crew-tile strong, .mission-card strong, .beat-option strong) { font-weight: 700; }
+:root:not(:lang(bg)) .menu-story h1 { font-family: "Pixelify Sans", var(--font-body); font-weight: 400; }
 /* A 44 px link inside a chip must grow the chip, not spill onto the next card. */
 p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35rem; }
 /* A job card with no astronaut picked yet looks "not ready" but still answers when tapped. */
