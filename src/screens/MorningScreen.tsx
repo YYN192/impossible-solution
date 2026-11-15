@@ -110,7 +110,7 @@ export function MorningReportView({
           <section className="m-card m-overnight" aria-labelledby="m-over">
             <h2 id="m-over">{t("morning.overnight")}</h2>
             {headline ? <Chain headline={headline} cause={cause} /> : (
-              <p className="m-calm"><span aria-hidden="true"><Icon name="tired" /></span> {sol === 1 ? tRun("morning.firstDay", {}, useMission.getState().setup?.place) : t("morning.nothingFell")}</p>
+              <p className="m-calm"><span aria-hidden="true"><Icon name="check" /></span> {sol === 1 ? tRun("morning.firstDay", {}, useMission.getState().setup?.place) : t("morning.nothingFell")}</p>
             )}
             {/* Sol 1: Pip's briefing for this campaign and the real thing behind it. */}
             {sol === 1 && setup && (
