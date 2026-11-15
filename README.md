@@ -19,7 +19,7 @@ It turns real NASA storm and radiation data into hard choices, so kids learn tha
 [![License](https://img.shields.io/github/license/YYN192/impossible-solution)](LICENSE)
 [![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-0b3d91)](https://www.spaceappschallenge.org/)
 
-<img src="docs/media/demo.gif" alt="Gameplay: walk to the mission console, plan three sols, see the domino chain of what caused what" width="720">
+<img src="docs/media/demo.gif" alt="Gameplay: pick a mission, walk the Mars base, drive the rover, plan the crew, then a real-data dust storm: wipe the solar panels and fix the greenhouse" width="720">
 
 </div>
 

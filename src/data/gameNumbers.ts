@@ -3,6 +3,7 @@ import { EXPLORE } from "../sim/explore";
 import { DOSE, JOBS, MISSION_SOLS, NIGHT, type JobId } from "../sim/types";
 import { CAMPAIGN_NUMBERS } from "./campaigns";
 import { DEMO_START } from "./demo";
+import { STORM_CHANCE } from "./hubStorm";
 
 export type GameNumberKey =
   "dataSources.gameNumberItems.jobPower" | "dataSources.gameNumberItems.value";
@@ -42,7 +43,10 @@ type GameNumberName =
   | "roverBatteryPerPower"
   | "roverMaxScience"
   | "demoStartFood"
-  | "demoStartPanels";
+  | "demoStartPanels"
+  | "dustStormChance"
+  | "stormPanelsDose"
+  | "stormGreenhousePower";
 
 export interface GameNumberDescriptor {
   /** Stable DOM/test identifier; do not derive this from translated copy. */
@@ -106,6 +110,9 @@ export const GAME_NUMBERS: GameNumberDescriptor[] = [
   value("rover-max-science", "roverMaxScience", EXPLORE.maxScience),
   value("demo-start-food", "demoStartFood", DEMO_START.food),
   value("demo-start-panels", "demoStartPanels", DEMO_START.panelEfficiency),
+  value("dust-storm-chance", "dustStormChance", STORM_CHANCE),
+  value("storm-panels-dose", "stormPanelsDose", DOSE.outsideExtra),
+  value("storm-greenhouse-power", "stormGreenhousePower", 1),
 ];
 
 function value(

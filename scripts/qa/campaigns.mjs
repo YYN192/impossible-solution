@@ -47,6 +47,29 @@ try {
       for (let i = 0; i < 110 && !done; i++) {
         await page.waitForTimeout(120);
         if (await page.locator(".stars").count()) { done = true; break; }
+        if (await page.locator(".dust-alarm").count()) {
+          // A dust storm calls the crew back to the base: wipe the panels (airlock), fix the greenhouse, back to the console.
+          types.add("dust storm");
+          await overflow("dust storm");
+          await click(page.locator(".dust-alarm .primary"));
+          const box = await page.locator("canvas").boundingBox();
+          const tapAt = (x, y) => (view.hasTouch ? page.touchscreen.tap : page.mouse.click).call(view.hasTouch ? page.touchscreen : page.mouse, box.x + box.width * x / 640, box.y + box.height * y / 384);
+          await page.waitForTimeout(400);
+          await tapAt(320, 350);
+          if (!(await page.locator(".storm-panels").waitFor({ timeout: 5000 }).then(() => true, () => false))) await click(page.locator(".interaction-guide .primary"));
+          await page.locator(".storm-panels").waitFor({ timeout: 4000 });
+          for (const b of await page.locator(".storm-panels button").all()) await click(b);
+          await click(page.locator(".storm-dialog .primary"));
+          await page.waitForTimeout(400); // the closing dialog keeps the canvas inert for a moment
+          await tapAt(208, 300);
+          // Tap-to-walk normally opens it on arrival; otherwise press Interact, like a kid would.
+          if (!(await page.locator(".storm-steps").waitFor({ timeout: 5000 }).then(() => true, () => false))) await click(page.locator(".interaction-guide .primary"));
+          await page.locator(".storm-steps").waitFor({ timeout: 4000 });
+          for (let s = 0; s < 3; s++) await click(page.locator(".storm-steps button:not(:disabled)").first());
+          await click(page.locator(".storm-dialog .primary"));
+          await click(page.getByRole("button", { name: new RegExp("^" + EN.world.goConsole) }).first());
+          continue;
+        }
         if (await page.locator(".explore-map").count()) {
           types.add("explore");
           await overflow("beat explore");

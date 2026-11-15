@@ -18,7 +18,15 @@
     "firstDay": "First morning on Mars. Everything works.",
     "nothingFell": "Nothing broke overnight. Good plan!",
     "because": "because",
-    "heading_moon": "Good morning! Day {{sol}}"
+    "heading_moon": "Good morning! Day {{sol}}",
+    "overnight": "What happened overnight",
+    "why": "Why?",
+    "hideWhy": "Hide",
+    "fromEarth": "News from outside",
+    "radio": "Message from Earth",
+    "radioTap": "Tap to decode it",
+    "decoded": "Decoded!",
+    "nasa": "Real NASA data: tap to see where it comes from"
   },
   "domino": {
     "panelsSkipped": "Nobody cleaned the solar panels.",
@@ -39,7 +47,9 @@
     "roverHome0": "The rover stayed at the base.",
     "roverHome1": "The rover came home with 1 sample.",
     "roverHome2": "The rover came home with 2 samples.",
-    "roverStranded": "The rover got stuck far from home. The crew walked out to tow it."
+    "roverStranded": "The rover got stuck far from home. The crew walked out to tow it.",
+    "stormPanels": "You wiped the panels in the dust storm. More power, more radiation.",
+    "stormGreenhouse": "You fixed the greenhouse after the dust storm. It used 1 power."
   },
   "event": {
     "burst": {
@@ -192,7 +202,10 @@
       "skillGreenhouse": "Amara's skill: extra food from her harvest",
       "roverBattery": "Rover battery for one drive (moves)",
       "roverBatteryPerPower": "Rover battery used per 1 power",
-      "roverMaxScience": "Most science one rover drive can add"
+      "roverMaxScience": "Most science one rover drive can add",
+      "dustStormChance": "Dust storm at the base",
+      "stormPanelsDose": "Dose for wiping panels in a dust storm",
+      "stormGreenhousePower": "Power to fix the greenhouse"
     },
     "simplifies": "What this game simplifies",
     "back": "Back"
@@ -474,8 +487,10 @@
       "engineer": "Engineer Kai",
       "scientist": "Scientist Amara",
       "drone": "Pip · Maintenance drone",
-      "airlock": "Station airlock"
-    }
+      "airlock": "Station airlock",
+      "greenhouse": "Greenhouse"
+    },
+    "greenhouse": "GREENHOUSE"
   },
   "dialogue": {
     "commander": {
@@ -497,12 +512,20 @@
     "airlock": {
       "hello": "Surface trips are assigned through the mission console.",
       "advice": "Outside jobs collect science or clean panels. Watch the space rays!"
+    },
+    "greenhouse": {
+      "hello": "This greenhouse grows our food. Its lights need power.",
+      "advice": "No power for the lights means no harvest. Then the food runs low."
     }
   },
   "lang": {
     "label": "Language",
     "en": "English",
     "bg": "Български"
+  },
+  "fullscreen": {
+    "enter": "Full screen",
+    "exit": "Exit full screen"
   },
   "sound": {
     "toggle": "Sound on/off"
@@ -811,5 +834,41 @@
     "map": "Map of the Gale Crater area. Use the arrow keys or the buttons to drive.",
     "legend": "Light ground costs 1 battery. Dark, rough ground costs 2. Rocks block the way.",
     "square": "One square is about 20 km of real Mars."
+  },
+  "hubStorm": {
+    "eyebrow": "Alarm",
+    "title": "Dust storm!",
+    "lead": "Dust is blowing over the whole base. The Sun is hidden. Fix two things before you plan the day.",
+    "panels": "Clean the solar panels. Go out through the airlock.",
+    "greenhouse": "Fix the greenhouse.",
+    "realTitle": "This really happens on Mars",
+    "real": {
+      "opportunity2018": "In June 2018 a dust storm covered all of Mars. The rover Opportunity got almost no sunlight on its solar panels. Its last message came on 10 June 2018.",
+      "insight2022": "In October 2022 a dust storm hit NASA's InSight lander. Its solar panels made about 275 watt-hours a sol instead of 425 (a watt-hour is a small amount of electricity). That is about one third less power."
+    },
+    "source": "Source",
+    "go": "Let's fix it!",
+    "todo": "Storm jobs",
+    "blocked": "Fix the storm damage first!",
+    "clear": "Storm damage fixed! Now go to the console.",
+    "outside": "Outside the base",
+    "panelsTitle": "Wipe every solar panel",
+    "panelsLead": "Tap each dusty panel to wipe it. Being outside gives your crew a little extra radiation (invisible energy from space).",
+    "panel": "Panel {{n}}: {{state}}",
+    "dusty": "dusty",
+    "clean": "clean",
+    "panelsLeft_one": "{{count}} dusty panel left",
+    "panelsLeft_other": "{{count}} dusty panels left",
+    "panelsAllClean": "All panels are clean!",
+    "backInside": "Done! Go back inside",
+    "later": "Not now",
+    "greenhouseTitle": "Fix the greenhouse",
+    "greenhouseLead": "The storm broke the greenhouse. Do the three jobs in order. The repair uses 1 unit of power.",
+    "step": {
+      "cover": "Patch the torn cover",
+      "lights": "Turn the grow lights back on",
+      "plants": "Plant new seedlings"
+    },
+    "fixed": "Greenhouse fixed!"
   }
 }

@@ -9,6 +9,11 @@ import { useSession } from "./game/session";
 import { usePressedKeys } from "./game/pressedKeys";
 import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type Entity, type Point } from "./game/world";
 import { useGame } from "./state/game";
+import { useNav } from "./state/screen";
+import { readFlags } from "./data/flags";
+import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
+import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
+import type { StormView } from "./game/renderWorld";
 
 // Physical keys → on-screen hint they light up (keydown on, keyup off).
 const HINT_KEYS = { w: "w", arrowup: "w", a: "a", arrowleft: "a", s: "s", arrowdown: "s", d: "d", arrowright: "d", e: "e" } as const;
@@ -29,15 +34,36 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const sol = useGame((s) => s.state.sol);
   const pressed = usePressedKeys(HINT_KEYS);
+  // A real-data dust storm on this sol: the console stays shut until the panels and the greenhouse are fixed.
+  const game = useGame((s) => s.state);
+  const nav = useNav();
+  const setup = useMission((m) => m.setup);
+  const storm = ["morning", "beat", "plan"].includes(nav.screen) && nav.sol === game.sol ? hubStormFor(setup, nav.sol, readFlags().demo) : undefined;
+  const panelsDone = !storm || repaired(game, "storm-panels"), greenhouseDone = !storm || repaired(game, "storm-greenhouse");
+  const stormLeft = Number(!panelsDone) + Number(!greenhouseDone);
+  const [alarm, setAlarm] = useState(stormLeft > 0);
+  const [task, setTask] = useState<"panels" | "greenhouse">();
+  const [notice, setNotice] = useState("");
+  const view = useRef<StormView>({ level: 0, broken: false, marks: [] });
+  view.current = { level: alarm ? 1 : stormLeft / 2, broken: !greenhouseDone, marks: [...(panelsDone ? [] : ["airlock"]), ...(greenhouseDone ? [] : ["greenhouse"])] };
+  const finishTask = (done: boolean) => {
+    if (done && task === "panels") useGame.getState().choose(panelsAction(storm!));
+    if (done && task === "greenhouse") useGame.getState().choose(greenhouseAction(useGame.getState().state));
+    if (done) { audio.playSfx("job-complete"); setNotice(stormLeft === 1 ? t("hubStorm.clear") : ""); }
+    setTask(undefined); canvas.current?.focus({ preventScroll: true });
+  };
   const interact = useCallback(() => {
-    if (!near || activating || dialogue) return;
+    if (!near || activating || dialogue || task || alarm) return;
     held.current.clear(); goal.current = pending.current = undefined;
+    if (near.interaction === "console" && stormLeft) { audio.playSfx("machine-warning"); setNotice(t("hubStorm.blocked")); return; }
+    if (near.id === "airlock" && !panelsDone) { audio.playSfx("door"); setTask("panels"); return; }
+    if (near.id === "greenhouse" && !greenhouseDone) { audio.playSfx("npc"); setTask("greenhouse"); return; }
     audio.playSfx(near.interaction === "console" ? "console" : near.interaction === "door" ? "door" : "npc");
     if (near.interaction === "console") {
       setActivating(true);
       timer.current = setTimeout(onConsole, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
     } else { setDialogue(near); setPage(0); }
-  }, [near, activating, dialogue, onConsole]);
+  }, [near, activating, dialogue, onConsole, task, alarm, stormLeft, panelsDone, greenhouseDone, t]);
   useEffect(() => { if (arrived && pending.current && pending.current === near?.id) interact(); }, [arrived, near, interact]);
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => { const track = musicFor("hub"); audio.playMusic(track); return audio.stopMusic; }, []);
@@ -50,7 +76,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
     let last = performance.now(), raf = 0, lastNear = "", lastStep = 0;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const frame = (now: number) => {
-      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating;
+      const keys = held.current, seconds = (now - last) / 1000, free = !dialogue && !activating && !task && !alarm;
       const dx = Number(keys.has("d") || keys.has("arrowright")) - Number(keys.has("a") || keys.has("arrowleft"));
       const dy = Number(keys.has("s") || keys.has("arrowdown")) - Number(keys.has("w") || keys.has("arrowup"));
       let moving = false;
@@ -65,33 +91,32 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       last = now;
       const target = nearestInteraction(MARS_BASE, player);
       if ((target?.id ?? "") !== lastNear) { setNear(target); lastNear = target?.id ?? ""; }
-      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches);
+      renderWorld(ctx, MARS_BASE, player, now, moving, target?.id, motion.matches, view.current);
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => { cancelAnimationFrame(raf); useSession.setState({ position: player }); };
-  }, [dialogue, activating]);
-  // The key listeners read the latest state through a ref, so they are attached once. Re-attaching
-  // them whenever `interact` changed (every time something came into or out of reach) ran the
-  // cleanup below, which dropped the held keys: the player froze until the OS key-repeat kicked in.
-  const latest = useRef({ interact, dialogue, activating });
-  useEffect(() => { latest.current = { interact, dialogue, activating }; });
+  }, [dialogue, activating, task, alarm]);
+  // The key listeners live for the whole visit. They read the latest state through refs: re-adding them
+  // whenever `near` changed used to clear the held keys, so walking past a crew member stopped the player.
+  const live = useRef({ interact, busy: false });
+  live.current = { interact, busy: Boolean(dialogue || task || alarm) || activating };
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      const { interact, dialogue, activating } = latest.current;
-      if (dialogue || activating || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
+      if (live.current.busy || (e.target instanceof HTMLElement && e.target.closest("input, select, textarea"))) return;
       const key = e.key.toLowerCase();
       if (["w", "a", "s", "d", "arrowup", "arrowleft", "arrowdown", "arrowright"].includes(key)) {
         // Arrows only stop page scrolling while the game itself has focus.
         if (e.target === canvas.current || e.target === document.body) e.preventDefault();
         held.current.add(key);
       }
-      if (key === "e" && !e.repeat) interact();
+      if (key === "e" && !e.repeat) live.current.interact();
     };
     const up = (e: KeyboardEvent) => held.current.delete(e.key.toLowerCase());
-    // Resizing/rotating can swallow key-up or pointer-up events: never keep walking afterwards.
+    // Leaving the tab or rotating can swallow key-up or pointer-up events: never keep walking afterwards.
+    // (Not on "resize": phone address bars resize the page while a finger holds the d-pad.)
     const clear = () => held.current.clear();
-    const events = ["blur", "resize", "orientationchange"] as const;
+    const events = ["blur", "orientationchange"] as const;
     window.addEventListener("keydown", down); window.addEventListener("keyup", up); events.forEach((n) => window.addEventListener(n, clear));
     document.addEventListener("visibilitychange", clear);
     return () => { clear(); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); events.forEach((n) => window.removeEventListener(n, clear)); document.removeEventListener("visibilitychange", clear); };
@@ -109,10 +134,13 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
   };
   const dialogueBox = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (dialogue) dialogueBox.current?.showModal(); }, [dialogue]);
-  const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue}-portrait`;
-  return <main className="station">
+  const portrait = dialogue?.dialogue === "drone" ? "characters/robots/assistant-drone-portrait" : dialogue?.dialogue === "airlock" ? "consoles/mission-monitor" : `characters/npcs/${dialogue?.dialogue === "commander" ? "mission-commander" : dialogue?.dialogue === "greenhouse" ? "scientist" : dialogue?.dialogue}-portrait`;
+  return <main className={stormLeft ? "station in-storm" : "station"}>
     <header className="station-header"><button onClick={() => { audio.playSfx("menu-back"); onMenu(); }}>← {t("world.menu")}</button><div><p className="eyebrow">{campaign && campaign !== "storm" ? `${tRun(`campaign.${campaign}.where`)} / ${tRun(`campaign.${campaign}.name`)}` : t("world.location")}</p><h1>{t("world.name")}</h1></div><span className="sol-tag">{tRun("common.solOf", { sol, total: useMission.getState().setup?.rules.sols ?? 3 }, useMission.getState().setup?.place)}</span></header>
-    <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>
+    {stormLeft ? <div className="world-objective storm-objective"><p><strong>🌪️ {t("hubStorm.todo")}</strong></p><ul>
+      <li className={panelsDone ? "done" : ""}>{panelsDone ? "✅" : "☀️"} {t("hubStorm.panels")}</li>
+      <li className={greenhouseDone ? "done" : ""}>{greenhouseDone ? "✅" : "🌱"} {t("hubStorm.greenhouse")}</li></ul></div>
+      : <div className="world-objective"><span className="beacon-dot" /><p>{t("world.objective")}</p><span>{t("world.controls")}</span></div>}
     <div className={`world-viewport ${activating ? "activating" : ""}`}><div className="world-screen">
       <canvas ref={canvas} width={MARS_BASE.width} height={MARS_BASE.height} tabIndex={0} aria-label={t("world.canvas")} aria-describedby="world-description" onPointerDown={tap} />
       <p id="world-description" className="visually-hidden">{t("world.description")}</p>
@@ -122,14 +150,18 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       {([['w', '↑', 'up'], ['a', '←', 'left'], ['s', '↓', 'down'], ['d', '→', 'right']] as const).map(([key, symbol, direction]) => <button key={key} className={`move-${direction}`} data-pressed={pressed.has(key) ? "" : undefined} aria-label={t(`world.${direction}`)}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); held.current.add(key); }}
         onPointerUp={() => held.current.delete(key)} onPointerCancel={() => held.current.delete(key)} onLostPointerCapture={() => held.current.delete(key)}>{symbol}</button>)}
-    </div><div className="interaction-guide"><p aria-live="polite">{near ? t(`world.near.${near.dialogue ?? "console"}`) : t("world.explore")}</p>
+    </div><div className="interaction-guide"><p aria-live="polite">{notice || (near ? t(`world.near.${near.dialogue ?? "console"}`) : t("world.explore"))}</p>
       <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd data-pressed={pressed.has("e") ? "" : undefined}>E</kbd></button>
-      <button className="quiet-button go-console" onClick={onConsole}>{t("world.goConsole")} →</button>
+      <button className="quiet-button go-console" disabled={stormLeft > 0} onClick={onConsole}>{t("world.goConsole")} →</button>
     </div><p className="station-tip">{t("world.tip")}</p></div>
     {dialogue && <dialog ref={dialogueBox} className="npc-dialogue" aria-labelledby="npc-dialogue-title" onCancel={(e) => { e.preventDefault(); closeDialogue(); }}>
       <img src={asset(portrait)} alt="" /><div><p className="eyebrow">{t("world.crewChannel")}</p><h2 id="npc-dialogue-title">{t(`world.near.${dialogue.dialogue!}`)}</h2>
         <p className="lead">{t(`dialogue.${dialogue.dialogue!}.${page === 0 ? "hello" : "advice"}`)}</p>
         <div className="actions">{page === 0 && <button className="primary" onClick={() => { setPage(1); audio.playSfx("dialogue"); }}>{t("common.next")} →</button>}<button onClick={closeDialogue}>{t("help.close")}</button></div></div>
     </dialog>}
+    {stormLeft > 0 && <div className={alarm ? "dust-cover full" : "dust-cover"} style={{ opacity: alarm ? 1 : stormLeft / 3 }} aria-hidden="true" />}
+    {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
+    {task === "panels" && <PanelsTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
+    {task === "greenhouse" && <GreenhouseTask onDone={() => finishTask(true)} onClose={() => finishTask(false)} />}
   </main>;
 }

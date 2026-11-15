@@ -6,8 +6,8 @@ export interface Entity extends Rect {
   id: string;
   sprite: string;
   solid?: boolean;
-  interaction?: "console" | "npc" | "door";
-  dialogue?: "commander" | "engineer" | "scientist" | "drone" | "airlock";
+  interaction?: "console" | "npc" | "door" | "task";
+  dialogue?: "commander" | "engineer" | "scientist" | "drone" | "airlock" | "greenhouse";
 }
 export interface Room { id: string; width: number; height: number; bounds: Rect; entities: Entity[] }
 const object = (id: string, sprite: string, x: number, y: number, w = 32, h = 32): Entity => ({ id, sprite, x, y, w, h, solid: true });
@@ -28,6 +28,7 @@ export const MARS_BASE: Room = {
     object("crate1", "environment/decorations/mars-crate", 64, 288),
     object("crate2", "environment/decorations/mars-crate", 96, 288),
     object("machine", "consoles/charging-station", 560, 272),
+    { ...object("greenhouse", "", 176, 286, 64, 30), interaction: "task", dialogue: "greenhouse" },
     { ...object("airlock", "environment/doors/mars-door-airlock-closed", 288, 336, 64, 32), interaction: "door", dialogue: "airlock" },
     { ...object("commander", "characters/npcs/mission-commander-idle-front", 208, 168), interaction: "npc", dialogue: "commander" },
     { ...object("scientist", "characters/npcs/scientist-idle-left", 496, 176), interaction: "npc", dialogue: "scientist" },

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { DataBadge } from "./components/DataBadge";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { SoundToggle } from "./components/SoundToggle";
+import { FullscreenToggle } from "./components/FullscreenToggle";
 import { audio } from "./game/audio";
 import { readFlags } from "./data/flags";
 import { DataSources } from "./screens/DataSources";
@@ -16,6 +17,8 @@ import { TeacherCard } from "./screens/TeacherCard";
 import { useMission } from "./state/mission";
 import { useNav, type Screen } from "./state/screen";
 import { useSession } from "./game/session";
+import { hubStormFor, repaired } from "./data/hubStorm";
+import { useGame } from "./state/game";
 import MainMenu, { type RunChoice } from "./MainMenu";
 import MarsHub from "./MarsHub";
 import ConsolePage from "./ConsolePage";
@@ -47,6 +50,13 @@ export default function App() {
       setPlace(name);
     }
   }, [setup]);
+  // A dust storm on this sol's morning calls the crew back to the base (once per sol).
+  const stormCalled = useRef(0);
+  useEffect(() => {
+    if (screen !== "morning" || place !== "console" || stormCalled.current === sol) return;
+    const game = useGame.getState().state;
+    if (game.sol === sol && hubStormFor(setup, sol, readFlags().demo) && !repaired(game, "storm-panels")) { stormCalled.current = sol; setPlace("hub"); }
+  }, [screen, sol, place, setup, setPlace]);
   const visiblePlace = screen === "title" ? "menu" : place;
   const play = () => {
     if (screen === "title") { useSession.getState().clearPlan(); useNav.getState().next(); }
@@ -70,7 +80,7 @@ export default function App() {
   return <div className="expedition">
     <div className="mission-status-bar">
       {setup ? <DataBadge source={setup.dataSource} fetchedAt={setup.dataFetchedAt} /> : <span role="status">{t("menu.loading")}</span>}
-      <LanguageToggle /><SoundToggle />
+      <LanguageToggle /><SoundToggle /><FullscreenToggle />
       {!overlay && visiblePlace !== "menu" && <nav><button onClick={() => openOverlay("sources")}>{t("dataSources.open")}</button><button onClick={() => openOverlay("teacher")}>{t("teacher.open")}</button></nav>}
     </div>
     {setup?.noticeKey && <p className="availability-note" role="status">{t(setup.noticeKey as "notice.sunQuiet" | "notice.sunPassed")}</p>}

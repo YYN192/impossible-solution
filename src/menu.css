@@ -1,0 +1,42 @@
+/* Start screen: one centred stage that fills the screen. Fresh class names; the old two-column rules are dead. */
+.mission-menu{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(12px,2.2vh,32px) clamp(14px,3vw,48px) 0;gap:clamp(8px,1.6vh,20px);background:radial-gradient(ellipse 120% 55% at 50% 118%,#ff8a3d 0,#c4501f 22%,#5b2314 40%,transparent 62%),radial-gradient(ellipse at 50% 30%,#14283a 0,transparent 60%),#080f1a}
+.mission-menu::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-62vw;height:70vw;border-radius:50%;background:radial-gradient(circle at 50% 8%,#d9622a 0,#8f3416 30%,#3a160c 60%,#0b0f18 74%);box-shadow:0 -10px 90px 10px rgba(255,138,61,.35);pointer-events:none}
+.menu-stage{position:relative;z-index:1;width:100%;max-width:min(1400px,100%);display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vh,22px);text-align:center}
+.menu-head h1{font-size:clamp(2.4rem,1rem + 4.2vw,5rem);line-height:1;margin:.15em 0 .2em}
+.menu-tagline{font-size:clamp(1rem,.8rem + .7vw,1.5rem);margin:0;color:#d5e3ee}
+.menu-head .eyebrow{justify-content:center;margin:0;font-size:clamp(.8rem,.7rem + .3vw,1rem)}
+.mission-menu .mission-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,28px);width:100%;margin:0}
+.mission-menu .mission-card{display:flex;flex-direction:column;gap:.35rem;text-align:left;padding:0 0 .8rem;overflow:hidden;position:relative;min-height:48px;transition:transform .15s,box-shadow .15s}
+.mission-menu .mission-card>.mission-art{width:100%;height:clamp(90px,14vh,230px);object-fit:cover;object-position:center;grid-row:auto;border:0;border-bottom:2px solid var(--ink,#080b12);image-rendering:pixelated}
+.mission-menu .mission-card>:not(.mission-art){margin:0 clamp(.7rem,1.2vw,1.2rem)}
+.mission-menu .mission-card strong{font-size:clamp(1.1rem,.9rem + .6vw,1.6rem)}
+.mission-menu .mission-card small,.mission-menu .mission-card .mission-meta{font-size:clamp(1rem,.9rem + .25vw,1.15rem)}
+.mission-menu .mission-card .mission-meta{color:#c9d8e4}
+.mission-menu .mission-card .mission-tags{font-size:.875rem;opacity:.9}
+.mission-menu .mission-card[aria-pressed="true"]{border-color:#5eead4;box-shadow:0 0 0 3px #5eead4,0 8px 28px rgba(0,0,0,.5)}
+.mission-menu .mission-card[aria-pressed="true"]::after{content:"✓";position:absolute;top:8px;right:8px;width:2rem;height:2rem;display:grid;place-items:center;background:#5eead4;color:#04121a;font-weight:700;font-size:1.2rem;border:2px solid var(--ink,#080b12)}
+.mission-menu .mission-card:focus-visible,.menu-stage button:focus-visible{outline:3px solid #5eead4;outline-offset:3px}
+.menu-actions{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.menu-actions .launch-button{min-height:64px;min-width:min(22rem,90vw);font-size:clamp(1.3rem,1rem + 1vw,2rem);padding:.4rem 2.2rem;margin:0}
+.menu-actions button{min-height:48px}
+.menu-quiet{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem}
+.menu-quiet button{min-height:48px;padding:.3rem 1rem;font-size:1rem}
+.menu-resume{font-size:1.15rem;max-width:36rem;margin:0}
+.menu-stage .sol-explainer{margin:0;font-size:.95rem}
+.menu-settings{width:min(32rem,100%);text-align:left;display:grid;gap:.8rem}
+.mission-menu .menu-bottom{position:relative;z-index:1;margin-top:auto;padding:.5rem 0}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){.mission-menu .mission-card:not(:disabled):hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,.55)}}
+@media(max-width:900px){.mission-menu .mission-picker{grid-template-columns:1fr}.mission-menu .mission-card{display:grid;grid-template-columns:7.5rem 1fr;gap:.2rem .7rem;padding:.5rem}.mission-menu .mission-card>.mission-art{grid-row:1/span 4;height:100%;min-height:5rem;border:2px solid var(--ink,#080b12)}.mission-menu .mission-card>:not(.mission-art){grid-column:2;margin:0}.mission-menu{justify-content:flex-start}}
+@media(max-width:480px){.mission-menu .mission-card{grid-template-columns:5.5rem 1fr}}
+:root:not(:lang(bg)) .mission-menu .menu-head h1{font-family:"Pixelify Sans",var(--font-body);font-weight:400;letter-spacing:0;text-shadow:3px 3px 0 var(--ink,#080b12)}
+.mission-menu .mission-card[aria-pressed="true"][aria-pressed][aria-pressed][aria-pressed][aria-pressed][aria-pressed]{background:#1d3a52;border-color:#5eead4;color:#fff}
+.mission-menu .mission-card[aria-pressed="true"] .mission-meta,.mission-menu .mission-card[aria-pressed="true"] small{color:#e6f0f7}
+.mission-menu .mission-card[aria-pressed="true"] .mission-tags{color:#9fe0d8}
+.mission-menu .mission-card:disabled .mission-meta,.mission-menu .mission-card:disabled small{color:#c9d8e4}
+.launch-button{display:inline-flex;align-items:center;justify-content:center;gap:.6rem}
+.mission-menu{min-height:calc(100svh - 48px);padding-top:clamp(8px,1.6vh,28px);padding-bottom:0}
+.mission-menu .menu-bottom{padding:.35rem 0;font-size:.8rem;margin-top:0}
+@media(max-width:900px){.mission-menu .mission-card>.mission-art{height:auto;aspect-ratio:8/5;min-height:0;align-self:start}}
+.mission-menu .mission-card:disabled{opacity:.88}
+@media(max-height:800px) and (min-width:901px){.mission-menu .menu-bottom{display:none}.menu-head h1{font-size:clamp(2.2rem,1rem + 3.4vw,4rem)}}
+.mission-menu .menu-bottom,.mission-menu .menu-bottom span,.mission-menu .sol-explainer{color:#f4f7fa;text-shadow:0 1px 3px #000,0 0 6px #000}
