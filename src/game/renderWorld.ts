@@ -52,7 +52,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
       const dx = player.x - (e.x + e.w / 2), dy = player.y - (e.y + e.h - 4);
       path = path.replace(/-idle-\w+$/, `-idle-${Math.abs(dx) > Math.abs(dy) ? dx > 0 ? "right" : "left" : dy > 0 ? "front" : "back"}`);
     }
-    if (e.interaction === "door") { door(ctx, getSprite(path), e.x, e.y, e.w, e.h, near === e.id, reduced); return; }
+    if (e.interaction === "door") { door(ctx, getSprite(path), getSprite("environment/doors/mars-door-airlock-open"), e.x, e.y, e.w, e.h, near === e.id, reduced); return; }
     sprite(path, e.x, e.y + bob, e.w, e.h);
   }}));
   entities.push({ y: player.y, draw: () => {
@@ -96,17 +96,28 @@ export function renderWorld(ctx: CanvasRenderingContext2D, room: Room, player: P
 
 /** Sliding airlock (like classic top-down games): the frame stays put and the two panels part, never a sprite swap. */
 let doorOpen = 0;
-function door(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number, open: boolean, reduced: boolean) {
-  if (!img.complete || !img.naturalWidth) return;
-  doorOpen = reduced ? Number(open) : Math.max(0, Math.min(1, doorOpen + (open ? 0.08 : -0.08)));
-  ctx.drawImage(img, x, y, w, h);
+/** Where the door leaf sits in the 32×32 airlock sprites: inside the side posts, under the orange light, above the sill
+ *  (columns 6–25, rows 6–28). Only this part moves; the frame around it is never covered. */
+const LEAF = { x: 6, y: 6, w: 20, h: 23 };
+/** Each panel keeps this many sprite columns showing at the edge when fully open, so the door slides into the wall
+ *  instead of vanishing. */
+const PANEL_LIP = 2;
+function door(ctx: CanvasRenderingContext2D, closed: HTMLImageElement, open: HTMLImageElement, x: number, y: number, w: number, h: number, near: boolean, reduced: boolean) {
+  if (!closed.complete || !closed.naturalWidth) return;
+  doorOpen = reduced ? Number(near) : Math.max(0, Math.min(1, doorOpen + (near ? 0.08 : -0.08)));
+  ctx.drawImage(closed, x, y, w, h);
   if (!doorOpen) return;
-  const sw = img.naturalWidth, sh = img.naturalHeight, inset = w * 0.16, shift = Math.round(doorOpen * (w / 2 - inset));
+  const sx = w / closed.naturalWidth, sy = h / closed.naturalHeight; // sprite pixel → canvas
+  const lx = x + LEAF.x * sx, ly = y + LEAF.y * sy, lw = LEAF.w * sx, lh = LEAF.h * sy, half = LEAF.w / 2;
   ctx.save();
-  ctx.beginPath(); ctx.rect(x + inset, y + h * 0.12, w - inset * 2, h * 0.88); ctx.clip();
-  ctx.fillStyle = "#03060c"; ctx.fillRect(x, y, w, h);
-  ctx.drawImage(img, 0, 0, sw / 2, sh, x - shift, y, w / 2, h);
-  ctx.drawImage(img, sw / 2, 0, sw / 2, sh, x + w / 2 + shift, y, w / 2, h);
+  ctx.beginPath(); ctx.rect(lx, ly, lw, lh); ctx.clip();
+  // Behind the panels: the corridor from the open-door art (or plain dark if it has not loaded yet).
+  if (open.complete && open.naturalWidth) ctx.drawImage(open, LEAF.x, LEAF.y, LEAF.w, LEAF.h, lx, ly, lw, lh);
+  else { ctx.fillStyle = "#03060c"; ctx.fillRect(lx, ly, lw, lh); }
+  // Whole sprite pixels only, so the panels stay crisp while they slide.
+  const shift = Math.round(doorOpen * (half - PANEL_LIP)) * sx;
+  ctx.drawImage(closed, LEAF.x, LEAF.y, half, LEAF.h, lx - shift, ly, half * sx, lh);
+  ctx.drawImage(closed, LEAF.x + half, LEAF.y, half, LEAF.h, lx + half * sx + shift, ly, half * sx, lh);
   ctx.restore();
 }
 
