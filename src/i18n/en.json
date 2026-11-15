@@ -347,7 +347,7 @@
     "sunKept": "NASA data · downloaded on {{date}} and kept",
     "sunSaved": "Saved NASA data · saved on {{date}}",
     "sunComing": "NASA's computer forecast says a storm cloud from the Sun will reach Mars on {{date}}.",
-    "sunReached": "NASA's computer forecast says it reached Mars on {{date}}.",
+    "sunReached": "NASA's computer forecast said a storm cloud would reach Mars on {{date}}.",
     "sunId": "NASA calls it {{id}}.",
     "sunSpeed": "It left the Sun at {{speed}} kilometres per second (km/s).",
     "sunLink": "See it on NASA's space weather site"
