@@ -95,10 +95,12 @@ export function BeatScreen() {
         </p>
       )}
       {beat.card && <DataChip source={beat.card} />}
-      <ResourceMeters bars={state.bars} previous={done?.before} />
-      <div className="small-counters">
-        <span>{t("bars.food")} <b>{state.food}</b></span>
-        <span>{t("bars.science")} <b>{state.science}</b></span>
+      <div className="beat-meters">
+        <ResourceMeters bars={state.bars} previous={done?.before} />
+        <div className="small-counters">
+          <span>{t("bars.food")} <b>{state.food}</b></span>
+          <span>{t("bars.science")} <b>{state.science}</b></span>
+        </div>
       </div>
       {onMap && beat.map && (
         <>

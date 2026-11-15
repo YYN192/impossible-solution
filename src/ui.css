@@ -142,3 +142,50 @@ p.chip { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.35re
 /* Help buttons and the main "next" buttons: bigger for ages 7–9. */
 .expedition .whats-this__button { min-width: var(--tap) !important; min-height: var(--tap) !important; } /* 44 px, 48 px on touch */
 .expedition :is(.end-sol, .beat-result .primary, .morning-go, .screen .actions .primary, .launch-button) { min-height: 56px; }
+
+/* #75 phones: the main action of each screen stays on screen. Start (menu), Plan the day (morning) and
+   End sol (plan) are pinned to the bottom edge until their own place scrolls into view (position: sticky,
+   so nothing is ever covered for good and the page still scrolls normally). */
+.mission-menu { overflow: clip; } /* clip, not hidden: hidden would make the menu a scroll box and break sticky */
+@media (max-width: 720px) {
+  .phone-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-inline: -14px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: #0b1825f2;
+    border-top: 2px solid #31495e;
+    box-shadow: 0 -8px 18px #020811b3;
+  }
+  .screen .actions.phone-dock { margin-top: 1rem; margin-bottom: 0; }
+  /* Menu: the cards scroll under a pinned Start button. */
+  .mission-menu .menu-actions { display: contents; }
+  .mission-menu .menu-actions .launch-button {
+    position: sticky;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 5;
+    box-shadow: 0 0 0 4px #080f1a, 0 8px 24px #000c;
+  }
+  /* Plan: one line of "after this sol" numbers above End sol. */
+  .plan-bar { display: grid; gap: 8px; }
+  .plan-bar .end-sol { width: 100%; margin: 0; }
+  .plan-bar [role="alert"] { margin: 0; }
+  .plan-bar__preview { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; font-size: 1rem; }
+  .plan-bar__value { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+  /* Beat screens: the three meters as one compact strip (icon, ?, number) above the choices. */
+  .beat-meters .resource-meters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 12px 0 6px; }
+  .beat-meters .resource-meter { padding: 6px 8px; }
+  .beat-meters .meter-label { flex-wrap: nowrap; gap: 6px; }
+  .beat-meters .meter-label > span:not(.whats-this),
+  .beat-meters .meter-track,
+  .beat-meters .resource-meter > small {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .beat-meters .meter-label .whats-this { margin-left: auto; }
+  .beat-meters .meter-value { margin: 2px 0 0; }
+  .beat-meters .meter-value strong { font-size: 1.25rem; }
+  .beat-meters .small-counters { padding: 6px 0; }
+}
+/* #75 phones: the hub picture sits in the middle of the free space, not stuck to its top. */
+@media (max-width: 720px) { .world-viewport { place-items: center; } }

@@ -29,7 +29,10 @@ const reduced = () =>
 /** Arcade-style typewriter: letters appear one by one with a soft blip. A click or key shows the whole line at once. */
 function useTyped(text: string, blip: string) {
   const [shown, setShown] = useState(() => (reduced() ? text.length : 0));
+  // Set by finish(): the typing timer must stop, or its next tick would put the shorter text back.
+  const skipped = useRef(false);
   useEffect(() => {
+    skipped.current = false;
     if (reduced()) {
       setShown(text.length);
       return;
@@ -37,6 +40,10 @@ function useTyped(text: string, blip: string) {
     setShown(0);
     const start = performance.now();
     const id = setInterval(() => {
+      if (skipped.current) {
+        clearInterval(id);
+        return;
+      }
       const n = lettersShown(text, performance.now() - start);
       setShown(n);
       if (n % 3 === 1 && text[n - 1]?.trim()) audio.playSfx(blip, 60);
@@ -47,7 +54,10 @@ function useTyped(text: string, blip: string) {
   return {
     shown: text.slice(0, shown),
     done: shown >= text.length,
-    finish: () => setShown(text.length),
+    finish: () => {
+      skipped.current = true;
+      setShown(text.length);
+    },
   };
 }
 
@@ -87,7 +97,7 @@ export function CrewTalk({
   return (
     <dialog
       ref={box}
-      className="npc-dialogue crew-talk"
+      className={`npc-dialogue crew-talk${step.kind === "drill" ? " crew-talk--wide" : ""}`}
       aria-labelledby="crew-talk-name"
       onCancel={(e) => {
         e.preventDefault();
