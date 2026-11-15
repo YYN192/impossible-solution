@@ -59,9 +59,12 @@ type Step =
 export function CrewTalk({
   speaker,
   onClose,
+  alarm = false,
 }: {
   speaker: Speaker;
   onClose: () => void;
+  /** A real storm emergency is on: every crew member only shouts the repair call (normal talk comes back after). */
+  alarm?: boolean;
 }) {
   const { t } = useTranslation();
   const drill = DRILL[speaker];
@@ -71,7 +74,9 @@ export function CrewTalk({
   const moon = place === "moon";
   const box = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState<Step>(
-    drill
+    alarm
+      ? { kind: "text", key: "talk.storm", then: "close" }
+      : drill
       ? { kind: "text", key: `talk.${speaker}.intro`, then: "menu" }
       : {
           kind: "text",

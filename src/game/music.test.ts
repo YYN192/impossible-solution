@@ -15,18 +15,18 @@ interface FakeSource {
   connect: (n: unknown) => unknown;
   end: () => void;
 }
-function fakeAudio(opts: { slow?: string } = {}) {
+function fakeAudio(opts: { slow?: string; state?: string } = {}) {
   const sources: FakeSource[] = [];
   const gains: { gain: { value: number } }[] = [];
   const ctxs: { suspend: ReturnType<typeof vi.fn>; resume: ReturnType<typeof vi.fn> }[] = [];
   let release: (() => void) | undefined;
   const node = () => ({ connect: (n: unknown) => n });
   class FakeContext {
-    state = "running";
+    state = opts.state ?? "running";
     currentTime = 0;
     destination = node();
     suspend = vi.fn(() => Promise.resolve());
-    resume = vi.fn(() => Promise.resolve());
+    resume = vi.fn(() => { this.state = "running"; return Promise.resolve(); });
     constructor() { ctxs.push(this); }
     createGain() {
       const gain = {
@@ -67,7 +67,7 @@ function fakeAudio(opts: { slow?: string } = {}) {
 const flush = () => new Promise((r) => setTimeout(r, 0));
 const MENU = "Mars_Main_Menu_8bit.wav", CONSOLE = "mars_console_preview.wav", MINI = "Mars_Minigames_8bit.wav", STORM = "STORM_8bit_electronic_preview.wav";
 
-async function setup(prefs: Record<string, unknown> = { music: 0.5 }, opts?: { slow?: string }) {
+async function setup(prefs: Record<string, unknown> = { music: 0.5 }, opts?: { slow?: string; state?: string }) {
   localStorage.setItem("sol:audio", JSON.stringify(prefs));
   const fake = fakeAudio(opts);
   const mod = await import("./audio");
@@ -263,6 +263,50 @@ describe("music coordinator", () => {
     expect(a.useAudio.getState().muted).toBe(false);
   });
 
+  it("page start: the menu song is tried at once; a blocked browser holds it until the first tap anywhere", async () => {
+    const a = await setup({ music: 0.5 }, { state: "suspended" }); // autoplay not allowed yet
+    a.audio.setMusic({ scene: "menu", storm: false });
+    a.audio.autostart();
+    await flush();
+    expect(a.ctxs).toHaveLength(1);
+    expect(a.music().map(a.name)).toEqual([MENU]); // loaded and queued on the waiting context
+    window.dispatchEvent(new Event("keydown")); // first key press anywhere on the page
+    await flush();
+    expect(a.ctxs[0].resume).toHaveBeenCalled();
+    expect(a.ctxs).toHaveLength(1); // the same context, never a second one
+    expect(a.live().map(a.name)).toEqual([MENU]);
+    expect(a.live()[0].loop).toBe(true);
+    window.dispatchEvent(new Event("pointerdown"));
+    await flush();
+    expect(a.music()).toHaveLength(1); // more taps never restart or stack it
+  });
+
+  it("page start where the browser allows audio: the menu song plays without a tap; muted stays silent", async () => {
+    const a = await setup();
+    a.audio.setMusic({ scene: "menu", storm: false });
+    a.audio.autostart();
+    await flush();
+    expect(a.live().map(a.name)).toEqual([MENU]);
+    vi.resetModules();
+    const b = await setup({ music: 0.5, muted: true });
+    b.audio.setMusic({ scene: "menu", storm: false });
+    b.audio.autostart();
+    await flush();
+    expect(b.music().filter((s) => s.started)).toHaveLength(0);
+  });
+
+  it("storm on/off/on/off quickly: one source at a time and no storm song after the all-clear", async () => {
+    const a = await setup({ music: 0.5 }, { slow: "STORM" });
+    a.audio.unlock();
+    a.audio.setMusic({ scene: "base", storm: false });
+    await flush();
+    for (const storm of [true, false, true, false]) { a.audio.setMusic({ scene: "base", storm }); await flush(); }
+    a.release(); // the storm file arrives late
+    await flush();
+    expect(a.live()).toHaveLength(1);
+    expect(a.live().map(a.name)).not.toContain(STORM);
+  });
+
   it("a hidden tab suspends all sound and resumes it when shown again", async () => {
     const a = await setup();
     a.audio.unlock();
@@ -273,6 +317,7 @@ describe("music coordinator", () => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
     document.dispatchEvent(new Event("visibilitychange"));
     expect(ctx.resume).toHaveBeenCalled();
+    expect(a.ctxs).toHaveLength(1);
   });
 
   it("a missing track is skipped quietly", async () => {

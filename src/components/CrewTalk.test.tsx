@@ -117,3 +117,22 @@ describe("CrewTalk practice on the Moon", () => {
     screen.getByRole("heading", { name: en.miniGame.moon.panels.title });
   });
 });
+
+describe("CrewTalk during a real storm", () => {
+  it("every crew member only shouts the repair call while the storm is on (EN and BG), normal talk otherwise", async () => {
+    const { default: i18next } = await import("../i18n");
+    const en = (await import("../i18n/en.json")).talk.storm;
+    const bgLine = (await import("../i18n/bg.json")).talk.storm;
+    expect(en).toBe("We must fix all the systems!!!");
+    expect(bgLine).toBe("Трябва да поправим всички системи!!!");
+    for (const speaker of ["commander", "engineer", "scientist", "drone"] as const) {
+      const { unmount } = render(<CrewTalk speaker={speaker} onClose={() => {}} alarm />);
+      expect(await screen.findAllByText(en)).not.toHaveLength(0);
+      unmount();
+      const calm = render(<CrewTalk speaker={speaker} onClose={() => {}} />);
+      expect(screen.queryAllByText(en)).toHaveLength(0);
+      calm.unmount();
+    }
+    expect(i18next.t("talk.storm", { lng: "bg" })).toBe(bgLine);
+  });
+});

@@ -14,6 +14,7 @@ import { MARS_BASE, movePlayer, nearestInteraction, tapTarget, walkToward, type 
 import { useGame } from "./state/game";
 import { firstSolStarted, useNav } from "./state/screen";
 import { readFlags } from "./data/flags";
+import { stormMusic } from "./game/musicDirector";
 import { greenhouseAction, hubStormFor, panelsAction, repaired } from "./data/hubStorm";
 import { GreenhouseTask, PanelsTask, StormAlarm } from "./components/HubStorm";
 import { CrewTalk } from "./components/CrewTalk";
@@ -186,7 +187,7 @@ export default function MarsHub({ onConsole, onMenu }: { onConsole: () => void; 
       <button className="primary" disabled={!near || activating} onClick={interact}>{near?.interaction === "console" ? t("world.openConsole") : t("world.interact")} <kbd data-pressed={pressed.has("e") ? "" : undefined}>E</kbd></button>
       <button className="quiet-button go-console" disabled={stormLeft > 0} onClick={onConsole}>{t("world.goConsole")} →</button>
     </div><p className="station-tip">{t("world.tip")}</p></div>
-    {dialogue?.dialogue && <CrewTalk speaker={dialogue.dialogue} onClose={closeDialogue} />}
+    {dialogue?.dialogue && <CrewTalk speaker={dialogue.dialogue} onClose={closeDialogue} alarm={stormMusic(setup, nav, game, readFlags().demo)} />}
     {stormLeft > 0 && alarm && <div className="dust-cover full" aria-hidden="true" />}
     {storm && alarm && <StormAlarm storm={storm} onClose={() => { setAlarm(false); canvas.current?.focus({ preventScroll: true }); }} />}
     {panel === "map" && <SiteMap current={campaign} onClose={closePanel} />}
