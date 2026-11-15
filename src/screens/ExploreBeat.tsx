@@ -1,9 +1,9 @@
-import { reducedMotion } from "../state/comfort";
 import { Icon } from "../components/Icon";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../game/assets";
 import { audio } from "../game/audio";
+import { mistake, shake } from "../game/feedback";
 import { EXPLORE, drivePower, driveAction, isHome, move, ranOutOfPower, startDrive, type ExploreMap } from "../sim/explore";
 import type { Action } from "../sim/types";
 import { gameKey, usePressedKeys } from "../game/pressedKeys";
@@ -24,7 +24,7 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
   const { t } = useTranslation();
   const [drive, setDrive] = useState(() => startDrive(map));
   const [facing, setFacing] = useState<Dir>("right");
-  const [shake, setShake] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
   const home = isHome(map, drive);
   const pressed = usePressedKeys(HINT_KEYS);
 
@@ -32,17 +32,17 @@ export function ExploreBeat({ map, onDone }: { map: ExploreMap; onDone: (action:
     const [dx, dy] = DIRS[dir];
     setFacing(dir);
     const next = move(map, drive, dx, dy);
-    if (next === drive) return audio.playSfx("job-remove");
+    if (next === drive) return mistake("small", box.current); // rock, edge or no power
     audio.playSfx(next.collected.length > drive.collected.length ? "assign" : "select");
     if (ranOutOfPower(map, drive, next)) {
       audio.playSfx("rover-power-down");
-      if (!reducedMotion()) { setShake(true); setTimeout(() => setShake(false), 400); }
+      shake(box.current);
     }
     setDrive(next);
   }
 
   return (
-    <div className={shake ? "explore shake" : "explore"}>
+    <div ref={box} className="explore">
       <div
         className="explore-map"
         role="application"
