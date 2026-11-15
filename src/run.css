@@ -5,7 +5,10 @@
 .mission-card small, .mission-card .mission-meta, .mission-card .mission-tags { font-family: var(--font-body); font-size: 0.875rem; line-height: 1.35; }
 .mission-card .mission-tags { color: #9fe0d8; }
 .mission-card[aria-pressed="true"] { border-color: #ffd166; background: #26384d; }
+.mission-card[aria-pressed="true"] .mission-tags { color: inherit; }
 .mission-card:disabled { opacity: 0.7; }
+/* Long campaigns: the progress strip shows numbers only, so 6 or 7 days fit a phone. */
+.sol-navigation.many > span { min-width: 0; text-align: center; }
 .mission-extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.5rem; }
 .mission-extras button[aria-pressed="true"] { border-color: #ffd166; }
 

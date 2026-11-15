@@ -20,7 +20,7 @@ export default function ConsolePage({ children, onExit }: { children: ReactNode;
   useEffect(() => { audio.playSfx("console-boot"); audio.playMusic("mission-console-ambience"); return audio.stopMusic; }, []);
   return <main className="mission-console">
     <header className="console-top"><button onClick={() => { audio.playSfx("console-close"); onExit(); }}>← {t("world.return")}</button><div><span className="eyebrow">{t("world.name")}</span><b>{t("world.console")}</b></div></header>
-    <div className="sol-navigation" aria-label={t("play.progress")}>{Array.from({ length: sols }, (_, i) => i + 1).map((day) => <span key={day} aria-current={day === sol ? "step" : undefined} className={day <= sol ? "reached" : ""}><i />{tRun("final.sol", { sol: day }, moon)}</span>)}</div>
+    <div className={sols > 3 ? "sol-navigation many" : "sol-navigation"} aria-label={t("play.progress")}>{Array.from({ length: sols }, (_, i) => i + 1).map((day) => <span key={day} aria-current={day === sol ? "step" : undefined} className={day <= sol ? "reached" : ""}><i />{sols > 3 ? <><span className="visually-hidden">{tRun("final.sol", { sol: day }, moon)}</span><span aria-hidden="true">{day}</span></> : tRun("final.sol", { sol: day }, moon)}</span>)}</div>
     <div className="console-content">{showInbox && <aside className="earth-inbox" aria-label={t("play.earthInbox")}>
       <img src={asset("characters/robots/mission-control-hologram-portrait")} alt="" /><div><strong>{t("play.earthInbox")}</strong>
         <EarthAnswer answer={answer} /></div></aside>}{children}</div>

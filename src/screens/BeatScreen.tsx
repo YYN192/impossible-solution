@@ -32,7 +32,7 @@ function effects(action: Action, t: (k: string, o?: object) => string): string[]
     action.ask && `📡 ${t("fx.ask")}`,
     r.solar !== undefined && `☀️ ${t("rule.solar", { n: r.solar })}`,
     r.heater !== undefined && `🔥 ${t("rule.heater", { n: r.heater })}`,
-    r.dustFactor !== undefined && `🌫️ ${t("rule.dustFactor", { n: pct(r.dustFactor) })}`,
+    r.dustFactor !== undefined && `🧽 ${t("rule.dustFactor", { n: pct(r.dustFactor) })}`,
     r.airMachinePower !== undefined && `🫧 ${t("rule.airMachinePower", { n: r.airMachinePower })}`,
     r.foodGain !== undefined && `🥬 ${t("rule.foodGain", { n: r.foodGain })}`,
     r.shelterFactor !== undefined && `🛡️ ${t("rule.shelterFactor", { n: pct(r.shelterFactor) })}`,
