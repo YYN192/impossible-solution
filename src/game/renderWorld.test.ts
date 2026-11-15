@@ -40,14 +40,15 @@ describe("sliding airlock", () => {
 });
 
 describe("console glow (#55)", () => {
-  it("pulses in whole steps, 0 to 3 rings and back, every 1.8 s", () => {
+  it("pulses in whole steps, 1 to 3 rings and back, every 1.8 s", () => {
     const rings = Array.from({ length: 12 }, (_, i) => consoleGlow(i * 300, false, false));
-    expect(rings).toEqual([0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1]);
+    expect(rings).toEqual([1, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 1]);
   });
-  it("stays still once the mission is running, and with reduced motion", () => {
+  it("keeps glowing during the mission, and stays steady with reduced motion", () => {
     for (let t = 0; t < 1800; t += 100) {
-      expect(consoleGlow(t, false, true)).toBe(0);
-      expect(consoleGlow(t, true, false)).toBe(0);
+      expect(consoleGlow(t, false, true)).toBeGreaterThanOrEqual(1);
+      expect(consoleGlow(t, true, false)).toBe(2);
+      expect(consoleGlow(t, true, true)).toBe(2);
     }
   });
 });
